@@ -1,5 +1,4 @@
 ---
-# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "Release"
 
 on:
@@ -9,7 +8,6 @@ on:
 
 jobs:
   release:
-    if: ${{ github.repository == 'onedr0p/cluster-template' }}
     name: Release
     runs-on: ubuntu-latest
     steps:

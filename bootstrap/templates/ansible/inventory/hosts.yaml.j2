@@ -1,29 +1,28 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
 ---
 kubernetes:
   children:
-    controllers:
+    master:
       hosts:
-        #% for item in bootstrap_node_inventory %#
-        #% if item.controller %#
-        "#{ item.name }#":
-          ansible_user: "#{ item.ssh_user }#"
-          ansible_host: "#{ item.address }#"
-          #% if item.ssh_key %#
-          ansible_ssh_private_key_file: "#{ item.ssh_key }#"
-          #% endif %#
-        #% endif %#
-        #% endfor %#
-    #% if bootstrap_node_inventory | selectattr('controller', 'equalto', False) | list | length %#
-    workers:
+      {% for item in bootstrap_nodes.master %}
+        {{ item.name }}:
+          ansible_user: {{ item.username }}
+      {% if item.external_address is defined %}
+          ansible_host: {{ item.external_address }}
+      {% else %}
+          ansible_host: {{ item.address }}
+      {% endif %}
+      {% endfor %}
+    {% if bootstrap_nodes.worker | default([]) | length > 0 %}
+    worker:
       hosts:
-        #% for item in bootstrap_node_inventory %#
-        #% if not item.controller %#
-        "#{ item.name }#":
-          ansible_user: "#{ item.ssh_user }#"
-          ansible_host: "#{ item.address }#"
-          #% if item.ssh_key %#
-          ansible_ssh_private_key_file: "#{ item.ssh_key }#"
-          #% endif %#
-        #% endif %#
-        #% endfor %#
-    #% endif %#
+      {% for item in bootstrap_nodes.worker %}
+        {{ item.name }}:
+          ansible_user: {{ item.username }}
+      {% if item.external_address is defined %}
+          ansible_host: {{ item.external_address }}
+      {% else %}
+          ansible_host: {{ item.address }}
+      {% endif %}
+      {% endfor %}
+    {% endif %}

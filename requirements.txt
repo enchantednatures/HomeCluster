@@ -1,6 +1,8 @@
-bcrypt==4.1.3
-cloudflare==2.20.0
-email-validator==2.1.1
-makejinja==2.6.0
-netaddr==1.2.1
+ansible==9.1.0
+ansible-lint==6.22.1
+# https://github.com/pyca/bcrypt/issues/684
+bcrypt==4.1.2
+jmespath==1.0.1
+netaddr==0.9.0
+openshift==0.13.2
 passlib==1.7.4

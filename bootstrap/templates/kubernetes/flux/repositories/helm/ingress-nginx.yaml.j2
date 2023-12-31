@@ -1,6 +1,5 @@
-#% if bootstrap_cloudflare.enabled %#
 ---
-apiVersion: source.toolkit.fluxcd.io/v1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
   name: ingress-nginx
@@ -8,4 +7,3 @@ metadata:
 spec:
   interval: 1h
   url: https://kubernetes.github.io/ingress-nginx
-#% endif %#

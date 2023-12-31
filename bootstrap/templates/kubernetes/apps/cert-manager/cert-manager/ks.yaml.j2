@@ -18,7 +18,6 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
-#% if bootstrap_cloudflare.enabled %#
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
@@ -41,4 +40,3 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
-#% endif %#
