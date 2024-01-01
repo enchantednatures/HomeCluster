@@ -1,0 +1,19 @@
+---
+kubernetes:
+  children:
+    master:
+      hosts:
+        control-plane-01:
+          ansible_user: root
+          ansible_host: 192.168.1.201
+    worker:
+      hosts:
+        lg-01:
+          ansible_user: root
+          ansible_host: 192.168.1.202
+        lg-02:
+          ansible_user: root
+          ansible_host: 192.168.1.203
+        lg-03:
+          ansible_user: root
+          ansible_host: 192.168.1.204

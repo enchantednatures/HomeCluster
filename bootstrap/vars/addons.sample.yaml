@@ -9,7 +9,7 @@ hajimari:
 
 # https://github.com/grafana/grafana
 grafana:
-  enabled: false
+  enabled: true
   # password: # password for `admin` user
 
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
