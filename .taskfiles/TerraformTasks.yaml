@@ -2,24 +2,6 @@
 version: "3"
 
 tasks:
-  cloudflare:init:
-    desc: Initialize Cloudflare terraform
-    dir: provision/terraform/cloudflare
-    cmds:
-      - "terraform init"
-
-  cloudflare:plan:
-    desc: Plan Cloudflare configuration
-    dir: provision/terraform/cloudflare
-    cmds:
-      - "terraform plan"
-
-  cloudflare:apply:
-    desc: Apply Cloudflare configuration
-    dir: provision/terraform/cloudflare
-    cmds:
-      - "terraform apply"
-
   proxmox:refresh:
     desc: Refresh terraform
     dir: provision/terraform/proxmox
