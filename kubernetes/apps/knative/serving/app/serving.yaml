@@ -5,6 +5,7 @@ metadata:
   namespace: knative
 spec:
   {}
+  # TODO: when istio is working: use istio here
   # ingress:
   #   kourier:
   #     enabled: true

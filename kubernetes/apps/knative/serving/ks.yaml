@@ -8,7 +8,6 @@ spec:
   targetNamespace: knative
   dependsOn:
     - name: knative-operator
-      # namespace: knative
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
