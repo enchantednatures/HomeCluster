@@ -9,7 +9,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/knative/opearator/app
+  path: ./kubernetes/apps/knative/operator/app
   prune: false # never should be deleted
   sourceRef:
     kind: GitRepository
