@@ -5,6 +5,5 @@ metadata:
   name: velero
   namespace: flux-system
 spec:
-  type: oci
   interval: 5m
   url: https://vmware-tanzu.github.io/helm-charts
