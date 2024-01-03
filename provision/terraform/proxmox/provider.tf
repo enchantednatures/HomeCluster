@@ -42,7 +42,7 @@ provider "proxmox" {
 }
 
 provider "tailscale" {
-  api_key = "tskey-api-kT5thp5CNTRL-YZmmhEPxHrHqST1RLCc6sH2vvHG7a48pD"
+  api_key = var.tailscale_api_key
   tailnet = "enchantednatures.github"
 }
 

@@ -19,6 +19,12 @@ variable "target_node" {
   description = "Proxmox node"
   type        = string
 }
+
+variable "tailscale_api_key" {
+  description = "Tailscale API key"
+  type        = string
+}
+
 variable "onboot" {
   description = "Auto start VM when node is start"
   type        = bool
