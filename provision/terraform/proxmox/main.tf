@@ -25,6 +25,14 @@ locals {
   ])])
 }
 
+resource "tailscale_tailnet_key" "machine_key" {
+  reusable      = true
+  ephemeral     = true
+  preauthorized = true
+  expiry        = 3600
+  description   = "Auth Key"
+}
+
 data "proxmox_virtual_environment_vms" "template" {
   node_name = var.target_node
   tags      = ["template", var.template_tag]
@@ -56,7 +64,10 @@ resource "proxmox_virtual_environment_file" "cloud_user_config" {
 
 
   source_raw {
-    data      = templatefile("./cloud-inits/user.tftpl", { hostname = local.nodes[count.index].name }) # file_name = "${var.vm_hostname}.${var.domain}-ci-user.yml"
+    data      = templatefile("./cloud-inits/user.tftpl", {
+      hostname = local.nodes[count.index].name
+      tailscale_machine_key = tailscale_tailnet_key.machine_key.key
+    }) # file_name = "${var.vm_hostname}.${var.domain}-ci-user.yml"
     file_name = "user-${count.index}.yaml"
   }
 }
