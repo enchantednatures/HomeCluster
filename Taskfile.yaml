@@ -2,6 +2,8 @@
 version: "3"
 
 vars:
+  PROJECT_DIR:
+    sh: "git rev-parse --show-toplevel"
   PYTHON_BIN: python3
   BOOTSTRAP_DIR: "{{.ROOT_DIR}}/bootstrap"
   ANSIBLE_DIR: "{{.ROOT_DIR}}/ansible"
