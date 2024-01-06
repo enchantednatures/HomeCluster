@@ -1,16 +1,8 @@
-<<<<<<< HEAD
 # Deploy a Kubernetes cluster backed by Flux
 
 Welcome to my highly opinionated template for deploying a single Kubernetes ([k3s](https://k3s.io)) cluster with [Ansible](https://www.ansible.com) and using [Flux](https://toolkit.fluxcd.io) to manage its state.
 
 ## 👋 Introduction
-=======
-# Template for deploying k3s and Flux backed by SOPS secrets
-
-Template for creating a [k3s](https://k3s.io/) cluster with [k3sup](https://github.com/alexellis/k3sup).
-
-Using this template you will be able to bootstrap the nodes you want with the following components:
->>>>>>> 7ffca5b (fix: update readme)
 
 The goal of this project is to make it easy for people interested in learning Kubernetes to deploy a cluster at home and become familiar with the GitOps tool Flux.
 
@@ -18,11 +10,7 @@ This template implements Flux in a way that promotes legibility and ease of use 
 
 If you are new to Flux and GitOps in general it is important to understand that **all changes** you want made to your Kubernetes cluster should be **commited to your Git repository** which Flux will pick up and attempt to apply. You're still free to make _dirty_ edits using `kubectl` but keep in mind that Flux might revert them once its reconcilation loop happens.
 
-<<<<<<< HEAD
 ## ✨ Features
-=======
-Bare metal or VMs with any modern operating system like Ubuntu, Debian or CentOS.
->>>>>>> 7ffca5b (fix: update readme)
 
 - Automated, reproducible, customizable setup through Ansible templates and playbooks
 - Opinionated implementation of Flux with [strong community support](https://github.com/onedr0p/flux-cluster-template/tree/main#-help)
@@ -165,18 +153,10 @@ Once you have installed Debian on your nodes, there are six stages to getting a 
 
     📍 _After installing `direnv` be sure to **[hook it into your shell](https://direnv.net/docs/hook.html)** and after that is done run `direnv allow` while in your repos' directory._
 
-<<<<<<< HEAD
     ```sh
     # Brew
     brew install direnv
     ```
-=======
-## What's next?
-
-The world is your oyster, try installing a ingress controller!
-
-## :handshake:&nbsp; Thanks
->>>>>>> 7ffca5b (fix: update readme)
 
 3. Setup a Python virual env and install Ansible by running the following task command.
 
