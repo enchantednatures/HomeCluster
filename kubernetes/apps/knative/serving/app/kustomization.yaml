@@ -4,3 +4,4 @@ kind: Kustomization
 namespace: knative
 resources:
   - ./serving.yaml
+  - ./cluster-role.yaml
