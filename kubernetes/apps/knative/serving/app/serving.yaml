@@ -4,10 +4,7 @@ metadata:
   name: knative-serving
   namespace: knative
 spec:
-  # TODO: when istio is working: use istio here
   ingress:
-    kourier:
+    istio:
       enabled: true
-  # config:
-  #   istio:
-  #     local-gateway.knative-serving.knative-local-gateway: "knative-local-gateway.istio-system.svc.cluster.local"
+  config: { }
