@@ -30,7 +30,7 @@ spec:
       username: admin
     ingress:
       enabled: true
-      className: internal
+      className: external
       annotations:
         hajimari.io/icon: sawtooth-wave
       hosts:
