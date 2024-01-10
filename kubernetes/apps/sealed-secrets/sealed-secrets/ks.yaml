@@ -2,14 +2,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app velero
+  name: &app sealed-secrets
   namespace: flux-system
 spec:
-  targetNamespace: velero
+  targetNamespace: kube-system
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/velero/velero/app
+  path: ./kubernetes/apps/sealed-secrets/sealed-secrets/app
   prune: true
   sourceRef:
     kind: GitRepository
