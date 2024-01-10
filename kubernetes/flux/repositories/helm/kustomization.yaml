@@ -21,8 +21,8 @@ resources:
   - ./nfs-subdir-external-provisioner.yaml
   - ./piraeus.yaml
   - ./prometheus-community.yaml
+  - ./sealed-secrets.yaml
   - ./stakater.yaml
   - ./velero.yaml
-  - ./weave-gitops.yaml
   - ./vmware-tanzu.yaml
-  - ./sealed-secrets.yaml
+  - ./weave-gitops.yaml
