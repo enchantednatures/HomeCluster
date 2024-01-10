@@ -1,17 +1,4 @@
-# Copyright 2022 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
+---
 apiVersion: v1
 kind: Secret
 metadata:
@@ -21,23 +8,7 @@ metadata:
     app.kubernetes.io/component: operator-webhook
     app.kubernetes.io/version: "1.11.9"
     app.kubernetes.io/name: knative-operator
-# The data is populated at install time.
-
 ---
-# Copyright 2022 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -63,7 +34,6 @@ spec:
         app.kubernetes.io/version: "1.11.9"
         app.kubernetes.io/name: knative-operator
     spec:
-      # To avoid node becoming SPOF, spread our replicas to different nodes.
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -76,8 +46,6 @@ spec:
       serviceAccountName: operator-webhook
       containers:
         - name: operator-webhook
-          # This is the Go import path for the binary that is containerized
-          # and substituted here.
           image: gcr.io/knative-releases/knative.dev/operator/cmd/webhook@sha256:a04cf04b7fdd40bc656c3a9f479bc6e0cf652b76cfba75a0608d09436ff30106
           resources:
             requests:
@@ -141,24 +109,9 @@ spec:
                   value: "webhook"
             failureThreshold: 6
             initialDelaySeconds: 120
-      # Our webhook should gracefully terminate by lame ducking first, set this to a sufficiently
-      # high value that we respect whatever value it has configured for the lame duck grace period.
       terminationGracePeriodSeconds: 300
 
 ---
-# Copyright 2022 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: v1
 kind: Service
@@ -172,7 +125,6 @@ metadata:
   namespace: default
 spec:
   ports:
-    # Define metrics and profiling for them to be accessible within service meshes.
     - name: http-metrics
       port: 9090
       targetPort: 9090
@@ -186,19 +138,6 @@ spec:
     role: operator-webhook
 
 ---
-# Copyright 2021 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -220,10 +159,8 @@ spec:
           description: Schema for the knativeeventings API
           properties:
             apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
               type: string
             kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
               type: string
             metadata:
               type: object
@@ -284,7 +221,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -300,7 +236,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -340,7 +275,6 @@ spec:
                                             description: The key to select.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the ConfigMap or its key must be defined
@@ -386,7 +320,6 @@ spec:
                                             description: The key of the secret to select from.  Must be a valid secret key.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the Secret or its key must be defined
@@ -425,7 +358,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -441,7 +373,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -972,7 +903,6 @@ spec:
                                             description: The key to select.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the ConfigMap or its key must be defined
@@ -1018,7 +948,6 @@ spec:
                                             description: The key of the secret to select from.  Must be a valid secret key.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the Secret or its key must be defined
@@ -1048,7 +977,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -1064,7 +992,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -1093,7 +1020,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -1109,7 +1035,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -1747,19 +1672,6 @@ spec:
           path: /resource-conversion
 
 ---
-# Copyright 2021 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -1781,10 +1693,8 @@ spec:
           description: Schema for the knativeservings API
           properties:
             apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
               type: string
             kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
               type: string
             metadata:
               type: object
@@ -1856,7 +1766,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -1872,7 +1781,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -1912,7 +1820,6 @@ spec:
                                             description: The key to select.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the ConfigMap or its key must be defined
@@ -1958,7 +1865,6 @@ spec:
                                             description: The key of the secret to select from.  Must be a valid secret key.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the Secret or its key must be defined
@@ -1997,7 +1903,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -2013,7 +1918,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -2544,7 +2448,6 @@ spec:
                                             description: The key to select.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the ConfigMap or its key must be defined
@@ -2590,7 +2493,6 @@ spec:
                                             description: The key of the secret to select from.  Must be a valid secret key.
                                             type: string
                                           name:
-                                            description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names TODO: Add other useful fields. apiVersion, kind, uid?'
                                             type: string
                                           optional:
                                             description: Specify whether the Secret or its key must be defined
@@ -2620,7 +2522,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -2636,7 +2537,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -2665,7 +2565,6 @@ spec:
                               format: int32
                               type: integer
                             initialDelaySeconds:
-                              description: 'Number of seconds after the container has started before liveness probes are initiated. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                             periodSeconds:
@@ -2681,7 +2580,6 @@ spec:
                               format: int64
                               type: integer
                             timeoutSeconds:
-                              description: 'Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes'
                               format: int32
                               type: integer
                           required:
@@ -3389,19 +3287,6 @@ spec:
           path: /resource-conversion
 
 ---
-# Copyright 2020 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -3412,12 +3297,8 @@ metadata:
     app.kubernetes.io/name: knative-operator
 aggregationRule:
   clusterRoleSelectors:
-    # This (along with escalate below) allows the Operator to pick up any
-    # roles that are provided to the admin of the cluster by knative serving
-    # automatically.
     - matchExpressions:
         - {key: serving.knative.dev/release, operator: Exists}
-rules: [] # Rules are automatically filled in by the controller manager.
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -3428,12 +3309,8 @@ metadata:
     app.kubernetes.io/name: knative-operator
 aggregationRule:
   clusterRoleSelectors:
-    # This (along with escalate below) allows the Operator to pick up any
-    # roles that are provided to the admin of the cluster by knative serving
-    # automatically.
     - matchExpressions:
         - {key: app.kubernetes.io/name, operator: In, values: ["knative-serving"]}
-rules: [] # Rules are automatically filled in by the controller manager.
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -3444,12 +3321,8 @@ metadata:
     app.kubernetes.io/name: knative-operator
 aggregationRule:
   clusterRoleSelectors:
-    # This (along with escalate below) allows the Operator to pick up any
-    # roles that are provided to the admin of the cluster by knative eventing
-    # automatically.
     - matchExpressions:
         - {key: eventing.knative.dev/release, operator: Exists}
-rules: [] # Rules are automatically filled in by the controller manager.
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -3460,27 +3333,10 @@ metadata:
     app.kubernetes.io/name: knative-operator
 aggregationRule:
   clusterRoleSelectors:
-    # This (along with escalate below) allows the Operator to pick up any
-    # roles that are provided to the admin of the cluster by knative eventing
-    # automatically.
     - matchExpressions:
         - {key: app.kubernetes.io/name, operator: In, values: ["knative-eventing"]}
-rules: [] # Rules are automatically filled in by the controller manager.
 
 ---
-# Copyright 2020 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -3496,9 +3352,6 @@ rules:
       - '*'
     verbs:
       - '*'
-  # Bootstrapping permissions.
-  # Roles that are explicitly bound buch which are specified by this Operator
-  # MUST be specified here with 'get' and 'bind'.
   - apiGroups:
       - rbac.authorization.k8s.io
     resources:
@@ -3525,9 +3378,6 @@ rules:
     verbs:
       - create
       - delete
-      # Escalate is necessary in order to create a role using cluster role aggregation,
-      # and to allow the Operator to bootstrap itself into the necessary set of
-      # permissions, even as those continue to evolve upstream.
       - escalate
       - get
       - list
@@ -3543,8 +3393,6 @@ rules:
       - list
       - get
       - update
-  # Permissions required for Knative controller
-  # infra.
   - apiGroups:
       - apiregistration.k8s.io
     resources:
@@ -3641,8 +3489,6 @@ rules:
       - customresourcedefinitions
     verbs:
       - '*'
-  # Old resources that need cleaning up that are not in the knative-serving
-  # namespace.
   - apiGroups:
       - ""
     resources:
@@ -3669,7 +3515,6 @@ rules:
       - knative-serving-operator
     verbs:
       - delete
-  # for contour TLS
   - apiGroups:
       - projectcontour.io
     resources:
@@ -3684,7 +3529,6 @@ rules:
       - delete
       - deletecollection
       - patch
-  # for security-guard
   - apiGroups:
       - guard.security.knative.dev
     resources:
@@ -3736,9 +3580,6 @@ rules:
       - '*'
     verbs:
       - '*'
-  # Bootstrapping permissions.
-  # Roles that are explicitly bound buch which are specified by this Operator
-  # MUST be specified here with 'get' and 'bind'.
   - apiGroups:
       - rbac.authorization.k8s.io
     resources:
@@ -3747,9 +3588,6 @@ rules:
     verbs:
       - create
       - delete
-      # Escalate is necessary in order to create a role using cluster role aggregation,
-      # and to allow the Operator to bootstrap itself into the necessary set of
-      # permissions, even as those continue to evolve upstream.
       - escalate
       - get
       - list
@@ -3765,8 +3603,6 @@ rules:
       - list
       - get
       - update
-  # Permissions required for Knative controller
-  # infra.
   - apiGroups:
       - apiregistration.k8s.io
     resources:
@@ -3870,8 +3706,6 @@ rules:
       - get
       - list
       - watch
-      # Old resources that need cleaning up that are not in the knative-eventing
-      # namespace.
   - apiGroups:
       - ""
     resources:
@@ -3880,7 +3714,6 @@ rules:
       - knative-eventing-operator
     verbs:
       - delete
-  # for RabbitMQ messaging topology objects
   - apiGroups:
       - rabbitmq.com
     resources:
@@ -3911,7 +3744,6 @@ rules:
       - exchanges/status
     verbs:
       - get
-  # for Kafka eventing source
   - apiGroups:
       - keda.sh
     resources:
@@ -3927,7 +3759,6 @@ rules:
       - update
       - create
       - delete
-  # Internal APIs
   - apiGroups:
       - "internal.kafka.eventing.knative.dev"
     resources:
@@ -4083,7 +3914,6 @@ rules:
       - deployments
     verbs:
       - deletecollection
-  # Eventing TLS
   - apiGroups:
       - "cert-manager.io"
     resources:
@@ -4098,19 +3928,6 @@ rules:
       - watch
 
 ---
-# Copyright 2020 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: v1
 kind: ServiceAccount
@@ -4122,21 +3939,7 @@ metadata:
     app.kubernetes.io/name: knative-operator
 
 ---
-# Copyright 2020 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-# TODO: Consider restriction of non-aggregated role to knativeservings namespaces.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -4153,7 +3956,6 @@ subjects:
     name: knative-operator
     namespace: default
 ---
-# TODO: Consider restriction of non-aggregated role to knativeeventing namespaces.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -4171,19 +3973,6 @@ subjects:
     namespace: default
 
 ---
-# Copyright 2022 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -4194,7 +3983,6 @@ metadata:
     app.kubernetes.io/version: "1.11.9"
     app.kubernetes.io/name: knative-operator
 rules:
-  # For manipulating certs into secrets.
   - apiGroups:
       - ""
     resources:
@@ -4215,7 +4003,6 @@ metadata:
     app.kubernetes.io/version: "1.11.9"
     app.kubernetes.io/name: knative-operator
 rules:
-  # For watching logging configuration and getting certs.
   - apiGroups:
       - ""
     resources:
@@ -4224,7 +4011,6 @@ rules:
       - "get"
       - "list"
       - "watch"
-  # For manipulating certs into secrets.
   - apiGroups:
       - ""
     resources:
@@ -4236,14 +4022,12 @@ rules:
       - "list"
       - "watch"
       - "patch"
-  # finalizers are needed for the owner reference of the webhook
   - apiGroups:
       - ""
     resources:
       - "namespaces/finalizers"
     verbs:
       - "update"
-  # For getting our Deployment so we can decorate with ownerref.
   - apiGroups:
       - "apps"
     resources:
@@ -4256,7 +4040,6 @@ rules:
       - "deployments/finalizers"
     verbs:
       - update
-  # For actually registering our webhook.
   - apiGroups:
       - "admissionregistration.k8s.io"
     resources:
@@ -4270,32 +4053,16 @@ rules:
       - "delete"
       - "patch"
       - "watch"
-  # For leader election
   - apiGroups:
       - "coordination.k8s.io"
     resources:
       - "leases"
     verbs: *everything
-  # Necessary for conversion webhook. These are copied from the serving
-  # TODO: Do we really need all these permissions?
   - apiGroups: ["apiextensions.k8s.io"]
     resources: ["customresourcedefinitions"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
 
 ---
-# Copyright 2020 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: v1
 kind: ServiceAccount
@@ -4307,19 +4074,6 @@ metadata:
     app.kubernetes.io/name: knative-operator
 
 ---
-# Copyright 2022 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -4355,19 +4109,6 @@ subjects:
     namespace: default
 
 ---
-# Copyright 2020 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -4432,8 +4173,7 @@ subjects:
   - kind: ServiceAccount
     name: knative-operator
     namespace: default
-
-
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -4444,7 +4184,6 @@ metadata:
     app.kubernetes.io/name: knative-operator
 data: {}
 ---
-
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -4454,22 +4193,7 @@ metadata:
     app.kubernetes.io/version: "1.11.9"
     app.kubernetes.io/name: knative-operator
 data: {}
-
 ---
-# Copyright 2020 The Knative Authors
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     https://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -4517,5 +4241,4 @@ spec:
           ports:
             - name: metrics
               containerPort: 9090
-
 ---
