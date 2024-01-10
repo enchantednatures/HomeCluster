@@ -24,3 +24,5 @@ resources:
   - ./stakater.yaml
   - ./velero.yaml
   - ./weave-gitops.yaml
+  - ./vmware-tanzu.yaml
+  - ./sealed-secrets.yaml
