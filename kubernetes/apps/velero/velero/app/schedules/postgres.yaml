@@ -1,0 +1,18 @@
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: postgres-backup
+  namespace: velero
+spec:
+  schedule: "@every 6h"
+  template:
+    defaultVolumesToRestic: true
+    hooks: {}
+    includedNamespaces:
+      - postgres
+    metadata: {}
+    storageLocation: minio
+    ttl: 12h0m0s
+  useOwnerReferencesInBackup: false
+status: {}
