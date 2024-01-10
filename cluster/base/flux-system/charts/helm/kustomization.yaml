@@ -5,8 +5,3 @@ resources:
   - ingress-nginx-charts.yaml
   - jetstack-charts.yaml
   - k8s-at-home-charts.yaml
-  - external-dns-charts.yaml
-  - coredns-charts.yaml
-  - k8s-gateway-charts.yaml
-  - vmware-tanzu-charts.yaml
-  - sealed-secrets-charts.yaml
