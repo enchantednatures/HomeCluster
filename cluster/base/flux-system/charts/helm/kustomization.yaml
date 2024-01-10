@@ -9,3 +9,4 @@ resources:
   - coredns-charts.yaml
   - k8s-gateway-charts.yaml
   - vmware-tanzu-charts.yaml
+  - sealed-secrets-charts.yaml
