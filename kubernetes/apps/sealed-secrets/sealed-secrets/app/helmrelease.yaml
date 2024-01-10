@@ -1,0 +1,88 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: sealed-secrets
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: sealed-secrets
+      version: 5.1.7
+      sourceRef:
+        kind: HelmRepository
+        name: sealed-secrets-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    namespace: kube-system
+    # image:
+    #   # registry: quay.io
+    #   registry: docker.io
+    #   repository: bitnami/sealed-secrets-controller
+    #   tag: v0.24.5
+    #   pullPolicy: IfNotPresent
+    createController: true
+    secretName: "sealed-secrets-key"
+    updateStatus: true
+    resources:
+      limits: {}
+      requests: {}
+    service:
+      type: ClusterIP
+      port: 8080
+      nodePort: ""
+      annotations: {}
+    ingress:
+      enabled: true
+      pathType: ImplementationSpecific
+      apiVersion: networking.k8s.io/v1
+      ingressClassName: traefik
+      hostname: sealed-secrets.enchantednatures.com
+      path: /v1/cert.pem
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+
+      tls: true
+      selfSigned: false
+      extraHosts: []
+      extraPaths: []
+      extraTls: []
+      secrets: []
+    networkPolicy:
+      enabled: false
+
+
+    serviceAccount:
+      create: true
+      labels: {}
+      name: ""
+    rbac:
+      create: true
+      labels: {}
+      pspEnabled: false
+
+
+    metrics:
+      serviceMonitor:
+        enabled: false
+        namespace: monitoring
+        labels: {}
+        annotations: {}
+        interval: ""
+        scrapeTimeout: ""
+        metricRelabelings: []
+        relabelings: []
+      dashboards:
+        create: true
+        labels: {}
+        namespace: monitoring
