@@ -8,3 +8,4 @@ resources:
   - external-dns-charts.yaml
   - coredns-charts.yaml
   - k8s-gateway-charts.yaml
+  - vmware-tanzu-charts.yaml
