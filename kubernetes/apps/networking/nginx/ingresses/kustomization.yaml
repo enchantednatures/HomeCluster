@@ -1,0 +1,10 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./minio-ui.ingress.yaml
+  - ./minio-ui.service.yaml
+  - ./minio-service.ingress.yaml
+  - ./minio-service.service.yaml
+  - ./pve.ingress.yaml
+  - ./pve.service.yaml
