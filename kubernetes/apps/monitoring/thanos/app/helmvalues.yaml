@@ -1,0 +1,106 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: thanos-values
+data:
+  values.yaml: |
+    image:
+      repository: bitnami/thanos
+    query:
+      enabled: true
+      replicaLabels:
+        - replica
+      dnsDiscovery:
+        sidecarsService: prometheus-thanos-discovery
+        sidecarsNamespace: monitoring
+      ingress:
+        enabled: true
+        hostname: "thanos.enchantednatures.com"
+        ingressClassName: "traefik"
+        tls: true
+    objstoreConfig: |-
+      type: s3
+      config:
+        bucket: thanos
+        endpoint: 192.168.1.241:9768
+        access_key: thanos
+        secret_key: 38f1caed5c4012f80b82ec6f2c86fe46
+        insecure: true
+    queryFrontend:
+      enabled: false
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+    bucketweb:
+      enabled: true
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+    compactor:
+      enabled: true
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+      persistence:
+        enabled: false
+    storegateway:
+      enabled: true
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+      persistence:
+        enabled: true
+        size: 5Gi
+    ruler:
+      enabled: false
+    recieve:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+    recieveDistributor:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+    minio:
+      enabled: false
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
