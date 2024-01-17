@@ -162,6 +162,7 @@ spec:
       annotations:
         hajimari.io/icon: simple-icons:grafana
         external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        external-dns.alpha.kubernetes.io/is-public: true
       hosts:
         - &host "grafana.${SECRET_DOMAIN}"
       tls:
