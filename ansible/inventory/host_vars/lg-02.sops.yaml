@@ -1,4 +1,4 @@
-ansible_become_pass: ENC[AES256_GCM,data:aF3+apqW/8Uu/Sr+,iv:k37dyDpKToObCSEn5UF4mMd/hDJ8ZHCDNuQ7UMlzHM4=,tag:fxAebkAykpP658ZBm1dc7A==,type:str]
+ansible_become_pass: ENC[AES256_GCM,data:BqK6ga2ikmmCgZeN,iv:TVsRHXZZjgMrJv5eTZOk51GSMA/0xDf513+b8pYsHhA=,tag:J617qGw+zCuPM2brTBfqZQ==,type:str]
 sops:
     kms: []
     gcp_kms: []
@@ -8,14 +8,14 @@ sops:
         - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBMRTR3eFFQblRyc1AwTlAx
-            WVlJN3NwckRkb3ZDNXRUQ2lvUDl1ZmJxckhZCnNxTFlsNUFxQkwvRWR2cjV4T2Fn
-            MkMzUWY4NFprcVYraSs5NEVSbDZFNEkKLS0tIGFucXJqdEFxUm9HVlMwNytNNU1B
-            UjJ5N0xydmhId1FZUEQxeTJNVjZMMFUKHBQfHrQoGZWeL2c8OAfbnO4hhuoPDmZ0
-            yt5zOpS5sl2kX1MkiP4XsYZ1Ah7wNB0FlglY57mgiJOhF0dfSQsthA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBJYzhxM0x1RlVaanF2dHdu
+            OWxZa1lMbEFBWmkrTUZ6TDA4eDV4NmVVVVY0Clg4aXNidzZiR2ozTkhrMWtEVGZR
+            YTVXaG1JNk10ZCtqUzEyay93b1oxZU0KLS0tIGZXZE9meUhQL3plWjZSc3hnVWh4
+            RTliYnF3MHhISlV0c21lbVJhT21rcDAKQYUQzxeybkl5KBfUhT9f58A3dvgKIjDV
+            AKtGD+UWQsguM4ff6Z7Wfdv1NuozYL6ZzhE3+uytXvmftJVqhihSnA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-01-06T05:57:29Z"
-    mac: ENC[AES256_GCM,data:gVHQ+NYSJpB+A5Bm9RGz+YJgucSlTuMoCpgdwjmK2Sdmqr/l5dqk6PELqttxV274MU5jXIW8r1n/PiHcnTLltNqdEdHme6JH9U7ktC2QNlxV+rcCIVInIHKcOasx4z3LfuwYUreyep970VgRAUUyOpbuC/2RHm2l88h08MxYAAg=,iv:YYsY2ZNrAvw8B4CFxSfjgiM92DsSZY7xvV4TIO2oqNQ=,tag:Tqk4ORsV0JJk+5oLrCe6xQ==,type:str]
+    lastmodified: "2024-01-17T03:57:27Z"
+    mac: ENC[AES256_GCM,data:LLA6+Jr+tlP/KD653iq7SpH/raGbOSZ2boqtCKtrdZWD6jIiYG5Aq05vV+j10IQo+fWxsfoN3y7VJ66iYu8y36+pSF5+RS/I6s70uBMubiNbrBhtODBxWE0iYxRLg6swmWk79o4aHx8egUkSJjTFHuoE1hl1lQ2dD5Oszob7bhQ=,iv:QrMchN2EOK7n/j23DrWlJwaKxliqTRPEast5QDG8GPU=,tag:0fnTjFwxZVq7lhweRP3WxA==,type:str]
     pgp: []
     unencrypted_suffix: _unencrypted
     version: 3.8.1
