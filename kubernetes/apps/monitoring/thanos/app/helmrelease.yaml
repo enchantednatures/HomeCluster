@@ -38,10 +38,6 @@ spec:
       kind: ConfigMap
       name: thanos-bucket-v2
       valuesKey: BUCKET_HOST
-    - targetPath: objstoreConfig.config.region
-      kind: ConfigMap
-      name: thanos-bucket-v2
-      valuesKey: BUCKET_REGION
     - targetPath: objstoreConfig.config.access_key
       kind: Secret
       name: thanos-bucket-v2
