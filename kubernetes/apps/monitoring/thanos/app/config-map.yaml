@@ -7,4 +7,3 @@ metadata:
 data:
   BUCKET_NAME: thanos
   BUCKET_HOST: 192.168.1.241:9768
-
