@@ -7,5 +7,7 @@ metadata:
 spec:
   type: ExternalName
   ports:
-    - port: 8006
+    - name: Proxmox UI
+      port: 8006
+      targetPort: 8006
   externalName: 192.168.1.240
