@@ -46,7 +46,6 @@ spec:
       kind: Secret
       name: thanos-bucket-v2
       valuesKey: AWS_SECRET_ACCESS_KEY
-  valuesFrom:
     - name: thanos-values
       kind: ConfigMap
       valuesKey: values.yaml
