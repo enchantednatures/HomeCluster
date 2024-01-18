@@ -13,6 +13,7 @@ resources:
   - ./external-dns.yaml
   - ./grafana.yaml
   - ./hajimari.yaml
+  - ./infracloudio.yaml
   - ./ingress-nginx.yaml
   - ./istio.yaml
   - ./jetstack.yaml
