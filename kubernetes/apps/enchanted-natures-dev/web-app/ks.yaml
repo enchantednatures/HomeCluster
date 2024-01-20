@@ -4,7 +4,7 @@ metadata:
   name: &app dev-web-app
   namespace: flux-system
 spec:
-  targetNamespace: flux-system
+  targetNamespace: enchanted-natures-dev
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
