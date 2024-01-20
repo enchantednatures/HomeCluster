@@ -1,0 +1,406 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: redis
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: redis
+      wersion: 18.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    clusterDomain: cluster.local
+    image:
+      registry: docker.io
+      repository: bitnami/redis
+      tag: 7.0.0-debian-10-r0
+      pullPolicy: IfNotPresent
+      debug: false
+    architecture: standalone
+    auth:
+      enabled: true
+      sentinel: true
+      redisUsername: authentik
+      existingSecret: "authentik-redis"
+      existingSecretPasswordKey: "password"
+      usePasswordFiles: false
+    commonConfiguration: |-
+      # Enable AOF https://redis.io/topics/persistence#append-only-file
+      appendonly yes
+      # Disable RDB persistence, AOF persistence already enabled.
+      save ""
+    master:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+      persistence:
+        enabled: false
+        # path: /data
+        # storageClass: "ceph-block"
+        # accessModes:
+        #   - ReadWriteOnce
+        # size: 8Gi
+      service:
+        type: ClusterIP
+        ports:
+          redis: 6379
+        externalTrafficPolicy: Cluster
+        internalTrafficPolicy: Cluster
+        extraPorts: []
+        clusterIP: ""
+      terminationGracePeriodSeconds: 30
+    replica:
+      replicaCount: 3
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values:
+                      - amd64
+      persistence:
+        enabled: false
+        # path: /data
+        # storageClass: "longhorn"
+        # accessModes:
+        #   - ReadWriteOnce
+        # size: 8Gi
+      service:
+        type: ClusterIP
+        ports:
+          redis: 6379
+        externalTrafficPolicy: Cluster
+        internalTrafficPolicy: Cluster
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 11
+        targetCPU: ""
+        targetMemory: ""
+    sentinel:
+      enabled: false
+    networkPolicy:
+      enabled: false
+      allowExternal: true
+    podSecurityPolicy:
+      create: false
+      enabled: false
+    rbac:
+      create: false
+    serviceAccount:
+      create: true
+    pdb:
+      create: false
+    tls:
+      enabled: false
+      authClients: true
+    metrics:
+      ## @param metrics.enabled Start a sidecar prometheus exporter to expose Redis&trade; metrics
+      ##
+      enabled: true
+      ## Bitnami Redis&trade; Exporter image
+      ## ref: https://hub.docker.com/r/bitnami/redis-exporter/tags/
+      ## @param metrics.image.registry Redis&trade; Exporter image registry
+      ## @param metrics.image.repository Redis&trade; Exporter image repository
+      ## @param metrics.image.tag Redis&trade; Redis&trade; Exporter image tag (immutable tags are recommended)
+      ## @param metrics.image.pullPolicy Redis&trade; Exporter image pull policy
+      ## @param metrics.image.pullSecrets Redis&trade; Exporter image pull secrets
+      ##
+      image:
+        registry: docker.io
+        repository: bitnami/redis-exporter
+        tag: 1.37.0-debian-10-r39
+        pullPolicy: IfNotPresent
+        ## Optionally specify an array of imagePullSecrets.
+        ## Secrets must be manually created in the namespace.
+        ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+        ## e.g:
+        ## pullSecrets:
+        ##   - myRegistryKeySecretName
+        ##
+        pullSecrets: []
+      ## @param metrics.command Override default metrics container init command (useful when using custom images)
+      ##
+      command: []
+      ## @param metrics.redisTargetHost A way to specify an alternative Redis&trade; hostname
+      ## Useful for certificate CN/SAN matching
+      ##
+      redisTargetHost: "localhost"
+      ## @param metrics.extraArgs Extra arguments for Redis&trade; exporter, for example:
+      ## e.g.:
+      ## extraArgs:
+      ##   check-keys: myKey,myOtherKey
+      ##
+      extraArgs: {}
+      ## @param metrics.extraEnvVars Array with extra environment variables to add to Redis&trade; exporter
+      ## e.g:
+      ## extraEnvVars:
+      ##   - name: FOO
+      ##     value: "bar"
+      ##
+      extraEnvVars: []
+      ## Configure Container Security Context
+      ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+      ## @param metrics.containerSecurityContext.enabled Enabled Redis&trade; exporter containers' Security Context
+      ## @param metrics.containerSecurityContext.runAsUser Set Redis&trade; exporter containers' Security Context runAsUser
+      ##
+      containerSecurityContext:
+        enabled: true
+        runAsUser: 1001
+      ## @param metrics.extraVolumes Optionally specify extra list of additional volumes for the Redis&trade; metrics sidecar
+      ##
+      extraVolumes: []
+      ## @param metrics.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis&trade; metrics sidecar
+      ##
+      extraVolumeMounts: []
+      ## Redis&trade; exporter resource requests and limits
+      ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+      ## @param metrics.resources.limits The resources limits for the Redis&trade; exporter container
+      ## @param metrics.resources.requests The requested resources for the Redis&trade; exporter container
+      ##
+      resources:
+        limits: {}
+        requests: {}
+      ## @param metrics.podLabels Extra labels for Redis&trade; exporter pods
+      ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+      ##
+      podLabels: {}
+      ## @param metrics.podAnnotations [object] Annotations for Redis&trade; exporter pods
+      ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+      ##
+      podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9121"
+      ## Redis&trade; exporter service parameters
+      ##
+      service:
+        ## @param metrics.service.type Redis&trade; exporter service type
+        ##
+        type: ClusterIP
+        ## @param metrics.service.port Redis&trade; exporter service port
+        ##
+        port: 9121
+        ## @param metrics.service.externalTrafficPolicy Redis&trade; exporter service external traffic policy
+        ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+        ##
+        externalTrafficPolicy: Cluster
+        ## @param metrics.service.extraPorts Extra ports to expose (normally used with the `sidecar` value)
+        ##
+        extraPorts: []
+        ## @param metrics.service.loadBalancerIP Redis&trade; exporter service Load Balancer IP
+        ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+        ##
+        loadBalancerIP: ""
+        ## @param metrics.service.loadBalancerSourceRanges Redis&trade; exporter service Load Balancer sources
+        ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+        ## e.g.
+        ## loadBalancerSourceRanges:
+        ##   - 10.10.10.0/24
+        ##
+        loadBalancerSourceRanges: []
+        ## @param metrics.service.annotations Additional custom annotations for Redis&trade; exporter service
+        ##
+        annotations: {}
+      ## Prometheus Service Monitor
+      ## ref: https://github.com/coreos/prometheus-operator
+      ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+      ##
+      serviceMonitor:
+        ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+        ##
+        enabled: false
+        ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+        ##
+        namespace: ""
+        ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+        ##
+        interval: 30s
+        ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+        ##
+        scrapeTimeout: ""
+        ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+        ##
+        relabellings: []
+        ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+        ##
+        metricRelabelings: []
+        ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+        ##
+        honorLabels: false
+        ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+        ##
+        additionalLabels: {}
+      ## Custom PrometheusRule to be defined
+      ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+      ##
+      prometheusRule:
+        ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+        ##
+        enabled: false
+        ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+        ##
+        namespace: ""
+        ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+        ##
+        additionalLabels: {}
+        ## @param metrics.prometheusRule.rules Custom Prometheus rules
+        ## e.g:
+        ## rules:
+        ##   - alert: RedisDown
+        ##     expr: redis_up{service="{{ template "common.names.fullname" . }}-metrics"} == 0
+        ##     for: 2m
+        ##     labels:
+        ##       severity: error
+        ##     annotations:
+        ##       summary: Redis&trade; instance {{ "{{ $labels.instance }}" }} down
+        ##       description: Redis&trade; instance {{ "{{ $labels.instance }}" }} is down
+        ##    - alert: RedisMemoryHigh
+        ##      expr: >
+        ##        redis_memory_used_bytes{service="{{ template "common.names.fullname" . }}-metrics"} * 100
+        ##        /
+        ##        redis_memory_max_bytes{service="{{ template "common.names.fullname" . }}-metrics"}
+        ##        > 90
+        ##      for: 2m
+        ##      labels:
+        ##        severity: error
+        ##      annotations:
+        ##        summary: Redis&trade; instance {{ "{{ $labels.instance }}" }} is using too much memory
+        ##        description: |
+        ##          Redis&trade; instance {{ "{{ $labels.instance }}" }} is using {{ "{{ $value }}" }}% of its available memory.
+        ##    - alert: RedisKeyEviction
+        ##      expr: |
+        ##        increase(redis_evicted_keys_total{service="{{ template "common.names.fullname" . }}-metrics"}[5m]) > 0
+        ##      for: 1s
+        ##      labels:
+        ##        severity: error
+        ##      annotations:
+        ##        summary: Redis&trade; instance {{ "{{ $labels.instance }}" }} has evicted keys
+        ##        description: |
+        ##          Redis&trade; instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
+        ##
+        rules: []
+    ## @section Init Container Parameters
+    ##
+
+    ## 'volumePermissions' init container parameters
+    ## Changes the owner and group of the persistent volume mount point to runAsUser:fsGroup values
+    ##   based on the *podSecurityContext/*containerSecurityContext parameters
+    ##
+    volumePermissions:
+      ## @param volumePermissions.enabled Enable init container that changes the owner/group of the PV mount point to `runAsUser:fsGroup`
+      ##
+      enabled: false
+      ## Bitnami Shell image
+      ## ref: https://hub.docker.com/r/bitnami/bitnami-shell/tags/
+      ## @param volumePermissions.image.registry Bitnami Shell image registry
+      ## @param volumePermissions.image.repository Bitnami Shell image repository
+      ## @param volumePermissions.image.tag Bitnami Shell image tag (immutable tags are recommended)
+      ## @param volumePermissions.image.pullPolicy Bitnami Shell image pull policy
+      ## @param volumePermissions.image.pullSecrets Bitnami Shell image pull secrets
+      ##
+      image:
+        registry: docker.io
+        repository: bitnami/bitnami-shell
+        tag: 10-debian-10-r408
+        pullPolicy: IfNotPresent
+        ## Optionally specify an array of imagePullSecrets.
+        ## Secrets must be manually created in the namespace.
+        ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+        ## e.g:
+        ## pullSecrets:
+        ##   - myRegistryKeySecretName
+        ##
+        pullSecrets: []
+      ## Init container's resource requests and limits
+      ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+      ## @param volumePermissions.resources.limits The resources limits for the init container
+      ## @param volumePermissions.resources.requests The requested resources for the init container
+      ##
+      resources:
+        limits: {}
+        requests: {}
+      ## Init container Container Security Context
+      ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      ## @param volumePermissions.containerSecurityContext.runAsUser Set init container's Security Context runAsUser
+      ## NOTE: when runAsUser is set to special value "auto", init container will try to chown the
+      ##   data folder to auto-determined user&group, using commands: `id -u`:`id -G | cut -d" " -f2`
+      ##   "auto" is especially useful for OpenShift which has scc with dynamic user ids (and 0 is not allowed)
+      ##
+      containerSecurityContext:
+        runAsUser: 0
+    ## init-sysctl container parameters
+    ## used to perform sysctl operation to modify Kernel settings (needed sometimes to avoid warnings)
+    ##
+    sysctl:
+      ## @param sysctl.enabled Enable init container to modify Kernel settings
+      ##
+      enabled: false
+      ## Bitnami Shell image
+      ## ref: https://hub.docker.com/r/bitnami/bitnami-shell/tags/
+      ## @param sysctl.image.registry Bitnami Shell image registry
+      ## @param sysctl.image.repository Bitnami Shell image repository
+      ## @param sysctl.image.tag Bitnami Shell image tag (immutable tags are recommended)
+      ## @param sysctl.image.pullPolicy Bitnami Shell image pull policy
+      ## @param sysctl.image.pullSecrets Bitnami Shell image pull secrets
+      ##
+      image:
+        registry: docker.io
+        repository: bitnami/bitnami-shell
+        tag: 10-debian-10-r408
+        pullPolicy: IfNotPresent
+        ## Optionally specify an array of imagePullSecrets.
+        ## Secrets must be manually created in the namespace.
+        ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+        ## e.g:
+        ## pullSecrets:
+        ##   - myRegistryKeySecretName
+        ##
+        pullSecrets: []
+      ## @param sysctl.command Override default init-sysctl container command (useful when using custom images)
+      ##
+      command: []
+      ## @param sysctl.mountHostSys Mount the host `/sys` folder to `/host-sys`
+      ##
+      mountHostSys: false
+      ## Init container's resource requests and limits
+      ## ref: https://kubernetes.io/docs/user-guide/compute-resources/
+      ## @param sysctl.resources.limits The resources limits for the init container
+      ## @param sysctl.resources.requests The requested resources for the init container
+      ##
+      resources:
+        limits: {}
+        requests: {}
+    ## @section useExternalDNS Parameters
+    ##
+    ## @param useExternalDNS.enabled Enable various syntax that would enable external-dns to work.  Note this requires a working installation of `external-dns` to be usable.
+    ## @param useExternalDNS.additionalAnnotations Extra annotations to be utilized when `external-dns` is enabled.
+    ## @param useExternalDNS.annotationKey The annotation key utilized when `external-dns` is enabled.
+    ## @param useExternalDNS.suffix The DNS suffix utilized when `external-dns` is enabled.  Note that we prepend the suffix with the full name of the release.
+    ##
+    useExternalDNS:
+      enabled: false
+      suffix: ""
+      annotationKey: external-dns.alpha.kubernetes.io/
+      additionalAnnotations: {}
