@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: enchanted-natures-dev
+spec:
+  selector:
+    app: dev-api
+  type: ClusterIP
+  ports:
+    - name: dev-api
+      protocol: TCP
+      port: 6969
+      targetPort: 6969

@@ -1,0 +1,15 @@
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-dev
+  namespace: enchanted-natures-dev
+spec:
+  selector:
+    app: web-app-dev
+  type: ClusterIP
+  ports:
+    - name: web-app-dev
+      protocol: TCP
+      port: 80
+      targetPort: 80
