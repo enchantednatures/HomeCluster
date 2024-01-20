@@ -5,6 +5,7 @@ resources:
   - ./namespace.yaml
   - ./grafana/ks.yaml
   - ./jaeger-operator/ks.yaml
+  - ./jaeger/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
   - ./thanos/ks.yaml
   - ./botkube/ks.yaml
