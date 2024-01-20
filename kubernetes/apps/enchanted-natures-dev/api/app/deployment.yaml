@@ -25,7 +25,7 @@ spec:
         - name: regcred
       containers:
         - name: api
-          image: ghcr.io/enchantednatures/enchantednatures.api:main
+          image: ghcr.io/enchantednatures/enchantednatures.api:v0.3.0
           imagePullPolicy: Always
           volumeMounts:
             - name: config
@@ -72,7 +72,7 @@ spec:
             - containerPort: 6969
               name: dev-api
       volumes:
-      - name: config
-        configMap:
-          name: dev-api
+        - name: config
+          configMap:
+            name: dev-api
       restartPolicy: Always
