@@ -1,0 +1,8 @@
+[
+    {
+        "name": "web-app",
+        "cluster": "in-cluster",
+        "namespace": "default",
+        "folderPath": "main/enchanted_natures_web_app"
+    }
+]

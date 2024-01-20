@@ -1,0 +1,32 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: enchanted-web-app
+  namespace: enchantednatures 
+  labels:
+    app: enchanted-web-app
+spec:
+  selector:
+    matchLabels:
+      app: enchanted-web-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: enchanted-web-app
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: enchanted-web-app
+          image: ghcr.io/enchantednatures/enchantednatures.webapp:v0.2.1
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 100m
+              memory: 100Mi
+      restartPolicy: Always
