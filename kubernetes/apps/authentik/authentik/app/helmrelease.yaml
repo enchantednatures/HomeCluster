@@ -1,0 +1,113 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: authentik
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: authentik
+      version: 2023.10.5
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  valuesFrom:
+    - targetPath: authentik.secretKey
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: SECRET_KEY
+    - targetPath: authentik.postgresql.password
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: POSTGRES_PASSWORD
+    - targetPath: authentik.postgresql.name
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: POSTGRES_DATABASE_NAME
+    - targetPath: authentik.postgresql.user
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: POSTGRES_USER
+    - targetPath: postgresql.postgresqlPassword
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: POSTGRES_PASSWORD
+    - targetPath: postgresql.postgresqlDatabase
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: POSTGRES_DATABASE_NAME
+    - targetPath: postgresql.postgresqlUsername
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: POSTGRES_USER
+    - targetPath: authentik.redis.password
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: REDIS_PASSWORD
+    - targetPath: authentik.redis.auth.password
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: REDIS_PASSWORD
+  values:
+    image:
+      repository: ghcr.io/goauthentik/server
+      tag: 2023.10.5
+    ingress:
+      enabled: true
+      ingressClassName: "external"
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        kubernetes.io/tls-acme: "true"
+        external-dns/is-public: "true"
+        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+      hosts:
+        - host: &host auth.${SECRET_DOMAIN}
+          paths:
+            - path: /
+      tls:
+        - secretName: authentik-tls
+          hosts:
+            - *host
+    resources:
+      server:
+        requests:
+          cpu: 15m
+          memory: 476M
+      worker:
+        requests:
+          cpu: 15m
+          memory: 512M
+    geoip:
+      enabled: false
+    authentik:
+      error_reporting:
+        enabled: false
+      log_level: debug
+      outposts:
+        docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
+      postgresql:
+        host: 192.168.1.241
+      redis:
+        host: "redis-master.redis.svc.cluster.local" #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
+    postgresql:
+      enabled: false
+      persistence:
+        enabled: false
+        # existingClaim: authentik-postgresql
+    redis:
+      enabled: false
+      auth:
+        enabled: true
+      persistence:
+        enabled: false
