@@ -13,7 +13,7 @@ metadata:
 spec:
   ingressClassName: external
   rules:
-    - host: s3.${SECRET_DOMAIN}
+    - host: &host s3.${SECRET_DOMAIN}
       http:
         paths:
           - path: /
@@ -25,5 +25,5 @@ spec:
                   number: 9768
   tls:
     - hosts:
-        - "s3.enchantednatures.com"
+        - *host
       secretName: minio-service-tls
