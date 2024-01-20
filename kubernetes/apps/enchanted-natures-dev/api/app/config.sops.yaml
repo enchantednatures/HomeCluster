@@ -1,28 +1,29 @@
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: dev-api
-  namespace: enchantednatures-dev
+    name: dev-api
+    namespace: enchantednatures-dev
 data:
-  config.yaml: |
-    database_url: postgres://dev_api_service:HannahH0ney@192.168.1.241:5432/enchanted_natures_development
-    aws_access_key_id: enchanted_natures
-    aws_secret_access_key: DRVFv9qStWOWHuExPRWCJQ8l7V0RrIuf
-    aws_endpoint_url: http://192.168.1.241:9768
-    aws_region: us-east-rack-01
-    aws_bucket_name: photos_development
-    auth_settings:
-      client_id: lAhSmpvxqKuetDQXUEbnxxKP1mxIc8wt46XoroD7
-      client_secret: Dpr4QTo6gerebEcVTk5rCIgmX8ShW9ieUGttM01VW6gU1hRqHKeSl0UQHrE2DMiGtdaU3wo3LWrnLk90f7sEhPubI5ycrHbaQCdT98VwvxGxbuGDEsy0iW2PpLU2t3sT
-      redirect_url: https://development-api.enchantednatures.com/authorized
-      token_url: https://auth.enchantednatures.com/application/o/token/
-      auth_url: https://auth.enchantednatures.com/application/o/authorize/
-      introspection_url: https://auth.enchantednatures.com/application/o/userinfo/
-      revocation_url: https://auth.enchantednatures.com/application/o/revoke/
-    redis_url: redis://redis-master.redis.svc.cluster.local/2
-    app_settings:
-      addr: [ 0, 0, 0, 0 ]
-      port: 6969
-  AWS_SECRET_ACCESS_KEY: DRVFv9qStWOWHuExPRWCJQ8l7V0RrIuf
-  AWS_ACCESS_KEY_ID: enchanted_natures
+    config.yaml: ENC[AES256_GCM,data:Pn09+DBC5QPwtifKDEBryp06WRnr+gNy5rfhdoEBiCLtQjVJ5EGPCKC6KV6pc7pTRPDCVo1bTzUwZyAGvxBBLzdE3pzmxFGqh4Jbfbq4f/uiTxrF5LIQywnNJDoIUmbQs5ZnTceHF4/2mHBkYZOySjaWJZBDhcTgUNO3dx5VFbTiLESyQw+9ZfdLNMz7hGnu5Jw7LtFMd+LDCxEC9MzDhFQMh1gXmr8WWZ1pYwnC7o7bZ2VieTfCH+f78kNi8EWNkBGoK0+DiY3vAGMWCMN+qogDFhIn5zz5ugO6KuddJlxKyb/F/jX5bCuz7rD+9koXZyVRu43PKLJllpAQXrLy0CRh97Bujq1/QoS7+6qhoXFM5tciH0cTV6AxCcf85wyCy1IJUQKqe8w//TP3FhOA4mb0l4aSTnYiW2G+R/tl5zShIa7Z8yNZ6UAjxIWF0iPXbWuk5TtWgGcqmNvXp/3K69mwwuk7G7Xqe4JFIKXfHV0CUn7QOgKz9rUsYFifMR1adAisOg6CD8Q3oAoIeO82uGwjCxHrw34ofHl5UA7ivyuftYmtcniYspktUko0le9KMi90nCpOmErsrMWKffYC+0ciAXxU9OdE8ZAWhj0J3hGpGdS13oxzZyiwu+alnW/iedGRLjdgFBolLFuCVQVwU+uLvNCYrCff/vzjpLbFCEcuy79lvZwaK0gJYU0UbMpbdf6TR3jlszIlfl1gW0AvTt87eKpwP5ZcA4655iRcE22wCa8dprPD4GQ+9OKiW0PxZljg/yAvCN0Gd5hI9iccLREVHVxm2knhcO8e1QstMW0JiGs6wrgm6ZOgzpMrbnQ837K9LvKTWGNqDHTxiAhFJDL2Fy0ZhQoV60QJre6iKUbPcPDNtVjq2DVw2a9PAXKhSLJfFIUCkwLbC1QXP14bqwCjH0poUydDIkxeU7JIndj4Ww3qngWOlgF8WuW4qXzt365q//8BFheMY6xbGaoob3PgNtZSdzndxyw/7Rkyp4DfOvpbaO/Ccq1awhkIExe5Opwk8kBxbG0xZvIa4xCtiVRPeyhTSi/bllV4Egz/1wd0W3kyFNPZzCSqc8f3bpkFBlu7sVN6hBTkaIe9IYQ+PF0JdpMOuhEtrvXvhkPJyNFDy3Ob4kHcAfNf8bfSq9eYAGtnli2njsp6A7vMzjcCEG6XoJXRTNy+Jfu1UYIAyi/hjaLu7pkve36YoQiLYL38/i1RMeORB3Ds1SoGCsffC4Wbym5kdTIzTziZjjxMmZNG/dVK0D+o0ufjkbCOp4YqFxRD0I62NF0x2mVFlLD6RcQs5q46zty2IjK4bl27,iv:OL/weBRfTePI8vH2JcWi2CrcFk81+FE+QcZrYCpedMY=,tag:JXdjbE7j9sCTQpiwfAmpLQ==,type:str]
+    AWS_SECRET_ACCESS_KEY: ENC[AES256_GCM,data:Zv4F+y75VV7ZgknqrUlKa7aaHbnaNaSfnDm5HYymVjs=,iv:0h7zVF4a23fKLjBLQzeHx7bbCfnAvJ6WFEPNPi/Aug8=,tag:9+Iup47PPGKg7xqEKKa2RQ==,type:str]
+    AWS_ACCESS_KEY_ID: ENC[AES256_GCM,data:ohicCBk+AX+dAyRDNS4TSI8=,iv:RsRshcIZ7c6Uy+JD2PY8xrH2/ALACmtupbHO7Gv1t4Q=,tag:O9yd9Byci7H+pKXR13HYAg==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA3NTg5d3RJQ1pCWEhaQThO
+            RG1nbUNaTFpMbithdzFESU9taGRSaUV2N3pVCkhqL21sbVUzazRzU1V4WTlLSkhL
+            SnVLR1IxNi9hVERMR1FiN1l4NmFrNEkKLS0tIEFPcEFMQUFweG0reXdOVVpkUXpD
+            c0xPTi82Y0IwUVRpY1IvbGJkaXBYN1kKJYf0321CRKCae/9PZ8tHoZ/w+VQ5SQp2
+            j3fheFwiIpv8V59Brxhhc73k89aEs44aLsBs1CB13AZ/849aMldE0w==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-01-20T04:30:10Z"
+    mac: ENC[AES256_GCM,data:ANPoZogVvTDFfYhLcd1016wPmHCVf/SyUppBMpLx2bXBLMADBvz/ct45saiD7EX7FuzcleRNP4l5QSV8dPiOALY283WbsPLC6jNBFdGmdZW4hFsL2O7OWmyr3tFs4eGnh8alAztQ6+vjVe5w4v1KqWE9R+Jv2OGzQOYa5SJEjPA=,iv:UtiksKKH4Zb7PxpGEJCcvPlC2m/Jokn8dIhHKVRv2EA=,tag:8qXDWdFaKbQ1HlnIHHUELw==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.8.1
