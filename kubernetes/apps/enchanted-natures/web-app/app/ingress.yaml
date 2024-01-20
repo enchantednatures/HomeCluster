@@ -1,0 +1,30 @@
+# https://kubernetes.io/docs/concepts/services-networking/ingress/
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: enchanted-web-app
+  namespace: enchantednatures 
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+    external-dns/is-public: "true"
+    external-dns.alpha.kubernetes.io/target: "ipv4.enchantednatures.com"
+spec:
+  ingressClassName: "traefik"
+  rules:
+    - host: enchantednatures.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: enchanted-web-app
+                port:
+                  number: 80
+  tls:
+
+    - hosts:
+        - "enchantednatures.com"
+      secretName: web-app-tls
