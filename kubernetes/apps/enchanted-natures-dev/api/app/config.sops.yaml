@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-api
+  namespace: enchantednatures-dev
+data:
+  config.yaml: |
+    database_url: postgres://dev_api_service:HannahH0ney@192.168.1.241:5432/enchanted_natures_development
+    aws_access_key_id: enchanted_natures
+    aws_secret_access_key: DRVFv9qStWOWHuExPRWCJQ8l7V0RrIuf
+    aws_endpoint_url: http://192.168.1.241:9768
+    aws_region: us-east-rack-01
+    aws_bucket_name: photos_development
+    auth_settings:
+      client_id: lAhSmpvxqKuetDQXUEbnxxKP1mxIc8wt46XoroD7
+      client_secret: Dpr4QTo6gerebEcVTk5rCIgmX8ShW9ieUGttM01VW6gU1hRqHKeSl0UQHrE2DMiGtdaU3wo3LWrnLk90f7sEhPubI5ycrHbaQCdT98VwvxGxbuGDEsy0iW2PpLU2t3sT
+      redirect_url: https://development-api.enchantednatures.com/authorized
+      token_url: https://auth.enchantednatures.com/application/o/token/
+      auth_url: https://auth.enchantednatures.com/application/o/authorize/
+      introspection_url: https://auth.enchantednatures.com/application/o/userinfo/
+      revocation_url: https://auth.enchantednatures.com/application/o/revoke/
+    redis_url: redis://redis-master.redis.svc.cluster.local/2
+    app_settings:
+      addr: [ 0, 0, 0, 0 ]
+      port: 6969
+  AWS_SECRET_ACCESS_KEY: DRVFv9qStWOWHuExPRWCJQ8l7V0RrIuf
+  AWS_ACCESS_KEY_ID: enchanted_natures

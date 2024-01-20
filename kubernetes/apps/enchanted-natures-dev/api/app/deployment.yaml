@@ -1,0 +1,78 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-api
+  namespace: enchantednatures-dev
+  labels:
+    app: dev-api
+spec:
+  selector:
+    matchLabels:
+      app: dev-api
+  replicas: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: dev-api
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - name: api
+          image: ghcr.io/enchantednatures/enchantednatures.api:main
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: config
+              mountPath: /config/dev.yaml
+              subPath: config.yaml
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
+            limits:
+              cpu: 100m
+              memory: 100Mi
+          livenessProbe:
+            tcpSocket:
+              port: 6969
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health_check
+              port: 6969
+            initialDelaySeconds: 5
+            timeoutSeconds: 2
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          env:
+            - name: ENVIRONMENT
+              value: development
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-api
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: dev-api
+                  key: AWS_SECRET_ACCESS_KEY
+          ports:
+            - containerPort: 6969
+              name: dev-api
+      volumes:
+      - name: config
+        configMap:
+          name: dev-api
+      restartPolicy: Always
