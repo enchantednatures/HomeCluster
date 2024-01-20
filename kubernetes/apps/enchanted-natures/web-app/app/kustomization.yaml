@@ -3,7 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 metadata:
   name: enchanted_natures_web_app
-  namespace: enchantednatures 
+  namespace: enchanted-natures
 resources:
   - deployment.yaml
   - ingress.yaml

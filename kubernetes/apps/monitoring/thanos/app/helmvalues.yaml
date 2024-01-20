@@ -16,8 +16,8 @@ data:
         sidecarsNamespace: monitoring
       ingress:
         enabled: true
-        hostname: "thanos.enchantednatures.com"
-        ingressClassName: "traefik"
+        hostname: "thanos.${SECRET_DOMAIN}"
+        ingressClassName: "external"
         tls: true
     objstoreConfig:
       type: s3

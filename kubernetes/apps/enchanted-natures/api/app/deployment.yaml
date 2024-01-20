@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
-  namespace: enchantednatures
+  namespace: enchanted-natures
   labels:
     app: api
 spec:
