@@ -20,4 +20,3 @@ spec:
   timeout: 5m
   dependsOn:
     - name: jaeger-operator
-      namespace: monitoring
