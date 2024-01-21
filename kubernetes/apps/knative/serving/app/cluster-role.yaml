@@ -10,3 +10,17 @@ subjects:
 - kind: ServiceAccount
   name: default
   namespace: default
+---
+
+kind: ClusterRoleBinding
+metadata:
+  name: youtinerary:knative-serving-namespaced-admin
+  namespace: youtinerary
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: knative-serving-namespaced-admin
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: default
