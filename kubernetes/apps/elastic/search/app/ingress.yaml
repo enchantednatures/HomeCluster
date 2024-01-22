@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: elasticsearch
+  namespace: elastic
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+spec:
+  ingressClassName: internal-nginx
+  rules:
+    - host: elastic.${SECRET_DOMAIN}
+      http:
+        paths:
+          - backend:
+              service:
+                name: main-es-http
+                port:
+                  number: 9200
+            path: /
+            pathType: Prefix
