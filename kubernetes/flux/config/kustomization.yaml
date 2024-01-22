@@ -4,3 +4,4 @@ resources:
   - ./flux.yaml
   - ./cluster.yaml
   - ./media.yaml
+  - ./media-auth.sops.yaml

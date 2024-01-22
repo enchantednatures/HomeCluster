@@ -1,0 +1,51 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: &app home-dns
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: coredns
+      version: 1.29.0
+      sourceRef:
+        kind: HelmRepository
+        name: coredns
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      repository: coredns/coredns
+    service:
+      name: kube-dns
+      clusterIP:  192.168.1.227
+    serviceAccount:
+      create: false
+      name: home-dns-cluster
+    rbac:
+      create: false
+    isClusterService: false
+    loadBalancerIP: 192.168.1.227
+    customConfig:
+      config: |
+        .:53 {
+            log
+            errors
+            health lameduck 5s
+            ready
+            cache 300
+            loop
+            local
+            prometheus localhost:9153
+            k8s_external chastened.lan
+            forward . 1.1.1.1 1.0.0.1
+        }
