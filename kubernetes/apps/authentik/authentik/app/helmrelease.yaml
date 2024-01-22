@@ -59,6 +59,14 @@ spec:
       kind: Secret
       name: authentik-secrets
       valuesKey: REDIS_PASSWORD
+    - targetPath: authentik.email.password
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: EMAIL_PASSWORD
+    - targetPath: authentik.email.username
+      kind: Secret
+      name: authentik-secrets
+      valuesKey: EMAIL_USERNAME
   values:
     image:
       repository: ghcr.io/goauthentik/server
@@ -91,6 +99,11 @@ spec:
     geoip:
       enabled: false
     authentik:
+      email:
+        from: id@${SECRET_DOMAIN}
+        host: smtp.gmail.com
+        port: 465
+        use_ssl: true
       error_reporting:
         enabled: false
       log_level: debug
