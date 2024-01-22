@@ -27,13 +27,20 @@ spec:
       repository: coredns/coredns
     service:
       name: kube-dns
-      clusterIP:  192.168.1.227
+      clusterIP: 192.168.1.227
     serviceAccount:
       create: false
       name: home-dns-cluster
     rbac:
       create: false
     isClusterService: false
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-role.kubernetes.io/control-plane
+                  operator: Exists
     loadBalancerIP: 192.168.1.227
     customConfig:
       config: |
