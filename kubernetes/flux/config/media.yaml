@@ -8,7 +8,7 @@ spec:
   interval: 30m
   ref:
     branch: main
-  url: "https://github.com/enchantednatures/LeviathanCluster.Media.git"
+  url: "ssh://git@github.com/enchantednatures/LeviathanCluster.Media.git"
   ignore: |
     # exclude all
     /*
