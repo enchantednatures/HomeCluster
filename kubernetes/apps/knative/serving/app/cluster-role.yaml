@@ -7,11 +7,11 @@ roleRef:
   kind: ClusterRole
   name: knative-serving-namespaced-admin
 subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: default
+  - kind: ServiceAccount
+    name: default
+    namespace: default
 ---
-
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: youtinerary:knative-serving-namespaced-admin
@@ -21,6 +21,6 @@ roleRef:
   kind: ClusterRole
   name: knative-serving-namespaced-admin
 subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: default
+  - kind: ServiceAccount
+    name: default
+    namespace: default
