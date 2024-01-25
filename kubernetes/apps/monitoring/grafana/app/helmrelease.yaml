@@ -25,6 +25,11 @@ spec:
   dependsOn:
     - name: local-path-provisioner
       namespace: kube-system
+  valuesFrom:
+    - targetPath: grafana.ini.auth.generic_oauth
+      kind: Secret
+      name: grafana-oauth-secret
+      valuesKey: CLIENT_SECRET
   values:
     deploymentStrategy:
       type: Recreate
@@ -34,6 +39,19 @@ spec:
       GF_EXPLORE_ENABLED: true
       GF_SERVER_ROOT_URL: "https://grafana.${SECRET_DOMAIN}"
     grafana.ini:
+      auth:
+          signout_redirect_url: "https://authentik.${SECRET_DOMAIN}/application/o/grafana/end-session/"
+          oauth_auto_login: true
+      auth.generic_oauth:
+          name: authentik
+          enabled: true
+          client_id: qBW1hScNwEEVrzwdTiZeA3H6KuQlLpI5t3fYo6fa
+          scopes: "openid profile email"
+          auth_url: "https://authentik.${SECRET_DOMAIN}/application/o/authorize/"
+          token_url: "https://authentik.${SECRET_DOMAIN}/application/o/token/"
+          api_url: "https://authentik.${SECRET_DOMAIN}/application/o/userinfo/"
+          # Optionally map user groups to Grafana roles
+          role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
       analytics:
         check_for_updates: false
         check_for_plugin_updates: false
