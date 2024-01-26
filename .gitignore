@@ -17,3 +17,4 @@ provision/terraform/proxmox/terraform.tfstate.backup
 provision/terraform/proxmox/.terraform.lock.hcl
 provision/terraform/proxmox/.terraform/providers/registry.terraform.io
 provision/terraform/proxmox/api_credentials.auto.tfvars
+/provision/terraform/proxmox/api-credentials.auto.tfvars
