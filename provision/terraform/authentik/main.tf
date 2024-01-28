@@ -16,10 +16,10 @@ data "authentik_scope_mapping" "scope-openid" {
 }
 
 resource "authentik_provider_oauth2" "grafana" {
-  name          = "Grafana"
-  client_id     = var.client_id
-  # client_secret = var.client_secret
-  authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
+  name               = "Grafana"
+  client_id          = var.client_id
+  client_secret      = var.client_secret
+  authorization_flow = data.authentik_flow.default-provider-authorization-implicit-consent.id
 
   redirect_uris = var.redirect_urls
 
@@ -32,18 +32,20 @@ resource "authentik_provider_oauth2" "grafana" {
 
 resource "authentik_application" "grafana" {
   name              = "Grafana"
+  group             = "Grafana"
   slug              = "grafana"
+  meta_icon         = var.icon
   protocol_provider = authentik_provider_oauth2.grafana.id
 }
 
 resource "authentik_group" "grafana_admins" {
-  name    = "Grafana Admins"
+  name = "Grafana Admins"
 }
 
 resource "authentik_group" "grafana_editors" {
-  name    = "Grafana Editors"
+  name = "Grafana Editors"
 }
 
 resource "authentik_group" "grafana_viewers" {
-  name    = "Grafana Viewers"
+  name = "Grafana Viewers"
 }
