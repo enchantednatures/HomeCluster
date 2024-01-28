@@ -25,11 +25,11 @@ spec:
   dependsOn:
     - name: local-path-provisioner
       namespace: kube-system
-  valuesFrom:
-    - targetPath: grafana.ini.auth.generic_oauth
-      kind: Secret
-      name: grafana-oauth-secret
-      valuesKey: CLIENT_SECRET
+  # valuesFrom:
+  #   - targetPath: grafana.ini.auth.generic_oauth
+  #     kind: Secret
+  #     name: grafana-oauth-secret
+  #     valuesKey: CLIENT_SECRET
   values:
     deploymentStrategy:
       type: Recreate
@@ -40,18 +40,20 @@ spec:
       GF_SERVER_ROOT_URL: "https://grafana.${SECRET_DOMAIN}"
     grafana.ini:
       auth:
-          signout_redirect_url: "https://auth.${SECRET_DOMAIN}/application/o/grafana/end-session/"
-          oauth_auto_login: true
+        signout_redirect_url: "https://auth.${SECRET_DOMAIN}/application/o/grafana/end-session/"
+        oauth_auto_login: true
       auth.generic_oauth:
-          name: authentik
-          enabled: true
-          client_id: qBW1hScNwEEVrzwdTiZeA3H6KuQlLpI5t3fYo6fa
-          scopes: "openid profile email"
-          auth_url: "https://auth.${SECRET_DOMAIN}/application/o/authorize/"
-          token_url: "https://auth.${SECRET_DOMAIN}/application/o/token/"
-          api_url: "https://auth.${SECRET_DOMAIN}/application/o/userinfo/"
-          # Optionally map user groups to Grafana roles
-          role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+        name: authentik
+        enabled: true
+        allow_assign_grafana_admin: true
+        client_id: qBW1hScNwEEVrzwdTiZeA3H6KuQlLpI5t3fYo6fa
+        client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
+        scopes: "openid profile email"
+        auth_url: "https://auth.${SECRET_DOMAIN}/application/o/authorize/"
+        token_url: "https://auth.${SECRET_DOMAIN}/application/o/token/"
+        api_url: "https://auth.${SECRET_DOMAIN}/application/o/userinfo/"
+        # Optionally map user groups to Grafana roles
+        role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
       analytics:
         check_for_updates: false
         check_for_plugin_updates: false
@@ -189,3 +191,9 @@ spec:
       storageClassName: local-hostpath
     testFramework:
       enabled: false
+    extraSecretMounts:
+      - name: auth-generic-oauth-secret-mount
+        secretName: grafana-oauth-secret
+        defaultMode: 0440
+        mountPath: /etc/secrets/auth_generic_oauth
+        readOnly: true
