@@ -21,7 +21,14 @@ metadata:
 spec:
   type: ExternalName
   ports:
-    - name: proxmox-ui
+    - name: https
       port: 8006
       targetPort: 8006
   externalName: 192.168.1.240
+  # clusterIP: None
+  # type: ClusterIP
+  # ports:
+  #   - name: https
+  #     port: 8006
+  #     protocol: TCP
+  #     targetPort: 8006
