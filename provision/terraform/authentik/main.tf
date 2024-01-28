@@ -18,7 +18,7 @@ data "authentik_scope_mapping" "scope-openid" {
 resource "authentik_provider_oauth2" "grafana" {
   name          = "Grafana"
   client_id     = var.client_id
-  client_secret = var.client_secret
+  # client_secret = var.client_secret
   authorization_flow  = data.authentik_flow.default-provider-authorization-implicit-consent.id
 
   redirect_uris = var.redirect_urls
