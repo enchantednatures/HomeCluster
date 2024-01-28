@@ -18,3 +18,6 @@ provision/terraform/proxmox/.terraform.lock.hcl
 provision/terraform/proxmox/.terraform/providers/registry.terraform.io
 provision/terraform/proxmox/api_credentials.auto.tfvars
 /provision/terraform/proxmox/api-credentials.auto.tfvars
+/provision/terraform/authentik/.terraform.lock.hcl
+/provision/terraform/authentik/.terraform
+/provision/terraform/authentik/api-credentials.auto.tfvars
