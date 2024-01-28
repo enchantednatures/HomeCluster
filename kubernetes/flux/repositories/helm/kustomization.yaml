@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ./authentik.yaml
   - ./backube.yaml
+  - ./bitnami-schema-registry.yaml
   - ./bitnami.yaml
   - ./bjw-s.yaml
   - ./cilium.yaml
@@ -14,16 +15,16 @@ resources:
   - ./fairwinds.yaml
   - ./grafana.yaml
   - ./hajimari.yaml
+  - ./influx-data.yaml
   - ./infracloudio.yaml
   - ./ingress-nginx.yaml
-  - ./influx-data.yaml
   - ./istio.yaml
-  - ./kafka-ui.yaml
   - ./jaeger.yaml
   - ./jetstack.yaml
-  - ./k8s-gateway.yaml
-  - ./kubernetes-dashboard.yaml
   - ./k8s-at-home.yaml
+  - ./k8s-gateway.yaml
+  - ./kafka-ui.yaml
+  - ./kubernetes-dashboard.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
