@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: velero-minio-access-key
+    namespace: velero
+type: Opaque
+stringData:
+    cloud: ENC[AES256_GCM,data:oNjzBDRZKbdnPA9m+xt1/5NQ9nJj9a+ERoDEN0P37DRz5DrwKgLK/KmeXuHRO+PoRQuNkVmRXAxqFZCzOZfVMA9cLGJQ0F62v7LpEkAdOfxAthlWCw==,iv:UsB9RcVH2mOUeGU0EXKjQCVt8G2Tq211e50Gx2bawQg=,tag:Gahf3Q5WGJWV1Op6gItSDg==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBoWG9VbVE3eUJCRmpHdW1B
+            T2RyRm1oNlZBcHZ0SEJTUE5xb3FmNlBtSlhFCkhqeGdXWjdYSnRFbGVmanpuN0dB
+            eitUbnBFUkFUc1BrcmFUb0dTbzVtVVkKLS0tIElwSXRFdUVKTXJaaUdJWnNrbFAw
+            TW1PRTF2WW4za1o4Q3dUWXh5NHdrbm8KFEQMknySOSp9g7Uk8UHHp2XS5yBnCe8m
+            8tHBFZOmp2o4p3MO8PMEtQ3S2NSxTmsrO2KJyPEUN4/0iMbEv1lMrA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-01-28T17:44:50Z"
+    mac: ENC[AES256_GCM,data:8lQ+xpbsLchVVq1/W0KmRTgF2BSdnjdbpNxkpP+2juLJ0Qw8h0JsLtX4foSWinkmKEdNmqvBvenCv7EBH7rwUAtsr7VkdepmtXSv0+dR+FnhGY7fYNQ+e/BgPfMM1+yx8MpSHoRI/3lTPsh/7bIJx+Tv3gZOriCiyFVRdCvY868=,iv:yClsj1A0CMC6BZhfDqwgKM2qwDI2bHwL3ucZNIn9pws=,tag:VOVmqNDwBfQSeRbLEktYXQ==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.8.1
