@@ -21,8 +21,8 @@ spec:
       labels:
         app: dev-api
     spec:
-      imagePullSecrets:
-        - name: regcred
+      # imagePullSecrets:
+      #   - name: regcred
       containers:
         - name: api
           image: ghcr.io/enchantednatures/enchantednatures.api:v0.3.0
