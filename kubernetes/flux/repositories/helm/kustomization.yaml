@@ -16,6 +16,7 @@ resources:
   - ./hajimari.yaml
   - ./infracloudio.yaml
   - ./ingress-nginx.yaml
+  - ./influx-data.yaml
   - ./istio.yaml
   - ./jaeger.yaml
   - ./jetstack.yaml
