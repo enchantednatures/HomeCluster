@@ -28,7 +28,6 @@ spec:
     broker:
       replicaCount: 1
     kraft:
-      enabled: true
+      enabled: false
     zookeeper:
       enabled: true
-
