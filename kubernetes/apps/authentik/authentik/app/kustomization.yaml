@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - ./secrets.sops.yaml
   - ./helmrelease.yaml
-  - ./nginx-forward-auth.yaml
+  # - ./nginx-forward-auth.yaml
