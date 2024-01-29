@@ -23,5 +23,7 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    kraft:
+      enabled: true
     zookeeper:
       enabled: true
