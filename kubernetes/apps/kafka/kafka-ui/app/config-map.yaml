@@ -7,7 +7,7 @@ data:
     kafka:
       clusters:
         - name: yaml
-          bootstrapServers: kafka:9092
+          bootstrapServers: kafka-controller-headless:9093
     auth:
       type: disabled
     management:
