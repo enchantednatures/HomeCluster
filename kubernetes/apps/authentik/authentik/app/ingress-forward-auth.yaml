@@ -7,10 +7,11 @@ spec:
   rules:
     - host: ${SECRET_DOMAIN}
       http:
-        paths: /outpost.goauthentik.io
-        pathType: Prefix
-        backend:
-          service:
-            name: ak-outpost-nginx
-            port:
-              name: http
+        paths:
+          - path: /outpost.goauthentik.io
+            pathType: Prefix
+            backend:
+              service:
+                name: ak-outpost-nginx
+                port:
+                  name: http
