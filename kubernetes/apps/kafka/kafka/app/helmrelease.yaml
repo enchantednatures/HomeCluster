@@ -25,7 +25,10 @@ spec:
   values:
     controller:
       replicaCount: 0
+    broker:
+      replicaCount: 1
     kraft:
       enabled: true
     zookeeper:
       enabled: true
+
