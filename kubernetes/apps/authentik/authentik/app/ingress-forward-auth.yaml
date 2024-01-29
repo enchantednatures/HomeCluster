@@ -13,4 +13,4 @@ spec:
           service:
             name: ak-outpost-nginx
             port:
-              number: 9000
+              name: http
