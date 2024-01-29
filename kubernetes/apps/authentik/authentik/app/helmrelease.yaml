@@ -71,6 +71,8 @@ spec:
     image:
       repository: ghcr.io/goauthentik/server
       tag: 2023.10.6
+    clusterRole:
+      enabled: true
     ingress:
       enabled: true
       ingressClassName: "external"
