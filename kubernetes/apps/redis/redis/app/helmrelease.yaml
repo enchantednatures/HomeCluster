@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: redis
-      version: 18.9.0
+      version: 18.12.0
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -44,22 +44,10 @@ spec:
       # Disable RDB persistence, AOF persistence already enabled.
       save ""
     master:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: "kubernetes.io/arch"
-                    operator: In
-                    values:
-                      - amd64
+      serviceAccount:
+        create: true
       persistence:
         enabled: false
-        # path: /data
-        # storageClass: "ceph-block"
-        # accessModes:
-        #   - ReadWriteOnce
-        # size: 8Gi
       service:
         type: ClusterIP
         ports:
@@ -71,22 +59,8 @@ spec:
       terminationGracePeriodSeconds: 30
     replica:
       replicaCount: 3
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: "kubernetes.io/arch"
-                    operator: In
-                    values:
-                      - amd64
       persistence:
         enabled: false
-        # path: /data
-        # storageClass: "longhorn"
-        # accessModes:
-        #   - ReadWriteOnce
-        # size: 8Gi
       service:
         type: ClusterIP
         ports:
