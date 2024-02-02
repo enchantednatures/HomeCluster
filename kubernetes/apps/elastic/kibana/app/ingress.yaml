@@ -4,8 +4,6 @@ metadata:
   name: kibana
   namespace: elastic
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: HTTP
-    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
     external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
     external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
