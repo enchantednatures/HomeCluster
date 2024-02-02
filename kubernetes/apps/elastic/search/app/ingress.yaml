@@ -22,6 +22,8 @@ spec:
             path: /
             pathType: Prefix
 
-      tls:
-        - hosts:
-            - *host
+  tls:
+    - hosts:
+        - *host
+
+  secretName: elasticsearch-tls

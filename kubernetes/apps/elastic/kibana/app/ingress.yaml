@@ -1,15 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: elasticsearch
+  name: kibana
   namespace: elastic
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTP
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
+    external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+    external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
-  ingressClassName: internal-nginx
+  ingressClassName: external
   rules:
-    - host: elastic.${SECRET_DOMAIN}
+    - host: &host kibana.${SECRET_DOMAIN}
       http:
         paths:
           - backend:
@@ -19,3 +21,9 @@ spec:
                   number: 9200
             path: /
             pathType: Prefix
+
+  tls:
+    - hosts:
+        - *host
+
+      secretName: kibana-tls
