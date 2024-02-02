@@ -6,12 +6,10 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTP
     nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
-    external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
-    external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
-  ingressClassName: external
+  ingressClassName: internal-nginx
   rules:
-    - host: &host elastic.${SECRET_DOMAIN}
+    - host: elastic.${SECRET_DOMAIN}
       http:
         paths:
           - backend:
@@ -21,7 +19,3 @@ spec:
                   number: 9200
             path: /
             pathType: Prefix
-
-      tls:
-        - hosts:
-            - *host
