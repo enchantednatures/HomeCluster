@@ -11,29 +11,15 @@ spec:
       selfSignedCertificate:
         disabled: true
   nodeSets:
-    - name: master
-      count: 1
-      config:
-        node.roles: ["master"]
-        node.store.allow_mmap: false
-      podTemplate:
-        metadata:
-          labels:
-            app: ekmnt
-          annotations:
-            traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
-            traffic.sidecar.istio.io/excludeInboundPorts: "9300"
-    - name: data
+    - name: default
       count: 3
       config:
-        node.roles: ["data"]
         node.store.allow_mmap: false
-      metadata:
-        labels:
-          app: ekmnt
-        annotations:
-          traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
-          traffic.sidecar.istio.io/excludeInboundPorts: "9300"
+        xpack.security.authc:
+          anonymous:
+            username: chastened
+            roles: superuser
+            authz_exception: false
       podTemplate:
         spec:
           nodeSelector:
@@ -54,25 +40,3 @@ spec:
             resources:
               requests:
                 storage: 10Gi
-
-
-    - name: ingest
-      count: 1
-      config:
-        node.roles: ["ingest"]
-        node.store.allow_mmap: false
-      podTemplate:
-        metadata:
-          annotations:
-            traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
-            traffic.sidecar.istio.io/excludeInboundPorts: "9300"
-    - name: coordinating
-      count: 1
-      config:
-        node.roles: []
-        node.store.allow_mmap: false
-      podTemplate:
-        metadata:
-          annotations:
-            traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
-            traffic.sidecar.istio.io/excludeInboundPorts: "9300"
