@@ -5,3 +5,5 @@ resources:
   - ./namespace.yaml
   - ./operator/ks.yaml
   - ./search/ks.yaml
+  - ./kibana/ks.yaml
+  - ./maps/ks.yaml
