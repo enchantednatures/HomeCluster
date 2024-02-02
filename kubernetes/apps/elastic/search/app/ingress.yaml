@@ -16,7 +16,7 @@ spec:
         paths:
           - backend:
               service:
-                name: main-es-http
+                name: elasticsearch-es-http
                 port:
                   number: 9200
             path: /
