@@ -21,9 +21,7 @@ spec:
                   number: 9200
             path: /
             pathType: Prefix
-
   tls:
     - hosts:
         - *host
-
       secretName: kibana-tls
