@@ -14,13 +14,13 @@ spec:
     - host: &host kibana.${SECRET_DOMAIN}
       http:
         paths:
-          - backend:
-              service:
-                name: main-es-http
-                port:
-                  number: 9200
-            path: /
+          - path: "/"
             pathType: Prefix
+            backend:
+              service:
+                name: kibana-kb-http
+                port:
+                  name: https
   tls:
     - hosts:
         - *host
