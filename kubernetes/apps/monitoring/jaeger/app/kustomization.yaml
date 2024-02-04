@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./jaeger.yaml
   - ./elastic-credentials.sealed.yaml
+  - ./ingress.yaml
