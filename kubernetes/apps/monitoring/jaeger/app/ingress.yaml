@@ -4,6 +4,8 @@ metadata:
   name: jaeger-collector
   namespace: monitoring
   annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTP
+    nginx.ingress.kubernetes.io/proxy-ssl-verify: "off"
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns/is-public: "true"
