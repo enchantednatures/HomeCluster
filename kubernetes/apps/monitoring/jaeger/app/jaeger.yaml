@@ -3,6 +3,19 @@ kind: Jaeger
 metadata:
   name: jaeger
 spec:
-  strategy: allInOne
+  strategy: production
   ingress:
-      secretName: jaeger-tls
+    secretName: jaeger-tls
+  collector:
+    maxReplicas: 5
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    storage:
+      type: elasticsearch
+      options:
+        es:
+          server-urls: http://elasticsearch-es-http.elastic.svc.cluster.local:9200
+          index-prefix: jaeger
+      secretName: jaeger-es-secret
