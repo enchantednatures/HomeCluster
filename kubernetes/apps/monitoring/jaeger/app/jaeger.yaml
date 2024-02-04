@@ -12,10 +12,10 @@ spec:
       limits:
         cpu: 100m
         memory: 128Mi
-    storage:
-      type: elasticsearch
-      options:
-        es:
-          server-urls: http://elasticsearch-es-http.elastic.svc.cluster.local:9200
-          index-prefix: jaeger
-      secretName: jaeger-es-secret
+  storage:
+    type: elasticsearch
+    options:
+      es:
+        server-urls: http://elasticsearch-es-http.elastic.svc.cluster.local:9200
+        index-prefix: jaeger
+    secretName: jaeger-es-secret
