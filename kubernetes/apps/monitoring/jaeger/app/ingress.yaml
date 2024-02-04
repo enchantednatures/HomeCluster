@@ -20,7 +20,7 @@ spec:
               service:
                 name: jaeger-collector
                 port:
-                  name: http-otlp
+                  name: grpc-jaeger
   tls:
     - hosts:
         - *host
