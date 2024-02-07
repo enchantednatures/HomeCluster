@@ -47,7 +47,7 @@ spec:
         enabled: true
         allow_assign_grafana_admin: true
         client_id: qBW1hScNwEEVrzwdTiZeA3H6KuQlLpI5t3fYo6fa
-        client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
+        client_secret: $__file{/etc/secrets/auth_generic_oauth/CLIENT_SECRET}
         scopes: "openid profile email"
         auth_url: "https://auth.${SECRET_DOMAIN}/application/o/authorize/"
         token_url: "https://auth.${SECRET_DOMAIN}/application/o/token/"
