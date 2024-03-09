@@ -46,7 +46,7 @@ spec:
       serviceAccountName: operator-webhook
       containers:
         - name: operator-webhook
-          image: gcr.io/knative-releases/knative.dev/operator/cmd/webhook@sha256:446ccc3d269c78a3087702fba1075c5c5fefbe9f2141d8360a54d5d06cf6b059
+          image: gcr.io/knative-releases/knative.dev/operator/cmd/webhook@sha256:7ba5c700c0b23c83be3e77b92350162f91adcbc9c85a54dee77a85fae64bb12e
           resources:
             requests:
               cpu: 100m
