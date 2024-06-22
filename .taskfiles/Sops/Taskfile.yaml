@@ -27,6 +27,13 @@ tasks:
               find "{{.KUBERNETES_DIR}}" -type f -name "*.sops.*" -exec grep -L "ENC\[AES256_GCM" {} \;
           fi
 
+  decrypt:
+    desc: Encrypt all sops
+    dir: kubernetes
+    cmds:
+      - |
+        find . -maxdepth 8 -name "*.sops.yaml" | xargs -L1 sops --decrypt --age $(rg -ioP "public key: \K(.*$)" $SOPS_AGE_KEY_FILE) -i
+
   .encrypt-file:
     internal: true
     cmd: sops --encrypt --in-place {{.file}}
