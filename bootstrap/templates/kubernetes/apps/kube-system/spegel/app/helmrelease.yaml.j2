@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: spegel
-      version: v0.0.22
+      version: v0.0.23
       sourceRef:
         kind: HelmRepository
         name: spegel
@@ -20,12 +20,11 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  valuesFrom:
+    - kind: ConfigMap
+      name: spegel-helm-values
   values:
-    spegel:
-      containerdSock: /run/containerd/containerd.sock
-      containerdRegistryConfigPath: /etc/cri/conf.d/hosts
-    service:
-      registry:
-        hostPort: 29999
+    grafanaDashboard:
+      enabled: true
     serviceMonitor:
       enabled: true

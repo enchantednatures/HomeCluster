@@ -8,3 +8,9 @@ resources:
   {% endif %}
   - ./helmvalues.yaml
   - ./helmrelease.yaml
+configMapGenerator:
+  - name: cilium-helm-values
+    files:
+      - values.yaml=./helm-values.yaml
+configurations:
+  - kustomizeconfig.yaml
