@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app: api
-  replicas: 10
+  replicas: 3
   strategy:
     rollingUpdate:
       maxSurge: 25%
