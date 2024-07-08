@@ -59,7 +59,7 @@ resource "proxmox_virtual_environment_vm" "k8s-ctrl-01" {
     }
     ip_config {
       ipv4 {
-        address = "192.168.1.200/24"
+        address = "192.168.1.201/24"
         gateway = "192.168.1.1"
       }
     }
