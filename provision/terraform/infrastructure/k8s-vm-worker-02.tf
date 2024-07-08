@@ -1,12 +1,12 @@
-resource "proxmox_virtual_environment_vm" "k8s-work-01" {
+resource "proxmox_virtual_environment_vm" "k8s-work-02" {
   provider  = proxmox.euclid
   node_name = var.euclid.node_name
 
-  name        = "k8s-work-01"
-  description = "Kubernetes Worker 01"
+  name        = "k8s-work-02"
+  description = "Kubernetes Worker 02"
   tags        = ["k8s", "worker"]
   on_boot     = true
-  vm_id       = 8101
+  vm_id       = 8102
 
   machine       = "q35"
   scsi_hardware = "virtio-scsi-single"
@@ -23,7 +23,7 @@ resource "proxmox_virtual_environment_vm" "k8s-work-01" {
 
   network_device {
     bridge      = "vmbr0"
-    mac_address = "BC:24:11:2E:AE:01"
+    mac_address = "BC:24:11:2E:AE:02"
   }
 
   efi_disk {
@@ -88,19 +88,17 @@ resource "proxmox_virtual_environment_vm" "k8s-work-01" {
     }
 
     datastore_id      = "local"
-    user_data_file_id = proxmox_virtual_environment_file.cloud-init-work-01.id
+    user_data_file_id = proxmox_virtual_environment_file.cloud-init-work-02.id
   }
 }
 
-output "work_01_ipv4_address" {
-  depends_on = [proxmox_virtual_environment_vm.k8s-work-01]
-  value      = proxmox_virtual_environment_vm.k8s-work-01.ipv4_addresses[1][0]
+output "work_02_ipv4_address" {
+  depends_on = [proxmox_virtual_environment_vm.k8s-work-02]
+  value      = proxmox_virtual_environment_vm.k8s-work-02.ipv4_addresses[1][0]
 }
 
-resource "local_file" "work-01-ip" {
-  content         = proxmox_virtual_environment_vm.k8s-work-01.ipv4_addresses[1][0]
-  filename        = "output/work-01-ip.txt"
+resource "local_file" "work-02-ip" {
+  content         = proxmox_virtual_environment_vm.k8s-work-02.ipv4_addresses[1][0]
+  filename        = "output/work-02-ip.txt"
   file_permission = "0644"
 }
-
-

@@ -25,15 +25,10 @@ env:
   VIRTUAL_ENV: "{{.ROOT_DIR}}/.venv"
 
 includes:
-  ansible: .taskfiles/Ansible/Taskfile.yaml
   kubernetes:
     aliases: ["k8s"]
     taskfile: .taskfiles/Kubernetes/Taskfile.yaml
   flux: .taskfiles/Flux/Taskfile.yaml
-  repository:
-    aliases: ["repo"]
-    taskfile: .taskfiles/Repository/Taskfile.yaml
-  talos: .taskfiles/Talos/Taskfile.yaml
   terraform: .taskfiles/TerraformTasks.yaml
   sops: .taskfiles/Sops/Taskfile.yaml
   workstation: .taskfiles/Workstation/Taskfile.yaml
