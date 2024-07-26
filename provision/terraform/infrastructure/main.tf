@@ -13,15 +13,15 @@ terraform {
       version = "0.16.1"
     }
 
-    flux = {
-      source  = "fluxcd/flux"
-      version = ">= 1.2"
-    }
+    # flux = {
+    #   source  = "fluxcd/flux"
+    #   version = ">= 1.2"
+    # }
 
-    github = {
-      source  = "integrations/github"
-      version = ">= 6.1"
-    }
+    # github = {
+    #   source  = "integrations/github"
+    #   version = ">= 6.1"
+    # }
 
     tls = {
       source  = "hashicorp/tls"
@@ -29,8 +29,6 @@ terraform {
     }
   }
 }
-
-
 
 provider "proxmox" {
   alias    = "euclid"
@@ -46,8 +44,8 @@ provider "proxmox" {
   }
 }
 
-provider "tailscale" {
-  api_key = var.tailscale_api_key
-  tailnet = "enchantednatures.github"
-}
+# provider "tailscale" {
+#   api_key = var.tailscale_api_key
+#   tailnet = "enchantednatures.github"
+# }
 
