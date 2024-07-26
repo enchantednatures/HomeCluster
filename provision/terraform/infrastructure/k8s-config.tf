@@ -26,6 +26,7 @@ resource "proxmox_virtual_environment_file" "cloud-init-ctrl-01" {
         password    = var.vm_password
         pub-key     = file("~/.ssh/id_rsa.pub")
         k8s-version = var.k8s-version
+        tailscale_machine_key = var.tailscale_machine_key
         kubeadm-cmd = "kubeadm init --skip-phases=addon/kube-proxy"
       })
       username           = var.vm_user
@@ -50,6 +51,7 @@ resource "proxmox_virtual_environment_file" "cloud-init-work-01" {
         password    = var.vm_password
         pub-key     = file("~/.ssh/id_rsa.pub")
         k8s-version = var.k8s-version
+        tailscale_machine_key = var.tailscale_machine_key
         kubeadm-cmd = module.kubeadm-join.stdout
       })
     })
@@ -71,6 +73,7 @@ resource "proxmox_virtual_environment_file" "cloud-init-work-02" {
         password    = var.vm_password
         pub-key     = file("~/.ssh/id_rsa.pub")
         k8s-version = var.k8s-version
+        tailscale_machine_key = var.tailscale_machine_key
         kubeadm-cmd = module.kubeadm-join.stdout
       })
     })

@@ -64,4 +64,6 @@ runcmd:
   - modprobe br_netfilter
   - sysctl --system
   - systemctl restart containerd
+  - sh -c curl -fsSL https://tailscale.com/install.sh | sh
+  - tailscale up -authkey=${tailscale_machine_key}
   - ${kubeadm-cmd}

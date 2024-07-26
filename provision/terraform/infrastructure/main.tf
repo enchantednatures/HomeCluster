@@ -51,6 +51,3 @@ provider "tailscale" {
   tailnet = "enchantednatures.github"
 }
 
-
-
-

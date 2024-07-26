@@ -23,4 +23,3 @@ provision/terraform/proxmox/api_credentials.auto.tfvars
 /provision/terraform/authentik/api-credentials.auto.tfvars
 /provision/terraform/authentik/terraform.tfstate
 /provision/terraform/authentik/terraform.tfstate.backup
-/kubernetes/apps/monitoring/influxdb

@@ -60,3 +60,9 @@ variable "github_repository" {
   description = "GitHub repository"
   type        = string
 }
+
+variable "tailscale_machine_key" {
+  description = "Machine Key to use for Tailscale"
+  type        = string
+  sensitive   = true
+}
