@@ -4219,7 +4219,7 @@ spec:
       serviceAccountName: knative-operator
       containers:
         - name: knative-operator
-          image: gcr.io/knative-releases/knative.dev/operator/cmd/operator@sha256:0628e78ad113b770ad5f2ae8648783358aba26d1b206174d66031f8806230c84
+          image: gcr.io/knative-releases/knative.dev/operator/cmd/operator@sha256:2c10194fa3c7f984228ba688a99cd7f6857ccd9d62ab95a80d2b0b4203f89f9b
           imagePullPolicy: IfNotPresent
           env:
             - name: POD_NAME
