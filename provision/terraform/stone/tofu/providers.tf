@@ -1,0 +1,55 @@
+# tofu/providers.tf
+terraform {
+  # backend "s3" {
+  #   bucket = "tofu"
+  #   key    = "state"
+  #   region = "us-east-rack-01"
+  #   endpoints = {
+  #     s3 = "https://tower:9769"
+  #   }
+  #   skip_credentials_validation = true  # Skip AWS related checks and validations
+  #   skip_requesting_account_id = true
+  #   skip_metadata_api_check = true
+  #   skip_region_validation = true
+  #   use_path_style = true
+  # }
+
+  backend "pg" { }
+
+  required_providers {
+    talos = {
+      source  = "siderolabs/talos"
+      version = "0.5.0"
+    }
+    proxmox = {
+      source  = "bpg/proxmox"
+      version = "0.61.1"
+    }
+    restapi = {
+      source  = "Mastercard/restapi"
+      version = "1.19.1"
+    }
+  }
+}
+
+provider "proxmox" {
+  endpoint = var.proxmox.endpoint
+  insecure = var.proxmox.insecure
+
+  api_token = var.proxmox.api_token
+  ssh {
+    agent    = true
+    username = var.proxmox.username
+  }
+}
+
+provider "restapi" {
+  uri                  = var.proxmox.endpoint
+  insecure             = var.proxmox.insecure
+  write_returns_object = true
+
+  headers = {
+    "Content-Type"  = "application/json"
+    "Authorization" = "PVEAPIToken=${var.proxmox.api_token}"
+  }
+}

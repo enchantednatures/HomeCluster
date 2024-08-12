@@ -1,0 +1,17 @@
+---
+title: Overview of the the Proxmox cluster used in this article
+---
+flowchart TB
+    subgraph cluster["Proxmox Cluster"]
+        subgraph euclid["euclid"]
+            vm01["VM: ctrl-01"]
+        end
+        subgraph abel["abel"]
+            vm00["VM: ctrl-00"]
+            vm10["VM: work-00"]
+        end
+        subgraph cantor["cantor"]
+            vm02["VM: ctrl-02"]
+        end
+    end
+    euclid --- abel --- cantor --- euclid
