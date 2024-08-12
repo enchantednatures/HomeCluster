@@ -5,16 +5,16 @@ image = {
 }
 
 nodes = {
-  "ctrl-00" = {
+  "ctrl-01" = {
     host_node    = "pve"
     machine_type = "controlplane"
   }
-  "ctrl-01" = {
+  "ctrl-02" = {
     host_node    = "pve"
     machine_type = "controlplane"
     update       = true
   }
-  "ctrl-02" = {
+  "ctrl-03" = {
     host_node    = "pve"
     machine_type = "controlplane"
     update       = true
