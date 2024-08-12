@@ -23,3 +23,8 @@ provision/terraform/proxmox/api_credentials.auto.tfvars
 /provision/terraform/authentik/api-credentials.auto.tfvars
 /provision/terraform/authentik/terraform.tfstate
 /provision/terraform/authentik/terraform.tfstate.backup
+provision/terraform/infrastructure/.terraform/modules/kube-config.delete_files/
+provision/terraform/infrastructure/.terraform/modules/kube-config.write_command_files/LICENSE
+provision/terraform/infrastructure/.terraform/
+provision/terraform/stone/tofu/.terraform/
+provision/terraform/stone/tofu/outputs/
