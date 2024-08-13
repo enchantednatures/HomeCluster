@@ -26,8 +26,8 @@ provision/terraform/proxmox/api_credentials.auto.tfvars
 provision/terraform/infrastructure/.terraform/modules/kube-config.delete_files/
 provision/terraform/infrastructure/.terraform/modules/kube-config.write_command_files/LICENSE
 provision/terraform/infrastructure/.terraform/
-provision/terraform/stone/tofu/.terraform/
-provision/terraform/stone/tofu/outputs/
-provision/terraform/stone/tofu/certs/
-provision/terraform/stone/tofu/.terraform.lock.hcl
-provision/terraform/stone/tofu/proxmox.auto.tfvars
+provision/terraform/proxmox/.terraform/
+provision/terraform/proxmox/outputs/
+provision/terraform/proxmox/certs/
+provision/terraform/proxmox/.terraform.lock.hcl
+provision/terraform/proxmox/proxmox.auto.tfvars
