@@ -28,3 +28,6 @@ provision/terraform/infrastructure/.terraform/modules/kube-config.write_command_
 provision/terraform/infrastructure/.terraform/
 provision/terraform/stone/tofu/.terraform/
 provision/terraform/stone/tofu/outputs/
+provision/terraform/stone/tofu/certs/
+provision/terraform/stone/tofu/.terraform.lock.hcl
+provision/terraform/stone/tofu/proxmox.auto.tfvars
