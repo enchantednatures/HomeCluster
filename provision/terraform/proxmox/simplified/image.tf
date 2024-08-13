@@ -4,7 +4,7 @@ locals {
 
   platform = "nocloud"
   arch     = "amd64"
-  version  = "v1.7.5"
+  version  = "v1.7.6"
   schematic = file("${path.module}/image/schematic.yaml")
 
   schematic_id = jsondecode(data.http.schematic_id.response_body)["id"]
