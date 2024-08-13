@@ -1,20 +1,22 @@
 # tofu/providers.tf
 terraform {
-  # backend "s3" {
-  #   bucket = "tofu"
-  #   key    = "state"
-  #   region = "us-east-rack-01"
-  #   endpoints = {
-  #     s3 = "https://tower:9769"
-  #   }
-  #   skip_credentials_validation = true  # Skip AWS related checks and validations
-  #   skip_requesting_account_id = true
-  #   skip_metadata_api_check = true
-  #   skip_region_validation = true
-  #   use_path_style = true
-  # }
+  backend "s3" {
+    bucket = "tofu"
+    key    = "state"
+    region = "us-east-rack-01"
+    access_key = var.aws_access_key
+    secret_key = var.aws_secret_key
+    endpoints = {
+      s3 = "http://tower:9768"
+    }
+    skip_credentials_validation = true  # Skip AWS related checks and validations
+    skip_requesting_account_id = true
+    skip_metadata_api_check = true
+    skip_region_validation = true
+    use_path_style = true
+  }
 
-  backend "pg" { }
+  # backend "pg" { }
 
   required_providers {
     talos = {
