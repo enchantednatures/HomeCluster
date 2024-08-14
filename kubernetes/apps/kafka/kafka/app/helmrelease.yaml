@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: kafka
-      version: 29.3.7
+      version: 30.0.3
       sourceRef:
         kind: HelmRepository
         name: bitnami
