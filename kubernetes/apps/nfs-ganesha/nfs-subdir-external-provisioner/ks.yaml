@@ -9,7 +9,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/core/nfs-ganesha/nfs-subdir-external-provisioner/app
+  path: ./kubernetes/apps/nfs-ganesha/nfs-subdir-external-provisioner/app
   prune: true
   sourceRef:
     kind: GitRepository

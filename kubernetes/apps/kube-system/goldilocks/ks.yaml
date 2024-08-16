@@ -9,7 +9,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/core/kube-system/goldilocks/app
+  path: ./kubernetes/apps/kube-system/goldilocks/app
   prune: true
   sourceRef:
     kind: GitRepository
