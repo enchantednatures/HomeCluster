@@ -58,6 +58,13 @@ resource "proxmox_virtual_environment_vm" "this" {
         gateway = var.cluster.gateway
       }
     }
+    dns {
+      servers = [
+        "100.100.100.100",
+        "1.1.1.1",
+        "8.8.8.8"
+      ]
+    }
   }
 
   # dynamic "hostpci" {
