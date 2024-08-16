@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kube-prometheus-stack-values
+  namespace: monitoring
 data:
   values.yaml: |
     crds:
