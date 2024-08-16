@@ -6,7 +6,7 @@ image = {
 
 nodes = {
   "ctrl-01" = {
-    host_node    = "melusine"
+    host_node    = "pve"
     machine_type = "controlplane"
   }
   "ctrl-02" = {

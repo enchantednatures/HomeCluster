@@ -26,7 +26,7 @@ module "talos" {
 
   nodes = {
     "ctrl-01" = {
-      host_node     = "melusine"
+      host_node     = "pve"
       machine_type  = "controlplane"
       ip            = "192.168.1.201"
       mac_address   = "BC:24:11:2E:C8:01"
@@ -54,7 +54,7 @@ module "talos" {
     #   ram_dedicated = 4096
     # }
     "work-00" = {
-      host_node     = "melusine"
+      host_node     = "pve"
       machine_type  = "worker"
       ip            = "192.168.1.211"
       mac_address   = "BC:24:11:2E:08:00"

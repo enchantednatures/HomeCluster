@@ -1,0 +1,16 @@
+
+data "proxmox_virtual_environment_dns" "pve_dns" {
+  node_name = "pve"
+}
+
+resource "proxmox_virtual_environment_dns" "pve_dns" {
+  domain    = data.proxmox_virtual_environment_dns.pve_dns.domain
+  node_name = data.proxmox_virtual_environment_dns.pve_dns.node_name
+
+  servers = [
+    "100.100.100.100",
+    "1.1.1.1",
+    "8.8.8.8",
+  ]
+}
+
