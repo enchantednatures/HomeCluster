@@ -22,9 +22,9 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  dependsOn:
-    - name: local-path-provisioner
-      namespace: kube-system
+  # dependsOn:
+  #   - name: local-path-provisioner
+  #     namespace: kube-system
   # valuesFrom:
   #   - targetPath: grafana.ini.auth.generic_oauth
   #     kind: Secret
