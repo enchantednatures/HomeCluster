@@ -70,7 +70,7 @@ spec:
   values:
     image:
       repository: ghcr.io/goauthentik/server
-      tag: 2024.6.3
+      tag: 2024.6.4
     clusterRole:
       enabled: true
     ingress:
