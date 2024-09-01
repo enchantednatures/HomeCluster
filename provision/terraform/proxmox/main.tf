@@ -32,7 +32,7 @@ module "talos" {
       mac_address   = "BC:24:11:2E:C8:01"
       vm_id         = 800
       cpu           = 8
-      ram_dedicated = 4096
+      ram_dedicated = 8192
     }
     # "ctrl-02" = {
     #   host_node     = "pve"
@@ -59,8 +59,8 @@ module "talos" {
       ip            = "192.168.1.211"
       mac_address   = "BC:24:11:2E:08:00"
       vm_id         = 810
-      cpu           = 8
-      ram_dedicated = 4096
+      cpu           = 16
+      ram_dedicated = 16384
       igpu          = true
     }
   }
