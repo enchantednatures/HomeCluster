@@ -25,10 +25,14 @@ spec:
       #   - name: regcred
       containers:
         - name: api
-          image: ghcr.io/enchantednatures/enchantednatures.api:v0.3.0
+          image: ghcr.io/enchantednatures/enchantednatures.api:v0.4.2
           imagePullPolicy: Always
           volumeMounts:
             - name: config
+              mountPath: /config/dev.yaml
+              subPath: config.yaml
+
+            - name: certs
               mountPath: /config/dev.yaml
               subPath: config.yaml
           resources:
@@ -55,19 +59,6 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 10
-          env:
-            - name: ENVIRONMENT
-              value: development
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                configMapKeyRef:
-                  name: dev-api
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                configMapKeyRef:
-                  name: dev-api
-                  key: AWS_SECRET_ACCESS_KEY
           ports:
             - containerPort: 6969
               name: dev-api
