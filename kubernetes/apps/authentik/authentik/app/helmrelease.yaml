@@ -68,9 +68,6 @@ spec:
       name: authentik-secrets
       valuesKey: EMAIL_USERNAME
   values:
-    # image:
-    #   repository: ghcr.io/goauthentik/server
-    #   tag: 2024.6.3
     clusterRole:
       enabled: true
     ingress:
@@ -89,15 +86,6 @@ spec:
         - secretName: authentik-tls
           hosts:
             - *host
-    resources:
-      server:
-        requests:
-          cpu: 15m
-          memory: 476M
-      worker:
-        requests:
-          cpu: 15m
-          memory: 512M
     geoip:
       enabled: false
     authentik:
