@@ -33,6 +33,7 @@ module "talos" {
       vm_id         = 800
       cpu           = 8
       ram_dedicated = 8192
+      disk_size     = 32
     }
     # "ctrl-02" = {
     #   host_node     = "pve"
@@ -61,6 +62,8 @@ module "talos" {
       vm_id         = 810
       cpu           = 16
       ram_dedicated = 32768
+      disk_size     = 64
+      datastore_id  = "data"
       igpu          = true
     }
 
@@ -72,9 +75,10 @@ module "talos" {
       vm_id         = 811
       cpu           = 16
       ram_dedicated = 32768
+      disk_size     = 64
+      datastore_id  = "data"
       igpu          = true
     }
-
   }
 }
 
