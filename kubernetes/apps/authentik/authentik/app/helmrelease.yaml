@@ -68,9 +68,9 @@ spec:
       name: authentik-secrets
       valuesKey: EMAIL_USERNAME
   values:
-    image:
-      repository: ghcr.io/goauthentik/server
-      tag: 2024.6.3
+    # image:
+    #   repository: ghcr.io/goauthentik/server
+    #   tag: 2024.6.3
     clusterRole:
       enabled: true
     ingress:
