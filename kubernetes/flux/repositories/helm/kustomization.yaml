@@ -32,6 +32,7 @@ resources:
   - ./piraeus.yaml
   - ./prometheus-community.yaml
   - ./sealed-secrets.yaml
+  - ./spegel.yaml
   - ./stakater.yaml
   - ./velero.yaml
   - ./vmware-tanzu.yaml
