@@ -188,7 +188,7 @@ spec:
             - *host
     persistence:
       enabled: true
-      storageClassName: local-hostpath
+      storageClassName: csi-nfs
     testFramework:
       enabled: false
     extraSecretMounts:

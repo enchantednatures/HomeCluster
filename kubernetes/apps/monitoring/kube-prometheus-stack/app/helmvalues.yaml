@@ -108,7 +108,7 @@ data:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: local-hostpath
+              storageClassName: csi-nfs
               resources:
                 requests:
                   storage: 10Gi
