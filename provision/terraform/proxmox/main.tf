@@ -85,7 +85,7 @@ module "talos" {
       machine_type  = "worker"
       ip            = "192.168.1.213"
       mac_address   = "BC:24:11:2E:08:02"
-      vm_id         = 811
+      vm_id         = 812
       cpu           = 8
       ram_dedicated = 16384
       disk_size     = 64
