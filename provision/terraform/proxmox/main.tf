@@ -32,7 +32,7 @@ module "talos" {
       mac_address   = "BC:24:11:2E:C8:01"
       vm_id         = 800
       cpu           = 8
-      ram_dedicated = 8192
+      ram_dedicated = 32768
       disk_size     = 32
     }
     # "ctrl-02" = {
@@ -60,8 +60,8 @@ module "talos" {
       ip            = "192.168.1.211"
       mac_address   = "BC:24:11:2E:08:00"
       vm_id         = 810
-      cpu           = 16
-      ram_dedicated = 32768
+      cpu           = 8
+      ram_dedicated = 16384
       disk_size     = 64
       datastore_id  = "data"
       igpu          = true
@@ -73,8 +73,21 @@ module "talos" {
       ip            = "192.168.1.212"
       mac_address   = "BC:24:11:2E:08:01"
       vm_id         = 811
-      cpu           = 16
-      ram_dedicated = 32768
+      cpu           = 8
+      ram_dedicated = 16384
+      disk_size     = 64
+      datastore_id  = "data"
+      igpu          = true
+    }
+
+    "work-02" = {
+      host_node     = "pve"
+      machine_type  = "worker"
+      ip            = "192.168.1.213"
+      mac_address   = "BC:24:11:2E:08:02"
+      vm_id         = 811
+      cpu           = 8
+      ram_dedicated = 16384
       disk_size     = 64
       datastore_id  = "data"
       igpu          = true
