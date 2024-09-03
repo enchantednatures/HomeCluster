@@ -32,6 +32,11 @@ resource "proxmox_virtual_environment_vm" "this" {
     mac_address = each.value.mac_address
   }
 
+  network_device {
+    bridge      = "vmbr8"
+    mac_address = each.value.mac_address
+  }
+
   disk {
     datastore_id = each.value.datastore_id
     interface    = "scsi0"
