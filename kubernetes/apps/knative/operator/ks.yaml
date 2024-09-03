@@ -5,6 +5,8 @@ metadata:
   name: &app knative-operator
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: nginx-external
   targetNamespace: knative
   commonMetadata:
     labels:

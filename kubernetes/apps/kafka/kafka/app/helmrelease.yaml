@@ -31,3 +31,17 @@ spec:
       enabled: false
     zookeeper:
       enabled: true
+    externalAccess:
+      enabled: true
+      service:
+        type: LoadBalancer
+    listeners:
+      client:
+        protocol: SSL
+    auth:
+      clientProtocol: ssl
+      interBrokerProtocol: ssl
+    tls:
+      type: jks
+      passwordSecretName: kafka-tls-password
+      certificatesSecretName: kafka-tls-certificates

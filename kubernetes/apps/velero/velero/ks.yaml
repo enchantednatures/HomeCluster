@@ -5,6 +5,8 @@ metadata:
   name: &app velero
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: sealed-secrets
   targetNamespace: velero
   commonMetadata:
     labels:

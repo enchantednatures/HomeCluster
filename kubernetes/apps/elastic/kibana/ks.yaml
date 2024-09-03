@@ -5,6 +5,8 @@ metadata:
   name: &app kibana
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: elasticsearch
   targetNamespace: elastic
   commonMetadata:
     labels:

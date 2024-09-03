@@ -5,6 +5,8 @@ metadata:
   name: &app thanos
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: kube-prometheus-stack
   targetNamespace: monitoring
   commonMetadata:
     labels:

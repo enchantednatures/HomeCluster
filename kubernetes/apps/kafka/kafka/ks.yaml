@@ -4,6 +4,8 @@ metadata:
   name: &app kafka
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: zookeeper
   targetNamespace: kafka
   commonMetadata:
     labels:

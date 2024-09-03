@@ -5,6 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: authentik
+  dependsOn:
+    - name: sealed-secrets
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

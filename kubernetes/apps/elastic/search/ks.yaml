@@ -5,6 +5,8 @@ metadata:
   name: &app elasticsearch
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: sealed-secrets
   targetNamespace: elastic
   commonMetadata:
     labels:

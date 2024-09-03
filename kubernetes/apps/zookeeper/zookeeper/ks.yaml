@@ -4,6 +4,8 @@ metadata:
   name: &app zookeeper
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: sealed-secrets
   targetNamespace: zookeeper
   commonMetadata:
     labels:

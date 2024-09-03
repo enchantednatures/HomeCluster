@@ -5,6 +5,8 @@ metadata:
   name: &app volsync
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: kafka
   targetNamespace: volsync
   commonMetadata:
     labels:
