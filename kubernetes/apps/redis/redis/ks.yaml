@@ -4,6 +4,8 @@ metadata:
   name: &app redis
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: sealed-secrets
   targetNamespace: redis
   commonMetadata:
     labels:
