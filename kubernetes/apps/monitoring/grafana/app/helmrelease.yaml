@@ -186,9 +186,9 @@ spec:
       tls:
         - hosts:
             - *host
-    persistence:
-      enabled: true
-      storageClassName: csi-nfs
+    # persistence:
+    #   enabled: true
+    #   storageClassName: csi-nfs
     testFramework:
       enabled: false
     extraSecretMounts:
