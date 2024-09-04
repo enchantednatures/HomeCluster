@@ -80,9 +80,7 @@ spec:
           external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
         hosts:
-          - host: &host auth.${SECRET_DOMAIN}
-            paths:
-              - path: /
+          - &host auth.${SECRET_DOMAIN}
         tls:
           - secretName: authentik-tls
             hosts:
