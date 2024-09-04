@@ -1,6 +1,6 @@
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: OciRepository
 metadata:
   name: bjw-s
   namespace: flux-system
