@@ -38,6 +38,8 @@ spec:
     env:
       GF_EXPLORE_ENABLED: true
       GF_SERVER_ROOT_URL: "https://grafana.${SECRET_DOMAIN}"
+    envFromSecrets:
+      - name: grafana-oauth-secret
     grafana.ini:
       auth:
         signout_redirect_url: "https://auth.${SECRET_DOMAIN}/application/o/grafana/end-session/"
@@ -46,14 +48,14 @@ spec:
         name: authentik
         enabled: true
         allow_assign_grafana_admin: true
-        client_id: qBW1hScNwEEVrzwdTiZeA3H6KuQlLpI5t3fYo6fa
-        client_secret: $__file{/etc/secrets/auth_generic_oauth/CLIENT_SECRET}
         scopes: "openid profile email"
         auth_url: "https://auth.${SECRET_DOMAIN}/application/o/authorize/"
         token_url: "https://auth.${SECRET_DOMAIN}/application/o/token/"
         api_url: "https://auth.${SECRET_DOMAIN}/application/o/userinfo/"
         # Optionally map user groups to Grafana roles
         role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+      auth.basic:
+        enabled: false
       analytics:
         check_for_updates: false
         check_for_plugin_updates: false
