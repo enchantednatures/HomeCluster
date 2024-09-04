@@ -3,9 +3,7 @@ kind: Kustomization
 resources:
   - ./authentik.yaml
   - ./backube.yaml
-  - ./bitnami-schema-registry.yaml
-  - ./bitnami.yaml
-  - ./bjw-s.yaml
+
   - ./cilium.yaml
   - ./coredns.yaml
   - ./csi-driver-nfs.yaml
@@ -30,10 +28,10 @@ resources:
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
   - ./piraeus.yaml
-  - ./prometheus-community.yaml
   - ./sealed-secrets.yaml
-  - ./spegel.yaml
   - ./stakater.yaml
   - ./velero.yaml
   - ./vmware-tanzu.yaml
-  - ./weave-gitops.yaml
+
+
+
