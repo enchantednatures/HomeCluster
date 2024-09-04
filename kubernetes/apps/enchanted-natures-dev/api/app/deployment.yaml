@@ -34,6 +34,9 @@ spec:
             - name: database-certs
               mountPath: /cert
               readOnly: true
+          env:
+            - name: ENVIRONMENT
+              value: "development"
           resources:
             requests:
               cpu: 100m
