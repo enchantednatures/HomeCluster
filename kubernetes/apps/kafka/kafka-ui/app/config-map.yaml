@@ -7,7 +7,7 @@ data:
     kafka:
       clusters:
         - name: yaml
-          bootstrapServers: kafka-broker-0:9093
+          bootstrapServers: kafka.kafka.svc.cluster.local:9092
     auth:
       type: disabled
     management:
