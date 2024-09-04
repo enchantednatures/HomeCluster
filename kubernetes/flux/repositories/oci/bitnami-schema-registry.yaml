@@ -1,6 +1,6 @@
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: OciRepository
+kind: HelmRepository
 metadata:
   name: bitnami-schema-registry
   namespace: flux-system

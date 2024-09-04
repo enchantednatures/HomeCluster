@@ -1,6 +1,6 @@
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: OciRepository
+kind: HelmRepository
 metadata:
   name: weave-gitops
   namespace: flux-system
