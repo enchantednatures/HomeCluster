@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dev-api
-  namespace: enchantednatures-dev
+  namespace: enchanted-natures-dev
   labels:
     app: dev-api
 spec:
@@ -29,8 +29,7 @@ spec:
           imagePullPolicy: Always
           volumeMounts:
             - name: config
-              mountPath: /config/dev.yaml
-              subPath: config.yaml
+              mountPath: /config/development.yaml
             - name: database-certs
               mountPath: /cert
               readOnly: true
