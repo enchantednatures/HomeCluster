@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
@@ -10,3 +11,4 @@ resources:
   - ./prometheus-operator-crds//ks.yaml
   - ./thanos/ks.yaml
   - ./botkube/ks.yaml
+  - ./influxdb/ks.yaml
