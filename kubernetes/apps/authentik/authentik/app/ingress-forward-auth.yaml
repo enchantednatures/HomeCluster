@@ -13,6 +13,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: nginx-outpost
+                name: ak-outpost-authentik-embedded-outpost
                 port:
                   name: http
