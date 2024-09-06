@@ -15,4 +15,5 @@ spec:
               service:
                 name: ak-outpost-authentik-embedded-outpost
                 port:
-                  name: http
+                  # name: http
+                  number: 9000
