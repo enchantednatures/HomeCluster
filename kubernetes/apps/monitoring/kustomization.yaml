@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./grafana/ks.yaml
+  - ./loki-operator/ks.yaml
   - ./jaeger-operator/ks.yaml
   - ./jaeger/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
