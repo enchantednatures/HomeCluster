@@ -14,7 +14,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: influxdata
-        namespace: flux-charts
+        namespace: flux-system
       interval: 15m
       reconcileStrategy: ChartVersion
   uninstall:
