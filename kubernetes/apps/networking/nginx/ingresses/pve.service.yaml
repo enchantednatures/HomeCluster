@@ -3,6 +3,20 @@ kind: Service
 metadata:
   name: pve
   namespace: networking
+  labels:
+    app: pve
 spec:
   type: ExternalName
   externalName: 192.168.1.240
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: pve-service-monitor
+spec:
+  selector:
+    matchLabels:
+      app: pve
+  endpoints:
+    - targetPort: 9221
+      path: /metrics
