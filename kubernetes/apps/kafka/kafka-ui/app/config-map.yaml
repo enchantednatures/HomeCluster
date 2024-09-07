@@ -6,7 +6,7 @@ data:
   config.yml: |-
     kafka:
       clusters:
-        - name: yaml
+        - name: cluster
           bootstrapServers: kafka.kafka.svc.cluster.local:9092
         - name: tower
           bootstrapServers: 192.168.1.241:9092
