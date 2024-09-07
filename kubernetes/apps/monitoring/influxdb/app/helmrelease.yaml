@@ -50,7 +50,7 @@ spec:
         value: "${TIMEZONE}"
     ingress:
       enabled: true
-      className: internal
+      className: external
       hostname: &host influxdb.${SECRET_DOMAIN}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
