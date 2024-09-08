@@ -114,13 +114,11 @@ spec:
     prometheus:
       ingress:
         enabled: true
-        ingressClassName: internal
+        ingressClassName: external
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns.alpha.kubernetes.io/target: external.enchantednatures.com
           external-dns/is-public: "true"
-          hajimari.io/appName: Prometheus
-          hajimari.io/icon: simple-icons:prometheus
           kubernetes.io/tls-acme: "true"
           meta.helm.sh/release-name: kube-prometheus-stack
           meta.helm.sh/release-namespace: monitoring
