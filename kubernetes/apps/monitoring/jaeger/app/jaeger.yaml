@@ -1,31 +1,11 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: jaeger-operator-cluster-role
-rules:
-  - apiGroups: [""]
-    resources: ["namespaces", "ingressclasses"]
-    verbs: ["get", "list", "watch"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: jaeger-operator-cluster-role-binding
-subjects:
-  - kind: ServiceAccount
-    name: jaeger-operator
-    namespace: monitoring
-roleRef:
-  kind: ClusterRole
-  name: jaeger-operator-cluster-role
-  apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: jaegertracing.io/v1
 kind: Jaeger
 metadata:
   name: jaeger
+  namespace: monitoring
 spec:
-  strategy: production
+  strategy: all-in-one
   ingress:
     ingressClassName: external
     annotations:
@@ -40,16 +20,16 @@ spec:
       - hosts:
           - *host
         secretName: jaeger-tls
-  collector:
-    maxReplicas: 5
-    resources:
-      limits:
-        cpu: 100m
-        memory: 128Mi
-  storage:
-    type: elasticsearch
-    options:
-      es:
-        server-urls: http://elasticsearch-es-http.elastic.svc.cluster.local:9200
-        index-prefix: jaeger
-    secretName: jaeger-es-secret
+  # collector:
+  #   maxReplicas: 5
+  #   resources:
+  #     limits:
+  #       cpu: 100m
+  #       memory: 128Mi
+  # storage:
+  #   type: elasticsearch
+  #   options:
+  #     es:
+  #       server-urls: http://elasticsearch-es-http.elastic.svc.cluster.local:9200
+  #       index-prefix: jaeger
+  #   secretName: jaeger-es-secret
