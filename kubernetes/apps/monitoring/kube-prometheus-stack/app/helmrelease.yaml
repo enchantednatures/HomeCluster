@@ -116,14 +116,22 @@ spec:
         enabled: true
         ingressClassName: internal
         annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns.alpha.kubernetes.io/target: external.enchantednatures.com
+          external-dns/is-public: "true"
           hajimari.io/appName: Prometheus
           hajimari.io/icon: simple-icons:prometheus
+          kubernetes.io/tls-acme: "true"
+          meta.helm.sh/release-name: kube-prometheus-stack
+          meta.helm.sh/release-namespace: monitoring
+          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
         pathType: Prefix
         hosts:
           - "prometheus.${SECRET_DOMAIN}"
         tls:
           - hosts:
               - "prometheus.${SECRET_DOMAIN}"
+            secretName: prometheus-tls
       prometheusSpec:
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false

@@ -5,10 +5,11 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./grafana/ks.yaml
-  - ./loki-operator/ks.yaml
+  - ./loki-stack/ks.yaml
   - ./jaeger-operator/ks.yaml
   - ./jaeger/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
+  - ./kube-state-metrics/ks.yaml
   - ./prometheus-operator-crds//ks.yaml
   - ./thanos/ks.yaml
   - ./botkube/ks.yaml
