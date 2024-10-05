@@ -29,6 +29,13 @@ spec:
       replicaCount: 0
     broker:
       replicaCount: 1
+      resources:
+        requests:
+          cpu: 4
+          memory: 2048Mi
+        limits:
+          cpu: 8
+          memory: 8192Mi
     kraft:
       enabled: false
     zookeeper:
