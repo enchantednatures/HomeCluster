@@ -70,15 +70,16 @@ spec:
     listeners:
       client:
         protocol: PLAINTEXT
-    advertisedListeners:
-      - name: EXTERNAL
-        protocol: PLAINTEXT
-        port: 9094
-    extraEnvVars:
-      - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
-        value: "EXTERNAL:PLAINTEXT"
-      - name: KAFKA_CFG_ADVERTISED_LISTENERS
-        value: "EXTERNAL://{{ .NodeIP }}:{{ .NodePort }}"
+        name: EXTERNAL
+    # advertisedListeners:
+    #   - name: EXTERNAL
+    #     protocol: PLAINTEXT
+    #     port: 9094
+    # extraEnvVars:
+    #   - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+    #     value: "EXTERNAL:PLAINTEXT"
+    #   - name: KAFKA_CFG_ADVERTISED_LISTENERS
+    #     value: "EXTERNAL://{{ .NodeIP }}:{{ .NodePort }}"
     serviceAccount:
       create: true
     rbac:
