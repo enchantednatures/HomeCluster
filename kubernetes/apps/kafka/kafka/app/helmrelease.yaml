@@ -55,8 +55,8 @@ spec:
         size: 8Gi
     externalAccess:
       enabled: true
-      autoDiscovery:
-        enabled: true
+      # autoDiscovery:
+      #   enabled: true
       # broker:
       #   service:
       #     type: NodePort
