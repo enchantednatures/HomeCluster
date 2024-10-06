@@ -26,14 +26,7 @@ spec:
   values:
     controller:
       automountServiceAccountToken: true
-      replicaCount: 1
-      resources:
-        requests:
-          cpu: 4
-          memory: 2048Mi
-        limits:
-          cpu: 8
-          memory: 8192Mi
+      replicaCount: 0
     broker:
       automountServiceAccountToken: true
       replicaCount: 1
@@ -51,41 +44,41 @@ spec:
           - ReadWriteOnce
         size: 8Gi
     kraft:
-      enabled: true
-    zookeeper:
       enabled: false
-    #   persistence:
-    #     enabled: true
-    #     storageClass: "csi-nfs"
-    #     accessModes:
-    #       - ReadWriteOnce
-    #     size: 8Gi
-    # externalAccess:
-    #   enabled: true
-    #   autoDiscovery:
-    #     enabled: true
-    #   broker:
-    #     service:
-    #       type: NodePort
-    #       ports:
-    #         external: 9094
+    zookeeper:
+      enabled: true
+      persistence:
+        enabled: true
+        storageClass: "csi-nfs"
+        accessModes:
+          - ReadWriteOnce
+        size: 8Gi
+    externalAccess:
+      enabled: true
+      autoDiscovery:
+        enabled: true
+      broker:
+        service:
+          type: NodePort
+          ports:
+            external: 9092
     listeners:
       client:
         protocol: PLAINTEXT
         name: EXTERNAL
-    # advertisedListeners:
-    #   - name: EXTERNAL
-    #     protocol: PLAINTEXT
-    #     port: 9094
-    # extraEnvVars:
-    #   - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
-    #     value: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
-    #   - name: KAFKA_CFG_LISTENERS
-    #     value: "INTERNAL://:9092,EXTERNAL://:9094"
-    #   - name: KAFKA_CFG_ADVERTISED_LISTENERS
-    #     value: "INTERNAL://{{ .Release.Name }}-{{ .Values.broker.name }}-{{ .Release.Namespace }}:9092,EXTERNAL://{{ .NodeIP }}:{{ .NodePort }}"
-    #   - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
-    #     value: "INTERNAL"
+    advertisedListeners:
+      - name: EXTERNAL
+        protocol: PLAINTEXT
+        port: 9092
+    extraEnvVars:
+      - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+        value: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+      - name: KAFKA_CFG_LISTENERS
+        value: "EXTERNAL://:9092"
+      - name: KAFKA_CFG_ADVERTISED_LISTENERS
+        value: "EXTERNAL://{{ .Release.Name }}-{{ .Values.broker.name }}-{{ .Release.Namespace }}:9092"
+      - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+        value: "EXTERNAL"
     serviceAccount:
       create: true
     rbac:
