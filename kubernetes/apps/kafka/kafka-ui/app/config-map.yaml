@@ -8,8 +8,6 @@ data:
       clusters:
         - name: cluster
           bootstrapServers: kafka.kafka.svc.cluster.local:9092
-        - name: tower
-          bootstrapServers: 192.168.1.241:9092
 
     auth:
       type: disabled
