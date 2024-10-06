@@ -53,8 +53,8 @@ spec:
         accessModes:
           - ReadWriteOnce
         size: 8Gi
-    externalAccess:
-      enabled: true
+    # externalAccess:
+    #   enabled: true
       # autoDiscovery:
       #   enabled: true
       # broker:
