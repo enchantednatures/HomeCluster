@@ -26,7 +26,14 @@ spec:
   values:
     controller:
       automountServiceAccountToken: true
-      replicaCount: 0
+      replicaCount: 1
+      resources:
+        requests:
+          cpu: 4
+          memory: 2048Mi
+        limits:
+          cpu: 8
+          memory: 8192Mi
     broker:
       automountServiceAccountToken: true
       replicaCount: 1
@@ -44,24 +51,24 @@ spec:
           - ReadWriteOnce
         size: 8Gi
     kraft:
-      enabled: false
+      enabled: true
     zookeeper:
-      enabled: true
-      persistence:
-        enabled: true
-        storageClass: "csi-nfs"
-        accessModes:
-          - ReadWriteOnce
-        size: 8Gi
-    externalAccess:
-      enabled: true
-      autoDiscovery:
-        enabled: true
-      broker:
-        service:
-          type: NodePort
-          ports:
-            external: 9094
+      enabled: false
+    #   persistence:
+    #     enabled: true
+    #     storageClass: "csi-nfs"
+    #     accessModes:
+    #       - ReadWriteOnce
+    #     size: 8Gi
+    # externalAccess:
+    #   enabled: true
+    #   autoDiscovery:
+    #     enabled: true
+    #   broker:
+    #     service:
+    #       type: NodePort
+    #       ports:
+    #         external: 9094
     listeners:
       client:
         protocol: PLAINTEXT
