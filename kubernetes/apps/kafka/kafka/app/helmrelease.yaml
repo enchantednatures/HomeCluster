@@ -53,8 +53,24 @@ spec:
         size: 8Gi
     externalAccess:
       enabled: true
-      service:
-        type: LoadBalancer
+      autoDiscovery:
+        enabled: true
+      controller:
+        service:
+          type: LoadBalancer
+          ports:
+            external: 9094
+          annotations:
+            external-dns.alpha.kubernetes.io/hostname: "kafka-controller-{{ .targetPod }}.${SECRET_DOMAIN}"
+      broker:
+        service:
+          type: LoadBalancer
+          ports:
+            external: 9094
+          annotations:
+            external-dns.alpha.kubernetes.io/hostname: "kafka-broker-{{ .targetPod }}.${SECRET_DOMAIN}"
+          service:
+            type: LoadBalancer
     listeners:
       client:
         protocol: plaintext
