@@ -26,7 +26,7 @@ spec:
   values:
     controller:
       automountServiceAccountToken: true
-      replicaCount: 0
+      replicaCount: 1
     broker:
       automountServiceAccountToken: true
       replicaCount: 8
@@ -59,23 +59,27 @@ spec:
         enabled: true
       controller:
         service:
-          type: LoadBalancer
+          type: NodePort
           ports:
             external: 9094
-          annotations:
-            external-dns.alpha.kubernetes.io/hostname: "kafka-controller-{{ .targetPod }}.${SECRET_DOMAIN}"
       broker:
         service:
-          type: LoadBalancer
+          type: NodePort
           ports:
             external: 9094
-          annotations:
-            external-dns.alpha.kubernetes.io/hostname: "kafka-broker-{{ .targetPod }}.${SECRET_DOMAIN}"
-          service:
-            type: LoadBalancer
     listeners:
       client:
-        protocol: plaintext
+        protocol: PLAINTEXT
+        name: EXTERNAL
+    advertisedListeners:
+      - name: EXTERNAL
+        protocol: PLAINTEXT
+        port: 9094
+    extraEnvVars:
+      - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+        value: "EXTERNAL:PLAINTEXT"
+      - name: KAFKA_CFG_ADVERTISED_LISTENERS
+        value: "EXTERNAL://{{ .NodeIP }}:{{ .NodePort }}"
     serviceAccount:
       create: true
     rbac:
