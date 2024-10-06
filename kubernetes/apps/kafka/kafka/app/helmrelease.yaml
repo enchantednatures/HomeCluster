@@ -64,8 +64,7 @@ spec:
             # external: 9095
     listeners:
       client:
-        protocol: PLAINTEXT
-        name: EXTERNAL
+        protocol: plaintext
     # advertisedListeners:
     #   - name: EXTERNAL
     #     protocol: PLAINTEXT
