@@ -57,11 +57,6 @@ spec:
       enabled: true
       autoDiscovery:
         enabled: true
-      controller:
-        service:
-          type: NodePort
-          ports:
-            external: 9094
       broker:
         service:
           type: NodePort
