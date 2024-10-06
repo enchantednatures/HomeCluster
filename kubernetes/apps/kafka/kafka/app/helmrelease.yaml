@@ -25,9 +25,11 @@ spec:
     keepHistory: false
   values:
     controller:
+      automountServiceAccountToken: true
       replicaCount: 0
     broker:
-      replicaCount: 3
+      automountServiceAccountToken: true
+      replicaCount: 1
       resources:
         requests:
           cpu: 4
@@ -51,10 +53,33 @@ spec:
         accessModes:
           - ReadWriteOnce
         size: 8Gi
-    externalAccess:
-      enabled: true
-      service:
-        type: LoadBalancer
+    # externalAccess:
+    #   enabled: true
+      # autoDiscovery:
+      #   enabled: true
+      # broker:
+      #   service:
+      #     type: NodePort
+      #     ports:
+            # external: 9095
     listeners:
       client:
-        protocol: plaintext
+        protocol: PLAINTEXT
+        name: EXTERNAL
+    # advertisedListeners:
+    #   - name: EXTERNAL
+    #     protocol: PLAINTEXT
+    #     port: 9095
+    # extraEnvVars:
+    #   - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+    #     value: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+    #   - name: KAFKA_CFG_LISTENERS
+    #     value: "EXTERNAL://:9092"
+    #   - name: KAFKA_CFG_ADVERTISED_LISTENERS
+    #     value: "EXTERNAL://{{ .Release.Name }}-{{ .Values.broker.name }}-{{ .Release.Namespace }}:9092"
+    #   - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+    #     value: "EXTERNAL"
+    serviceAccount:
+      create: true
+    rbac:
+      create: true
