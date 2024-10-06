@@ -70,15 +70,15 @@ spec:
       - name: EXTERNAL
         protocol: PLAINTEXT
         port: 9094
-    extraEnvVars:
-      - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
-        value: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
-      - name: KAFKA_CFG_LISTENERS
-        value: "INTERNAL://:9092,EXTERNAL://:9094"
-      - name: KAFKA_CFG_ADVERTISED_LISTENERS
-        value: "INTERNAL://{{ .Release.Name }}-{{ .Values.broker.name }}-{{ .Release.Namespace }}:9092,EXTERNAL://{{ .NodeIP }}:{{ .NodePort }}"
-      - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
-        value: "INTERNAL"
+    # extraEnvVars:
+    #   - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+    #     value: "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT"
+    #   - name: KAFKA_CFG_LISTENERS
+    #     value: "INTERNAL://:9092,EXTERNAL://:9094"
+    #   - name: KAFKA_CFG_ADVERTISED_LISTENERS
+    #     value: "INTERNAL://{{ .Release.Name }}-{{ .Values.broker.name }}-{{ .Release.Namespace }}:9092,EXTERNAL://{{ .NodeIP }}:{{ .NodePort }}"
+    #   - name: KAFKA_CFG_INTER_BROKER_LISTENER_NAME
+    #     value: "INTERNAL"
     serviceAccount:
       create: true
     rbac:
