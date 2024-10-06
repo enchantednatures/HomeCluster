@@ -71,10 +71,10 @@ spec:
       client:
         protocol: PLAINTEXT
         name: EXTERNAL
-    advertisedListeners:
-      - name: EXTERNAL
-        protocol: PLAINTEXT
-        port: 9094
+    # advertisedListeners:
+    #   - name: EXTERNAL
+    #     protocol: PLAINTEXT
+    #     port: 9094
     extraEnvVars:
       - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
         value: "EXTERNAL:PLAINTEXT"
