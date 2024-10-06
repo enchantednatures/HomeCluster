@@ -29,7 +29,7 @@ spec:
       replicaCount: 0
     broker:
       automountServiceAccountToken: true
-      replicaCount: 8
+      replicaCount: 3
       resources:
         requests:
           cpu: 4
@@ -71,10 +71,10 @@ spec:
       client:
         protocol: PLAINTEXT
         name: EXTERNAL
-    # advertisedListeners:
-    #   - name: EXTERNAL
-    #     protocol: PLAINTEXT
-    #     port: 9094
+    advertisedListeners:
+      - name: EXTERNAL
+        protocol: PLAINTEXT
+        port: 9094
     # extraEnvVars:
     #   - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
     #     value: "EXTERNAL:PLAINTEXT"
