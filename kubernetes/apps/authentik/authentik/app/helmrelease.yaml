@@ -110,7 +110,7 @@ spec:
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
       postgresql:
-        host: 192.168.1.241
+        host: 192.168.1.249
       redis:
         host: "redis-master.redis.svc.cluster.local" #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
     postgresql:
