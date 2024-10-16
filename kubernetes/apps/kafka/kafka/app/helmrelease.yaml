@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -25,6 +24,10 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    serviceAccount:
+      create: true
+    rbac:
+      create: true
     controller:
       replicaCount: 0
     broker:
@@ -40,17 +43,53 @@ spec:
       enabled: false
     zookeeper:
       enabled: true
+      metrics:
+        enabled: true
     externalAccess:
-      enabled: false
+      enabled: true
       service:
-        type: LoadBalancer
+        type: ClusterIp
+      controller:
+        service:
+          annotations:
+            external-dns.alpha.kubernetes.io/hostname: "{{ .targetPod }}.chastened.lan"
+          ports:
+            external: 9095
+      broker:
+        service:
+          type: LoadBalancer
+          ports:
+            external: 9095
+          domain: chastened.lan
+          annotations:
+            external-dns.alpha.kubernetes.io/hostname: "{{ .targetPod }}.chastened.lan"
     listeners:
       client:
-        protocol: plaintext
-    # auth:
-    #   clientProtocol: ssl
-    #   interBrokerProtocol: ssl
-    # tls:
-    #   type: jks
-    #   passwordSecretName: kafka-tls-password
-    #   certificatesSecretName: kafka-tls-certificates
+        name: CLIENT
+        protocol: SASL_PLAINTEXT #_SSL
+        # sslClientAuth: required
+        containerPort: 9092
+      external:
+        name: EXTERNAL
+        protocol: SASL_PLAINTEXT #_SSL
+        # sslClientAuth: required
+        containerPort: 9095
+    sasl:
+      enabledMechanisms: PLAIN #,OAUTHBEARER
+      # todo:
+      # oauthbearer:
+      #   tokenEndpointUrl: auth.enchantednatures.com
+      #   jwksEndpointUrl: auth.enchantednatures.com
+    metrics:
+      jmx:
+        enabled: true
+      serviceMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
+    provisioning:
+      enabled: false # wip
+      auth:
+        tls:
+          type: JKS
+          certificatesSecret: kafka-tls # todo
