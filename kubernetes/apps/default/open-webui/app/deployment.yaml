@@ -26,7 +26,7 @@ spec:
           image: ghcr.io/open-webui/open-webui:main
           imagePullPolicy: Always
           envFrom:
-            - secretRef:
+            - secretRef: open-webui-secret
               name: open-webui-secret
           resources:
             requests:
