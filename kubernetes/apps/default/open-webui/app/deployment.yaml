@@ -34,8 +34,14 @@ spec:
               memory: 100Mi
               # limits:
               #   cpu: 100m
-              #   memory: 100Mi
+          #   memory: 100Mi
+
+          volumeMounts:
+            - mountPath: /app/backend/data
+              name: open-webui-data
           ports:
             - containerPort: 8080
               name: open-webui
       restartPolicy: Always
+      volumes:
+        - name: open-webui-data
