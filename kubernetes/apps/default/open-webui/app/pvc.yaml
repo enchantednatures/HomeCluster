@@ -1,0 +1,21 @@
+# https://kubernetes.io/docs/concepts/storage/persistent-volumes/
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: open-webui-data
+  namespace: default
+  labels:
+    app: open-webui
+spec:
+  # AKS: default,managed-premium
+  # GKE: standard
+  # EKS: gp2 (custom)
+  # Rook: rook-ceph-block,rook-ceph-fs
+  storageClassName: default
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+
