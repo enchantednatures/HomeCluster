@@ -26,8 +26,8 @@ spec:
           image: ghcr.io/open-webui/open-webui:main
           imagePullPolicy: Always
           envFrom:
-            - secretRef: open-webui-secret
-              name: open-webui-secret
+            - secretRef:
+                name: open-webui-secret
           resources:
             requests:
               cpu: 100m
