@@ -54,11 +54,12 @@ spec:
             configBlock: |-
               pods insecure
               fallthrough in-addr.arpa ip6.arpa
-              ttl 30
           - name: prometheus
             parameters: 0.0.0.0:9153
           - name: forward
             parameters: . /etc/resolv.conf
+            configBlock: |-
+              max_concurrent 1000
           - name: cache
             parameters: 30
           - name: loop
