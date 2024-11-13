@@ -1,0 +1,48 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: rook-ceph-cluster
+spec:
+  interval: 20m
+  chart:
+    spec:
+      chart: rook-ceph-cluster
+      version: v1.15.2
+      sourceRef:
+        kind: HelmRepository
+        name: rook-ceph
+        namespace: flux-system
+  install:
+    createNamespace: false
+    remediation:
+      retries: 5
+  upgrade:
+    remediation:
+      retries: 5
+  values:
+    toolbox:
+      enabled: true
+    operatorNamespace: &ns rook-ceph  # cluster chart will skip conflicting resources if it knows the operator is in same namespace
+    monitoring:
+      enabled: true
+      createPrometheusRules: true
+      externalMgrEndpoints:
+      - ip: 192.168.1.240
+        externalMgrPrometheusPort: 9283
+    configOverride: |
+      [global]
+      bdev_enable_discard = true
+      bdev_async_discard = true
+    cephClusterSpec:
+      external:
+        enable: true
+      cephVersion:
+        image: quay.io/ceph/ceph:v18.2.4 # Should match external cluster version, but pveceph having issues with matching 18.2.2
+      crashCollector:
+        disable: true
+      healthCheck:
+        daemonHealth:
+          mon:
+            disabled: false
+            interval: 45s
