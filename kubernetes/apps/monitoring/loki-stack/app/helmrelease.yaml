@@ -47,7 +47,7 @@ spec:
     loki:
       enabled: true
       rbac:
-        pspEnabled: false
+        pspEnabled: true
       serviceMonitor:
         enabled: true
     promtail:
