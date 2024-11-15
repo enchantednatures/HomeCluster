@@ -36,5 +36,5 @@ spec:
         - hard
     storageClass:
       name: rack-nfs-client
-      defaultClass: true
+      defaultClass: false
       allowVolumeExpansion: true
