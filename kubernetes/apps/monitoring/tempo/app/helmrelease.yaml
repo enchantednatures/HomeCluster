@@ -65,8 +65,8 @@ spec:
     - targetPath: tempo.storage.trace.s3.access_key
       kind: Secret
       name: tempo-bucket
-      valuesKey: AWS_ACCESS_KEY_ID
+      valuesKey: ACCESS_KEY
     - targetPath: tempo.storage.trace.s3.secret_key
       kind: Secret
       name: tempo-bucket
-      valuesKey: AWS_SECRET_ACCESS_KEY
+      valuesKey: ACCESS_SECRET
