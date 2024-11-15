@@ -44,7 +44,7 @@ spec:
           - action: labeldrop
             regex: (pod)
     rbac:
-      pspEnabled: false
+      pspEnabled: true
     resources:
       requests:
         cpu: 50m
