@@ -14,7 +14,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 65.0.0
+      version: 66.1.1
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
@@ -35,10 +35,10 @@ spec:
     keepHistory: false
   values:
     crds:
-      enabled: false
+      enabled: true
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
-      enabled: false
+      enabled: true
     kube-state-metrics:
       metricLabelsAllowlist:
         - "deployments=[*]"
