@@ -1,0 +1,10 @@
+# https://kubernetes.io/docs/concepts/configuration/configmap/
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-bucket
+  namespace: monitoring
+data:
+  BUCKET_NAME: tempo
+  BUCKET_HOST: 192.168.1.241:9768
+
