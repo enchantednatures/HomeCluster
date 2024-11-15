@@ -30,11 +30,6 @@ spec:
     remediation:
       strategy: rollback
       retries: 3
-  dependsOn:
-    - name: openebs
-      namespace: openebs-system
-    - name: thanos
-      namespace: observability
   values:
     crds:
       enabled: false
