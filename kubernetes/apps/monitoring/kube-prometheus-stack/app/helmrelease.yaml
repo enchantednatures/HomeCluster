@@ -21,24 +21,26 @@ spec:
         namespace: flux-system
   maxHistory: 2
   install:
-    timeout: 30m
     crds: CreateReplace
     remediation:
       retries: 3
   upgrade:
-    timeout: 30m
     cleanupOnFail: true
     crds: CreateReplace
     remediation:
+      strategy: rollback
       retries: 3
-  uninstall:
-    keepHistory: false
+  dependsOn:
+    - name: openebs
+      namespace: openebs-system
+    - name: thanos
+      namespace: observability
   values:
     crds:
-      enabled: true
+      enabled: false
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
-      enabled: true
+      enabled: false
     kube-state-metrics:
       metricLabelsAllowlist:
         - "deployments=[*]"
