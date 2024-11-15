@@ -5,6 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: rook-ceph
+  dependsOn:
+    - name: rook-ceph
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
