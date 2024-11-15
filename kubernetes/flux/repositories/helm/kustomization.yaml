@@ -3,8 +3,8 @@ kind: Kustomization
 resources:
   - ./authentik.yaml
   - ./backube.yaml
-
   - ./cilium.yaml
+  - ./cloudnative-pg.yaml
   - ./coredns.yaml
   - ./csi-driver-nfs.yaml
   - ./democratic-csi.yaml
@@ -28,10 +28,8 @@ resources:
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
   - ./piraeus.yaml
+  - ./rook-ceph.yaml
   - ./sealed-secrets.yaml
   - ./stakater.yaml
   - ./velero.yaml
   - ./vmware-tanzu.yaml
-
-
-
