@@ -29,6 +29,7 @@ resources:
   - ./open-telemetry.yaml
   - ./piraeus.yaml
   - ./rook-ceph.yaml
+  - ./ceph-charts.yaml
   - ./sealed-secrets.yaml
   - ./stakater.yaml
   - ./velero.yaml
