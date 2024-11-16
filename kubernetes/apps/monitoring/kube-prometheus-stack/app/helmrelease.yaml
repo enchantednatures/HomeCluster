@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -7,8 +6,8 @@ metadata:
   namespace: monitoring
 spec:
   dependsOn:
-   - name: prometheus-operator-crds
-     namespace: monitoring
+    - name: prometheus-operator-crds
+      namespace: monitoring
   interval: 30m
   timeout: 15m
   chart:
@@ -35,7 +34,25 @@ spec:
       enabled: false
     cleanPrometheusOperatorObjectNames: true
     alertmanager:
-      enabled: false
+      enabled: true
+      # ingress:
+      #   enabled: true
+      #   pathType: Prefix
+      #   ingressClassName: internal
+      #   hosts:
+      #     - &host alertmanager.${SECRET_PUBLIC_DOMAIN}
+      #   tls:
+      #     - hosts: [*host]
+      alertmanagerSpec:
+        replicas: 3
+        # useExistingSecret: true
+        # configSecret: alertmanager-secret
+        storage:
+          volumeClaimTemplate:
+            spec:
+              resources:
+                requests:
+                  storage: 1Gi
     kube-state-metrics:
       metricLabelsAllowlist:
         - "deployments=[*]"

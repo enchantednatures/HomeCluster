@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -112,6 +111,47 @@ spec:
             jsonData:
               prometheusType: Prometheus
             isDefault: false
+          - name: Loki
+            type: loki
+            uid: loki
+            access: proxy
+            url: http://loki-gateway.monitoring.svc.cluster.local
+            jsonData:
+              maxLines: 250
+          - name: Alertmanager
+            type: alertmanager
+            uid: alertmanager
+            access: proxy
+            url: http://alertmanager-operated.monitoring.svc.cluster.local:9093
+            jsonData:
+              implementation: prometheus
+          - name: Tempo
+            type: tempo
+            url: http://tempo.monitoring.svc.cluster.local:3100
+            access: proxy
+            jsonData:
+              tracesToLogsV2:
+                datasourceUid: "Loki"
+                tags: ["job", "instance", "pod", "namespace"]
+                filterByTraceID: true
+                filterBySpanID: true
+                customQuery: true
+              tracesToMetrics:
+                datasourceUid: "Prometheus"
+                tags: [{key: "service.name", value: "service"}, {key: "job"}]
+              serviceMap:
+                datasourceUid: "Prometheus"
+              nodeGraph:
+                enabled: true
+              search:
+                hide: false
+              lokiSearch:
+                datasourceUid: "Loki"
+              traceQuery:
+                timeShiftEnabled: true
+              spanBar:
+                type: "Tag"
+                tag: "http.path"
     dashboards:
       default:
         cloudflared:
