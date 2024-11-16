@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -23,13 +22,13 @@ spec:
   values:
     toolbox:
       enabled: true
-    operatorNamespace: &ns rook-ceph  # cluster chart will skip conflicting resources if it knows the operator is in same namespace
+    operatorNamespace: &ns rook-ceph # cluster chart will skip conflicting resources if it knows the operator is in same namespace
     monitoring:
       enabled: true
       createPrometheusRules: true
       externalMgrEndpoints:
-      - ip: 192.168.1.240
-        externalMgrPrometheusPort: 9283
+        - ip: 192.168.1.240
+          externalMgrPrometheusPort: 9283
     configOverride: |
       [global]
       bdev_enable_discard = true
