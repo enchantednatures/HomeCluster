@@ -1,7 +1,7 @@
 age
 cloudflared-bin
 direnv
-flux-bin
+fluxcd
 go-task
 go-yq
 helm
@@ -10,8 +10,9 @@ jq
 kubeconform
 kubectl-bin
 kustomize
+minijinja-cli-bin
 moreutils
 sops
-stern-bin
+stern
 talhelper-bin
 talosctl
