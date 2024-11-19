@@ -7,7 +7,7 @@ module "talos" {
   }
 
   image = {
-    version = "v1.7.5"
+    version = "v1.8.3"
     schematic = file("${path.module}/talos/image/schematic.yaml")
   }
 
@@ -63,7 +63,7 @@ module "talos" {
       cpu           = 8
       ram_dedicated = 16384
       disk_size     = 64
-      datastore_id  = "data"
+      datastore_id  = "local-lvm"
       igpu          = true
     }
 
@@ -76,7 +76,7 @@ module "talos" {
       cpu           = 8
       ram_dedicated = 16384
       disk_size     = 64
-      datastore_id  = "data"
+      datastore_id  = "local-lvm"
       igpu          = true
     }
 
@@ -89,7 +89,7 @@ module "talos" {
       cpu           = 8
       ram_dedicated = 16384
       disk_size     = 64
-      datastore_id  = "data"
+      datastore_id  = "local-lvm"
       igpu          = true
     }
   }
