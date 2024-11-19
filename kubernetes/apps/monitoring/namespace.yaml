@@ -4,18 +4,18 @@ metadata:
   name: monitoring
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
----
-apiVersion: apiserver.config.k8s.io/v1
-kind: AdmissionConfiguration
-metadata:
-  name: pod-sec
-plugins:
-  - name: PodSecurity
-    configuration:
-      defaults:
-        enforce: "privileged" # Change from baseline to privileged
-        enforce-version: "latest"
-      exemptions:
-        usernames: []
-        runtimeClasses: []
-        namespaces: [monitoring] # Add your namespace here
+# ---
+# apiVersion: apiserver.config.k8s.io/v1
+# kind: AdmissionConfiguration
+# metadata:
+#   name: pod-sec
+# plugins:
+#   - name: PodSecurity
+#     configuration:
+#       defaults:
+#         enforce: "privileged" # Change from baseline to privileged
+#         enforce-version: "latest"
+#       exemptions:
+#         usernames: []
+#         runtimeClasses: []
+#         namespaces: [monitoring] # Add your namespace here
