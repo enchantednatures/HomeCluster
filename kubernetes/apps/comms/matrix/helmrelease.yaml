@@ -17,6 +17,7 @@ spec:
       interval: 5m
   dependsOn:
     - name: authentik
+      namespace: authentik
   values:
     image:
       repository: ghcr.io/element-hq/synapse
