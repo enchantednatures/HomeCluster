@@ -10,7 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: &app cloudnative-pg
-  path: ./kubernetes/main/apps/postgres/cluster/app
+  path: ./kubernetes/apps/postgres/cluster/app
   prune: true
   sourceRef:
     kind: GitRepository
