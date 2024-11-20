@@ -12,8 +12,8 @@ spec:
   instances: 3
   primaryUpdateStrategy: unsupervised
   storage:
-    size: 100Gi
-    storageClass: ceph-block
+    size: 10Gi
+    storageClass: rack-nfs-client
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
