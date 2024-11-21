@@ -8,5 +8,5 @@ resources:
   - ./deployment.yaml
   - ./ingress.yaml
   - ./service.yaml
-  - ./sealed-secret.yaml
   - ./pvc.yaml
+  - ./secret.sops.yaml
