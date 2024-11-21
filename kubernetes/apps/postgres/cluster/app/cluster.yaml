@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -8,12 +7,13 @@ metadata:
     app.kubernetes.io/name: postgres-db
 spec:
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
-  imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
+  # imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
+  imageName: ghcr.io/cloudnative-pg/postgis:17-3.5-18
   instances: 3
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: rack-nfs-client
+    storageClass: csi-nfs
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
@@ -23,3 +23,10 @@ spec:
       shared_buffers: 512MB
   monitoring:
     enablePodMonitor: true
+  bootstrap:
+    initdb:
+      postInitTemplateSQL:
+        - CREATE EXTENSION postgis;
+        - CREATE EXTENSION postgis_topology;
+        - CREATE EXTENSION fuzzystrmatch;
+        - CREATE EXTENSION postgis_tiger_geocoder;
