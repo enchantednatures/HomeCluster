@@ -40,4 +40,4 @@ spec:
             resources:
               requests:
                 storage: 10Gi
-            storageClassName: rack-nfs-client
+            storageClassName: csi-nfs
