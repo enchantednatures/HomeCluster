@@ -127,7 +127,6 @@ spec:
             url: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
             jsonData:
               implementation: prometheus
-        datasources:
           - name: Prometheus
             type: prometheus
             uid: prometheus
