@@ -7,3 +7,4 @@ resources:
   - secret.sops.yaml
   - prometheus-rule.yaml
   - scheduled-backup.yaml
+  - superusersecret.sops.yaml
