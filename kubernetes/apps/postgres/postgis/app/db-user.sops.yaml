@@ -1,0 +1,29 @@
+apiVersion: v1
+stringData:
+    password: ENC[AES256_GCM,data:Ntxrk7iNxxUST7w+,iv:BDun9i0LEBxVdqOxChwS4joWdxWHFiG/2hY5+WEue4E=,tag:dJ3Y+HlZalUCbejATNlU/g==,type:str]
+    username: ENC[AES256_GCM,data:FimH,iv:RoWw1Jf1FC5pq4Lw6//O3vZvifgShgMe3dk5Xu3+5YE=,tag:xCEFJXWkEJAFwhC2Rc5t9w==,type:str]
+kind: Secret
+metadata:
+    name: postgis-app-user
+    namespace: postgres
+type: kubernetes.io/basic-auth
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBrRVFEczE3VUx3MzI4ZEtX
+            Uy9vQTFTelgycC83a3FsV0JrdGdTS3FGYmh3Cnl6RHZ3cXNURUkvZ2lFd215eDZq
+            MFNBN0JjckU4MDFFU2lsYUo3WkFndUEKLS0tIEtTQUxXdjVJdEdTK3QwMTZVWEps
+            UzBPVVJCSzM3RlJvSEhzamZKbi8welkKvScUmhy5dMD/CKAvB6ww6SCpBDzAHCNU
+            me+5P8TOy6RYp5OkLgjKLtT9NkPQNFeDA6seMfFUMqt0QPVkw1COoQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-11-24T23:25:18Z"
+    mac: ENC[AES256_GCM,data:LnblY79CBGsbJcu3Tik4ZSIZcjL7A0elEhtApMMe30+JyLR+FV9fEQ0eZjpMHNIENtCQNp02jJ5cf3pHrLV0KRFk1MBRSkCZ6n31FGA6p/8mN0AFcVA+9ITnl8ljW0/jinsusIIr1b/yRvXV3IslCZfTxDYQI9YevA+j75oXOjo=,iv:/SWh/ufsXMqNECMina0YzpT2ivG0byudWika0Egy3qI=,tag:pL/ZEbPm2qhmz+BmWLsrcQ==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.9.1

@@ -20,6 +20,8 @@ spec:
     parameters:
       max_connections: "300"
       shared_buffers: 512MB
+    pg_hba:
+      - host all all 10.244.0.0/16 md5
   monitoring:
     enablePodMonitor: true
   backup:
@@ -46,6 +48,10 @@ spec:
   # cluster when recovering from an existing cnpg cluster
   bootstrap:
     initdb:
+      database: app
+      owner: app
+      secret:
+        name: postgis-app-user
       postInitTemplateSQL:
         - CREATE EXTENSION postgis;
         - CREATE EXTENSION postgis_topology;
