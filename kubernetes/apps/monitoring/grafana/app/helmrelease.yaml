@@ -201,30 +201,30 @@ spec:
           url: https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/master/contrib/prometheus-mixin/dashboards/sealed-secrets-controller.json
           datasource: Prometheus
       # thanos:
-        # thanos-overview:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/overview.json
-        #   datasource: Prometheus
-        # thanos-compact:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/compact.json
-        #   datasource: Prometheus
-        # thanos-querier:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query.json
-        #   datasource: Prometheus
-        # thanos-store:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/store.json
-        #   datasource: Prometheus
-        # thanos-receiver:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/receive.json
-        #   datasource: Prometheus
-        # thanos-sidecar:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/sidecar.json
-        #   datasource: Prometheus
-        # thanos-ruler:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/rule.json
-        #   datasource: Prometheus
-        # thanos-replicate:
-        #   url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/bucket-replicate.json
-        #   datasource: Prometheus
+        thanos-overview:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/overview.json
+          datasource: Prometheus
+        thanos-compact:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/compact.json
+          datasource: Prometheus
+        thanos-querier:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/query.json
+          datasource: Prometheus
+        thanos-store:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/store.json
+          datasource: Prometheus
+        thanos-receiver:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/receive.json
+          datasource: Prometheus
+        thanos-sidecar:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/sidecar.json
+          datasource: Prometheus
+        thanos-ruler:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/rule.json
+          datasource: Prometheus
+        thanos-replicate:
+          url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/bucket-replicate.json
+          datasource: Prometheus
       flux:
         flux-cluster:
           url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/cluster.json
