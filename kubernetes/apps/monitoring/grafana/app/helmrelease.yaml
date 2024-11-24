@@ -197,7 +197,7 @@ spec:
         sealed-secrets:
           url: https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/master/contrib/prometheus-mixin/dashboards/sealed-secrets-controller.json
           datasource: Prometheus
-      thanos:
+      # thanos:
         thanos-overview:
           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/overview.json
           datasource: Prometheus
