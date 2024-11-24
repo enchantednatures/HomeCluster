@@ -127,6 +127,7 @@ spec:
             url: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
             jsonData:
               implementation: prometheus
+            isDefault: false
           - name: Prometheus
             type: prometheus
             uid: prometheus
@@ -149,6 +150,7 @@ spec:
             url: http://alertmanager-operated.monitoring.svc.cluster.local:9093
             jsonData:
               implementation: prometheus
+            isDefault: false
           - name: Tempo
             type: tempo
             url: http://tempo.monitoring.svc.cluster.local:3100
@@ -176,6 +178,7 @@ spec:
               spanBar:
                 type: "Tag"
                 tag: "http.path"
+            isDefault: false
     dashboards:
       default:
         cloudflared:
