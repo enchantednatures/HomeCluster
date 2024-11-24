@@ -3,4 +3,6 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./cloudnative-pg/ks.yaml
+  - ./postgis/ks.yaml
   - ./cluster/ks.yaml
+  - ./prometheus-rule.yaml

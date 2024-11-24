@@ -3,14 +3,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cloudnative-pg-cluster
+  name: cloudnative-pg-postgis-cluster
   namespace: flux-system
 spec:
   targetNamespace: postgres
   commonMetadata:
     labels:
       app.kubernetes.io/name: &app cloudnative-pg
-  path: ./kubernetes/apps/postgres/app-db/app
+  path: ./kubernetes/apps/postgres/postgis/app
   prune: true
   sourceRef:
     kind: GitRepository

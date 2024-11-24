@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app postgis
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: postgis.${SECRET_DOMAIN}
+    lbipam.cilium.io/ips: 192.168.1.244
+spec:
+  type: LoadBalancer
+  ports:
+    - name: postgres
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+  selector:
+    cnpg.io/cluster: postgris-db
+    cnpg.io/instanceRole: primary

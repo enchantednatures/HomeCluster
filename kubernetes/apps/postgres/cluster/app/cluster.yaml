@@ -2,13 +2,12 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: postgis-db
+  name: postgres-db
   labels:
     app.kubernetes.io/name: postgres-db
 spec:
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
-  # imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
-  imageName: ghcr.io/cloudnative-pg/postgis:17-3.5-18
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
   instances: 3
   primaryUpdateStrategy: unsupervised
   storage:
@@ -35,7 +34,7 @@ spec:
       endpointURL: https://s3.${SECRET_DOMAIN}
       # Note: serverName version needs to be incremented
       # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgis-v0
+      serverName: &currentCluster postgres-v0
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -43,20 +42,3 @@ spec:
         secretAccessKey:
           name: cloudnative-pg-secret
           key: aws-secret-access-key
-  # Note: previousCluster needs to be set to the name of the previous
-  # cluster when recovering from an existing cnpg cluster
-  bootstrap:
-    initdb:
-      postInitTemplateSQL:
-        - CREATE EXTENSION postgis;
-        - CREATE EXTENSION postgis_topology;
-        - CREATE EXTENSION fuzzystrmatch;
-        - CREATE EXTENSION postgis_tiger_geocoder;
-    # recovery:
-    #   source: &previousCluster postgis-v0
-  # Note: externalClusters is needed when recovering from an existing cnpg cluster
-  # externalClusters:
-  #   - name:  &previousCluster postgres16-v0 #*previousCluster postgres16-v6
-  #     barmanObjectStore:
-  #       <<: *barmanObjectStore
-  #       serverName: *previousCluster
