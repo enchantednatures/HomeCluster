@@ -112,7 +112,7 @@ spec:
             type: prometheus
             access: proxy
             url: http://thanos-query.monitoring.svc.cluster.local:9090/
-            isDefault: true
+            isDefault: false
             # (OPTIONAL) Only required when some dashboards don't correctly set the datasource and you want to override it using the dashboard's uid
             # uid: "Prometheus"
           - name: Loki
