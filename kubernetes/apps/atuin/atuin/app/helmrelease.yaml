@@ -1,4 +1,3 @@
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -28,14 +27,14 @@ spec:
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
-        initContainers:
-          # init-db:
-          #   image:
-          #     repository: ghcr.io/buroa/postgres-init
-          #     tag: 16
-          #   envFrom: &envFrom
-          #     - secretRef:
-          #         name: atuin-secret
+        # initContainers:
+        # init-db:
+        #   image:
+        #     repository: ghcr.io/buroa/postgres-init
+        #     tag: 16
+        #   envFrom: &envFrom
+        #     - secretRef:
+        #         name: atuin-secret
         containers:
           app:
             image:
