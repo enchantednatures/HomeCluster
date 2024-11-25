@@ -1,15 +1,3 @@
-# ConfigMap containing the list of geographies to import
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: osm-geographies
-  namespace: postgres
-data:
-  geographies: |
-    europe/monaco-latest.osm.pbf
-    europe/andorra-latest.osm.pbf
-    europe/luxembourg-latest.osm.pbf
----
 # ConfigMap to track import progress
 apiVersion: v1
 kind: ConfigMap
@@ -44,12 +32,12 @@ spec:
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
-                  name: postgis-db-app
-                  key: user
+                  name: postgis-app-user
+                  key: username
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: postgis-db-app
+                  name: postgis-app-user
                   key: password
             - name: PGHOST
               valueFrom:
@@ -79,6 +67,8 @@ spec:
             - name: secret-volume-app
               mountPath: /etc/secrets/app
               readOnly: true
+            - name: osm-temp
+              mountPath: /tmp/osm-files
           command:
             - /bin/bash
             - -c
@@ -87,10 +77,10 @@ spec:
               apt-get update && apt-get install -y wget
 
               # Set PostgreSQL environment variables for SSL
-              export PGSSLMODE=verify-full
-              export PGSSLCERT=/etc/secrets/app/tls.crt
-              export PGSSLKEY=/etc/secrets/app/tls.key
-              export PGSSLROOTCERT=/etc/secrets/ca/ca.crt
+              # export PGSSLMODE=verify-full
+              # export PGSSLCERT=/etc/secrets/app/tls.crt
+              # export PGSSLKEY=/etc/secrets/app/tls.key
+              # export PGSSLROOTCERT=/etc/secrets/ca/ca.crt
 
               # Create required extensions
               psql -c "CREATE EXTENSION IF NOT EXISTS postgis;"
@@ -121,7 +111,9 @@ spec:
                 local retry_count=0
 
                 echo "Downloading $geography..."
+                cd /tmp/osm-files
                 wget -q https://download.geofabrik.de/$geography
+
 
                 echo "Importing $filename..."
                 while [ $retry_count -lt $max_retries ]; do
@@ -171,6 +163,7 @@ spec:
                   if [ "$DB_INITIALIZED" = "false" ]; then
                     # First import needs --create flag instead of --append
                     echo "Downloading first geography: $geography..."
+                    cd /tmp/osm-files
                     wget -q https://download.geofabrik.de/$geography
                     filename=$(basename $geography)
 
@@ -214,6 +207,9 @@ spec:
           secret:
             secretName: osm-installer
             defaultMode: 0600
+        - name: osm-temp
+          persistentVolumeClaim:
+            claimName: osm-temp-storage
       restartPolicy: Never
   backoffLimit: 2
 ---
@@ -235,6 +231,7 @@ rules:
       - "postgis-db-ca"
       - "osm-installer"
       - "postgis-db-app"
+      - "postgis-app-user"
     verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

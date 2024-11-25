@@ -1,0 +1,126 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: docker-build-pipeline
+spec:
+  workspaces:
+    - name: shared-workspace
+    - name: docker-credentials
+  params:
+    - name: git-url
+      type: string
+      description: "URL of the git repo"
+    - name: git-revision
+      type: string
+      description: "Git revision to checkout"
+      default: "main"
+    - name: image-name
+      type: string
+      description: "Name of the image to build"
+    - name: image-tag
+      type: string
+      description: "Tag for the built image"
+      default: "latest"
+    - name: dockerfile-path
+      type: string
+      description: "Path to the Dockerfile"
+      default: "Dockerfile"
+
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+        - name: deleteExisting
+          value: "true"
+
+    - name: run-unit-tests
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: docker-test
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: context
+          value: "."
+        - name: dockerfile
+          value: $(params.dockerfile-path)
+
+    - name: build-and-push
+      runAfter: ["run-unit-tests"]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerconfig
+          workspace: docker-credentials
+      params:
+        - name: IMAGE
+          value: $(params.image-name):$(params.image-tag)
+        - name: DOCKERFILE
+          value: $(params.dockerfile-path)
+        - name: CONTEXT
+          value: "."
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: docker-test
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: context
+      type: string
+    - name: dockerfile
+      type: string
+  steps:
+    - name: run-tests
+      image: docker:dind
+      script: |
+        cd $(workspaces.source.path)/$(params.context)
+        docker build -f $(params.dockerfile) --target test .
+      securityContext:
+        privileged: true
+      volumeMounts:
+        - name: dind-socket
+          mountPath: /var/run
+  volumes:
+    - name: dind-socket
+      emptyDir: {}
+---
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: docker-build-pipeline-run-
+spec:
+  pipelineRef:
+    name: docker-build-pipeline
+  workspaces:
+    - name: shared-workspace
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 1Gi
+    - name: docker-credentials
+      secret:
+        secretName: docker-config
+  params:
+    - name: git-url
+      value: "https://github.com/your-org/your-repo.git"
+    - name: image-name
+      value: "registry.example.com/your-image"
+    - name: image-tag
+      value: "1.0.0"

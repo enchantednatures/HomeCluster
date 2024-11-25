@@ -48,8 +48,6 @@ spec:
       commonConfig:
         path_prefix: /var/loki
         replication_factor: 1
-
-
         storage:
           s3:
             endpoint: https://s3.${SECRET_DOMAIN}
@@ -61,13 +59,10 @@ spec:
             secret_access_key: ${MINIO_SECRET_KEY}
             s3forcepathstyle: true
             insecure: false
-
       serviceMonitor:
         enabled: true
-
       storage:
         type: s3
-
       schemaConfig:
         configs:
           - from: "2020-10-24"
@@ -77,21 +72,18 @@ spec:
             index:
               prefix: index_
               period: 24h
-
       storageConfig:
         boltdb_shipper:
           active_index_directory: /var/loki/index
           cache_location: /var/loki/cache
           cache_ttl: 24h
           shared_store: s3
-
       limits_config:
         enforce_metric_name: false
         reject_old_samples: true
         reject_old_samples_max_age: 168h
         max_entries_limit_per_query: 5000
         volume_enabled: true
-
       ingester:
         chunk_idle_period: 3m
         chunk_block_size: 262144
@@ -102,50 +94,39 @@ spec:
             kvstore:
               store: inmemory
             replication_factor: 1
-
       query_range:
         align_queries_with_step: true
         max_retries: 5
         split_queries_by_interval: 15m
-
     ingester:
       persistence:
         enabled: true
         size: 10Gi
       replicas: 1
-
     distributor:
       replicas: 1
-
     querier:
       replicas: 1
-
     queryFrontend:
       replicas: 1
-
     gateway:
       enabled: true
       replicas: 1
-
     compactor:
       enabled: true
       replicas: 1
       persistence:
         enabled: true
         size: 10Gi
-
     # Optional components - disable if not needed
     ruler:
       enabled: false
     indexGateway:
       enabled: false
-
     serviceMonitor:
       enabled: true
-
     prometheusRule:
       enabled: true
-
   valuesFrom:
     - targetPath: loki.commonConfig.storage.s3.bucket
       kind: ConfigMap

@@ -1,0 +1,13 @@
+---
+# PVC for temporary OSM file storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: osm-temp-storage
+  namespace: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
