@@ -28,7 +28,7 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          app:
+          *app :
             image:
               repository: ghcr.io/atuinsh/atuin
               tag: 18.3.0@sha256:678def8e9d59652a502759ca431f9c5b54ebdd5e9361507c7fcf24705c9862e0
@@ -97,7 +97,7 @@ spec:
       config:
         type: emptyDir
     service:
-      app:
+      *app :
         controller: *app
         ports:
           http:
@@ -105,7 +105,7 @@ spec:
           metrics:
             port: *metricsPort
     serviceMonitor:
-      app:
+      *app :
         serviceName: *app
         endpoints:
           - port: metrics
