@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta2
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: loki
@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: loki-distributed
-      version: 0.69.17
+      version: 0.80.0
       sourceRef:
         kind: HelmRepository
         name: grafana
