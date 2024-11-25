@@ -22,8 +22,8 @@ spec:
     image:
       repository: ghcr.io/element-hq/synapse
       tag: v1.119.0
-    serverName: skylab.fi
-    publicServerName: matrix.skylab.fi
+    serverName: ${SECRET_DOMAIN}
+    publicServerName: matrix.${SECRET_DOMAIN}
     wellknown:
       enabled: true
       image:
