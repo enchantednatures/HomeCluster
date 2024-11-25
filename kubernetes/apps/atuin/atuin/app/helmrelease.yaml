@@ -92,7 +92,7 @@ spec:
         tls:
           - hosts:
               - *host
-          secretName: atuin-tls
+        secretName: atuin-tls
     persistence:
       config:
         type: emptyDir
