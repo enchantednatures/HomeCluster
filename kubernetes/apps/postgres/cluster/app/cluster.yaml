@@ -51,4 +51,3 @@ spec:
       secret:
         name: postgres-app-user
       postInitTemplateSQL: []
-
