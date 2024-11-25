@@ -19,7 +19,6 @@ spec:
   postgresql:
     parameters:
       max_connections: "300"
-      shared_buffers: 512MB
       # Memory configuration - optimized for 4GB total RAM
       shared_buffers: "1GB" # 25% of RAM
       effective_cache_size: "3GB" # 75% of RAM
