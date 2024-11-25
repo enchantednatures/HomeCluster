@@ -73,9 +73,9 @@ module "talos" {
       ip            = "192.168.1.212"
       mac_address   = "BC:24:11:2E:08:01"
       vm_id         = 811
-      cpu           = 8
+      cpu           = 16
       ram_dedicated = 16384
-      disk_size     = 64
+      disk_size     = 32
       datastore_id  = "local-lvm"
       igpu          = true
     }
@@ -88,7 +88,46 @@ module "talos" {
       vm_id         = 812
       cpu           = 8
       ram_dedicated = 16384
-      disk_size     = 64
+      disk_size     = 32
+      datastore_id  = "local-lvm"
+      igpu          = true
+    }
+
+    "work-03" = {
+      host_node     = "pve"
+      machine_type  = "worker"
+      ip            = "192.168.1.214"
+      mac_address   = "BC:24:11:2E:08:03"
+      vm_id         = 813
+      cpu           = 8
+      ram_dedicated = 16384
+      disk_size     = 32
+      datastore_id  = "local-lvm"
+      igpu          = true
+    }
+
+    "work-04" = {
+      host_node     = "pve"
+      machine_type  = "worker"
+      ip            = "192.168.1.215"
+      mac_address   = "BC:24:11:2E:08:04"
+      vm_id         = 813
+      cpu           = 4
+      ram_dedicated = 4096
+      disk_size     = 16
+      datastore_id  = "local-lvm"
+      igpu          = true
+    }
+
+    "work-05" = {
+      host_node     = "pve"
+      machine_type  = "worker"
+      ip            = "192.168.1.216"
+      mac_address   = "BC:24:11:2E:08:05"
+      vm_id         = 813
+      cpu           = 4
+      ram_dedicated = 4096
+      disk_size     = 16
       datastore_id  = "local-lvm"
       igpu          = true
     }
