@@ -41,7 +41,7 @@ spec:
       checkpoint_completion_target: "0.9"
       default_statistics_target: "500"
       # Extensions needed for OSM
-      shared_preload_libraries: "postgis"
+      # shared_preload_libraries: "postgis"
   # pg_hba:
   #   - host all all 10.244.0.0/16 md5
   monitoring:
