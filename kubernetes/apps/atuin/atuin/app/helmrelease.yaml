@@ -75,7 +75,7 @@ spec:
         runAsUser: 568
         runAsGroup: 568
     ingress:
-      app:
+      *app :
         className: external
         annotations:
           kubernetes.io/tls-acme: "true"
