@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: osm-geographies
-  namespace: default
+  namespace: postgres
 data:
   geographies: |
     europe/monaco-latest.osm.pbf
@@ -15,22 +15,21 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: osm-import-progress
-  namespace: default
+  namespace: postgres
 data:
   completed: ""
   initialized: "false"
----
-
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: osm-import
-  namespace: default
+  namespace: postgres
 spec:
   ttlSecondsAfterFinished: 100
   template:
     spec:
+      serviceAccountName: osm-import
       containers:
         - name: osm-import
           image: overv/openstreetmap-tile-server:latest
@@ -45,28 +44,28 @@ spec:
             - name: PGUSER
               valueFrom:
                 secretKeyRef:
-                  name: osm-pg-secret
+                  name: postgis-db-app
                   key: user
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: osm-pg-secret
-                  key: pass
+                  name: postgis-db-app
+                  key: password
             - name: PGHOST
               valueFrom:
                 secretKeyRef:
-                  name: osm-pg-secret
+                  name: postgis-db-app
                   key: host
             - name: PGPORT
               valueFrom:
                 secretKeyRef:
-                  name: osm-pg-secret
+                  name: postgis-db-app
                   key: port
             - name: PGDATABASE
               valueFrom:
                 secretKeyRef:
-                  name: osm-pg-secret
-                  key: db
+                  name: postgis-db-app
+                  key: dbname
           volumeMounts:
             - name: geographies
               mountPath: /etc/osm/geographies
@@ -74,12 +73,24 @@ spec:
               mountPath: /etc/osm/progress
             - name: cache
               mountPath: /tmp/osm-cache
+            - name: secret-volume-root-ca
+              mountPath: /etc/secrets/ca
+              readOnly: true
+            - name: secret-volume-app
+              mountPath: /etc/secrets/app
+              readOnly: true
           command:
             - /bin/bash
             - -c
             - |
               # Install wget
               apt-get update && apt-get install -y wget
+
+              # Set PostgreSQL environment variables for SSL
+              export PGSSLMODE=verify-full
+              export PGSSLCERT=/etc/secrets/app/tls.crt
+              export PGSSLKEY=/etc/secrets/app/tls.key
+              export PGSSLROOTCERT=/etc/secrets/ca/ca.crt
 
               # Create required extensions
               psql -c "CREATE EXTENSION IF NOT EXISTS postgis;"
@@ -195,7 +206,14 @@ spec:
           emptyDir: {}
         - name: cache
           emptyDir: {}
-      serviceAccountName: osm-import
+        - name: secret-volume-root-ca
+          secret:
+            secretName: postgis-db-ca
+            defaultMode: 0600
+        - name: secret-volume-app
+          secret:
+            secretName: osm-installer
+            defaultMode: 0600
       restartPolicy: Never
   backoffLimit: 2
 ---
@@ -203,5 +221,31 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: osm-import
-  namespace: default
+  namespace: postgres
 ---
+# 1. Create a ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: postgis-secret-reader
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames:
+      - "postgis-db-ca"
+      - "osm-installer"
+      - "postgis-db-app"
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: secret-reader-binding
+subjects:
+  - kind: ServiceAccount
+    name: osm-import
+    namespace: postgres
+roleRef:
+  kind: ClusterRole
+  name: postgis-secret-reader
+  apiGroup: rbac.authorization.k8s.io

@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -50,10 +49,81 @@ spec:
         pspEnabled: true
       serviceMonitor:
         enabled: true
+      config:
+        auth_enabled: false
+        ingester:
+          chunk_idle_period: 3m
+          chunk_block_size: 262144
+          chunk_retain_period: 1m
+          max_transfer_retries: 0
+          lifecycler:
+            ring:
+              kvstore:
+                store: inmemory
+              replication_factor: 1
+        limits_config:
+          enforce_metric_name: false
+          reject_old_samples: true
+          reject_old_samples_max_age: 168h
+          max_entries_limit_per_query: 5000
+        schema_config:
+          configs:
+            - from: 2020-10-24
+              store: boltdb-shipper
+              object_store: s3
+              schema: v11
+              index:
+                prefix: index_
+                period: 24h
+        storage_config:
+          boltdb_shipper:
+            active_index_directory: /data/loki/boltdb-shipper-active
+            cache_location: /data/loki/boltdb-shipper-cache
+            cache_ttl: 24h
+            shared_store: s3
+          aws:
+            s3: s3://BUCKET_NAME
+            bucketnames: loki
+            endpoint: https://s3.{SECRET_DOMAIN}  # e.g., minio.example.com:9000
+            access_key_id: ${MINIO_ACCESS_KEY}
+            secret_access_key: ${MINIO_SECRET_KEY}
+            s3forcepathstyle: true
+            insecure: false  # Set to true if not using TLS
+            http_config:
+              idle_conn_timeout: 90s
+              response_header_timeout: 0s
+              insecure_skip_verify: false  # Set to true if using self-signed certs
+        query_range:
+          align_queries_with_step: true
+          max_retries: 5
+          split_queries_by_interval: 15m
+      extraSecretMounts:
+        - name: minio-secret
+          secretName: loki-minio-secret
+          mountPath: /etc/loki/creds
+          readOnly: true
     promtail:
       enabled: true
       serviceMonitor:
         enabled: true
+      config:
+        snippets:
+          extraRelabelConfigs:
+            - action: replace
+              sourceLabels: [__meta_kubernetes_pod_node_name]
+              targetLabel: node_name
+            - action: replace
+              sourceLabels: [__meta_kubernetes_namespace]
+              targetLabel: namespace
+            - action: replace
+              sourceLabels: [__meta_kubernetes_pod_name]
+              targetLabel: pod
+            - action: replace
+              sourceLabels: [__meta_kubernetes_pod_container_name]
+              targetLabel: container
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
     fluent-bit:
       enabled: false
     grafana:
@@ -62,3 +132,28 @@ spec:
       enabled: false
     test_pod:
       enabled: true
+  valuesFrom:
+    - targetPath: loki.storage.s3.bucket
+      kind: ConfigMap
+      name: loki-bucket
+      valuesKey: BUCKET_NAME
+    - targetPath: loki.storage.s3.endpoint
+      kind: ConfigMap
+      name: loki-bucket
+      valuesKey: BUCKET_HOST
+    - targetPath: loki.storage.s3.s3
+      kind: ConfigMap
+      name: loki-bucket
+      valuesKey: BUCKET_ENDPOINT
+    - targetPath: loki.storage.s3.region
+      kind: ConfigMap
+      name: loki-bucket
+      valuesKey: REGION
+    - targetPath: loki.storage.s3.accessKeyId
+      kind: Secret
+      name: loki-bucket
+      valuesKey: ACCESS_KEY
+    - targetPath: loki.storage.s3.secretAccessKey
+      kind: Secret
+      name: loki-bucket
+      valuesKey: ACCESS_SECRET
