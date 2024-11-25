@@ -99,13 +99,13 @@ spec:
       frontend_proxy:
         enabled: false
     extraConfig:
-      email:
-        smtp_host: smtp-relay.default.svc.cluster.local
-        smtp_port: 587
-        notif_from: "Your Friendly %(app)s homeserver <noreply@${SECRET_DOMAIN}>"
-      trusted_key_servers:
-        - server_name: "kapsi.fi"
-        - server_name: "pikaviestin.fi"
+      # email:
+      #   smtp_host: smtp-relay.default.svc.cluster.local
+      #   smtp_port: 587
+      #   notif_from: "Your Friendly %(app)s homeserver <noreply@${SECRET_DOMAIN}>"
+      # trusted_key_servers:
+      #   - server_name: "kapsi.fi"
+      #   - server_name: "pikaviestin.fi"
       presence:
         enabled: true
       enable_3pid_lookup: false
@@ -113,7 +113,7 @@ spec:
         - idp_id: authentik
           idp_name: Skylab SSO
           discover: true
-          issuer: "https://id.skylab.fi/application/o/matrix/"
+          issuer: "https://auth.${SECRET_DOMAIN}/application/o/matrix/"
           client_id: "matrix"
           client_secret: ${SECRET_AUTHENTIK_MATRIX_CLIENT}
           scopes:
@@ -126,39 +126,38 @@ spec:
               display_name_template: "{{ user.name | capitalize }}"
     ingress:
       enabled: true
-      className: external-nginx
+      className: external
       annotations:
-        cert-manager.io/cluster-issuer: zerossl-production
+        cert-manager.io/cluster-issuer: letsencrypt-production
         nginx.ingress.kubernetes.io/use-regex: "true"
         external-dns-cf/is-public: "true"
         external-dns-cf/is-dns-public: "true"
         external-dns.target/enabled: "true"
         external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-        external-dns.alpha.kubernetes.io/target: "ingress-cf.skylab.fi"
+        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
       tls:
         - secretName: matrix-tls
           hosts:
-            - skylab.fi
-            - matrix.skylab.fi
+            - matrix.${SECRET_DOMAIN}
     postgresql:
-      enabled: false
-    externalPostgresql:
-      host: postgres16-rw.databases.svc.nebula.local
-      port: 5432
-      username: synapse
-      existingSecret: matrix-synapse-pg-creds
-      existingSecretPasswordKey: PASSWORD
-      database: "synapse"
+      enabled: true
+    # externalPostgresql:
+    #   host: postgres16-rw.databases.svc.cluster.local
+    #   port: 5432
+    #   username: synapse
+    #   existingSecret: matrix-synapse-pg-creds
+    #   existingSecretPasswordKey: PASSWORD
+    #   database: "synapse"
     # Will not want to work w/o pass
     #externalRedis:
     #  host: redis.databases.svc.cluster.local
     #  port: 6379
     #  dbid: 1
-    redis:
-      enabled: true
-      auth:
-        enabled: true
-        password: ${SECRET_MATRIX_REDIS_PASSWORD}
+    # redis:
+    #   enabled: true
+    #   auth:
+    #     enabled: true
+    #     password: ${SECRET_MATRIX_REDIS_PASSWORD}
     synapse:
       strategy:
         type: Recreate
@@ -169,10 +168,10 @@ spec:
         limits:
           cpu: 1000m
           memory: 2500Mi
-    signingkey:
-      job:
-        enabled: false
-      existingSecret: matrix-synapse-signingkey
-    persistence:
-      enabled: true
-      existingClaim: synapse-data
+    # signingkey:
+    #   job:
+    #     enabled: false
+    #   existingSecret: matrix-synapse-signingkey
+    # persistence:
+    #   enabled: true
+    #   existingClaim: synapse-data
