@@ -48,10 +48,15 @@ spec:
       commonConfig:
         path_prefix: /var/loki
         replication_factor: 1
+
+
         storage:
           s3:
             endpoint: https://s3.${SECRET_DOMAIN}
-            bucketnames: loki
+            bucketnames:
+              chunks: loki-chunks
+              ruler: loki-ruler
+              admini: loki-admin
             access_key_id: ${MINIO_ACCESS_KEY}
             secret_access_key: ${MINIO_SECRET_KEY}
             s3forcepathstyle: true
