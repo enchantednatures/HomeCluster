@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: harbor-db-config
   namespace: harbor
-stringData:
+data:
   host: postgres-db-rw.postgres.svc.cluster.local
   port: 5432
   coreDatabase: "registry"
