@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.49.0/release.yaml
   - https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml
-  - ./secrets/docker-regcred.sops.yaml
-  - ./secrets/git-credentials.sops.yaml
+  - ./secrets/kustomization.yaml
+  - ./tasks/kustomization.yaml
+  - ./pipelines/kustomization.yaml

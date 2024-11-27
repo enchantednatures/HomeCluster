@@ -1,0 +1,77 @@
+# Updated pipeline.yaml
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: docker-build-and-test
+spec:
+  workspaces:
+    - name: shared-workspace
+  params:
+    - name: git-url
+      type: string
+    - name: git-revision
+      type: string
+      default: main
+    - name: image-name
+      type: string
+    - name: image-tag
+      type: string
+      default: latest
+    - name: registry-url
+      type: string
+    - name: registry-username
+      type: string
+    - name: registry-password
+      type: string
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+    - name: build-image
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: IMAGE
+          value: $(params.registry-url)/$(params.image-name):$(params.image-tag)
+        - name: DOCKERFILE
+          value: ./Dockerfile
+    - name: run-tests
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: docker-build-and-run
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: DOCKERFILE
+          value: ./Dockerfile.test
+        - name: CONTEXT
+          value: .
+    - name: push-image
+      runAfter: ["build-image", "run-tests"]
+      taskRef:
+        name: docker-push
+      params:
+        - name: registry-url
+          value: $(params.registry-url)
+        - name: image-name
+          value: $(params.image-name)
+        - name: image-tag
+          value: $(params.image-tag)
+        - name: registry-username
+          value: $(params.registry-username)
+        - name: registry-password
+          value: $(params.registry-password)
+---

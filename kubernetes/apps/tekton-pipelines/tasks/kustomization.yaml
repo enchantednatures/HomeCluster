@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./minio-upload.yaml
+  - ./rust-build.yaml
+  - ./git-clone.yaml
+  - ./docker-push.yaml
+  - ./docker-build.yaml

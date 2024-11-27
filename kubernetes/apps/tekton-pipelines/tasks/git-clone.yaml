@@ -1,0 +1,33 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone
+spec:
+  workspaces:
+    - name: output
+      description: The workspace to clone the repository into
+      mountPath: /workspace/output
+  params:
+    - name: repo-url
+      description: The URL of the Git repository
+    - name: branch
+      description: The branch to clone
+      default: "main"
+  steps:
+    - name: clone
+      image: alpine/git
+      script: |
+        #!/bin/sh
+        mkdir -p ~/.ssh
+        cp /workspace/ssh-creds/ssh-privatekey ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        git clone -b $(params.branch) $(params.repo-url) /workspace/output
+      volumeMounts:
+        - name: git-ssh-key
+          mountPath: /workspace/ssh-creds
+  volumes:
+    - name: git-ssh-key
+      secret:
+        secretName: git-ssh-key
+---

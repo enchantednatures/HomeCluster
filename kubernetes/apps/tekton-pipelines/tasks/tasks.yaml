@@ -1,0 +1,58 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: docker-build-and-test
+spec:
+  workspaces:
+    - name: shared-workspace
+  params:
+    - name: git-url
+      type: string
+    - name: git-revision
+      type: string
+      default: main
+    - name: image-name
+      type: string
+    - name: image-tag
+      type: string
+      default: latest
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+
+    - name: build-image
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: kaniko
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: IMAGE
+          value: $(params.image-name):$(params.image-tag)
+        - name: DOCKERFILE
+          value: ./Dockerfile
+
+    - name: run-tests
+      runAfter: ["fetch-source"]
+      taskRef:
+        name: docker-build-and-run
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+      params:
+        - name: DOCKERFILE
+          value: ./Dockerfile.test
+        - name: CONTEXT
+          value: .
+
+

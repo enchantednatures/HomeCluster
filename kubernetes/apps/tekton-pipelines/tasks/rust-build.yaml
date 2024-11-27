@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: rust-build
+spec:
+  workspaces:
+    - name: source
+      description: The workspace containing the source code
+      mountPath: /workspace/source
+  steps:
+    - name: install-deps
+      image: rust:latest
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        rustup update
+        cargo build --release
+    - name: test
+      image: rust:latest
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        cargo test
+---

@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: docker-push
+spec:
+  params:
+    - name: registry-url
+      type: string
+      description: "Docker registry URL"
+    - name: image-name
+      type: string
+      description: "Name of the image to push"
+    - name: image-tag
+      type: string
+      description: "Tag of the image to push"
+    - name: registry-username
+      type: string
+      description: "Registry username"
+    - name: registry-password
+      type: string
+      description: "Registry password"
+  steps:
+    - name: docker-login
+      image: docker:dind
+      script: |
+        docker login $(params.registry-url) \
+          -u $(params.registry-username) \
+          -p $(params.registry-password)
+      volumeMounts:
+        - name: dind-socket
+          mountPath: /var/run/docker.sock
+    - name: docker-push
+      image: docker:dind
+      script: |
+        docker push $(params.registry-url)/$(params.image-name):$(params.image-tag)
+      volumeMounts:
+        - name: dind-socket
+          mountPath: /var/run/docker.sock
+  volumes:
+    - name: dind-socket
+      hostPath:
+        path: /var/run/docker.sock
+        type: Socket

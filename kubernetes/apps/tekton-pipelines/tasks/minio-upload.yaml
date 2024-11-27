@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: minio-upload
+spec:
+  workspaces:
+    - name: source
+      description: The workspace containing the build artifacts
+      mountPath: /workspace/source
+  params:
+    - name: minio-bucket
+      description: MinIO bucket name
+    - name: minio-endpoint
+      description: MinIO server endpoint
+    - name: access-key
+      description: MinIO access key
+    - name: secret-key
+      description: MinIO secret key
+  steps:
+    - name: upload
+      image: minio/mc
+      script: |
+        #!/bin/sh
+        mc alias set minio $(params.minio-endpoint) $(params.access-key) $(params.secret-key)
+        mc cp /workspace/source/target/release/* minio/$(params.minio-bucket)
+---

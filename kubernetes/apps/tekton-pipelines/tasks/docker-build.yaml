@@ -1,0 +1,28 @@
+# task-docker-build-and-run.yaml
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: docker-build-and-run
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: DOCKERFILE
+      type: string
+    - name: CONTEXT
+      type: string
+  steps:
+    - name: build-and-run-tests
+      image: docker:dind
+      script: |
+        cd $(workspaces.source.path)/$(params.CONTEXT)
+        docker build -f $(params.DOCKERFILE) -t test-image .
+        docker run --rm test-image
+      volumeMounts:
+        - name: dind-socket
+          mountPath: /var/run/docker.sock
+  volumes:
+    - name: dind-socket
+      hostPath:
+        path: /var/run/docker.sock
+        type: Socket
