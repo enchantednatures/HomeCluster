@@ -1,0 +1,13 @@
+# https://kubernetes.io/docs/concepts/configuration/configmap/
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: harbor-db-config
+  namespace: harbor
+stringData:
+  host: postgres-db-rw.postgres.svc.cluster.local
+  port: 5432
+  coreDatabase: "registry"
+  notaryServerDatabase: "notary_server"
+  notarySignerDatabase: "notary_signer"
+  sslmode: "disable"

@@ -1,0 +1,206 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: harbor
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: harbor
+      version: 1.14.2
+      sourceRef:
+        kind: HelmRepository
+        name: harbor-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  valuesFrom:
+    - kind: Secret
+      name: harbor-db
+      valuesKey: username
+      targetPath: database.external.username
+    - kind: Secret
+      name: harbor-db
+      valuesKey: password
+      targetPath: database.external.password
+    - kind: ConfigMap
+      name: harbor-db-config
+      valuesKey: coreDatabase
+      targetPath: database.external.coreDatabase
+    - kind: ConfigMap
+      name: harbor-db-config
+      valuesKey: notaryServerDatabase
+      targetPath: database.external.notaryServerDatabase
+    - kind: ConfigMap
+      name: harbor-db-config
+      valuesKey: notarySignerDatabase
+      targetPath: database.external.notarySignerDatabase
+  values:
+    expose:
+      type: ingress
+      tls:
+        enabled: true
+        certSource: secret
+        secret:
+          secretName: "harbor-tls"
+          notarySecretName: "harbor-notary-tls"
+      ingress:
+        hosts:
+          core: harbor.enchantednatures.com
+          notary: notary.enchantednatures.com
+        controller: default
+        annotations:
+          kubernetes.io/ingress.class: "nginx"
+          kubernetes.io/tls-acme: "true"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+    externalURL: https://harbor.${SECRET_DOMAIN}
+    internalTLS:
+      enabled: false
+      certSource: "auto"
+    persistence:
+      enabled: true
+      resourcePolicy: "keep"
+      # persistentVolumeClaim:
+        # registry:
+        #   existingClaim: "harbor-registry-pvc"
+        # chartmuseum:
+        #   existingClaim: "harbor-chartmuseum-pvc"
+        # jobservice:
+        # trivy:
+        #   size: 5Gi
+      imageChartStorage:
+        disableredirect: false
+        type: s3
+        s3:
+          existingSecret: "harbor-minio-credentials"
+          region: us-rack-east-01
+          bucket: harbor-registry
+          regionendpoint: https://s3.${SECRET_DOMAIN}
+    harborAdminPassword: "Harbor12345"
+    portal:
+      replicas: 1
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 100m
+    core:
+      replicas: 1
+      startupProbe:
+        enabled: true
+        initialDelaySeconds: 10
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 100m
+    jobservice:
+      replicas: 1
+    registry:
+      registry:
+        image:
+          repository: goharbor/registry-photon
+          tag: v2.10.2
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+      controller:
+        image:
+          repository: goharbor/harbor-registryctl
+          tag: v2.10.2
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 100m
+      replicas: 1
+      credentials:
+        username: "harbor_registry_user"
+        password: "harbor_registry_password"
+      middleware:
+        enabled: false
+    chartmuseum:
+      enabled: true
+      replicas: 1
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 100m
+    trivy:
+      enabled: true
+      insecure: false
+      # gitHubToken the GitHub access token to download Trivy DB
+      gitHubToken: ""
+      timeout: 5m0s
+      resources:
+        requests:
+          cpu: 200m
+          memory: 512Mi
+        limits:
+          cpu: 1
+          memory: 1Gi
+    notary:
+      enabled: false
+      server:
+        replicas: 1
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+      signer:
+        replicas: 1
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+        podAnnotations: {}
+    database:
+      type: external
+      external:
+        host: postgres-db-rw.postgres.svc.cluster.local
+        port: 5432
+        username: harbor # todo
+        password: harbor
+        coreDatabase: "registry"
+        notaryServerDatabase: "notary_server"
+        notarySignerDatabase: "notary_signer"
+        sslmode: "disable"
+      maxIdleConns: 100
+      maxOpenConns: 900
+      podAnnotations: {}
+    redis:
+      type: internal
+      internal:
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 100m
+      external:
+        addr: "192.168.0.2:6379"
+        coreDatabaseIndex: "0"
+        jobserviceDatabaseIndex: "1"
+        registryDatabaseIndex: "2"
+        chartmuseumDatabaseIndex: "3"
+        trivyAdapterIndex: "5"
+        password: ""
+    exporter:
+      replicas: 1
+      resources:
+        requests:
+          memory: 256Mi
+          cpu: 100m
+      cacheDuration: 23
+      cacheCleanInterval: 14400
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true

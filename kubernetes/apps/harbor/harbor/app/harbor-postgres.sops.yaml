@@ -1,0 +1,30 @@
+# https://kubernetes.io/docs/concepts/configuration/secret/
+apiVersion: v1
+kind: Secret
+metadata:
+    name: harbor-db
+    namespace: harbor
+type: Opaque
+stringData:
+    username: ENC[AES256_GCM,data:Z9j++ehO,iv:Y4lOMOO8Z0niX+vI85Y08QLxHORYoXSpwRK0GvLJB9k=,tag:p6kp9n7oGLISrqy83jylzQ==,type:str]
+    password: ENC[AES256_GCM,data:3psjrnQd,iv:Ulh1GJAIbcKPhUBCfWV83lDmqzHXczNaoLHbVIZ4Y+M=,tag:JJbIe0EuK9Nrd84mB8grRw==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBidU9UejVERlliS0U3c0xQ
+            andRdTlYT1VrOFIxT1ZZSEVqK216UnNzaUNjCjZzV0tBOWFEMTBwWHZTTStDNU96
+            ZFVrc2JOYXRiQlBqSEVjREVYVDZBNzQKLS0tIE96UXM3dTdDTGw1a0FETElRRWlI
+            dGdOZ3JiRFNKNG1nM0E3Ymh6ZWlqUjQKg0ru3d+9hUUwq0GukctG8xwf2mABSobl
+            voSSSi4fAp6ct5xIJ+CLlIKy0c5NBUh8HlhohCbLYvmiHykTwRcXHw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-11-27T04:10:39Z"
+    mac: ENC[AES256_GCM,data:/zK6lOGEkCHaukb0fpIwP2dfoCZ19lx9mrVHQ49DxfihHJ7H1NpjVswC4tk0UftKalXO1NS+NctRGtxO8lrugNfmBcTRODdaOhl5690Yf0UN9loQqf0n8R9oWEuN5qK5/oWZwIxzOiA0klPDP9W3djr9Qc9X6yWupCFx0mmO6Pw=,iv:o8KBEbwwayJzGwCFgYdVI5fsx5tpvB+WOiVTqG18WrE=,tag:ODuuQd6kFc/FS1oUJYOGZA==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.9.1
