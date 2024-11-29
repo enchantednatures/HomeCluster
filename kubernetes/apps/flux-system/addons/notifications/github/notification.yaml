@@ -8,7 +8,7 @@ spec:
   type: github
   address: https://github.com/enchantednatures/HomeCluster
   secretRef:
-    name: github-webhook-token-secret # TODO: make a new token for this
+    name: github-webhook-token-secret
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/notification.toolkit.fluxcd.io/alert_v1beta3.json
 apiVersion: notification.toolkit.fluxcd.io/v1beta3
