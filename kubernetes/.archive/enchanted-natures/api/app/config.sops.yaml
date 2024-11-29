@@ -13,7 +13,7 @@ data:
           application_name: enchanted_natures
         auth_settings:
           client_id: lAhSmpvxqKuetDQXUEbnxxKP1mxIc8wt46XoroD7
-          client_secret: Dpr4QTo6gerebEcVTk5rCIgmX8ShW9ieUGttM01VW6gU1hRqHKeSl0UQHrE2DMiGtdaU3wo3LWrnLk90f7sEhPubI5ycrHbaQCdT98VwvxGxbuGDEsy0iW2PpLU2t3sT
+          client_secret: 123
           redirect_url: https://api.enchantednatures.com/authorized
           token_url: https://auth.enchantednatures.com/application/o/token/
           auth_url: https://auth.enchantednatures.com/application/o/authorize/
