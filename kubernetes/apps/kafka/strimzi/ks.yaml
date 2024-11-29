@@ -1,12 +1,9 @@
----
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app kafka-ui
+  name: &app strimzi-kafka-operator
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: kafka
   targetNamespace: kafka
   commonMetadata:
     labels:
