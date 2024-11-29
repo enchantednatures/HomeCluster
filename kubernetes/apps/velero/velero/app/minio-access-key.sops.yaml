@@ -5,7 +5,7 @@ metadata:
     namespace: velero
 type: Opaque
 stringData:
-    cloud: ENC[AES256_GCM,data:6nxPsQcRO1hrZPDj8348ZXCd25+glUKz2tGPQR558mE7/mFvNZZN45jKBGxMIXeWRqTZi5g47HC5cDRIHuPxj5KFVp6/9XtvoO/9ICxXIy49+r/8oQ==,iv:FMd0OYUJ3/IOXnhYsit+NV9FHfIbsrqAyQNtrr2T1Mg=,tag:oC4JaQl2JyY6zYT05cpYZw==,type:str]
+    cloud: ENC[AES256_GCM,data:eosneaKaH+qL7LPd8TcRPmmfXDP9y8qmnl+dRxsDhv2ZxRaj+oM8qdHs5TxKCOV+LcxJfc48nMkrnu7d4NktWpZUUOKPBJd0eRF560gHSyChL+/xTA==,iv:DCAbREYy2Z0SsIdGR8K8rRMjiRB7zFXwTwl4roVFgYk=,tag:JnNihD0EKu7CrwLBhzY7jQ==,type:str]
 sops:
     kms: []
     gcp_kms: []
@@ -15,14 +15,14 @@ sops:
         - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBiUHVoUVVBMndaamhzaW1k
-            RENtVktKQkdVN1Y1R0dpRThCNTFvQ2c0djNRCmNNbjBiTWhvZkRLbHl4Wng5UTVi
-            clhaTTdsZ1BnVGszNE9CTGFPNXZIZDgKLS0tIGR6SW1jUFNzTG1IMWF0TWZSS0dj
-            VkxyQzJjVXVjU1BJMUwwRmNQcENsMWcKggJpO7RDJVGQcUT2BbQx4yvM+9KTqgtN
-            QZpcvoaNXoJ/6bUeLWzg2yCL9V8xDNlBcFGpIOnyipCudwMpCkUb+w==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBweG5rVXU2b1ZzMStRY2U2
+            ZGJOTEdaaHdnbUxvOElxWTU1QjNPYXpLZFRJCjNxQ1ByREYvUGtWYWY4aDJra1h0
+            OXlhbXZuVmhueEw3eDRRb3kwcDlaSUkKLS0tIGNiUHpYYWV0akVDOGE1VldCQ3FD
+            MVNZNGM1MDRJbFF0Z0RDYmM3S0UyM00KNmBRtMryQOs/Jb23o0uDcUyLO/mZ7RIp
+            YiwL3s/XX/wb/RuWU75DSMdpspFAB9kMcyTQuamrNm89nJfGKfE4mQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-11-29T07:26:05Z"
-    mac: ENC[AES256_GCM,data:SJhrczg+RMyDyDcg6ZYta5UCQdMdFHFO8ER/9Nf21Uh9wI2qmNo5tUzkHCCJNUWYYK3I6tV8/0/L12YJ12yXfJNLYSPEfuCV1w2FBtN8/J3HpIJbz+cvBNxPK0HQ3AFKoSL9nevTZwI089q3wBWKhNnpATJxWHe/WMQ0sY6cqUE=,iv:69h3yltUwWewUl++XDtC5jBjG6zoOtrwAUSDi5S6sz0=,tag:/ggv6zQpfGN7u1fcpBOcqw==,type:str]
+    lastmodified: "2024-11-29T07:27:29Z"
+    mac: ENC[AES256_GCM,data:hDsoR6S+VkuctgedoU3AZ2g5WLOLEF1a2t1f6qbomfzDdp60Zl082DvAcGDVnV3xxWH8dHb8LKiCTacSfNXYX0J8UqZJuTZlLMlksw+k9rjsgaH0antwhy10iBREOcFeX5JtqJ8sE8FM7PXF8CBj++p7n5pcJ9RMDyKnbIcrpfo=,iv:xc1/SUBUxM8ydJ0pg+308XImY1Wlz47ObySWU86IuKs=,tag:F8NdxZC7uWHks8xwaS6e/g==,type:str]
     pgp: []
     encrypted_regex: ^(data|stringData)$
     version: 3.9.1
