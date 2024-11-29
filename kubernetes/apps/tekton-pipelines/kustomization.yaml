@@ -5,6 +5,6 @@ metadata:
 resources:
   - https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.49.0/release.yaml
   - https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml
-  - ./secrets/
-  - ./tasks/
-  - ./pipelines/
+  # - ./secrets/
+  # - ./tasks/
+  # - ./pipelines/
