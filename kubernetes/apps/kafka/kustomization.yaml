@@ -6,3 +6,4 @@ resources:
   - ./kafka/ks.yaml
   - ./kafka-ui/ks.yaml
   - ./schema-registry/ks.yaml
+  - ./strimzi/ks.yaml
