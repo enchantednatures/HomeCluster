@@ -87,6 +87,7 @@ spec:
           region: us-rack-east-01
           bucket: harbor-registry
           regionendpoint: https://s3.${SECRET_DOMAIN}
+          forcepathstyle: true
     harborAdminPassword: "Harbor12345"
     portal:
       replicas: 1
