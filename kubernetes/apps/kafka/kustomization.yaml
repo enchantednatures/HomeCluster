@@ -7,3 +7,4 @@ resources:
   - ./kafka-ui/ks.yaml
   - ./schema-registry/ks.yaml
   - ./strimzi/ks.yaml
+  - ./snail-cluster/ks.yaml
