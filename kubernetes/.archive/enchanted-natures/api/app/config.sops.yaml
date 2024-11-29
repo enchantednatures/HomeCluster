@@ -4,22 +4,24 @@ metadata:
     name: enchanted-api
     namespace: enchanted-natures
 data:
-    config.yaml: |
-        database_settings:
-          host: tower
-          port: 5432
-          user: api_service
-          database: enchanted_natures
-          application_name: enchanted_natures
-        auth_settings:
-          client_id: lAhSmpvxqKuetDQXUEbnxxKP1mxIc8wt46XoroD7
-          client_secret: 123
-          redirect_url: https://api.enchantednatures.com/authorized
-          token_url: https://auth.enchantednatures.com/application/o/token/
-          auth_url: https://auth.enchantednatures.com/application/o/authorize/
-          introspection_url: https://auth.enchantednatures.com/application/o/userinfo/
-          revocation_url: https://auth.enchantednatures.com/application/o/revoke/
-        redis_url: redis://redis-master.redis.svc.cluster.local/1
-        app_settings:
-          addr: [ 0, 0, 0, 0 ]
-          port: 6969
+    config.yaml: ENC[AES256_GCM,data:HTdfRTGbupzi4/XgaqyJY5JvrH9IBf7/+BFvhAIMpTPM65fVHdbqqqjbfoIlEs8XnOCx4f1zfkaq4iYsQhOxqjbzwRD3XIUH/2+DbF5NdqHX7h975bVBP0zmG/Kyq9KfmGmbvHuhs+QZ6/jcQ24TpXLV26gltJe07U/mMptdHM4x2J5zaa1Oo/E8MiK+UtAOWjW0asFeHrmjbjFv2o9AAJM0fCCOB0B3qEwb3LZ2Eo53MLRiycC4RBniPAh5kcdWNhqjZa81s6FELISiNmQxLHV7sI5qBQUloTcs6oOrqkgP8ctAF7Jn2SkHui/JXLxtRwDvTTQjnQgdohGvv7UNYs9QDMw4pnr0A9gvFGSgVRF61tcFD8GE4pLaDqroMkzQeCUnN8GLn3DpG8Brp+9BsJBZaYGDrUOdUWJtDJCEoT4ZkyU6zF90VZd8NNTzPn+KGz43A+M7J//KPrky310Uv8PbG2M9j+jsYUmTt7xoAvLt8H2h4hw2HJVd1e4moxzLaEiDrP5qXU7zJdbE4nW+LVjLNLSem/r3yq9LNZvZIIW5T89vpn3LS0SJm6ERPWGIp66m7ArgRHvxKK8MSsyRxmFcdBpucGr905HqYVGgW8jZ1j5ciu6NPub8YQa3ZZJqkxp0hqfiKGuWq2TAC5tU3M9g4O2dvTsYO8H6AIcfSqt3nWlqp7Ygbr47hL9FeF2D0qhUdJgijyOhH2PIsSpS6SL7xw+MOdYcvOSnooLrsNxhDHJ04F8WVdtWWP+ZFdGl7825VaTjZdicLmsFzOszmAS6xyPH9T067KjWCC5cg4BF4h8hDPXMUTisRx2vxX6twOO7cBDymLwvWtJx56cOSfCUnZeiDeaJeeByuNxCTQ6fAhgtgWHGm9bE4mEdSYX17SIKiHm/OWYA9T+/,iv:h0L4Q1AQV5P4ehAKVhOdNHngCLOjEUlq6FkDkMFG5XU=,tag:SZpU4oqZTWqdBzgB+vRQRg==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB2dzdwbWV5dmFDOTdyUmxK
+            SFFoOWtIejk2Smp2VTJiV0tEQjVJTy9PV2pNCjA4V1dOOU5DeWNLMmxJckhwbnJD
+            elYyZVA0V3dhRS9oQjVGRitmaDEwY3cKLS0tIFB5WWZpRnJuYTZ1QVVCMUJoM0Y2
+            em05Nzg5elBxMEJjTGZVR1J4amdXd28KO3hq4LiD/0csp6IOpwjNjY+q5PlMxx76
+            ZmFuFo6ZMiGsOMhRnuDYikEQlCM6t94bR0TE7GmZNsMzG5Bck3kUwA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-11-29T07:26:05Z"
+    mac: ENC[AES256_GCM,data:BpM+SMkMLy2/ZcaFyqKLvzrP9E+X/UY7FP7c+t8K7VYpcAzavVkcj1/dpyuN9ut6Qboq8emorVZdMZNFTvqnNRwf3aZoeIn6Ofhy3DewLiIVdULCOMavCCotd5B8c1MYp9uoXYCsCB/memPWGT+KXnhgb9rW7l0HuKVdtWArubg=,iv:7wsoW/eG3I0RsmrsJ6r/kSO7ZuuFFdiulH7w1rxQKKY=,tag:2jqbRrxWL1IshDFyVrz/vw==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.9.1
