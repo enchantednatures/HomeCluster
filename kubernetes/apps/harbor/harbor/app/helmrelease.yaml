@@ -81,7 +81,7 @@ spec:
       #   size: 5Gi
       imageChartStorage:
         disableredirect: false
-        type: filesystem
+        type: s3
         s3:
           existingSecret: "harbor-minio-credentials"
           region: us-east-1
