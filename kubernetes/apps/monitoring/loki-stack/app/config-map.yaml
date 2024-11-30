@@ -7,4 +7,4 @@ data:
   BUCKET_NAME: "loki"
   BUCKET_ENDPOINT: "s3://loki"
   BUCKET_HOST: "s3.{SECRET_DOMAIN}"
-  REGION: us-east-rack-01
+  REGION: us-east-1

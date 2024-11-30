@@ -84,7 +84,7 @@ spec:
         type: filesystem
         s3:
           existingSecret: "harbor-minio-credentials"
-          region: us-rack-east-01
+          region: us-east-1
           bucket: harbor-registry
           regionendpoint: https://s3.${SECRET_DOMAIN}
           forcepathstyle: true

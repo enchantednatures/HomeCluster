@@ -3,7 +3,7 @@ terraform {
   backend "s3" {
     bucket = "tofu"
     key    = "state"
-    region = "us-east-rack-01"
+    region = "us-east-1"
     access_key = var.aws_access_key
     secret_key = var.aws_secret_key
     endpoints = {
