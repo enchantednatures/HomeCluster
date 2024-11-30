@@ -32,3 +32,5 @@ provision/terraform/proxmox/certs/
 provision/terraform/proxmox/.terraform.lock.hcl
 provision/terraform/proxmox/proxmox.auto.tfvars
 provision/terraform/proxmox/output/
+provision/terraform/harbor/.terraform
+provision/terraform/harbor/.terraform
