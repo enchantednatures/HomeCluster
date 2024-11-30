@@ -3,8 +3,9 @@ kind: Kustomization
 metadata:
   namespace: tekton-pipelines
 resources:
-  - https://storage.googleapis.com/tekton-releases/pipeline/previous/v0.49.0/release.yaml
+  - https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
   - https://storage.googleapis.com/tekton-releases/dashboard/latest/release.yaml
+  - https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
   # - ./secrets/
   # - ./tasks/
   # - ./pipelines/
