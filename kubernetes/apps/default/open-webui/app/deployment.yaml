@@ -45,3 +45,5 @@ spec:
       restartPolicy: Always
       volumes:
         - name: open-webui-data
+          persistentVolumeClaim:
+            claimName: open-webui-data
