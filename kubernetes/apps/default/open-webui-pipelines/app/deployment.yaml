@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipelines
+  labels:
+    app: pipelines
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipelines
+  template:
+    metadata:
+      labels:
+        app: pipelines
+    spec:
+      containers:
+        - name: pipelines
+          image: ghcr.io/open-webui/pipelines:main
+          ports:
+            - containerPort: 9099
+          volumeMounts:
+            - name: pipelines-storage
+              mountPath: /app/pipelines
+      volumes:
+        - name: pipelines-storage
+          persistentVolumeClaim:
+            claimName: pipelines-pvc
