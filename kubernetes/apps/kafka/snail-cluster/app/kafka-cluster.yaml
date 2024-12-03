@@ -43,6 +43,9 @@ spec:
           class: internal
           bootstrap:
             host: kafka-bootstrap.${SECRET_DOMAIN}
+            annotations:
+              cert-manager.io/cluster-issuer: letsencrypt-production
+              acme.cert-manager.io/http01-edit-in-place: "true"
           brokers:
             - broker: 0
               host: kafka-0.${SECRET_DOMAIN}
