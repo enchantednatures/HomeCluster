@@ -42,16 +42,16 @@ spec:
         configuration:
           class: internal
           bootstrap:
-            host: kafka-bootstrap.${LIMITED_DOMAIN}
+            host: kafka-bootstrap.${SECRET_DOMAIN}
           brokers:
             - broker: 0
-              host: kafka-0.${LIMITED_DOMAIN}
+              host: kafka-0.${SECRET_DOMAIN}
             - broker: 1
-              host: kafka-1.${LIMITED_DOMAIN}
+              host: kafka-1.${SECRET_DOMAIN}
             - broker: 2
-              host: kafka-2.${LIMITED_DOMAIN}
+              host: kafka-2.${SECRET_DOMAIN}
           brokerCertChainAndKey:
-            secretName: "${LIMITED_DOMAIN/./-}-production-tls"
+            secretName: "${SECRET_DOMAIN/./-}-production-tls"
             certificate: tls.crt
             key: tls.key
     config:
