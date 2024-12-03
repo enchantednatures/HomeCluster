@@ -29,7 +29,7 @@ spec:
     featureGates: "+UseKRaft,+UnidirectionalTopicOperator"
     tmpDirSizeLimit: 1Mi
     dashboards:
-      enabled: false
+      enabled: true
     resources:
       requests:
         memory: 384Mi
