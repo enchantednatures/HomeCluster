@@ -7,4 +7,6 @@ spec:
   ingress:
     istio:
       enabled: true
-  config: {}
+  config:
+    autoscaler:
+      enable-scale-to-zero: "true"
