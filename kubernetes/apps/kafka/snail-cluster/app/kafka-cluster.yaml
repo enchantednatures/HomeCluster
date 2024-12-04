@@ -5,7 +5,7 @@ metadata:
   labels:
     strimzi.io/cluster: snail
 spec:
-  replicas: 3
+  replicas: 5
   roles:
     - broker
     - controller
