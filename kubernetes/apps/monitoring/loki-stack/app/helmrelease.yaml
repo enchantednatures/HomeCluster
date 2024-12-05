@@ -10,8 +10,8 @@ spec:
     - name: prometheus-operator-crds
   chart:
     spec:
-      chart: loki-distributed
-      version: 0.80.0
+      chart: loki
+      version: 6.22.0
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -45,24 +45,26 @@ spec:
   values:
     loki:
       auth_enabled: false
+      storage:
+        type: s3
+        s3:
+          s3: https://s3.${SECRET_DOMAIN}
+          endpoint: https://s3.${SECRET_DOMAIN}
+          bucketnames:
+          chunks: loki-chunks
+          ruler: loki-ruler
+          admini: loki-admin
+          access_key_id: ${MINIO_ACCESS_KEY}
+          secret_access_key: ${MINIO_SECRET_KEY}
+          s3forcepathstyle: true
+          insecure: false
       commonConfig:
         path_prefix: /var/loki
         replication_factor: 1
-        storage:
-          s3:
-            endpoint: https://s3.${SECRET_DOMAIN}
-            bucketnames:
-              chunks: loki-chunks
-              ruler: loki-ruler
-              admini: loki-admin
-            access_key_id: ${MINIO_ACCESS_KEY}
-            secret_access_key: ${MINIO_SECRET_KEY}
-            s3forcepathstyle: true
-            insecure: false
       serviceMonitor:
         enabled: true
-      storage:
-        type: s3
+      prometheusRule:
+        enabled: true
       schemaConfig:
         configs:
           - from: "2020-10-24"
@@ -128,23 +130,23 @@ spec:
     prometheusRule:
       enabled: true
   valuesFrom:
-    - targetPath: loki.commonConfig.storage.s3.bucket
-      kind: ConfigMap
-      name: loki-bucket
-      valuesKey: BUCKET_NAME
-    - targetPath: loki.commonConfig.storage.s3.endpoint
+    # - targetPath: storage.s3.bucketnames.chunks
+    #   kind: ConfigMap
+    #   name: loki-bucket
+    #   valuesKey: BUCKET_NAME
+    - targetPath: storage.s3.endpoint
       kind: ConfigMap
       name: loki-bucket
       valuesKey: BUCKET_HOST
-    - targetPath: loki.commonConfig.storage.s3.region
+    - targetPath: storage.s3.region
       kind: ConfigMap
       name: loki-bucket
       valuesKey: REGION
-    - targetPath: loki.commonConfig.storage.s3.access_key_id
+    - targetPath: storage.s3.access_key_id
       kind: Secret
       name: loki-bucket
       valuesKey: ACCESS_KEY
-    - targetPath: loki.commonConfig.storage.s3.secret_access_key
+    - targetPath: storage.s3.secret_access_key
       kind: Secret
       name: loki-bucket
       valuesKey: ACCESS_SECRET
