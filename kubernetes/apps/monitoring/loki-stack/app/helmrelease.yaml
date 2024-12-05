@@ -47,7 +47,7 @@ spec:
       auth_enabled: false
       storage:
         type: s3
-        bucketnames:
+        bucketNames:
           chunks: loki-chunks
           ruler: loki-ruler
           admin: loki-admin
