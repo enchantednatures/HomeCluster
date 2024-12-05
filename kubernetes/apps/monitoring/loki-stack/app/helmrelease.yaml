@@ -44,7 +44,7 @@ spec:
   maxHistory: 3
   values:
     loki:
-      deploymentMode: "simple-scalable"  # Changed from distributed
+      deploymentMode: "simple-scalable"
       auth_enabled: false
       commonConfig:
         path_prefix: /var/loki
@@ -69,20 +69,25 @@ spec:
             index:
               prefix: index_
               period: 24h
-      storageConfig:
-        boltdb_shipper:
-          active_index_directory: /var/loki/index
-          cache_location: /var/loki/cache
-          cache_ttl: 24h
-          shared_store: s3
-      limits_config:
-        enforce_metric_name: false
-        reject_old_samples: true
-        reject_old_samples_max_age: 168h
-        max_entries_limit_per_query: 5000
-        volume_enabled: true
+      config:
+        limits:
+          enforce_metric_name: false
+          reject_old_samples: true
+          reject_old_samples_max_age: 168h
+          max_entries_limit_per_query: 5000
+          volume_enabled: true
+        storage_config:
+          boltdb_shipper:
+            active_index_directory: /var/loki/index
+            cache_location: /var/loki/cache
+            cache_ttl: 24h
+            shared_store: s3
+        query_range:
+          align_queries_with_step: true
+          max_retries: 5
+          split_queries_by_interval: 15m
 
-    # Component configurations for simple-scalable mode
+    # Component configurations
     write:
       replicas: 1
       persistence:
@@ -99,14 +104,13 @@ spec:
       enabled: true
       replicas: 1
 
-    # Monitoring
     serviceMonitor:
       enabled: true
     prometheusRule:
       enabled: true
 
   valuesFrom:
-    - targetPath: loki.storage.bucketNames.chunks  # Updated paths
+    - targetPath: loki.storage.bucketNames.chunks
       kind: ConfigMap
       name: loki-bucket
       valuesKey: chunks_bucket_name
