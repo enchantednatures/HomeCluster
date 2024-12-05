@@ -1,0 +1,66 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: docker-build-pipeline
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: revision
+      type: string
+      default: main
+    - name: image-name
+      type: string
+    - name: image-tag
+      type: string
+      default: latest
+    - name: registry-url
+      type: string
+    - name: dockerfile
+      type: string
+      default: ./Dockerfile
+    - name: docker-context
+      type: string
+      default: .
+    - name: extra-args
+      type: array
+      default: []
+  workspaces:
+    - name: shared-workspace
+    - name: dockerconfig
+  tasks:
+    - name: fetch-source
+      taskRef:
+        name: git-clone
+        kind: Task
+      params:
+        - name: repo-url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: deleteExisting
+          value: "true"
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+    - name: build-and-push
+      runAfter:
+        - fetch-source
+      taskRef:
+        name: kaniko
+        kind: Task
+      params:
+        - name: IMAGE
+          value: $(params.registry-url)/$(params.image-name):$(params.image-tag)
+        - name: DOCKERFILE
+          value: $(params.dockerfile)
+        - name: CONTEXT
+          value: $(params.docker-context)
+        - name: EXTRA_ARGS
+          value: $(params.extra-args[*])
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+        - name: dockerconfig
+          workspace: dockerconfig
