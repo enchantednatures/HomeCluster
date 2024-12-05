@@ -44,7 +44,12 @@ spec:
   maxHistory: 3
   values:
     loki:
+      deploymentMode: "distributed"
       auth_enabled: false
+
+      commonConfig:
+        path_prefix: /var/loki
+        replication_factor: 1
       storage:
         type: s3
         bucketNames:
@@ -58,9 +63,7 @@ spec:
           secret_access_key: ${MINIO_SECRET_KEY}
           s3forcepathstyle: true
           insecure: false
-      commonConfig:
-        path_prefix: /var/loki
-        replication_factor: 1
+
       serviceMonitor:
         enabled: true
       prometheusRule:
