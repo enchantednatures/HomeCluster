@@ -10,14 +10,14 @@ resource "authentik_user" "loki_service" {
   groups = [data.authentik_group.minio_admins.id]
 }
 
-resource "authentik_token" "loki_token" {
-  identifier  = "loki-minio-app-password"
-  user        = authentik_user.loki_service.id
-  description = "My secret token"
-  expiring = false
-  intent = "app_password"
-  retrieve_key = true
-}
+# resource "authentik_token" "loki_token" {
+#   identifier  = "loki-minio-app-password"
+#   user        = authentik_user.loki_service.id
+#   description = "My secret token"
+#   expiring = false
+#   intent = "app_password"
+#   retrieve_key = true
+# }
 
 
 
@@ -39,6 +39,11 @@ resource "minio_s3_bucket" "loki_ruler_bucket" {
 
 resource "minio_s3_bucket" "loki_admin_bucket" {
   bucket = "loki-admin"
+  acl    = "public"
+}
+
+resource "minio_s3_bucket" "tempo_bucket" {
+  bucket = "tempo"
   acl    = "public"
 }
 
