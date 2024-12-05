@@ -47,13 +47,13 @@ spec:
       auth_enabled: false
       storage:
         type: s3
+        bucketnames:
+          chunks: loki-chunks
+          ruler: loki-ruler
+          admin: loki-admin
         s3:
           s3: https://s3.${SECRET_DOMAIN}
           endpoint: https://s3.${SECRET_DOMAIN}
-          bucketnames:
-            chunks: loki-chunks
-            ruler: loki-ruler
-            admin: loki-admin
           access_key_id: ${MINIO_ACCESS_KEY}
           secret_access_key: ${MINIO_SECRET_KEY}
           s3forcepathstyle: true
@@ -130,7 +130,7 @@ spec:
     prometheusRule:
       enabled: true
   valuesFrom:
-    - targetPath: storage.s3.bucketnames.chunks
+    - targetPath: storage.bucketnames.chunks
       kind: ConfigMap
       name: loki-bucket
       valuesKey: chunks_bucket_name
