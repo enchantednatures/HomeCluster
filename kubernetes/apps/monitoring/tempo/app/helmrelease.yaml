@@ -37,7 +37,7 @@ spec:
         log_discarded_spans:
           enabled: true
     persistence:
-      enabled: false
+      enabled: true
     tempoQuery:
       ingress:
         enabled: true
