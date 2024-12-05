@@ -4,7 +4,7 @@ metadata:
   name: loki-bucket
   namespace: monitoring
 data:
-  BUCKET_NAME: "loki"
+  chunks_bucket_name: "loki-chunks"
   BUCKET_ENDPOINT: "s3://loki"
   BUCKET_HOST: "s3.{SECRET_DOMAIN}"
   REGION: us-east-1
