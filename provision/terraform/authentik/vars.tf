@@ -6,19 +6,13 @@ variable "url" {
   type = string
 }
 
-variable "redirect_urls" {
-  type = list(string)
-}
-
-
-variable "client_id" {
+variable "minio_url" {
   type = string
 }
 
-variable "client_secret" {
+variable "minio_region" {
   type = string
 }
 
-variable "icon" {
-  type = string
-}
+variable "aws_access_key" { type = string }
+variable "aws_secret_key" { type = string }
