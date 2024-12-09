@@ -29,22 +29,22 @@ resource "minio_iam_service_account" "loki_account" {
 
 resource "minio_s3_bucket" "loki_chunks_bucket" {
   bucket = "loki-chunks"
-  acl    = "public"
+  acl    = "private"
 }
 
 resource "minio_s3_bucket" "loki_ruler_bucket" {
   bucket = "loki-ruler"
-  acl    = "public"
+  acl    = "private"
 }
 
 resource "minio_s3_bucket" "loki_admin_bucket" {
   bucket = "loki-admin"
-  acl    = "public"
+  acl    = "private"
 }
 
 resource "minio_s3_bucket" "tempo_bucket" {
   bucket = "tempo"
-  acl    = "public"
+  acl    = "private"
 }
 
 # resource "kubernetes_secret" "example" {
@@ -70,5 +70,10 @@ resource "authentik_user" "harbor_service" {
 
 resource "minio_s3_bucket" "harbor_registry_bucket" {
   bucket = "harbor-registry"
-  acl    = "public"
+  acl    = "private"
+}
+
+resource "minio_s3_bucket" "tekton_bucket" {
+  bucket = "tekton"
+  acl    = "private"
 }
