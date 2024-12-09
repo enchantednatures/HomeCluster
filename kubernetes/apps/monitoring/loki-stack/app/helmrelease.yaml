@@ -69,23 +69,27 @@ spec:
             index:
               prefix: index_
               period: 24h
-      config:
-        limits:
-          # enforce_metric_name: false
-          # reject_old_samples: true
-          # reject_old_samples_max_age: 168h
-          # max_entries_limit_per_query: 5000
-          volume_enabled: true
-        storage_config:
-          boltdb_shipper:
-            active_index_directory: /var/loki/index
-            cache_location: /var/loki/cache
-            cache_ttl: 24h
-            shared_store: s3
-        query_range:
-          align_queries_with_step: true
-          max_retries: 5
-          split_queries_by_interval: 15m
+      storage_config:
+        aws:
+          # Note: use a fully qualified domain name (fqdn), like localhost.
+          # full example: http://loki:supersecret@localhost.:9000
+          s3: https://s3.${SECRET_DOMAIN}
+          endpoint: https://s3.${SECRET_DOMAIN}
+          s3forcepathstyle: true
+        tsdb_shipper:
+          active_index_directory: /loki/index
+          cache_location: /loki/index_cache
+          cache_ttl: 24h         # Can be increased for faster performance over longer query periods, uses more disk space
+
+schema_config:
+  configs:
+    - from: 2020-07-01
+      store: tsdb
+      object_store: s3
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
 
     # Component configurations
     write:
