@@ -1,4 +1,3 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -11,7 +10,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: 6.22.0
+      version: 6.23.0
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -44,11 +43,19 @@ spec:
   maxHistory: 3
   values:
     loki:
-      deploymentMode: "simple-scalable"
       auth_enabled: false
       commonConfig:
         path_prefix: /var/loki
         replication_factor: 1
+      schemaConfig:
+        configs:
+          - from: "2020-10-24"
+            store: tsdb
+            object_store: s3
+            schema: v12
+            index:
+              prefix: index_
+              period: 24h
       storage:
         type: s3
         bucketNames:
@@ -56,62 +63,34 @@ spec:
           ruler: loki-ruler
           admin: loki-admin
         s3:
-          s3: https://s3.${SECRET_DOMAIN}
-          endpoint: https://s3.${SECRET_DOMAIN}
-          s3forcepathstyle: true
+          endpoint: https://s3.enchantednatures.com
           insecure: false
-      schemaConfig:
-        configs:
-          - from: "2020-10-24"
-            store: boltdb-shipper
-            object_store: s3
-            schema: v11
-            index:
-              prefix: index_
-              period: 24h
-      storage_config:
-        aws:
-          # Note: use a fully qualified domain name (fqdn), like localhost.
-          # full example: http://loki:supersecret@localhost.:9000
-          s3: https://s3.${SECRET_DOMAIN}
-          endpoint: https://s3.${SECRET_DOMAIN}
           s3forcepathstyle: true
+      storage_config:
         tsdb_shipper:
-          active_index_directory: /loki/index
-          cache_location: /loki/index_cache
-          cache_ttl: 24h         # Can be increased for faster performance over longer query periods, uses more disk space
-
-schema_config:
-  configs:
-    - from: 2020-07-01
-      store: tsdb
-      object_store: s3
-      schema: v13
-      index:
-        prefix: index_
-        period: 24h
-
-    # Component configurations
-    write:
-      replicas: 1
-      persistence:
+          active_index_directory: /var/loki/tsdb-index
+          cache_location: /var/loki/tsdb-cache
+          cache_ttl: 24h
+          shared_store: s3
+      write:
+        replicas: 1
+        persistence:
+          enabled: true
+          size: 10Gi
+      read:
+        replicas: 1
+      backend:
+        replicas: 1
+        persistence:
+          enabled: true
+          size: 10Gi
+      gateway:
         enabled: true
-        size: 10Gi
-    read:
-      replicas: 1
-    backend:
-      replicas: 1
-      persistence:
+        replicas: 1
+      serviceMonitor:
         enabled: true
-        size: 10Gi
-    gateway:
-      enabled: true
-      replicas: 1
-
-    serviceMonitor:
-      enabled: true
-    prometheusRule:
-      enabled: true
+      prometheusRule:
+        enabled: true
 
   valuesFrom:
     - targetPath: loki.storage.bucketNames.chunks
