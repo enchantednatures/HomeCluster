@@ -1,0 +1,43 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: rust-build-release
+spec:
+  workspaces:
+    - name: shared-workspace
+      description: The workspace containing the source code and build artifacts
+      mountPath: /workspace/source
+  steps:
+    - name: build
+      image: rust:1
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        set -eu
+        apt-get update && apt-get install -y \
+          build-essential \
+          cmake \
+          openssl \
+          pkg-config \
+          libssl-dev \
+          ca-certificates \
+          && rm -rf /var/lib/apt/lists/*
+
+        # Update Rust toolchain
+        rustup update
+
+        # Create cargo directories
+        mkdir -p /workspace/source/.cargo-cache
+        mkdir -p /workspace/source/target
+        mkdir -p /workspace/source/.cargo
+
+        # Configure cargo to use workspace-local paths
+        cat > /workspace/source/.cargo/config.toml << EOF
+        [build]
+        jobs = 4
+        target-dir = "/workspace/source/target"
+
+        [cache]
+        dir = "/workspace/source/.cargo-cache"
+        EOF
+        cargo build --release
