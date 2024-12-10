@@ -1,7 +1,4 @@
 terraform {
-  required_version = "13"
-
-
   backend "s3" {
     bucket = "tofu"
     key    = "state"

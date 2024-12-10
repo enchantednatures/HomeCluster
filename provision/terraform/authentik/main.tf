@@ -77,3 +77,8 @@ resource "minio_s3_bucket" "tekton_bucket" {
   bucket = "tekton"
   acl    = "private"
 }
+
+resource "minio_s3_bucket" "tofu_bucket" {
+  bucket = "tofu"
+  acl    = "private"
+}
