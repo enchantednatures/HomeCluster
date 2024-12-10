@@ -78,7 +78,7 @@ spec:
           s3: s3://loki-chunks
           s3forcepathstyle: true
           insecure: false
-          signatureVersion: v4
+          # signatureVersion: v4
           endpoint: https://s3.enchantednatures.com
       write:
         replicas: 1
