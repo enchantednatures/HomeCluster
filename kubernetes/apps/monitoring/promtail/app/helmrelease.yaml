@@ -1,0 +1,103 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: promtail
+  namespace: monitoring
+spec:
+  # dependsOn:
+  #   - name: loki-stack
+  interval: 5m
+  chart:
+    spec:
+      chart: promtail
+      version: 6.15.3
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+      remediateLastFailure: true
+    cleanupOnFail: true
+  values:
+    config:
+      clients:
+        - url: http://loki-gateway/loki/api/v1/push
+      snippets:
+        extraRelabelConfigs:
+          - action: replace
+            sourceLabels:
+              - __meta_kubernetes_pod_node_name
+            targetLabel: node_name
+          - action: replace
+            sourceLabels:
+              - __meta_kubernetes_namespace
+            targetLabel: namespace
+          - action: replace
+            sourceLabels:
+              - __meta_kubernetes_pod_name
+            targetLabel: pod
+          - action: replace
+            sourceLabels:
+              - __meta_kubernetes_pod_container_name
+            targetLabel: container
+          - action: replace
+            replacement: $1
+            separator: /
+            sourceLabels:
+              - __meta_kubernetes_namespace
+              - __meta_kubernetes_pod_name
+            targetLabel: job
+          - action: replace
+            sourceLabels:
+              - __meta_kubernetes_pod_label_app_kubernetes_io_name
+            targetLabel: app
+          - action: replace
+            sourceLabels:
+              - __meta_kubernetes_pod_label_app_kubernetes_io_component
+            targetLabel: component
+          - action: replace
+            sourceLabels:
+              - __meta_kubernetes_pod_label_app_kubernetes_io_instance
+            targetLabel: instance
+
+    extraArgs:
+      - -config.expand-env=true
+
+    extraVolumes:
+      - name: journal
+        hostPath:
+          path: /var/log/journal
+      - name: machine-id
+        hostPath:
+          path: /etc/machine-id
+
+    extraVolumeMounts:
+      - name: journal
+        mountPath: /var/log/journal
+        readOnly: true
+      - name: machine-id
+        mountPath: /etc/machine-id
+        readOnly: true
+
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists
+
+    serviceMonitor:
+      enabled: true
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi

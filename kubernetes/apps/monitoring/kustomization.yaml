@@ -11,6 +11,7 @@ resources:
   - ./kube-state-metrics/ks.yaml
   - ./prometheus-operator-crds//ks.yaml
   - ./thanos/ks.yaml
+  - ./promtail/ks.yaml
   - ./influxdb/ks.yaml
   - ./node-exporter/ks.yaml
   - ./gatus/ks.yaml
