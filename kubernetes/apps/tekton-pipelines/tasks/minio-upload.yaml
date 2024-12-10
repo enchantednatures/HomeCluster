@@ -22,5 +22,15 @@ spec:
       script: |
         #!/bin/sh
         mc alias set minio $(params.minio-endpoint) $(params.access-key) $(params.secret-key)
-        mc cp /workspace/source/target/release/* minio/$(params.minio-bucket)
+        # mc cp /workspace/source/target/release/* minio/$(params.minio-bucket)
+        # Find all executables in target/release directory
+        # Excluding test binaries and build scripts
+        cd $(workspaces.source.path)/target/release
+        mc cp consumer minio/$(params.minio-bucket)/consumer
+        mc cp book minio/$(params.minio-bucket)/book
+        mc cp kraken minio/$(params.minio-bucket)/kraken
+        mc cp faster minio/$(params.minio-bucket)/faster
+        mc cp kraken_cancel_order minio/$(params.minio-bucket)/kraken_cancel_order
+        mc cp kraken_get_open_orders minio/$(params.minio-bucket)/kraken_get_open_orders
+        mc cp kraken_place_order minio/$(params.minio-bucket)/kraken_place_order
 ---

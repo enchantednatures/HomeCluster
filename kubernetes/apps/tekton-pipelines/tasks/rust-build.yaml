@@ -4,21 +4,92 @@ metadata:
   name: rust-build
 spec:
   workspaces:
-    - name: source
-      description: The workspace containing the source code
+    - name: shared-workspace
+      description: The workspace containing the source code and build artifacts
       mountPath: /workspace/source
   steps:
-    - name: install-deps
-      image: rust:latest
+    - name: setup-environment
+      image: rust:1
       workingDir: /workspace/source
       script: |
         #!/bin/sh
+        set -eu
+        apt-get update && apt-get install -y \
+          build-essential \
+          cmake \
+          openssl \
+          pkg-config \
+          libssl-dev \
+          ca-certificates \
+          && rm -rf /var/lib/apt/lists/*
+
+        # Update Rust toolchain
         rustup update
-        cargo build --release
-    - name: test
-      image: rust:latest
+
+        # Create cargo directories
+        mkdir -p /workspace/source/.cargo-cache
+        mkdir -p /workspace/source/target
+        mkdir -p /workspace/source/.cargo
+
+        # Configure cargo to use workspace-local paths
+        cat > /workspace/source/.cargo/config.toml << EOF
+        [build]
+        jobs = 4
+        target-dir = "/workspace/source/target"
+
+        [cache]
+        dir = "/workspace/source/.cargo-cache"
+        EOF
+
+    - name: build
+      image: rust:1
       workingDir: /workspace/source
       script: |
         #!/bin/sh
+        set -eu
+        apt-get update && apt-get install -y \
+          build-essential \
+          cmake \
+          openssl \
+          pkg-config \
+          libssl-dev \
+          ca-certificates \
+          && rm -rf /var/lib/apt/lists/*
+
+        # Update Rust toolchain
+        rustup update
+
+        # Create cargo directories
+        mkdir -p /workspace/source/.cargo-cache
+        mkdir -p /workspace/source/target
+        mkdir -p /workspace/source/.cargo
+
+        # Configure cargo to use workspace-local paths
+        cat > /workspace/source/.cargo/config.toml << EOF
+        [build]
+        jobs = 4
+        target-dir = "/workspace/source/target"
+
+        [cache]
+        dir = "/workspace/source/.cargo-cache"
+        EOF
+        cargo build --release
+
+    - name: test
+      image: rust:1
+      workingDir: /workspace/source
+      script: |
+        #!/bin/sh
+        set -eu
         cargo test
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rust-workspace-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

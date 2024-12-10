@@ -13,6 +13,20 @@ cluster:
       name: none
   proxy:
     disabled: true
+  apiServer:
+    admissionControl:
+      - name: PodSecurity
+        configuration:
+          defaults:
+            enforce: "privileged"
+            enforce-version: "latest"
+            audit: "privileged"
+            audit-version: "latest"
+            warn: "privileged"
+            warn-version: "latest"
+          exemptions:
+            namespaces:
+              - istio-system
   inlineManifests:
   - name: cilium-values
     contents: |
