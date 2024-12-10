@@ -71,7 +71,6 @@ spec:
           active_index_directory: /var/loki/tsdb-index
           cache_location: /var/loki/tsdb-cache
           cache_ttl: 24h
-          shared_store: s3
       write:
         replicas: 1
         persistence:
@@ -91,7 +90,6 @@ spec:
         enabled: true
       prometheusRule:
         enabled: true
-
   valuesFrom:
     - targetPath: loki.storage.bucketNames.chunks
       kind: ConfigMap
