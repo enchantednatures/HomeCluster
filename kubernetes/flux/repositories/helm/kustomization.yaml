@@ -1,8 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./ananace-charts.yaml
   - ./airflow-charts.yaml
+  - ./ananace-charts.yaml
   - ./authentik.yaml
   - ./backube.yaml
   - ./ceph-charts.yaml
@@ -15,6 +15,7 @@ resources:
   - ./elastic.yaml
   - ./external-dns.yaml
   - ./fairwinds.yaml
+  - ./flink-charts.yaml
   - ./grafana.yaml
   - ./hajimari.yaml
   - ./harbor-charts.yaml
@@ -28,11 +29,13 @@ resources:
   - ./k8s-gateway.yaml
   - ./kafka-ui.yaml
   - ./kedacore.yaml
+  - ./kestra-charts.yaml
   - ./kubernetes-dashboard.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
   - ./piraeus.yaml
+  - ./redpanda-charts.yaml
   - ./rook-ceph.yaml
   - ./sealed-secrets.yaml
   - ./stakater.yaml
