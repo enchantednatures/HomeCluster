@@ -39,6 +39,15 @@ spec:
           enabled: true
     persistence:
       enabled: true
+    tempo:
+      resources:
+        requests:
+          cpu: 128m
+          memory: 512Mi
+        limits:
+          cpu: 512m
+          memory: 2048Mi
+
     tempoQuery:
       ingress:
         enabled: true
