@@ -30,7 +30,7 @@ spec:
       namespace: default
       name: advanced-ingress
     spec:
-      image: flink:1.17
+      image: flink:2.0
       flinkVersion: v1_17
       ingress:
         template: "flink.enchantednatures.com/{{namespace}}/{{name}}(/|$)(.*)"
