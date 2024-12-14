@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: send-to-webhook-discord-run-
+spec:
+  taskRef:
+    name: send-to-webhook-discord
+  params:
+  - name: webhook-secret
+    value: webhook-secret
+  - name: message
+    value: "Hello from Tekton!"
+  - name: bot-name
+    value: "Tekton Bot"
+  - name: avatar-url
+    value: "https://github.com/tektoncd.png"
