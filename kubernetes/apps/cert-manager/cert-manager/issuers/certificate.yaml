@@ -8,8 +8,9 @@ spec:
   secretName: istio-tls
   dnsNames:
   - "${SECRET_DOMAIN}"
+  - "*.${SECRET_DOMAIN}"
   issuerRef:
-    name: letsencrypt-prod
+    name: letsencrypt-production
     kind: ClusterIssuer
   usages:
     - digital signature
