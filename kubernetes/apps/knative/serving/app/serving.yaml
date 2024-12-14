@@ -10,3 +10,5 @@ spec:
   config:
     autoscaler:
       enable-scale-to-zero: "true"
+  high-availability:
+    replicas: 3
