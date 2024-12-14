@@ -8,7 +8,7 @@ ingress:
     originRequest:
       originServerName: "external.${SECRET_DOMAIN}"
   - hostname: "*.${SECRET_DOMAIN}"
-    service: https://nginx-external-controller.networking.svc.cluster.local:443
+    service: https://istio-ingressgateway.istio-system:443
     originRequest:
       originServerName: "external.${SECRET_DOMAIN}"
   - service: http_status:404
