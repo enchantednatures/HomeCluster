@@ -42,6 +42,8 @@ spec:
     mode: enabled
   maxHistory: 3
   values:
+    gateway:
+      replica: 5
     loki:
       auth_enabled: false
       commonConfig:
