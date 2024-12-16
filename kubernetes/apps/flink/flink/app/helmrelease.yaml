@@ -26,29 +26,22 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    metadata:
-      namespace: default
-      name: advanced-ingress
-    spec:
-      image: flink:1.17
-      flinkVersion: v1_17
+    operator:
       ingress:
-        template: "flink.enchantednatures.com/{{namespace}}/{{name}}(/|$)(.*)"
-        className: "external"
+        enabled: true
+        ingressClassName: "external"
         annotations:
-          nginx.ingress.kubernetes.io/rewrite-target: "/$2"
+          nginx.ingress.kubernetes.io/auth-url: "http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx"
+          nginx.ingress.kubernetes.io/auth-signin: "https://auth.enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri"
+          nginx.ingress.kubernetes.io/auth-response-headers: "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
+          nginx.ingress.kubernetes.io/auth-snippet: |
+            proxy_set_header X-Forwarded-Host $http_host;
           kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
           external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
-          # This should be the in-cluster DNS name for the authentik outpost service
-          # as when the external URL is specified here, nginx will overwrite some crucial headers
-          nginx.ingress.kubernetes.io/auth-url: |-
-            http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
-          # If you're using domain-level auth, use the authentication URL instead of the application URL
-          nginx.ingress.kubernetes.io/auth-signin: |-
-            https://auth.enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri
-          nginx.ingress.kubernetes.io/auth-response-headers: |-
-            Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
-          nginx.ingress.kubernetes.io/auth-snippet: |
-            proxy_set_header X-Forwarded-Host $http_host;
+        template: "{{name}}.{{namespace}}.flink.${SECRET_DOMAIN}"
+    watchNamespaces:
+      - flink
+    webhook:
+      create: true
