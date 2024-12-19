@@ -7,15 +7,10 @@ metadata:
   labels:
     app: open-webui
 spec:
-  # AKS: default,managed-premium
-  # GKE: standard
-  # EKS: gp2 (custom)
-  # Rook: rook-ceph-block,rook-ceph-fs
   storageClassName: csi-nfs
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 2Gi
 ---
-
