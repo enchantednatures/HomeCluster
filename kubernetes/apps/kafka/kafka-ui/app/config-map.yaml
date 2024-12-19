@@ -6,8 +6,6 @@ data:
   config.yml: |-
     kafka:
       clusters:
-        - name: cluster
-          bootstrapServers: kafka.kafka.svc.cluster.local:9092
         - name: strimzi
           bootstrapServers: snail-kafka-bootstrap.kafka.svc.cluster.local:9092
     auth:
