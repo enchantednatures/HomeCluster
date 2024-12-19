@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -112,7 +111,7 @@ spec:
       postgresql:
         host: 192.168.1.241
       redis:
-        host: "redis-master.redis.svc.cluster.local" #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
+        host: "dragonfly.dragonflydb.svc.cluster.local" #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
     postgresql:
       enabled: false
       persistence:
