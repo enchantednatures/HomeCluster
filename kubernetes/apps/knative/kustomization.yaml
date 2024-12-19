@@ -6,3 +6,4 @@ resources:
   - ./operator/ks.yaml
   - ./serving/ks.yaml
 
+  - https://github.com/knative/net-istio/releases/download/knative-v1.16.0/net-istio.yaml
