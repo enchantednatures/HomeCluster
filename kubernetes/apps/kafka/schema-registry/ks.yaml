@@ -4,8 +4,6 @@ metadata:
   name: &app schema-registry
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: kafka
   targetNamespace: kafka
   commonMetadata:
     labels:
