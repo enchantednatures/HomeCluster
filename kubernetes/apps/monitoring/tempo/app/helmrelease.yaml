@@ -40,9 +40,10 @@ spec:
     persistence:
       enabled: true
     tempo:
-      overrides:
-        defaults:
-          max_traces_per_user: 0
+      config: |
+        overrides:
+          defaults:
+            max_traces_per_user: 0
       resources:
         requests:
           cpu: 128m
