@@ -41,7 +41,8 @@ spec:
       enabled: true
     tempo:
       overrides:
-        max_traces_per_user: 0
+        defaults:
+          max_traces_per_user: 0
       resources:
         requests:
           cpu: 128m
