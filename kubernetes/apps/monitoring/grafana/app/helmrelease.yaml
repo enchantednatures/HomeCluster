@@ -108,13 +108,6 @@ spec:
           - name: Alertmanager
             orgId: 1
         datasources:
-          - name: Thanos
-            type: prometheus
-            access: proxy
-            url: http://thanos-query.monitoring.svc.cluster.local:9090/
-            isDefault: false
-            # (OPTIONAL) Only required when some dashboards don't correctly set the datasource and you want to override it using the dashboard's uid
-            # uid: "Prometheus"
           - name: Loki
             type: loki
             access: proxy
@@ -143,14 +136,6 @@ spec:
             url: http://loki-gateway.monitoring.svc.cluster.local
             jsonData:
               maxLines: 250
-          - name: Alertmanager
-            type: alertmanager
-            uid: alertmanager
-            access: proxy
-            url: http://alertmanager-operated.monitoring.svc.cluster.local:9093
-            jsonData:
-              implementation: prometheus
-            isDefault: false
           - name: Tempo
             type: tempo
             url: http://tempo.monitoring.svc.cluster.local:3100
@@ -200,7 +185,7 @@ spec:
         sealed-secrets:
           url: https://raw.githubusercontent.com/bitnami-labs/sealed-secrets/master/contrib/prometheus-mixin/dashboards/sealed-secrets-controller.json
           datasource: Prometheus
-      # thanos:
+          # thanos:
         thanos-overview:
           url: https://raw.githubusercontent.com/thanos-io/thanos/main/examples/dashboards/overview.json
           datasource: Prometheus
