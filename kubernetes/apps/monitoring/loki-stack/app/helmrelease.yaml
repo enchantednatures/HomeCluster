@@ -41,25 +41,57 @@ spec:
   driftDetection:
     mode: enabled
   maxHistory: 3
+  valuesFrom:
+    - targetPath: loki.storage.bucketNames.chunks
+      kind: ConfigMap
+      name: &s3-secret loki-bucket
+      valuesKey: chunks_bucket_name
+    - targetPath: loki.storage.s3.endpoint
+      kind: ConfigMap
+      name: *s3-secret
+      valuesKey: BUCKET_HOST
+    - targetPath: loki.storage.s3.region
+      kind: ConfigMap
+      name: *s3-secret
+      valuesKey: REGION
+    - targetPath: loki.storage.s3.access_key_id
+      kind: Secret
+      name: *s3-secret
+      valuesKey: ACCESS_KEY
+    - targetPath: loki.storage.s3.secret_access_key
+      kind: Secret
+      name: *s3-secret
+      valuesKey: ACCESS_SECRET
+    - targetPath: loki.storage.bucketNames.chunks
+      kind: ConfigMap
+      name: *s3-secret
+      valuesKey: chunks_bucket_name
+    - targetPath: loki.storage_config.aws.endpoint
+      kind: ConfigMap
+      name: *s3-secret
+      valuesKey: BUCKET_HOST
+    - targetPath: loki.storage_config.aws.region
+      kind: ConfigMap
+      name: *s3-secret
+      valuesKey: REGION
+    - targetPath: loki.storage_config.aws.access_key_id
+      kind: Secret
+      name: *s3-secret
+      valuesKey: ACCESS_KEY
+    - targetPath: loki.storage_config.aws.secret_access_key
+      kind: Secret
+      name: *s3-secret
+      valuesKey: ACCESS_SECRET
   values:
-    gateway:
-      replica: 5
     loki:
+      podAnnotations:
+        secret.reloader.stakater.com/reload: *s3-secret
       auth_enabled: false
       commonConfig:
         path_prefix: /var/loki
         replication_factor: 1
       limits_config:
         allow_structured_metadata: false
-      schemaConfig:
-        configs:
-          - from: "2020-10-24"
-            store: tsdb
-            object_store: s3
-            schema: v13
-            index:
-              prefix: index_
-              period: 24h
       storage:
         type: s3
         bucketNames:
@@ -70,75 +102,110 @@ spec:
           endpoint: https://s3.enchantednatures.com
           insecure: false
           s3forcepathstyle: true
-          signatureVersion: v4
-      storage_config:
-        tsdb_shipper:
-          active_index_directory: /var/loki/tsdb-index
-          cache_location: /var/loki/tsdb-cache
-          cache_ttl: 24h
-        aws:
-          s3: s3://loki-chunks
-          s3forcepathstyle: true
-          insecure: false
-          # signatureVersion: v4
-          endpoint: https://s3.enchantednatures.com
-      write:
-        replicas: 1
-        persistence:
-          enabled: true
-          size: 10Gi
-      read:
-        replicas: 1
-      backend:
-        replicas: 1
-        persistence:
-          enabled: true
-          size: 10Gi
-      gateway:
+      schemaConfig:
+        configs:
+          - from: '2024-04-01' # quote
+            store: tsdb
+            object_store: s3
+            schema: v13
+            index:
+              prefix: loki_index_
+              period: 24h
+      structuredConfig:
+        auth_enabled: false
+        server:
+          log_level: info
+          http_listen_port: 3100
+          grpc_listen_port: 9095
+          grpc_server_max_recv_msg_size: 8388608
+          grpc_server_max_send_msg_size: 8388608
+        limits_config:
+          retention_period: 30d
+          reject_old_samples: true
+          reject_old_samples_max_age: 168h
+          max_query_parallelism: 100
+          ingestion_rate_mb: 64
+          ingestion_burst_size_mb: 128
+          per_stream_rate_limit: 64M
+          per_stream_rate_limit_burst: 128M
+          split_queries_by_interval: 1h
+          shard_streams:
+            enabled: true
+        query_scheduler:
+          max_outstanding_requests_per_tenant: 4096
+        frontend:
+          query_stats_enabled: true
+        compactor:
+          working_directory: /var/loki/compactor/retention
+          retention_enabled: true
+          delete_request_store: s3
+        ruler:
+          enable_api: true
+          enable_alertmanager_v2: true
+          alertmanager_url: http://alertmanager-operated.flux-monitoring.svc.cluster.local:9093
+          storage:
+            type: local
+            local:
+              directory: /rules
+          rule_path: /tmp/fake
+        analytics:
+          reporting_enabled: false
+    chunksCache:
+      allocatedMemory: 1700
+    backend:
+      replicas: &replication_factor 2
+      persistence:
+        size: 20Gi
+        storageClass: local-path
+    gateway:
+      enabled: true
+      replicas: *replication_factor
+      image:
+        registry: ghcr.io
+      deploymentStrategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 1
+      ingress:
         enabled: true
-        replicas: 1
-      serviceMonitor:
-        enabled: true
-      prometheusRule:
-        enabled: true
-  valuesFrom:
-    - targetPath: loki.storage.bucketNames.chunks
-      kind: ConfigMap
-      name: loki-bucket
-      valuesKey: chunks_bucket_name
-    - targetPath: loki.storage.s3.endpoint
-      kind: ConfigMap
-      name: loki-bucket
-      valuesKey: BUCKET_HOST
-    - targetPath: loki.storage.s3.region
-      kind: ConfigMap
-      name: loki-bucket
-      valuesKey: REGION
-    - targetPath: loki.storage.s3.access_key_id
-      kind: Secret
-      name: loki-bucket
-      valuesKey: ACCESS_KEY
-    - targetPath: loki.storage.s3.secret_access_key
-      kind: Secret
-      name: loki-bucket
-      valuesKey: ACCESS_SECRET
-    - targetPath: loki.storage.bucketNames.chunks
-      kind: ConfigMap
-      name: loki-bucket
-      valuesKey: chunks_bucket_name
-    - targetPath: loki.storage_config.aws.endpoint
-      kind: ConfigMap
-      name: loki-bucket
-      valuesKey: BUCKET_HOST
-    - targetPath: loki.storage_config.aws.region
-      kind: ConfigMap
-      name: loki-bucket
-      valuesKey: REGION
-    - targetPath: loki.storage_config.aws.access_key_id
-      kind: Secret
-      name: loki-bucket
-      valuesKey: ACCESS_KEY
-    - targetPath: loki.storage_config.aws.secret_access_key
-      kind: Secret
-      name: loki-bucket
-      valuesKey: ACCESS_SECRET
+        ingressClassName: external
+        annotations:
+          kubernetes.io/tls-acme: "true"
+          cert-manager.io/cluster-issuer: letsencrypt-production
+          external-dns/is-public: "true"
+          external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+          nginx.ingress.kubernetes.io/auth-url: |-
+            http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+          # If you're using domain-level auth, use the authentication URL instead of the application URL
+          nginx.ingress.kubernetes.io/auth-signin: |-
+            https://auth.enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri
+          nginx.ingress.kubernetes.io/auth-response-headers: |-
+            Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+          nginx.ingress.kubernetes.io/auth-snippet: |
+            proxy_set_header X-Forwarded-Host $http_host;
+        tls:
+          - hosts:
+              - loki.${SECRET_DOMAIN}
+            secretName: loki-tls
+        hosts:
+          - host: loki.${SECRET_DOMAIN}
+            paths:
+              - path: /
+                pathType: Prefix
+    read:
+      replicas: *replication_factor
+    write:
+      replicas: *replication_factor
+      persistence:
+        size: 20Gi
+        storageClass: local-path
+    # sidecar:
+    #   image:
+    #     repository: ghcr.io/kiwigrid/k8s-sidecar
+    #   rules:
+    #     searchNamespace: ALL
+    #     folder: /rules/fake
+    lokiCanary:
+      enabled: false
+    test:
+      enabled: false
