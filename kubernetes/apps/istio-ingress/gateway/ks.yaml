@@ -6,7 +6,6 @@ metadata:
 spec:
   dependsOn:
     - name: istiod
-      namespace: istio-system
   targetNamespace: istio-ingress
   commonMetadata:
     labels:

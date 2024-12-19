@@ -7,6 +7,7 @@ spec:
   interval: 30m
   dependsOn:
     - name: istiod
+      namespace: istio-system
   chart:
     spec:
       chart: gateway
