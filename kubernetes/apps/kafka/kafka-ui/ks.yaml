@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: kafka
+    - name: snail-cluster
   targetNamespace: kafka
   commonMetadata:
     labels:
