@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -26,7 +25,25 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  valuesFrom:
-    - name: istio-gateway-values
-      kind: ConfigMap
-      valuesKey: values.yaml
+  values:
+    gateways:
+      istio-ingressgateway:
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: "external.${SECRET_DOMAIN}"
+          io.cilium/lb-ipam-ips: "192.168.1.226"
+        service:
+          externalTrafficPolicy: Cluster
+        resources:
+          requests:
+            cpu: 10m
+            memory: 250Mi
+          limits:
+            memory: 500Mi
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: DoNotSchedule
+            labelSelector:
+              matchLabels:
+                app: istio-ingressgateway
+                istio: ingressgateway

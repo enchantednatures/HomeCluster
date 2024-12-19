@@ -1,0 +1,20 @@
+# kubernetes/apps/istio-ingress/gateway/app/gateway.yaml
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: external-gateway
+  namespace: istio-ingress
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: "${SECRET_DOMAIN/./-}-production-tls"
+      hosts:
+        - "external.${SECRET_DOMAIN}"
+        - "*.${SECRET_DOMAIN}"
