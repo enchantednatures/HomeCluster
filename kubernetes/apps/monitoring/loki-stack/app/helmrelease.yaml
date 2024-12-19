@@ -156,7 +156,7 @@ spec:
       replicas: &replication_factor 2
       persistence:
         size: 20Gi
-        storageClass: local-path
+        storageClass: csi-nfs
     gateway:
       enabled: true
       replicas: *replication_factor
