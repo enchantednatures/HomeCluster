@@ -37,10 +37,10 @@ spec:
       serverName: &currentCluster postgres-v0
       s3Credentials:
         accessKeyId:
-          name: cloudnative-pg-postgres-secret
+          name: cloudnative-pg-secret
           key: aws-access-key-id
         secretAccessKey:
-          name: cloudnative-pg-postgres-secret
+          name: cloudnative-pg-secret
           key: aws-secret-access-key
   # Note: previousCluster needs to be set to the name of the previous
   # cluster when recovering from an existing cnpg cluster
