@@ -29,7 +29,7 @@ spec:
               SEARXNG_BASE_URL: https://search.${SECRET_DOMAIN}
               SEARXNG_URL: https://search.${SECRET_DOMAIN}
               SEARXNG_PORT: &httpPort 8080
-              SEARXNG_REDIS_URL: redis://searxng-redis.selfhosted.svc.cluster.local:6379/0
+              SEARXNG_REDIS_URL: redis://dragonfly:6379/0
             envFrom:
               - secretRef:
                   name: searxng-secret
@@ -63,12 +63,6 @@ spec:
                   - SETGID
                   - SETUID
                   - DAC_OVERRIDE
-      redis:
-        pod:
-          securityContext:
-            runAsUser: 65534
-            runAsGroup: 65534
-        strategy: RollingUpdate
     service:
       app:
         controller: searxng
