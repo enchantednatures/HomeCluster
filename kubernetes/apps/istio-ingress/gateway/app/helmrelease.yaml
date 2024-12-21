@@ -48,3 +48,18 @@ spec:
               matchLabels:
                 app: istio-ingressgateway
                 istio: ingressgateway
+    replicaCount: 1
+    autoscaling:
+      enabled: false
+    service:
+      loadBalancerIP: 192.168.1.227
+      externalIPs:
+        - 192.168.1.227
+      externalTrafficPolicy: "Local"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
