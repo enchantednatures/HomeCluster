@@ -1,4 +1,3 @@
----
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 metadata:
@@ -10,3 +9,4 @@ resources:
   - ./service.yaml
   - ./pvc.yaml
   - ./secret.sops.yaml
+  - ./dragonfly.yaml

@@ -25,6 +25,10 @@ spec:
         - name: open-webui
           image: ghcr.io/open-webui/open-webui:main
           imagePullPolicy: Always
+          environment:
+            ENABLE_WEBSOCKET_SUPPORT: "true"
+            WEBSOCKET_MANAGER: "redis"
+            WEBSOCKET_REDIS_URL: "redis://open-webui-dragonfly:6379/1"
           envFrom:
             - secretRef:
                 name: open-webui-secret
