@@ -65,7 +65,7 @@ spec:
                   - DAC_OVERRIDE
     service:
       main:
-        controller: searxng
+        controller: main
         ports:
           http:
             port: *httpPort
