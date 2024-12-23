@@ -16,7 +16,7 @@ spec:
         namespace: flux-system
   values:
     controllers:
-      searxng:
+      main:
         strategy: RollingUpdate
         annotations:
           reloader.stakater.com/auto: "true"
@@ -64,13 +64,13 @@ spec:
                   - SETUID
                   - DAC_OVERRIDE
     service:
-      app:
+      main:
         controller: searxng
         ports:
           http:
             port: *httpPort
     ingress:
-      app:
+      main:
         className: "external"
         annotations:
           kubernetes.io/tls-acme: "true"
