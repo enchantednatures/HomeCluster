@@ -19,7 +19,7 @@ filter_link_local = true
 # activate link_token method in the ip_limit method
 link_token = false
 
-# [botdetection.ip_lists]
+[botdetection.ip_lists]
 
 # # In the limiter, the ip_lists method has priority over all other methods -> if
 # # an IP is in the pass_ip list, it has unrestricted access and it is also not
