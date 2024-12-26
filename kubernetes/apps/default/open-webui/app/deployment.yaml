@@ -47,7 +47,7 @@ spec:
             - containerPort: 3000
               name: open-webui
             - containerPort: 8080
-              name: open-webui-backend
+              name: backend
       restartPolicy: Always
       volumes:
         - name: open-webui-data
