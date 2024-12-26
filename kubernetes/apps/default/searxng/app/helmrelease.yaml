@@ -98,6 +98,7 @@ spec:
         tls:
           - hosts:
               - *host
+            secretName: searxng-tls
     persistence:
       config:
         type: configMap
