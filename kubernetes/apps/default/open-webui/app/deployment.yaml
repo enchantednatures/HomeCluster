@@ -44,10 +44,10 @@ spec:
             - mountPath: /app/backend/data
               name: open-webui-data
           ports:
-            - containerPort: 3000
-              name: open-webui
             - containerPort: 8080
-              name: backend
+              name: open-webui
+            # - containerPort: 8080
+            #   name: backend
       restartPolicy: Always
       volumes:
         - name: open-webui-data
