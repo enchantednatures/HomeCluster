@@ -21,7 +21,7 @@ spec:
               service:
                 name: open-webui
                 port:
-                  number: 8080
+                  number: 3000
   tls:
     - hosts:
         - *host
