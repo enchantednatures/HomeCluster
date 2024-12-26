@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ./airflow-charts.yaml
   - ./ananace-charts.yaml
+  - ./arroyo-charts.yaml
   - ./authentik.yaml
   - ./backube.yaml
   - ./ceph-charts.yaml
