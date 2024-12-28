@@ -1,3 +1,4 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
@@ -6,6 +7,7 @@ resources:
   - ./arroyo-charts.yaml
   - ./authentik.yaml
   - ./backube.yaml
+  - ./backstage-charts.yaml
   - ./ceph-charts.yaml
   - ./cilium.yaml
   - ./cloudnative-pg.yaml
