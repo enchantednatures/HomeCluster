@@ -7,7 +7,7 @@ machine:
     topology.kubernetes.io/zone: ${node_name}
 
 cluster:
-  allowSchedulingOnControlPlanes: true
+  allowSchedulingOnControlPlanes: false
   network:
     cni:
       name: none
