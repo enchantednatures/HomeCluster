@@ -1,3 +1,4 @@
+---
 # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 apiVersion: apps/v1
 kind: Deployment
@@ -36,18 +37,12 @@ spec:
             requests:
               cpu: 100m
               memory: 100Mi
-              # limits:
-              #   cpu: 100m
-          #   memory: 100Mi
-
           volumeMounts:
             - mountPath: /app/backend/data
               name: open-webui-data
           ports:
             - containerPort: 8080
               name: open-webui
-            # - containerPort: 8080
-            #   name: backend
       restartPolicy: Always
       volumes:
         - name: open-webui-data
