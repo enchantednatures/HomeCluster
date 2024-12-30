@@ -37,7 +37,6 @@ includes:
     optional: true
 
 tasks:
-
   default: task --list
 
   init:
