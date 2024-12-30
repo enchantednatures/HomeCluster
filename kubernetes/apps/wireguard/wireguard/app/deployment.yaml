@@ -46,7 +46,7 @@ spec:
             privileged: true
           envFrom:
             - configMapRef:
-              name: wireguard-config
+                name: wireguard-config
           ports:
             - containerPort: 51820
               protocol: UDP
