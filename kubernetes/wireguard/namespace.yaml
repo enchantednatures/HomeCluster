@@ -1,4 +1,7 @@
+---
 apiVersion: v1
 kind: namespace
 metadata:
   name: wireguard
+  labels:
+    kustomize.toolkit.fluxcd.io/prune: disabled

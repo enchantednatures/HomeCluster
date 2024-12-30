@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wireguard
+  namespace: wireguard
+spec:
+  selector:
+    matchLabels:
+      app: wireguard
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: wireguard
+    spec:
+      containers:
+        - name: wireguard
+          image: linuxserver/wireguard:latest
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_MODULE
+            privileged: true
+          ports:
+            - containerPort: 51820
+              protocol: UDP
+          volumeMounts:
+            - name: wireguard-config
+              mountPath: /config
+            - name: lib-modules
+              mountPath: /lib/modules
+              readOnly: true
+      initContainers:
+        - command:
+          - sh
+          - "-c"
+          - ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}'); sed "s/ENI/$ENI/g"
+            /etc/wireguard-secret/wg0.conf.template > /config/wg0.conf; chmod 400 /config/wg0.conf
+          - sysctl -w net.ipv4.ip_forward=1
+          image: busybox
+          name: wireguard-template-replacement
+          volumeMounts:
+            - mountPath: "/config/"
+              name: wireguard-config
+            - mountPath: "/etc/wireguard-secret/"
+              name: wireguard-secret
+      volumes:
+        - name: wireguard-config
+          secret:
+            secretName: wireguard-config
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
