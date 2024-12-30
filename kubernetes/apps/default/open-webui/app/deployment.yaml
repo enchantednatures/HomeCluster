@@ -29,9 +29,9 @@ spec:
           imagePullPolicy: Always
           envFrom:
             - secretRef:
-              name: open-webui-secret
+                name: open-webui-secret
             - configMapRef:
-              name: open-webui-config
+                name: open-webui-config
           resources:
             requests:
               cpu: 100m
