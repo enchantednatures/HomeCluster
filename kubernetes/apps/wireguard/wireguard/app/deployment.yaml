@@ -19,22 +19,19 @@ spec:
           image: busybox
           command:
             - sh
-            - -c
+            - "-c"
             - |
-              mkdir -p /config
+              mkdir -p /config/wg_confs
               ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}')
-              cp /etc/wireguard-secret/wg0.conf.template /config/wg0.conf.tmp
-              sed "s/ENI/$ENI/g" /config/wg0.conf.tmp > /config/wg0.conf
-              rm /config/wg0.conf.tmp
-              chmod 400 /config/wg0.conf
-              sysctl -w net.ipv4.ip_forward=1 || true
-          volumeMounts:
-            - name: wireguard-config
-              mountPath: /config
-            - name: wireguard-secret
-              mountPath: /etc/wireguard-secret
+              sed "s/ENI/$ENI/g" /etc/wireguard-secret/wg0.conf.template > /config/wg_confs/wg0.conf
+              chmod 400 /config/wg_confs/wg0.conf
           securityContext:
             privileged: true
+          volumeMounts:
+            - mountPath: /config
+              name: wireguard-config-vol
+            - mountPath: /etc/wireguard-secret
+              name: wireguard-secret
       containers:
         - name: wireguard
           image: linuxserver/wireguard:latest
@@ -42,22 +39,24 @@ spec:
             capabilities:
               add:
                 - NET_ADMIN
-                - SYS_MODULE
             privileged: true
+          envFrom:
+            - configMapRef:
+                name: wireguard-config
           ports:
             - containerPort: 51820
               protocol: UDP
           volumeMounts:
-            - name: wireguard-config
-              mountPath: /config
-            - name: lib-modules
-              mountPath: /lib/modules
+            - mountPath: /config
+              name: wireguard-config-vol
+            - mountPath: /lib/modules
+              name: lib-modules
               readOnly: true
       volumes:
         - name: wireguard-secret
           secret:
             secretName: wireguard-secret
-        - name: wireguard-config
+        - name: wireguard-config-vol
           emptyDir: {}
         - name: lib-modules
           hostPath:
