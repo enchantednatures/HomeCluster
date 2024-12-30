@@ -17,3 +17,4 @@ resources:
   - ./db-user.sops.yaml
   - ./scheduled-backup.yaml
   - ./superusersecret.sops.yaml
+  - ./config-map.yaml
