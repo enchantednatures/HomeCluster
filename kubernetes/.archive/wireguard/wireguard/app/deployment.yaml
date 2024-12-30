@@ -4,8 +4,6 @@ kind: Deployment
 metadata:
   name: wireguard
   namespace: wireguard
-  annotations:
-    reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
@@ -13,8 +11,6 @@ spec:
   replicas: 1
   template:
     metadata:
-      annotations:
-        reloader.stakater.com/auto: "true"
       labels:
         app: wireguard
     spec:
