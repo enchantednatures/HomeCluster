@@ -52,7 +52,7 @@ spec:
             secretName: wireguard-secret
         - name: wireguard-config
           configMap:
-            configMapName: wireguard-config
+            name: wireguard-config
         - name: lib-modules
           hostPath:
             path: /lib/modules
