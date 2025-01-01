@@ -52,7 +52,7 @@ spec:
     #     name: postgres-app-user
     #   postInitTemplatsSQL: []
     recovery:
-      source: &previousCluster clusterBackup
+      source: &previousCluster postgres-v0
   externalClusters:
     - name: *previousCluster
       barmanObjectStore:
