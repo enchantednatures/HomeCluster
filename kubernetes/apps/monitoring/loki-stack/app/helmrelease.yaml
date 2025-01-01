@@ -67,7 +67,7 @@ spec:
           ruler: loki-ruler
           admin: loki-admin
         s3:
-          endpoint: http://minio-service.networking.svc.cluster.local:9768
+          endpoint: https://s3.enchantednatures.com
           insecure: false
           s3forcepathstyle: true
           signatureVersion: v4
@@ -81,7 +81,7 @@ spec:
           s3forcepathstyle: true
           insecure: false
           # signatureVersion: v4
-          endpoint: http://minio-service.networking.svc.cluster.local:9768
+          endpoint: https://s3.enchantednatures.com
       write:
         replicas: 1
         persistence:

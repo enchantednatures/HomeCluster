@@ -9,7 +9,7 @@ metadata:
     external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
     external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
-  ingressClassName: istio
+  ingressClassName: external
   rules:
     - host: &host elastic.${SECRET_DOMAIN}
       http:

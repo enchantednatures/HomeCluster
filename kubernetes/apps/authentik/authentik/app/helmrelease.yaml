@@ -1,5 +1,4 @@
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -75,7 +74,7 @@ spec:
     server:
       ingress:
         enabled: true
-        ingressClassName: istio
+        ingressClassName: "external"
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           kubernetes.io/tls-acme: "true"
@@ -112,7 +111,7 @@ spec:
       postgresql:
         host: 192.168.1.241
       redis:
-        host: "dragonfly.dragonflydb.svc.cluster.local"
+        host: "dragonfly.dragonflydb.svc.cluster.local" #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
     postgresql:
       enabled: false
       persistence:

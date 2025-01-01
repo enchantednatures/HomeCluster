@@ -1,5 +1,4 @@
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -26,42 +25,4 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values:
-    pilot:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 2048Mi
-    global:
-      logAsJson: true
-      meshID: enchantednatures
-      tracer:
-        zipkin:
-          address: tempo.monitoring.svc.cluster.local:9411
-    meshConfig:
-      # serviceSettings:
-      #   - settings:
-      #       clusterLocal: true
-      #     hosts:
-      #       - "kiali.istio-system.svc.cluster.local"
-      accessLogFile: "/dev/stdout"
-      accessLogEncoding: "JSON"
-      enableTracing: true
-      defaultConfig:
-        tracing:
-          zipkin:
-            address: tempo.monitoring.svc.cluster.local:9411
-      enablePrometheusMerge: true
-      extensionProviders:
-        - envoyExtAuthzHttp:
-            headersToDownstreamOnAllow:
-              - cookie
-            headersToUpstreamOnAllow:
-              - set-cookie
-              - x-authentik-*
-            includeRequestHeadersInCheck:
-              - cookie
-            pathPrefix: /outpost.goauthentik.io/auth/envoy
-            port: "9000"
-            service: ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local
-          name: authentik
+  values: {}
