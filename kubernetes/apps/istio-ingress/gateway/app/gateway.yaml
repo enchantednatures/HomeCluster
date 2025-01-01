@@ -1,3 +1,4 @@
+---
 # kubernetes/apps/istio-ingress/gateway/app/gateway.yaml
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
@@ -6,7 +7,7 @@ metadata:
   namespace: istio-ingress
 spec:
   selector:
-    istio: ingressgateway
+    app: istio-gateway
   servers:
     - port:
         number: 443
