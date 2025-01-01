@@ -34,3 +34,4 @@ provision/terraform/proxmox/proxmox.auto.tfvars
 provision/terraform/proxmox/output/
 provision/terraform/harbor/.terraform
 provision/terraform/harbor/.terraform
+kubernetes/wip/
