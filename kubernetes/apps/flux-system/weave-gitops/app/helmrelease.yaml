@@ -31,7 +31,7 @@ spec:
       username: admin
     ingress:
       enabled: true
-      className: external
+      className: istio
       annotations:
         kubernetes.io/tls-acme: "true"
         cert-manager.io/cluster-issuer: letsencrypt-production

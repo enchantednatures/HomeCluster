@@ -34,12 +34,12 @@ spec:
             name: external-dns-secret
             key: api-token
     extraArgs:
-      - --ingress-class=external
+      - --ingress-class=istio
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
     policy: sync
-    sources: ["crd", "ingress"]
+    sources: ["crd", "ingress", "istio-virtualservice", "service"]
     txtPrefix: k8s.
     txtOwnerId: default
     domainFilters: ["${SECRET_DOMAIN}"]

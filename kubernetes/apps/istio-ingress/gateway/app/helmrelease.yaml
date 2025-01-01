@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -52,9 +53,11 @@ spec:
     autoscaling:
       enabled: false
     service:
-      loadBalancerIP: 192.168.1.227
+      annotations:
+        io.cilium/lb-ipam-ips: "192.168.1.226"  # Using your existing Nginx IP
+      loadBalancerIP: 192.168.1.226
       externalIPs:
-        - 192.168.1.227
+        - 192.168.1.226
       externalTrafficPolicy: "Local"
     resources:
       requests:

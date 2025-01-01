@@ -5,7 +5,7 @@ metadata:
   name: authentik-outpost-nginx
   namespace: authentik
 spec:
-  ingressClassName: external
+  ingressClassName: istio
   rules:
     - host: ${SECRET_DOMAIN}
       http:

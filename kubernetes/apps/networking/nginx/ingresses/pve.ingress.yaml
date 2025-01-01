@@ -1,3 +1,4 @@
+---
 # https://kubernetes.io/docs/concepts/services-networking/ingress/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -9,9 +10,10 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns/is-public: "true"
     external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    # Add Istio-specific annotations for HTTPS backend
+    networking.istio.io/upstream-protocol.8006: "HTTPS"
 spec:
-  ingressClassName: "external"
+  ingressClassName: istio
   rules:
     - host: &host pve.${SECRET_DOMAIN}
       http:
@@ -27,3 +29,21 @@ spec:
     - hosts:
         - *host
       secretName: pve-ui-tls
+---
+# ServiceEntry to tell Istio about the external Proxmox service
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: pve-external
+  namespace: networking
+spec:
+  hosts:
+    - pve.networking.svc.cluster.local
+  addresses:
+    - 192.168.1.240
+  ports:
+    - name: https
+      number: 8006
+      protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: STATIC

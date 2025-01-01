@@ -22,7 +22,7 @@ metadata:
           proxy_set_header X-Forwarded-Host $http_host;
 
 spec:
-  ingressClassName: external
+  ingressClassName: istio
   tls:
   - hosts:
       - tekton-dashboard-tls
