@@ -5,7 +5,9 @@ metadata:
   name: minio-service
   namespace: networking
 spec:
-  type: ExternalName
-  ports: 
+  type: ClusterIP
+  ports:
     - port: 9768
-  externalName: 192.168.1.241
+      targetPort: 9768
+      protocol: TCP
+
