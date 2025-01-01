@@ -119,7 +119,7 @@ spec:
       controller:
         image:
           repository: goharbor/harbor-registryctl
-          tag: v2.12.0
+          tag: v2.12.1
           resources:
             requests:
               memory: 256Mi
