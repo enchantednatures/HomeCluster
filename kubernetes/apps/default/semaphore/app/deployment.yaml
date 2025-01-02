@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: semaphore
+  labels:
+    app: semaphore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: semaphore
+  template:
+    metadata:
+      labels:
+        app: semaphore
+    spec:
+      containers:
+        - name: semaphore
+          image: semaphoreui/semaphore:v2.11.2
+          ports:
+            - containerPort: 3000
+          env:
+            - name: SEMAPHORE_DB_DIALECT
+              value: postgres
+            - name: SEMAPHORE_DB_HOST
+              value: semaphore-db-rw
+            - name: SEMAPHORE_DB_PORT
+              value: '5432'
+            - name: SEMAPHORE_DB_NAME
+              value: semaphore
+            - name: SEMAPHORE_DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: semaphore-db-credentials
+                  key: username
+            - name: SEMAPHORE_DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: semaphore-db-credentials
+                  key: password
+            - name: SEMAPHORE_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: semaphore-admin-credentials
+                  key: username
+            - name: SEMAPHORE_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: semaphore-admin-credentials
+                  key: password
+            - name: SEMAPHORE_ADMIN_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: semaphore-admin-credentials
+                  key: name
+            - name: SEMAPHORE_ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: semaphore-admin-credentials
+                  key: email
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: semaphore
+spec:
+  selector:
+    app: semaphore
+  ports:
+    - port: 3000
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: semaphore
+spec:
+  ingressClassName: external
+  rules:
+    - host: &host semaphore.${SECRET_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: semaphore
+                port:
+                  number: 3000
+  tls:
+    - hosts: [*host]
+      secretName: semaphore-tls
