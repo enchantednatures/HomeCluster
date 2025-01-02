@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -23,14 +24,6 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  # dependsOn:
-  #   - name: local-path-provisioner
-  #     namespace: kube-system
-  # valuesFrom:
-  #   - targetPath: grafana.ini.auth.generic_oauth
-  #     kind: Secret
-  #     name: grafana-oauth-secret
-  #     valuesKey: CLIENT_SECRET
   values:
     deploymentStrategy:
       type: Recreate
@@ -38,23 +31,24 @@ spec:
       existingSecret: grafana-admin-secret
     env:
       GF_EXPLORE_ENABLED: true
-      GF_SERVER_ROOT_URL: "https://grafana.${SECRET_DOMAIN}"
+      GF_SERVER_ROOT_URL: https://grafana.${SECRET_DOMAIN}
     envFromSecrets:
       - name: grafana-oauth-secret
     grafana.ini:
       auth:
-        signout_redirect_url: "https://auth.${SECRET_DOMAIN}/application/o/grafana/end-session/"
+        signout_redirect_url: https://auth.${SECRET_DOMAIN}/application/o/grafana/end-session/
         oauth_auto_login: true
       auth.generic_oauth:
         name: authentik
         enabled: true
         allow_assign_grafana_admin: true
-        scopes: "openid profile email"
-        auth_url: "https://auth.${SECRET_DOMAIN}/application/o/authorize/"
-        token_url: "https://auth.${SECRET_DOMAIN}/application/o/token/"
-        api_url: "https://auth.${SECRET_DOMAIN}/application/o/userinfo/"
+        scopes: openid profile email
+        auth_url: https://auth.${SECRET_DOMAIN}/application/o/authorize/
+        token_url: https://auth.${SECRET_DOMAIN}/application/o/token/
+        api_url: https://auth.${SECRET_DOMAIN}/application/o/userinfo/
         # Optionally map user groups to Grafana roles
-        role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'
+        role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups,
+          'Grafana Editors') && 'Editor' || 'Viewer'
       auth.basic:
         enabled: false
       analytics:
@@ -67,7 +61,7 @@ spec:
         providers:
           - name: default
             orgId: 1
-            folder: ""
+            folder: ''
             type: file
             disableDeletion: false
             editable: true
@@ -142,44 +136,46 @@ spec:
             access: proxy
             jsonData:
               tracesToLogsV2:
-                datasourceUid: "Loki"
-                tags: ["job", "instance", "pod", "namespace"]
+                datasourceUid: Loki
+                tags: [job, instance, pod, namespace]
                 filterByTraceID: true
                 filterBySpanID: true
                 customQuery: true
               tracesToMetrics:
-                datasourceUid: "Prometheus"
-                tags: [{key: "service.name", value: "service"}, {key: "job"}]
+                datasourceUid: Prometheus
+                tags:
+                  - {key: service.name, value: service}
+                  - {key: job}
               serviceMap:
-                datasourceUid: "Prometheus"
+                datasourceUid: Prometheus
               nodeGraph:
                 enabled: true
               search:
                 hide: false
               lokiSearch:
-                datasourceUid: "Loki"
+                datasourceUid: Loki
               traceQuery:
                 timeShiftEnabled: true
               spanBar:
-                type: "Tag"
-                tag: "http.path"
+                type: Tag
+                tag: http.path
             isDefault: false
     dashboards:
       default:
         cloudflared:
-          gnetId: 17457 # https://grafana.com/grafana/dashboards/17457?tab=revisions
+          gnetId: 17457  # https://grafana.com/grafana/dashboards/17457?tab=revisions
           revision: 6
           datasource:
             - {name: DS_PROMETHEUS, value: Prometheus}
         external-dns:
-          gnetId: 15038 # https://grafana.com/grafana/dashboards/15038?tab=revisions
+          gnetId: 15038  # https://grafana.com/grafana/dashboards/15038?tab=revisions
           revision: 1
           datasource: Prometheus
         cert-manager:
           url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
           datasource: Prometheus
         node-exporter-full:
-          gnetId: 1860 # https://grafana.com/grafana/dashboards/1860?tab=revisions
+          gnetId: 1860  # https://grafana.com/grafana/dashboards/1860?tab=revisions
           revision: 31
           datasource: Prometheus
       flux:
@@ -215,11 +211,18 @@ spec:
         nginx-request-handling-performance:
           url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/request-handling-performance.json
           datasource: Prometheus
+      kafka:
+        cruise-control:
+          url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/0.45.0/examples/metrics/grafana-dashboards/strimzi-cruise-control.json
+          datasource: Prometheus
+        kafka:
+          url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/0.45.0/examples/metrics/grafana-dashboards/strimzi-kafka.json
+          datasource: Prometheus
     sidecar:
       dashboards:
         enabled: true
         searchNamespace: ALL
-        labelValue: ""
+        labelValue: ''
         label: grafana_dashboard
         folderAnnotation: grafana_folder
         provider:
@@ -228,23 +231,18 @@ spec:
       datasources:
         enabled: true
         searchNamespace: ALL
-        labelValue: ""
+        labelValue: ''
     serviceMonitor:
       enabled: true
     ingress:
       enabled: true
       ingressClassName: external
       annotations:
-        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
-        external-dns.alpha.kubernetes.io/is-public: "true"
-      hosts:
-        - &host "grafana.${SECRET_DOMAIN}"
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        external-dns.alpha.kubernetes.io/is-public: 'true'
+      hosts: [&host 'grafana.${SECRET_DOMAIN}']
       tls:
-        - hosts:
-            - *host
-    # persistence:
-    #   enabled: true
-    #   storageClassName: csi-nfs
+        - hosts: [*host]
     testFramework:
       enabled: false
     extraSecretMounts:
