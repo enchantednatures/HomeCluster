@@ -1,19 +1,4 @@
----
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaNodePool
-metadata:
-  name: kafka
-  labels:
-    strimzi.io/cluster: snail
-spec:
-  replicas: 5
-  roles:
-    - broker
-    - controller
-  storage:
-    type: persistent-claim
-    size: 50Gi
-    class: csi-nfs
+
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
@@ -42,6 +27,12 @@ spec:
       default.replication.factor: 3
       min.insync.replicas: 2
       group.min.session.timeout.ms: 250
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: kafka-metrics
+          key: kafka-metrics-config.yml
   entityOperator:
     topicOperator: {}
     userOperator: {}

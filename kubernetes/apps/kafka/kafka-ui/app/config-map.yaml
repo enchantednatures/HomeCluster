@@ -1,13 +1,24 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kafka-ui-configmap
 data:
   config.yml: |-
+    dynamic:
+      config:
+        enabled: true
     kafka:
       clusters:
         - name: strimzi
           bootstrapServers: snail-kafka-bootstrap.kafka.svc.cluster.local:9092
+          metrics:
+                  port: 9997
+                  type: PROMETHEUS
+          schemaRegistry: http:// schema-registry.kafka.svc.cluster.local:8081
+          schemaRegistryAuth:
+            username: username
+            password: password
     auth:
       type: disabled
     management:
