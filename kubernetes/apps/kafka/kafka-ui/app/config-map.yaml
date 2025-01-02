@@ -13,12 +13,9 @@ data:
         - name: strimzi
           bootstrapServers: snail-kafka-bootstrap.kafka.svc.cluster.local:9092
           metrics:
-                  port: 9997
-                  type: PROMETHEUS
-          schemaRegistry: http:// schema-registry.kafka.svc.cluster.local:8081
-          schemaRegistryAuth:
-            username: username
-            password: password
+            port: 9997
+            type: PROMETHEUS
+          schemaRegistry: http://schema-registry.kafka.svc.cluster.local:8081
     auth:
       type: disabled
     management:
