@@ -7,7 +7,6 @@ metadata:
 spec:
   targetNamespace: authentik
   dependsOn:
-    - name: sealed-secrets
     - name: dragonflydb-operator
   commonMetadata:
     labels:
