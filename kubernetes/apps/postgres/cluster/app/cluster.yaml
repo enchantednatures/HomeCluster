@@ -54,6 +54,10 @@ spec:
     #   postInitTemplatsSQL: []
     recovery:
       source: &previousCluster postgres-v0
+      database: app
+      owner: app
+      secret:
+        name: postgres-app-user
   externalClusters:
     - name: *previousCluster
       barmanObjectStore:

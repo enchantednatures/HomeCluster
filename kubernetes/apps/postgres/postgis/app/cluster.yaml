@@ -81,6 +81,10 @@ spec:
     #     - CREATE EXTENSION postgis_tiger_geocoder;
     recovery:
       source: &previousCluster postgis-v0
+      database: app
+      owner: app
+      secret:
+        name: postgis-app-user
   externalClusters:
     - name: *previousCluster
       barmanObjectStore:
