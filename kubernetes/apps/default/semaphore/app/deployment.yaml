@@ -18,15 +18,15 @@ spec:
       containers:
         - name: semaphore
           image: semaphoreui/semaphore:v2.11.2
-          ports:
-            - containerPort: 3000
+          # ports:
+          #   - containerPort: 3000
           env:
             - name: SEMAPHORE_DB_DIALECT
               value: postgres
             - name: SEMAPHORE_DB_HOST
               value: semaphore-db-rw
             - name: SEMAPHORE_DB_PORT
-              value: '5432'
+              value: 5432
             - name: SEMAPHORE_DB_NAME
               value: semaphore
             - name: SEMAPHORE_DB_USER
