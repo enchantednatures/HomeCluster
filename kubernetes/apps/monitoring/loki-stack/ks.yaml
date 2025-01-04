@@ -6,6 +6,8 @@ metadata:
   name: &app loki-stack
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: csi-driver-nfs
   targetNamespace: monitoring
   commonMetadata:
     labels:
