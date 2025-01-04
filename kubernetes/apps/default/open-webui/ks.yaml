@@ -8,7 +8,9 @@ spec:
   targetNamespace: default
   dependsOn:
     - name: dragonflydb-operator
+      namespace: dragonflydb
     - name: cloudnative-pg
+      namespace: postgres
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
