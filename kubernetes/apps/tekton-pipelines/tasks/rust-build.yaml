@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -36,11 +37,9 @@ spec:
         [build]
         jobs = 4
         target-dir = "/workspace/source/target"
-
         [cache]
         dir = "/workspace/source/.cargo-cache"
         EOF
-
     - name: build
       image: rust:1
       workingDir: /workspace/source
@@ -69,12 +68,10 @@ spec:
         [build]
         jobs = 4
         target-dir = "/workspace/source/target"
-
         [cache]
         dir = "/workspace/source/.cargo-cache"
         EOF
         cargo build --release
-
     - name: test
       image: rust:1
       workingDir: /workspace/source
@@ -87,9 +84,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: rust-workspace-pvc
+  namespace: default
 spec:
-  accessModes:
-    - ReadWriteOnce
+  accessModes: [ReadWriteOnce]
   resources:
     requests:
       storage: 10Gi
