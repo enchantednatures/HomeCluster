@@ -5,6 +5,8 @@ metadata:
   name: &app elasticsearch
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: csi-driver-nfs
   targetNamespace: elastic
   commonMetadata:
     labels:

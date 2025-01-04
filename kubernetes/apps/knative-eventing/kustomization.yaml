@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./eventing/ks.yaml
-  - https://github.com/knative-extensions/eventing-kafka-broker/releases/download/knative-v1.16.1/eventing-kafka-controller.yaml
+
