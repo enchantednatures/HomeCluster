@@ -3,12 +3,10 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: csi-nfs
-  annotations:
-    storageclass.kubernetes.io/is-default-class: true
-provisioner: nfs.csi.k8s.io
 parameters:
   server: 192.168.1.89
-  share: /
+  share: /data/nfs  # Matching the exact export path
+provisioner: nfs.csi.k8s.io
+mountOptions: [hard, noatime, vers=4.0, rw]
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
-mountOptions: ["hard", "noatime"]
