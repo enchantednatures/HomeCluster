@@ -9,7 +9,6 @@ spec:
   dependsOn:
     - name: dragonflydb-operator
     - name: cloudnative-pg
-      namespace: postgres
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
