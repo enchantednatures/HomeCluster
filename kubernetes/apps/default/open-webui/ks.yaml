@@ -6,6 +6,9 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: default
+  dependsOn:
+    - name: dragonflydb-operator
+    - name: cloudnative-pg
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

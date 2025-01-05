@@ -15,23 +15,7 @@ spec:
         protocol: HTTPS
       tls:
         mode: SIMPLE
-        credentialName: "domain-production-tls"
+        credentialName: "${SECRET_DOMAIN/./-}-production-tls"
       hosts:
-        - "external.enchantednatures.com"
-        - "*.enchantednatures.com"
----
-# kubernetes/apps/istio-ingress/gateway/app/certificate.yaml
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: domain-production
-  namespace: istio-ingress
-spec:
-  secretName: domain-production-tls
-  issuerRef:
-    name: letsencrypt-production
-    kind: ClusterIssuer
-  commonName: "*.enchantednatures.com"
-  dnsNames:
-    - "*.enchantednatures.com"
-    - "enchantednatures.com"
+        - "external.${SECRET_DOMAIN}"
+        - "*.${SECRET_DOMAIN}"

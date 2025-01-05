@@ -9,4 +9,3 @@ spec:
   ports:
     - port: 9769
   externalName: 192.168.1.241
-

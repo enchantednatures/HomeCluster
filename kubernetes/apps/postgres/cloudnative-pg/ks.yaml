@@ -1,3 +1,4 @@
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -5,7 +6,8 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: sealed-secrets
+    - name: csi-driver-nfs
+    - name: prometheus-operator-crds
   targetNamespace: postgres
   commonMetadata:
     labels:

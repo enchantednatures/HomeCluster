@@ -58,7 +58,7 @@ spec:
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
       # Note: serverName version needs to be incremented
       # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgis-v0
+      serverName: &currentCluster postgis-v1
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-postgis-secret
@@ -69,21 +69,24 @@ spec:
   # Note: previousCluster needs to be set to the name of the previous
   # cluster when recovering from an existing cnpg cluster
   bootstrap:
-    initdb:
+    # initdb:
+    #   database: app
+    #   owner: app
+    #   secret:
+    #     name: postgis-app-user
+    #   postInitTemplateSQL:
+    #     - CREATE EXTENSION postgis;
+    #     - CREATE EXTENSION postgis_topology;
+    #     - CREATE EXTENSION fuzzystrmatch;
+    #     - CREATE EXTENSION postgis_tiger_geocoder;
+    recovery:
+      source: &previousCluster postgis-v0
       database: app
       owner: app
       secret:
         name: postgis-app-user
-      postInitTemplateSQL:
-        - CREATE EXTENSION postgis;
-        - CREATE EXTENSION postgis_topology;
-        - CREATE EXTENSION fuzzystrmatch;
-        - CREATE EXTENSION postgis_tiger_geocoder;
-        # recovery:
-        #   source: &previousCluster postgis-v0
-  # Note: externalClusters is needed when recovering from an existing cnpg cluster
-  # externalClusters:
-  #   - name:  &previousCluster postgres16-v0 #*previousCluster postgres16-v6
-  #     barmanObjectStore:
-  #       <<: *barmanObjectStore
-  #       serverName: *previousCluster
+  externalClusters:
+    - name: *previousCluster
+      barmanObjectStore:
+        <<: *barmanObjectStore
+        serverName: *previousCluster

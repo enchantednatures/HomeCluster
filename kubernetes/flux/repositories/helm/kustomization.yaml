@@ -6,8 +6,8 @@ resources:
   - ./ananace-charts.yaml
   - ./arroyo-charts.yaml
   - ./authentik.yaml
-  - ./backube.yaml
   - ./backstage-charts.yaml
+  - ./backube.yaml
   - ./ceph-charts.yaml
   - ./cilium.yaml
   - ./cloudnative-pg.yaml
@@ -22,6 +22,7 @@ resources:
   - ./grafana.yaml
   - ./hajimari.yaml
   - ./harbor-charts.yaml
+  - ./hyperswitch-charts.yaml
   - ./influx-data.yaml
   - ./infracloudio.yaml
   - ./ingress-nginx.yaml
@@ -37,6 +38,7 @@ resources:
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
+  - ./openebs-charts.yaml
   - ./piraeus.yaml
   - ./redpanda-charts.yaml
   - ./rook-ceph.yaml

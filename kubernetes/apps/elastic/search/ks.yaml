@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: sealed-secrets
+    - name: csi-driver-nfs
   targetNamespace: elastic
   commonMetadata:
     labels:

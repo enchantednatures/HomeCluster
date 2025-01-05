@@ -6,6 +6,8 @@ metadata:
   name: cloudnative-pg-postgis-cluster
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: cloudnative-pg
   targetNamespace: postgres
   commonMetadata:
     labels:

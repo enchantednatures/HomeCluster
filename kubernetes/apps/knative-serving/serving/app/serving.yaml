@@ -1,14 +1,14 @@
+---
 apiVersion: operator.knative.dev/v1beta1
 kind: KnativeServing
 metadata:
   name: knative-serving
-  namespace: knative
 spec:
   ingress:
     istio:
       enabled: true
   config:
     autoscaler:
-      enable-scale-to-zero: "true"
+      enable-scale-to-zero: 'true'
   high-availability:
     replicas: 3

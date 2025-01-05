@@ -1,0 +1,16 @@
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: kafka
+  labels:
+    strimzi.io/cluster: snail
+spec:
+  replicas: 5
+  roles:
+    - broker
+    - controller
+  storage:
+    type: persistent-claim
+    size: 50Gi
+    class: csi-nfs

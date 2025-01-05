@@ -20,11 +20,11 @@ terraform {
   required_providers {
     talos = {
       source  = "siderolabs/talos"
-      version = "0.6"
+      version = "0.7"
     }
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.68"
+      version = "0.69"
     }
     restapi = {
       source  = "Mastercard/restapi"

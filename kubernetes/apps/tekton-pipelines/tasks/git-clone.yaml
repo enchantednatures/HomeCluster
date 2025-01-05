@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -12,7 +13,7 @@ spec:
       description: The URL of the Git repository
     - name: branch
       description: The branch to clone
-      default: "main"
+      default: main
   steps:
     - name: clone
       image: alpine/git
@@ -30,4 +31,3 @@ spec:
     - name: git-ssh-key
       secret:
         secretName: git-ssh-key
----

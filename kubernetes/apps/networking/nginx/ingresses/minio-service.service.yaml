@@ -5,25 +5,9 @@ metadata:
   name: minio-service
   namespace: networking
 spec:
-  type: ExternalName
+  type: ClusterIP
   ports:
     - port: 9768
-  externalName: 192.168.1.241
----
-# kubernetes/apps/istio-ingress/gateway/app/virtualservice.yaml
-apiVersion: networking.istio.io/v1
-kind: VirtualService
-metadata:
-  name: s3-routes
-  namespace: istio-ingress
-spec:
-  hosts:
-    - "s3.enchantednatures.com"
-  gateways:
-    - external-gateway
-  http:
-    - route:
-        - destination:
-            host: minio-service.networking.svc.cluster.local
-            port:
-              number: 9768
+      targetPort: 9768
+      protocol: TCP
+
