@@ -13,7 +13,7 @@ spec:
       interval: 30m
       sourceRef:
         kind: HelmRepository
-        name: openebs
+        name: openebs-charts
         namespace: flux-system
   values:
     localpv-provisioner:
@@ -28,22 +28,17 @@ spec:
         name: openebs-hostpath
         isDefaultClass: false
         basePath: /var/mnt/extra
-
     openebs-crds:
       csi:
         volumeSnapshots:
           enabled: false
           keep: false
-
     zfs-localpv:
       enabled: false
-
     lvm-localpv:
       enabled: false
-
     mayastor:
       enabled: false
-
     engines:
       local:
         lvm:
