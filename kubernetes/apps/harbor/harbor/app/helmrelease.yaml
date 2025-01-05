@@ -180,14 +180,9 @@ spec:
       maxOpenConns: 900
       podAnnotations: {}
     redis:
-      type: internal
-      internal:
-        resources:
-          requests:
-            memory: 256Mi
-            cpu: 100m
+      type: external
       external:
-        addr: "192.168.0.2:6379"
+        addr: "harbor-dragonfly:6379"
         coreDatabaseIndex: "0"
         jobserviceDatabaseIndex: "1"
         registryDatabaseIndex: "2"

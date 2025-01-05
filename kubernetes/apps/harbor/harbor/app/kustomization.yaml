@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./config-map.yaml
+  - ./dragonfly.yaml
   - ./harbor-postgres.sops.yaml
   - ./harbor-minio-credentials.sops.yaml
