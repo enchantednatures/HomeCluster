@@ -45,5 +45,6 @@ resources:
   - ./sealed-secrets.yaml
   - ./stakater.yaml
   - ./strimzi.yaml
+  - ./tailscale-charts.yaml
   - ./velero.yaml
   - ./vmware-tanzu.yaml
