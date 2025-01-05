@@ -8,7 +8,6 @@ spec:
   targetNamespace: default
   dependsOn:
     - name: dragonflydb-operator
-      namespace: dragonflydb
     - name: cloudnative-pg
       namespace: postgres
   commonMetadata:
