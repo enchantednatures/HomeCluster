@@ -4,3 +4,4 @@ metadata:
   name: postgres
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
+    istio-injection: enabled

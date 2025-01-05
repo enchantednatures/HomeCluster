@@ -4,3 +4,4 @@ metadata:
   name: atuin
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
+    istio-injection: enabled

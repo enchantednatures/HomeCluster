@@ -5,3 +5,4 @@ metadata:
   name: airflow
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
+    istio-injection: enabled
