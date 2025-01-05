@@ -33,7 +33,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/authentik/db/app
+  path: ./kubernetes/apps/authentik/db
   prune: true
   sourceRef:
     kind: GitRepository
