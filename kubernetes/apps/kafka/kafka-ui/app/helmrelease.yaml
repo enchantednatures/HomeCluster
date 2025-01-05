@@ -25,6 +25,19 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      targetMemoryUtilizationPercentage: 60
+      targetCPUUtilizationPercentage: 60
+    resources:
+      limits:
+        cpu: 400m
+        memory: 1024Mi
+      requests:
+        cpu: 200m
+        memory: 256Mi
     annotations:
       reloader.stakater.com/auto: 'true'
     yamlApplicationConfigConfigMap:
