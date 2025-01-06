@@ -61,7 +61,6 @@ spec:
       owner: authentik
       secret:
         name: authentik-db-user
-      postInitTemplatesSQL: []
   #   recovery:
   #     source: &previousCluster postgres-v0
   #     database: app
