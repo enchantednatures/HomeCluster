@@ -14,8 +14,8 @@ spec:
         name: http
         protocol: HTTP
       hosts: ['external.${SECRET_DOMAIN}', '*.${SECRET_DOMAIN}']
-      tls:
-        httpsRedirect: true  # Redirect all HTTP traffic to HTTPS
+      # tls:
+      #   httpsRedirect: true  # Redirect all HTTP traffic to HTTPS
     - port:
         number: 443
         name: https
