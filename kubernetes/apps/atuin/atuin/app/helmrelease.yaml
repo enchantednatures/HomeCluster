@@ -76,7 +76,7 @@ spec:
         runAsGroup: 568
     ingress:
       *app:
-        className: external
+        className: istio
         annotations:
           kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
