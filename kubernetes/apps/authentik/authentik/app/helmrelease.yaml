@@ -75,7 +75,7 @@ spec:
     server:
       ingress:
         enabled: true
-        ingressClassName: external
+        ingressClassName: istio
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
           kubernetes.io/tls-acme: 'true'
