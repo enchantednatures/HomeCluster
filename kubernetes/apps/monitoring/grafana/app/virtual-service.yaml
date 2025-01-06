@@ -1,0 +1,15 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: grafana
+  namespace: monitoring  # adjust if different
+spec:
+  hosts: ['grafana.${SECRET_DOMAIN}']
+  gateways: [istio-system/external-gateway]
+  http:
+    - route:
+        - destination:
+            host: grafana.monitoring.svc.cluster.local  # adjust service name/namespace
+            port:
+              number: 3000  # adjust if different

@@ -5,3 +5,4 @@ resources:
   - ./secret.sops.yaml
   - ./oauth-secret.sops.yaml
   - ./helmrelease.yaml
+  - ./virtual-service.yaml
