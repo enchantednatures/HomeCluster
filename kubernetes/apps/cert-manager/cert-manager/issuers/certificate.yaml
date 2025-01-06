@@ -1,3 +1,4 @@
+---
 # certificate.yaml
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -6,33 +7,8 @@ metadata:
   namespace: istio-system
 spec:
   secretName: istio-tls
-  dnsNames:
-  - "${SECRET_DOMAIN}"
-  - "*.${SECRET_DOMAIN}"
+  dnsNames: ['${SECRET_DOMAIN}', '*.${SECRET_DOMAIN}']
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
-  usages:
-    - digital signature
-    - key encipherment
-    - server auth
----
-# istio-gateway.yaml
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
-metadata:
-  name: cluster-gateway
-  namespace: istio-system
-spec:
-  selector:
-    istio: ingressgateway
-  servers:
-  - port:
-      number: 443
-      name: https
-      protocol: HTTPS
-    tls:
-      mode: SIMPLE
-      credentialName: istio-tls
-    hosts:
-    - "*.${SECRET_DOMAIN}"
+  usages: [digital signature, key encipherment, server auth]
