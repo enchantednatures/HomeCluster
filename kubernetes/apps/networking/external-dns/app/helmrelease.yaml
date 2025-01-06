@@ -40,8 +40,9 @@ spec:
       - --crd-source-kind=DNSEndpoint
       # Add Istio Gateway source
       - --source=istio-gateway
+      - --source=ingress
       # Specify the Istio Gateway
-      - --istio-ingress-gateway=istio-ingress/external-gateway
+      # - --istio-ingress-gateway=istio-ingress/external-gateway
     policy: sync
     sources: [crd, ingress]
     txtPrefix: k8s.
