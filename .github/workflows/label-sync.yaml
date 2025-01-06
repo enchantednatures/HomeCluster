@@ -1,18 +1,15 @@
 ---
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: "Label Sync"
-
+name: Label Sync
 on:
   workflow_dispatch:
   push:
-    branches: ["main"]
-    paths: [".github/labels.yaml"]
+    branches: [main]
+    paths: [.github/labels.yaml]
   schedule:
-    - cron: "0 0 * * *" # Every day at midnight
-
+    - cron: 0 0 * * *  # Every day at midnight
 permissions:
   issues: write
-
 jobs:
   label-sync:
     name: Label Sync
@@ -22,7 +19,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: .github/labels.yaml
-
       - name: Sync Labels
         uses: EndBug/label-sync@v2
         with:
