@@ -34,15 +34,10 @@ spec:
             name: external-dns-secret
             key: api-token
     extraArgs:
-      - --ingress-class=istio
+      - --ingress-class=external
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
-      # Add Istio Gateway source
-      - --source=istio-gateway
-      - --source=ingress
-      # Specify the Istio Gateway
-      # - --istio-ingress-gateway=istio-ingress/external-gateway
     policy: sync
     sources: [crd, ingress]
     txtPrefix: k8s.

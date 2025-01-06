@@ -9,7 +9,7 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns/is-public: 'true'
 spec:
-  ingressClassName: istio
+  ingressClassName: external
   rules:
     - host: &host flux-webhook.${SECRET_DOMAIN}
       http:
