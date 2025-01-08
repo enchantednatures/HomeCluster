@@ -51,8 +51,8 @@ metadata:
 spec:
   targetNamespace: authentik
   dependsOn:
-    - name: *app-cache
-    - name: *app-db
+    - name: authentik-dragonfly
+    - name: authentik-db
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
