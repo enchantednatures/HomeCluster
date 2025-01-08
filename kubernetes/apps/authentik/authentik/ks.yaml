@@ -2,16 +2,16 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app authentik
+  name: &app-cache authentik-dragonfly
   namespace: flux-system
 spec:
   targetNamespace: authentik
   dependsOn:
-    - name: dragonflydb-operator
+    - name: dragonflydb
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/authentik/authentik/app
+      app.kubernetes.io/name: *app-cache
+  path: ./kubernetes/apps/authentik/authentik/dragonfly/
   prune: true
   sourceRef:
     kind: GitRepository
@@ -24,7 +24,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app authentik-db
+  name: &app-db authentik-db
   namespace: flux-system
 spec:
   targetNamespace: authentik
@@ -32,7 +32,7 @@ spec:
     - name: cloudnative-pg
   commonMetadata:
     labels:
-      app.kubernetes.io/name: *app
+      app.kubernetes.io/name: *app-db
   path: ./kubernetes/apps/authentik/authentik/db/
   prune: true
   sourceRef:
@@ -42,3 +42,27 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app authentik
+  namespace: flux-system
+spec:
+  targetNamespace: authentik
+  dependsOn:
+    - name: *app-cache
+    - name: *app-db
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/apps/authentik/authentik/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+
