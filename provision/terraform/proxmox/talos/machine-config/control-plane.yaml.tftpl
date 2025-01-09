@@ -6,6 +6,14 @@ machine:
     topology.kubernetes.io/region: ${cluster_name}
     topology.kubernetes.io/zone: ${node_name}
 
+  features:
+    kubernetesTalosAPIAccess:
+      enabled: true
+      allowedRoles:
+        - os:reader
+      allowedKubernetesNamespaces:
+        - default
+
 cluster:
   allowSchedulingOnControlPlanes: false
   network:
