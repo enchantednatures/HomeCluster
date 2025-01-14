@@ -44,8 +44,8 @@ spec:
       #       clusterLocal: true
       #     hosts:
       #       - "kiali.istio-system.svc.cluster.local"
-      accessLogFile: "/dev/stdout"
-      accessLogEncoding: "JSON"
+      accessLogFile: /dev/stdout
+      accessLogEncoding: JSON
       enableTracing: true
       defaultConfig:
         tracing:
@@ -54,14 +54,10 @@ spec:
       enablePrometheusMerge: true
       extensionProviders:
         - envoyExtAuthzHttp:
-            headersToDownstreamOnAllow:
-              - cookie
-            headersToUpstreamOnAllow:
-              - set-cookie
-              - x-authentik-*
-            includeRequestHeadersInCheck:
-              - cookie
+            headersToDownstreamOnAllow: [cookie]
+            headersToUpstreamOnAllow: [set-cookie, x-authentik-*]
+            includeRequestHeadersInCheck: [cookie]
             pathPrefix: /outpost.goauthentik.io/auth/envoy
-            port: "9000"
+            port: '9000'
             service: ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local
           name: authentik

@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -6,19 +7,19 @@ spec:
   params:
     - name: registry-url
       type: string
-      description: "Docker registry URL"
+      description: Docker registry URL
     - name: image-name
       type: string
-      description: "Name of the image to push"
+      description: Name of the image to push
     - name: image-tag
       type: string
-      description: "Tag of the image to push"
+      description: Tag of the image to push
     - name: registry-username
       type: string
-      description: "Registry username"
+      description: Registry username
     - name: registry-password
       type: string
-      description: "Registry password"
+      description: Registry password
   steps:
     - name: docker-login
       image: docker:dind

@@ -5,18 +5,18 @@ metadata:
   name: kibana
   namespace: elastic
   annotations:
-    kubernetes.io/tls-acme: "true"
+    kubernetes.io/tls-acme: 'true'
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns/is-public: "true"
-    external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    external-dns/is-public: 'true'
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
 spec:
   ingressClassName: external
   rules:
     - host: &host kibana.${SECRET_DOMAIN}
       http:
         paths:
-          - path: "/"
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -24,6 +24,5 @@ spec:
                 port:
                   name: https
   tls:
-    - hosts:
-        - *host
+    - hosts: [*host]
       secretName: kibana-tls

@@ -24,7 +24,7 @@ spec:
       retries: 3
   values:
     fullnameOverride: node-exporter
-    releaseLabel: true # disable for victoria-metrics
+    releaseLabel: true  # disable for victoria-metrics
     podLabels:
       jobLabel: node-exporter
     extraArgs:
@@ -36,10 +36,10 @@ spec:
         jobLabel: jobLabel
         metricRelabelings:
           - action: replace
-            sourceLabels: ["__meta_kubernetes_pod_node_name"]
+            sourceLabels: [__meta_kubernetes_pod_node_name]
             targetLabel: kubernetes_node
           - action: drop
-            sourceLabels: ["mountpoint"]
+            sourceLabels: [mountpoint]
             regex: /var/lib/kubelet/pods.+
           - action: labeldrop
             regex: (pod)

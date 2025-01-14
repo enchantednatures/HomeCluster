@@ -27,13 +27,13 @@ spec:
   values:
     namespace: kube-system
     # image:
-    #   # registry: quay.io
+    #  # registry: quay.io
     #   registry: docker.io
     #   repository: bitnami/sealed-secrets-controller
     #   tag: v0.24.5
     #   pullPolicy: IfNotPresent
     createController: true
-    secretName: "sealed-secrets-key"
+    secretName: sealed-secrets-key
     updateStatus: true
     resources:
       limits: {}
@@ -41,7 +41,7 @@ spec:
     service:
       type: ClusterIP
       port: 8080
-      nodePort: ""
+      nodePort: ''
       annotations: {}
     ingress:
       enabled: true
@@ -52,7 +52,6 @@ spec:
       path: /v1/cert.pem
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
-
       tls: true
       selfSigned: false
       extraHosts: []
@@ -61,26 +60,22 @@ spec:
       secrets: []
     networkPolicy:
       enabled: false
-
-
     serviceAccount:
       create: true
       labels: {}
-      name: ""
+      name: ''
     rbac:
       create: true
       labels: {}
       pspEnabled: false
-
-
     metrics:
       serviceMonitor:
         enabled: false
         namespace: monitoring
         labels: {}
         annotations: {}
-        interval: ""
-        scrapeTimeout: ""
+        interval: ''
+        scrapeTimeout: ''
         metricRelabelings: []
         relabelings: []
       dashboards:

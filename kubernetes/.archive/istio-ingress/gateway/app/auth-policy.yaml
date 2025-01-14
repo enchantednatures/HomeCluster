@@ -1,3 +1,4 @@
+---
 # kubernetes/apps/istio-ingress/gateway/app/auth-policy.yaml
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
@@ -12,7 +13,7 @@ spec:
   provider:
     name: authentik
   rules:
-    - {} # Apply to all requests
+    - {}  # Apply to all requests
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
@@ -30,15 +31,15 @@ spec:
         listener:
           filterChain:
             filter:
-              name: "envoy.filters.network.http_connection_manager"
+              name: envoy.filters.network.http_connection_manager
       patch:
         operation: INSERT_BEFORE
         value:
           name: envoy.ext_authz
           typed_config:
-            "@type": "type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz"
+            '@type': type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
             http_service:
               server_uri:
                 uri: http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000
                 cluster: outbound|9000||ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local
-              path_prefix: "/outpost.goauthentik.io/auth/nginx"
+              path_prefix: /outpost.goauthentik.io/auth/nginx

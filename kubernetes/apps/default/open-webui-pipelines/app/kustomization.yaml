@@ -4,7 +4,4 @@ kind: Kustomization
 metadata:
   name: open-webui-pipelines
   namespace: default
-resources:
-  - ./deployment.yaml
-  - ./service.yaml
-  - ./pvc.yaml
+resources: [./deployment.yaml, ./service.yaml, ./pvc.yaml]

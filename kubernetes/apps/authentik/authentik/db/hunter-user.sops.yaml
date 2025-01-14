@@ -1,30 +1,31 @@
+---
 apiVersion: v1
 kind: Secret
 metadata:
-    name: authentik-db-hunter
-    labels:
-        cnpg.io/reload: "true"
+  name: authentik-db-hunter
+  labels:
+    cnpg.io/reload: 'true'
 type: kubernetes.io/basic-auth
 stringData:
-    username: ENC[AES256_GCM,data:5C+lVJld,iv:eum8inrTwpAsYxKJh+RWWGX5DTs0xEC3+sLHuRmA+7o=,tag:Jurd6HjIJBv5hfJ4VXF9DQ==,type:str]
-    password: ENC[AES256_GCM,data:eHVcze9O4XrJ8Zip,iv:qsXqWaG4TiWP66hSfMGEjjUDonrbPTZtvx66l8ykmeE=,tag:ijFfHp7s1jDec6/pmzyPLA==,type:str]
+  username: ENC[AES256_GCM,data:5C+lVJld,iv:eum8inrTwpAsYxKJh+RWWGX5DTs0xEC3+sLHuRmA+7o=,tag:Jurd6HjIJBv5hfJ4VXF9DQ==,type:str]
+  password: ENC[AES256_GCM,data:eHVcze9O4XrJ8Zip,iv:qsXqWaG4TiWP66hSfMGEjjUDonrbPTZtvx66l8ykmeE=,tag:ijFfHp7s1jDec6/pmzyPLA==,type:str]
 sops:
-    kms: []
-    gcp_kms: []
-    azure_kv: []
-    hc_vault: []
-    age:
-        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
-          enc: |
-            -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUdVhROXBrL3BiUFFZUjFN
-            NmdCeTlMVC91NVUrWnF0bVNoT2F0SDM2b0FJCm1HNUZvUmZLMVM2dDM2NUN2RHJa
-            OVBRczgzUE5yOFNjSWVLMjdkeDVOa1EKLS0tIEtCUzBQQmo1d1RWV29DT3hUOGJ2
-            WWttWmQrSDBRZDdrSXZxdXRwVlVYSncKj0JfHpuVT230bxFcgGJ4lnH1Tz9VPqao
-            ciq3Upj8qGJXhBAcChN6cAj93Fjnpq8Bd0gMoXBeeLBa8lbFiEBuGg==
-            -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-01-06T01:56:14Z"
-    mac: ENC[AES256_GCM,data:dJ6u6GkDe2kQTZ4ihM+/pgBvJB2W2Hryao4wt/z2qqvoyi6XRdCUYB2TTFYpGTkHfyK6i8/1haC2Ou9ecaD4tjBHWkuWWT/4pQcXKeP0xOWhIrIVx+bitfiswhtAoc+13gkYswz4BZbM5cZBGgcQ9AJgULqsZe4l0gfJWPJbnCI=,iv:P9qMbY2YPXFdRrjDXVA/mnQg+xSegRmrb6wNQhr6GLE=,tag:Tmh4VB+CBrUmCCMm3dxLaQ==,type:str]
-    pgp: []
-    encrypted_regex: ^(data|stringData)$
-    version: 3.9.1
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBUdVhROXBrL3BiUFFZUjFN
+        NmdCeTlMVC91NVUrWnF0bVNoT2F0SDM2b0FJCm1HNUZvUmZLMVM2dDM2NUN2RHJa
+        OVBRczgzUE5yOFNjSWVLMjdkeDVOa1EKLS0tIEtCUzBQQmo1d1RWV29DT3hUOGJ2
+        WWttWmQrSDBRZDdrSXZxdXRwVlVYSncKj0JfHpuVT230bxFcgGJ4lnH1Tz9VPqao
+        ciq3Upj8qGJXhBAcChN6cAj93Fjnpq8Bd0gMoXBeeLBa8lbFiEBuGg==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: '2025-01-06T01:56:14Z'
+  mac: ENC[AES256_GCM,data:dJ6u6GkDe2kQTZ4ihM+/pgBvJB2W2Hryao4wt/z2qqvoyi6XRdCUYB2TTFYpGTkHfyK6i8/1haC2Ou9ecaD4tjBHWkuWWT/4pQcXKeP0xOWhIrIVx+bitfiswhtAoc+13gkYswz4BZbM5cZBGgcQ9AJgULqsZe4l0gfJWPJbnCI=,iv:P9qMbY2YPXFdRrjDXVA/mnQg+xSegRmrb6wNQhr6GLE=,tag:Tmh4VB+CBrUmCCMm3dxLaQ==,type:str]
+  pgp: []
+  encrypted_regex: ^(data|stringData)$
+  version: 3.9.1

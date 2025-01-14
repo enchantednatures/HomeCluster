@@ -1,3 +1,4 @@
+---
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
@@ -35,8 +36,7 @@ spec:
         - metadata:
             name: elasticsearch-data
           spec:
-            accessModes:
-              - ReadWriteOnce
+            accessModes: [ReadWriteOnce]
             resources:
               requests:
                 storage: 10Gi

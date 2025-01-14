@@ -1,3 +1,4 @@
+---
 # ConfigMap to track import progress
 apiVersion: v1
 kind: ConfigMap
@@ -5,8 +6,8 @@ metadata:
   name: osm-import-progress
   namespace: postgres
 data:
-  completed: ""
-  initialized: "false"
+  completed: ''
+  initialized: 'false'
 ---
 apiVersion: batch/v1
 kind: Job
@@ -23,11 +24,11 @@ spec:
           image: overv/openstreetmap-tile-server:latest
           resources:
             requests:
-              memory: "4Gi"
-              cpu: "2"
+              memory: 4Gi
+              cpu: '2'
             limits:
-              memory: "8Gi"
-              cpu: "4"
+              memory: 8Gi
+              cpu: '4'
           env:
             - name: PGUSER
               valueFrom:
@@ -109,12 +110,9 @@ spec:
                 local filename=$(basename $geography)
                 local max_retries=3
                 local retry_count=0
-
                 echo "Downloading $geography..."
                 cd /tmp/osm-files
                 wget -q https://download.geofabrik.de/$geography
-
-
                 echo "Importing $filename..."
                 while [ $retry_count -lt $max_retries ]; do
                   if osm2pgsql \
@@ -140,7 +138,6 @@ spec:
                     fi
                   fi
                 done
-
                 echo "Failed to import $geography after $max_retries attempts"
                 rm $filename
                 return 1
@@ -159,14 +156,12 @@ spec:
                     echo "Skipping already imported geography: $geography"
                     continue
                   fi
-
                   if [ "$DB_INITIALIZED" = "false" ]; then
                     # First import needs --create flag instead of --append
                     echo "Downloading first geography: $geography..."
                     cd /tmp/osm-files
                     wget -q https://download.geofabrik.de/$geography
                     filename=$(basename $geography)
-
                     echo "Importing first geography: $filename..."
                     osm2pgsql \
                       --create \
@@ -180,7 +175,6 @@ spec:
                       --database $PGDATABASE \
                       --username $PGUSER \
                       $filename
-
                     rm $filename
                     touch "$INITIALIZED_FILE"
                     mark_completed "$geography"
@@ -225,14 +219,14 @@ kind: ClusterRole
 metadata:
   name: postgis-secret-reader
 rules:
-  - apiGroups: [""]
-    resources: ["secrets"]
+  - apiGroups: ['']
+    resources: [secrets]
     resourceNames:
-      - "postgis-db-ca"
-      - "osm-installer"
-      - "postgis-db-app"
-      - "postgis-app-user"
-    verbs: ["get"]
+      - postgis-db-ca
+      - osm-installer
+      - postgis-db-app
+      - postgis-app-user
+    verbs: [get]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -17,9 +18,9 @@ metadata:
 #   - name: PodSecurity
 #     configuration:
 #       defaults:
-#         enforce: "privileged" # Change from baseline to privileged
+#         enforce: "privileged"  # Change from baseline to privileged
 #         enforce-version: "latest"
 #       exemptions:
 #         usernames: []
 #         runtimeClasses: []
-#         namespaces: [monitoring] # Add your namespace here
+#         namespaces: [monitoring]  # Add your namespace here

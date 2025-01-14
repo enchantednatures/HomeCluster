@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -47,20 +48,20 @@ spec:
       name: influxdb-data
     env:
       - name: TZ
-        value: "${TIMEZONE}"
+        value: ${TIMEZONE}
     ingress:
       enabled: true
       className: external
       hostname: &host influxdb.${SECRET_DOMAIN}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
-        kubernetes.io/tls-acme: "true"
-        external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        kubernetes.io/tls-acme: 'true'
+        external-dns/is-public: 'true'
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 
         # nginx.ingress.kubernetes.io/auth-url: |-
         #   http://ak-outpost-nginx.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
-        # # If you're using domain-level auth, use the authentication URL instead of the application URL
+        #  # If you're using domain-level auth, use the authentication URL instead of the application URL
         # nginx.ingress.kubernetes.io/auth-signin: |-
         #   https://enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri
         # nginx.ingress.kubernetes.io/auth-response-headers: |-

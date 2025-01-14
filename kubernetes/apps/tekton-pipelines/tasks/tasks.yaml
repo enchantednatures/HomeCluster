@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -28,9 +29,8 @@ spec:
           value: $(params.git-url)
         - name: revision
           value: $(params.git-revision)
-
     - name: build-image
-      runAfter: ["fetch-source"]
+      runAfter: [fetch-source]
       taskRef:
         name: kaniko
       workspaces:
@@ -41,9 +41,8 @@ spec:
           value: $(params.image-name):$(params.image-tag)
         - name: DOCKERFILE
           value: ./Dockerfile
-
     - name: run-tests
-      runAfter: ["fetch-source"]
+      runAfter: [fetch-source]
       taskRef:
         name: docker-build-and-run
       workspaces:
@@ -54,5 +53,3 @@ spec:
           value: ./Dockerfile.test
         - name: CONTEXT
           value: .
-
-

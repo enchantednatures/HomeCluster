@@ -40,13 +40,12 @@ spec:
         - name: revision
           value: $(params.revision)
         - name: deleteExisting
-          value: "true"
+          value: 'true'
       workspaces:
         - name: output
           workspace: shared-workspace
     - name: build-and-push
-      runAfter:
-        - fetch-source
+      runAfter: [fetch-source]
       taskRef:
         name: kaniko
         kind: Task

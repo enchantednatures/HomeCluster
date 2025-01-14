@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -59,12 +60,10 @@ spec:
         className: internal
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-        hosts:
-          - &host "tempo-query.${SECRET_DOMAIN}"
+        hosts: [&host 'tempo-query.${SECRET_DOMAIN}']
         tls:
           - secretName: tempo-tls
-            hosts:
-              - *host
+            hosts: [*host]
     serviceMonitor:
       enabled: true
   valuesFrom:

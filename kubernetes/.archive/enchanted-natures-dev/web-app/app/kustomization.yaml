@@ -4,7 +4,4 @@ kind: Kustomization
 metadata:
   name: web_app_dev
   namespace: enchanted-natures-dev
-resources:
-  - ./deployment.yaml
-  - ./ingress.yaml
-  - ./service.yaml
+resources: [./deployment.yaml, ./ingress.yaml, ./service.yaml]

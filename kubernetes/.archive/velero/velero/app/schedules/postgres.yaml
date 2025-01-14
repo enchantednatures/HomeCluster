@@ -5,12 +5,11 @@ metadata:
   name: postgres-backup
   namespace: velero
 spec:
-  schedule: "@every 6h"
+  schedule: '@every 6h'
   template:
     defaultVolumesToRestic: true
     hooks: {}
-    includedNamespaces:
-      - postgres
+    includedNamespaces: [postgres]
     metadata: {}
     storageLocation: minio
     ttl: 12h0m0s

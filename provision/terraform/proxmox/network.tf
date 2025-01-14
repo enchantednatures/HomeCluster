@@ -18,4 +18,3 @@ resource "proxmox_virtual_environment_dns" "pve_dns" {
     "8.8.8.8",
   ]
 }
-

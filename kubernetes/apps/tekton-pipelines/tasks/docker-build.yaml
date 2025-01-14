@@ -1,3 +1,4 @@
+---
 # task-docker-build-and-run.yaml
 apiVersion: tekton.dev/v1beta1
 kind: Task

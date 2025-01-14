@@ -14,7 +14,8 @@ spec:
       rules:
         - alert: LongRunningTransaction
           annotations:
-            description: Pod {{ $labels.pod }} is taking more than 5 minutes (300 seconds) for a query.
+            description: Pod {{ $labels.pod }} is taking more than 5 minutes (300
+              seconds) for a query.
             summary: A query is taking longer than 5 minutes.
           expr: |-
             cnpg_backends_max_tx_duration_seconds > 300
@@ -23,7 +24,8 @@ spec:
             severity: warning
         - alert: BackendsWaiting
           annotations:
-            description: Pod {{ $labels.pod }} has been waiting for longer than 5 minutes
+            description: Pod {{ $labels.pod }} has been waiting for longer than 5
+              minutes
             summary: If a backend is waiting for longer than 5 minutes
           expr: |-
             cnpg_backends_waiting_total > 300
@@ -51,7 +53,8 @@ spec:
         - alert: LastFailedArchiveTime
           annotations:
             description: Archiving failed for {{ $labels.pod }}
-            summary: Checks the last time archiving failed. Will be < 0 when it has not failed.
+            summary: Checks the last time archiving failed. Will be < 0 when it has
+              not failed.
           expr: |-
             (cnpg_pg_stat_archiver_last_failed_time - cnpg_pg_stat_archiver_last_archived_time) > 1
           for: 1m

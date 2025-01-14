@@ -7,4 +7,3 @@ metadata:
 spec:
   interval: 5m
   url: https://provectus.github.io/kafka-ui-charts
-

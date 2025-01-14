@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -30,8 +31,8 @@ spec:
     gateways:
       istio-ingressgateway:
         annotations:
-          external-dns.alpha.kubernetes.io/hostname: "external.${SECRET_DOMAIN}"
-          io.cilium/lb-ipam-ips: "192.168.1.226"
+          external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
+          io.cilium/lb-ipam-ips: 192.168.1.226
         service:
           externalTrafficPolicy: Cluster
         resources:
@@ -53,9 +54,8 @@ spec:
       enabled: false
     service:
       loadBalancerIP: 192.168.1.227
-      externalIPs:
-        - 192.168.1.227
-      externalTrafficPolicy: "Local"
+      externalIPs: [192.168.1.227]
+      externalTrafficPolicy: Local
     resources:
       requests:
         cpu: 100m

@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -36,8 +37,8 @@ spec:
       enabled: true
       sentinel: true
       redisUsername: authentik
-      existingSecret: "authentik-redis"
-      existingSecretPasswordKey: "password"
+      existingSecret: authentik-redis
+      existingSecretPasswordKey: password
       usePasswordFiles: false
     commonConfiguration: |-
       # Enable AOF https://redis.io/topics/persistence#append-only-file
@@ -56,7 +57,7 @@ spec:
         externalTrafficPolicy: Cluster
         internalTrafficPolicy: Cluster
         extraPorts: []
-        clusterIP: ""
+        clusterIP: ''
       terminationGracePeriodSeconds: 30
     replica:
       replicaCount: 3
@@ -72,8 +73,8 @@ spec:
         enabled: false
         minReplicas: 1
         maxReplicas: 11
-        targetCPU: ""
-        targetMemory: ""
+        targetCPU: ''
+        targetMemory: ''
     sentinel:
       enabled: false
     networkPolicy:
@@ -122,7 +123,7 @@ spec:
       ## @param metrics.redisTargetHost A way to specify an alternative Redis&trade; hostname
       ## Useful for certificate CN/SAN matching
       ##
-      redisTargetHost: "localhost"
+      redisTargetHost: localhost
       ## @param metrics.extraArgs Extra arguments for Redis&trade; exporter, for example:
       ## e.g.:
       ## extraArgs:
@@ -166,8 +167,8 @@ spec:
       ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
       ##
       podAnnotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "9121"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '9121'
       ## Redis&trade; exporter service parameters
       ##
       service:
@@ -187,7 +188,7 @@ spec:
         ## @param metrics.service.loadBalancerIP Redis&trade; exporter service Load Balancer IP
         ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
         ##
-        loadBalancerIP: ""
+        loadBalancerIP: ''
         ## @param metrics.service.loadBalancerSourceRanges Redis&trade; exporter service Load Balancer sources
         ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
         ## e.g.
@@ -208,13 +209,13 @@ spec:
         enabled: false
         ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
         ##
-        namespace: ""
+        namespace: ''
         ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
         ##
         interval: 30s
         ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
         ##
-        scrapeTimeout: ""
+        scrapeTimeout: ''
         ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
         ##
         relabellings: []
@@ -236,7 +237,7 @@ spec:
         enabled: false
         ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
         ##
-        namespace: ""
+        namespace: ''
         ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
         ##
         additionalLabels: {}
@@ -376,6 +377,6 @@ spec:
     ##
     useExternalDNS:
       enabled: false
-      suffix: ""
+      suffix: ''
       annotationKey: external-dns.alpha.kubernetes.io/
       additionalAnnotations: {}

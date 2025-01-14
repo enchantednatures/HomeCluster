@@ -1,3 +1,4 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -22,7 +23,7 @@ spec:
   values:
     toolbox:
       enabled: true
-    operatorNamespace: &ns rook-ceph # cluster chart will skip conflicting resources if it knows the operator is in same namespace
+    operatorNamespace: &ns rook-ceph  # cluster chart will skip conflicting resources if it knows the operator is in same namespace
     monitoring:
       enabled: true
       createPrometheusRules: true
@@ -37,7 +38,7 @@ spec:
       external:
         enable: true
       cephVersion:
-        image: quay.io/ceph/ceph:v19.2.0 # Should match external cluster version, but pveceph having issues with matching 18.2.2
+        image: quay.io/ceph/ceph:v19.2.0  # Should match external cluster version, but pveceph having issues with matching 18.2.2
       crashCollector:
         disable: true
       healthCheck:

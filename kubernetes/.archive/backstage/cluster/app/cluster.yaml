@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -18,13 +19,13 @@ spec:
     name: postgres-superuser
   postgresql:
     parameters:
-      max_connections: "300"
+      max_connections: '300'
       shared_buffers: 512MB
   monitoring:
     enablePodMonitor: true
   backup:
     retentionPolicy: 30d
-    barmanObjectStore: &barmanObjectStore
+    barmanObjectStore:
       data:
         compression: bzip2
       wal:

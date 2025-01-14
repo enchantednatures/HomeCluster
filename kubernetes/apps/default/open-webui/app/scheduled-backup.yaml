@@ -5,7 +5,7 @@ kind: ScheduledBackup
 metadata:
   name: openwebui-postgres
 spec:
-  schedule: "@daily"
+  schedule: '@daily'
   immediate: true
   backupOwnerReference: self
   cluster:

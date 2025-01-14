@@ -1,3 +1,4 @@
+---
 # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
 apiVersion: apps/v1
 kind: Deployment
@@ -69,9 +70,8 @@ spec:
           ports:
             - containerPort: 6969
               name: enchanted-api
-
       volumes:
-      - name: config
-        configMap:
-          name: enchanted-api
+        - name: config
+          configMap:
+            name: enchanted-api
       restartPolicy: Always

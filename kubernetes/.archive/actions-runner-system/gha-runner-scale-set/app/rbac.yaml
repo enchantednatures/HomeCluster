@@ -17,10 +17,4 @@ subjects:
     name: actions-runner
     namespace: actions-runner-system
 ---
-# apiVersion: talos.dev/v1alpha1
-# kind: ServiceAccount
-# metadata:
-#   name: actions-runner
-# spec:
-#   roles:
-#     - os:admin
+...

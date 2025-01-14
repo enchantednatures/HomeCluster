@@ -1,3 +1,4 @@
+---
 # https://kubernetes.io/docs/concepts/services-networking/ingress/
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -5,12 +6,12 @@ metadata:
   name: api
   namespace: enchanted-natures-dev
   annotations:
-    kubernetes.io/tls-acme: "true"
+    kubernetes.io/tls-acme: 'true'
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns/is-public: "true"
-    external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+    external-dns/is-public: 'true'
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
-  ingressClassName: "external"
+  ingressClassName: external
   rules:
     - host: &host development-api.${SECRET_DOMAIN}
       http:
@@ -23,7 +24,5 @@ spec:
                 port:
                   number: 6969
   tls:
-
-    - hosts:
-        - *host
+    - hosts: [*host]
       secretName: dev-api-tls
