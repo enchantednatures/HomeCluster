@@ -7,7 +7,7 @@ metadata:
 spec:
   targetNamespace: authentik
   dependsOn:
-    - name: dragonflydb
+    - name: dragonflydb-operator
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app-cache
