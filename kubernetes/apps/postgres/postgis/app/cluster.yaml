@@ -19,10 +19,10 @@ spec:
     name: postgis-superuser
   postgresql:
     parameters:
-      max_connections: '300'
+      max_connections: "300"
       # Memory configuration - optimized for 4GB total RAM
-      shared_buffers: 1GB  # 25% of RAM
-      effective_cache_size: 3GB  # 75% of RAM
+      shared_buffers: 1GB # 25% of RAM
+      effective_cache_size: 3GB # 75% of RAM
       work_mem: 32MB
       maintenance_work_mem: 256MB
       # Write-ahead log
@@ -30,17 +30,17 @@ spec:
       max_wal_size: 1GB
       min_wal_size: 512MB
       # Query planner
-      random_page_cost: '1.1'  # Assuming SSD storage
-      effective_io_concurrency: '100'
+      random_page_cost: "1.1" # Assuming SSD storage
+      effective_io_concurrency: "100"
       # Parallel query settings - reduced for smaller instance
-      max_parallel_workers_per_gather: '2'
-      max_parallel_workers: '4'
-      max_parallel_maintenance_workers: '2'
+      max_parallel_workers_per_gather: "2"
+      max_parallel_workers: "4"
+      max_parallel_maintenance_workers: "2"
       # OSM specific optimizations
-      autovacuum_vacuum_scale_factor: '0.1'
-      autovacuum_analyze_scale_factor: '0.05'
-      checkpoint_completion_target: '0.9'
-      default_statistics_target: '500'
+      autovacuum_vacuum_scale_factor: "0.1"
+      autovacuum_analyze_scale_factor: "0.05"
+      checkpoint_completion_target: "0.9"
+      default_statistics_target: "500"
       # Extensions needed for OSM
       # shared_preload_libraries: "postgis"
   # pg_hba:

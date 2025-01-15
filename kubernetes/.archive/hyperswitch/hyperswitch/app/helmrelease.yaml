@@ -27,5 +27,5 @@ spec:
       application:
         controlCenter:
           env:
-            default__features__email: 'false'
-            default__features__totp: 'false'
+            default__features__email: "false"
+            default__features__totp: "false"

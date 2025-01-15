@@ -6,8 +6,8 @@ metadata:
   name: osm-import-progress
   namespace: postgres
 data:
-  completed: ''
-  initialized: 'false'
+  completed: ""
+  initialized: "false"
 ---
 apiVersion: batch/v1
 kind: Job
@@ -25,10 +25,10 @@ spec:
           resources:
             requests:
               memory: 4Gi
-              cpu: '2'
+              cpu: "2"
             limits:
               memory: 8Gi
-              cpu: '4'
+              cpu: "4"
           env:
             - name: PGUSER
               valueFrom:
@@ -74,97 +74,49 @@ spec:
             - /bin/bash
             - -c
             - |
-              # Install wget
-              apt-get update && apt-get install -y wget
+                # Install wget
+                apt-get update && apt-get install -y wget
 
-              # Set PostgreSQL environment variables for SSL
-              # export PGSSLMODE=verify-full
-              # export PGSSLCERT=/etc/secrets/app/tls.crt
-              # export PGSSLKEY=/etc/secrets/app/tls.key
-              # export PGSSLROOTCERT=/etc/secrets/ca/ca.crt
+                # Set PostgreSQL environment variables for SSL
+                # export PGSSLMODE=verify-full
+                # export PGSSLCERT=/etc/secrets/app/tls.crt
+                # export PGSSLKEY=/etc/secrets/app/tls.key
+                # export PGSSLROOTCERT=/etc/secrets/ca/ca.crt
 
-              # Create required extensions
-              psql -c "CREATE EXTENSION IF NOT EXISTS postgis;"
-              psql -c "CREATE EXTENSION IF NOT EXISTS hstore;"
+                # Create required extensions
+                psql -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+                psql -c "CREATE EXTENSION IF NOT EXISTS hstore;"
 
-              # Function to mark geography as completed
-              mark_completed() {
-                local geography=$1
-                echo "$geography" >> /etc/osm/progress/completed
-              }
+                # Function to mark geography as completed
+                mark_completed() {
+                  local geography=$1
+                  echo "$geography" >> /etc/osm/progress/completed
+                }
 
-              # Function to check if geography was already imported
-              is_completed() {
-                local geography=$1
-                local completed_file="/etc/osm/progress/completed"
-                if [ -f "$completed_file" ]; then
-                  grep -Fxq "$geography" "$completed_file"
-                  return $?
-                fi
-                return 1
-              }
-
-              # Function to import a single geography with retries
-              import_geography() {
-                local geography=$1
-                local filename=$(basename $geography)
-                local max_retries=3
-                local retry_count=0
-                echo "Downloading $geography..."
-                cd /tmp/osm-files
-                wget -q https://download.geofabrik.de/$geography
-                echo "Importing $filename..."
-                while [ $retry_count -lt $max_retries ]; do
-                  if osm2pgsql \
-                    --append \
-                    --slim \
-                    --cache 2000 \
-                    --number-processes 4 \
-                    --hstore \
-                    --multi-geometry \
-                    --flat-nodes /tmp/osm-cache/nodes.cache \
-                    --host $PGHOST \
-                    --database $PGDATABASE \
-                    --username $PGUSER \
-                    $filename; then
-                    rm $filename
-                    echo "Completed import of $geography"
-                    return 0
-                  else
-                    retry_count=$((retry_count + 1))
-                    if [ $retry_count -lt $max_retries ]; then
-                      echo "Import failed, retrying in 30 seconds... (Attempt $retry_count of $max_retries)"
-                      sleep 30
-                    fi
+                # Function to check if geography was already imported
+                is_completed() {
+                  local geography=$1
+                  local completed_file="/etc/osm/progress/completed"
+                  if [ -f "$completed_file" ]; then
+                    grep -Fxq "$geography" "$completed_file"
+                    return $?
                   fi
-                done
-                echo "Failed to import $geography after $max_retries attempts"
-                rm $filename
-                return 1
-              }
+                  return 1
+                }
 
-              # Check if database is initialized
-              INITIALIZED_FILE="/etc/osm/progress/initialized"
-              DB_INITIALIZED="false"
-              [ -f "$INITIALIZED_FILE" ] && DB_INITIALIZED="true"
-
-              # Read geographies from config and process them
-              while IFS= read -r geography; do
-                if [ -n "$geography" ]; then
-                  # Skip if already completed
-                  if is_completed "$geography"; then
-                    echo "Skipping already imported geography: $geography"
-                    continue
-                  fi
-                  if [ "$DB_INITIALIZED" = "false" ]; then
-                    # First import needs --create flag instead of --append
-                    echo "Downloading first geography: $geography..."
-                    cd /tmp/osm-files
-                    wget -q https://download.geofabrik.de/$geography
-                    filename=$(basename $geography)
-                    echo "Importing first geography: $filename..."
-                    osm2pgsql \
-                      --create \
+                # Function to import a single geography with retries
+                import_geography() {
+                  local geography=$1
+                  local filename=$(basename $geography)
+                  local max_retries=3
+                  local retry_count=0
+                  echo "Downloading $geography..."
+                  cd /tmp/osm-files
+                  wget -q https://download.geofabrik.de/$geography
+                  echo "Importing $filename..."
+                  while [ $retry_count -lt $max_retries ]; do
+                    if osm2pgsql \
+                      --append \
                       --slim \
                       --cache 2000 \
                       --number-processes 4 \
@@ -174,17 +126,65 @@ spec:
                       --host $PGHOST \
                       --database $PGDATABASE \
                       --username $PGUSER \
-                      $filename
-                    rm $filename
-                    touch "$INITIALIZED_FILE"
-                    mark_completed "$geography"
-                    DB_INITIALIZED="true"
-                  else
-                    import_geography "$geography"
-                    mark_completed "$geography"
+                      $filename; then
+                      rm $filename
+                      echo "Completed import of $geography"
+                      return 0
+                    else
+                      retry_count=$((retry_count + 1))
+                      if [ $retry_count -lt $max_retries ]; then
+                        echo "Import failed, retrying in 30 seconds... (Attempt $retry_count of $max_retries)"
+                        sleep 30
+                      fi
+                    fi
+                  done
+                  echo "Failed to import $geography after $max_retries attempts"
+                  rm $filename
+                  return 1
+                }
+
+                # Check if database is initialized
+                INITIALIZED_FILE="/etc/osm/progress/initialized"
+                DB_INITIALIZED="false"
+                [ -f "$INITIALIZED_FILE" ] && DB_INITIALIZED="true"
+
+                # Read geographies from config and process them
+                while IFS= read -r geography; do
+                  if [ -n "$geography" ]; then
+                    # Skip if already completed
+                    if is_completed "$geography"; then
+                      echo "Skipping already imported geography: $geography"
+                      continue
+                    fi
+                    if [ "$DB_INITIALIZED" = "false" ]; then
+                      # First import needs --create flag instead of --append
+                      echo "Downloading first geography: $geography..."
+                      cd /tmp/osm-files
+                      wget -q https://download.geofabrik.de/$geography
+                      filename=$(basename $geography)
+                      echo "Importing first geography: $filename..."
+                      osm2pgsql \
+                        --create \
+                        --slim \
+                        --cache 2000 \
+                        --number-processes 4 \
+                        --hstore \
+                        --multi-geometry \
+                        --flat-nodes /tmp/osm-cache/nodes.cache \
+                        --host $PGHOST \
+                        --database $PGDATABASE \
+                        --username $PGUSER \
+                        $filename
+                      rm $filename
+                      touch "$INITIALIZED_FILE"
+                      mark_completed "$geography"
+                      DB_INITIALIZED="true"
+                    else
+                      import_geography "$geography"
+                      mark_completed "$geography"
+                    fi
                   fi
-                fi
-              done < /etc/osm/geographies/geographies
+                done < /etc/osm/geographies/geographies
       volumes:
         - name: geographies
           configMap:
@@ -219,7 +219,7 @@ kind: ClusterRole
 metadata:
   name: postgis-secret-reader
 rules:
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [secrets]
     resourceNames:
       - postgis-db-ca

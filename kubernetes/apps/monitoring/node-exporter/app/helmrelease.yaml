@@ -24,7 +24,7 @@ spec:
       retries: 3
   values:
     fullnameOverride: node-exporter
-    releaseLabel: true  # disable for victoria-metrics
+    releaseLabel: true # disable for victoria-metrics
     podLabels:
       jobLabel: node-exporter
     extraArgs:

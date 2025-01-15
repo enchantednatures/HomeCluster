@@ -4,7 +4,7 @@ kind: Secret
 metadata:
   name: authentik-db-hunter
   labels:
-    cnpg.io/reload: 'true'
+    cnpg.io/reload: "true"
 type: kubernetes.io/basic-auth
 stringData:
   username: ENC[AES256_GCM,data:5C+lVJld,iv:eum8inrTwpAsYxKJh+RWWGX5DTs0xEC3+sLHuRmA+7o=,tag:Jurd6HjIJBv5hfJ4VXF9DQ==,type:str]
@@ -24,7 +24,7 @@ sops:
         WWttWmQrSDBRZDdrSXZxdXRwVlVYSncKj0JfHpuVT230bxFcgGJ4lnH1Tz9VPqao
         ciq3Upj8qGJXhBAcChN6cAj93Fjnpq8Bd0gMoXBeeLBa8lbFiEBuGg==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: '2025-01-06T01:56:14Z'
+  lastmodified: "2025-01-06T01:56:14Z"
   mac: ENC[AES256_GCM,data:dJ6u6GkDe2kQTZ4ihM+/pgBvJB2W2Hryao4wt/z2qqvoyi6XRdCUYB2TTFYpGTkHfyK6i8/1haC2Ou9ecaD4tjBHWkuWWT/4pQcXKeP0xOWhIrIVx+bitfiswhtAoc+13gkYswz4BZbM5cZBGgcQ9AJgULqsZe4l0gfJWPJbnCI=,iv:P9qMbY2YPXFdRrjDXVA/mnQg+xSegRmrb6wNQhr6GLE=,tag:Tmh4VB+CBrUmCCMm3dxLaQ==,type:str]
   pgp: []
   encrypted_regex: ^(data|stringData)$

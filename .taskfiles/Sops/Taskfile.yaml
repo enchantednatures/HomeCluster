@@ -1,18 +1,18 @@
 ---
 # yaml-language-server: $schema=https://taskfile.dev/schema.json
-version: '3'
+version: "3"
 tasks:
   age-keygen:
     desc: Initialize Age Key for Sops
     cmd: age-keygen --output {{.AGE_FILE}}
-    status: ['test -f {{.AGE_FILE}}']
+    status: ["test -f {{.AGE_FILE}}"]
   encrypt:
     desc: Encrypt all Kubernetes SOPS secrets
     cmds:
-      - for: {var: file}
+      - for: { var: file }
         task: .encrypt-file
         vars:
-          file: '{{.ITEM}}'
+          file: "{{.ITEM}}"
     vars:
       file:
         sh: find "{{.KUBERNETES_DIR}}" -type f -name "*.sops.*" -exec grep -L "ENC\[AES256_GCM"
@@ -22,7 +22,7 @@ tasks:
     dir: kubernetes
     cmds:
       - |
-        find . -maxdepth 8 -name "*.sops.yaml" | xargs -L1 sops --decrypt --age $(rg -ioP "public key: \K(.*$)" $SOPS_AGE_KEY_FILE) -i
+          find . -maxdepth 8 -name "*.sops.yaml" | xargs -L1 sops --decrypt --age $(rg -ioP "public key: \K(.*$)" $SOPS_AGE_KEY_FILE) -i
   .encrypt-file:
     internal: true
     cmd: sops --encrypt --in-place {{.file}}

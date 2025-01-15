@@ -35,7 +35,7 @@ spec:
       create: true
     deployment:
       annotations:
-        reloader.stakater.com/auto: 'true'
+        reloader.stakater.com/auto: "true"
     servers:
       - zones:
           - zone: .

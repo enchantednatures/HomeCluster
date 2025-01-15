@@ -21,10 +21,10 @@ spec:
             - sh
             - -c
             - |
-              mkdir -p /config/wg_confs
-              ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}')
-              sed "s/ENI/$ENI/g" /etc/wireguard-secret/wg0.conf.template > /config/wg_confs/wg0.conf
-              chmod 400 /config/wg_confs/wg0.conf
+                mkdir -p /config/wg_confs
+                ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}')
+                sed "s/ENI/$ENI/g" /etc/wireguard-secret/wg0.conf.template > /config/wg_confs/wg0.conf
+                chmod 400 /config/wg_confs/wg0.conf
           securityContext:
             privileged: true
           volumeMounts:

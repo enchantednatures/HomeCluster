@@ -5,13 +5,13 @@ metadata:
   name: wireguard-config
   namespace: wireguard
 data:
-  PUID: '911'
-  PGID: '911'
+  PUID: "911"
+  PGID: "911"
   TZ: America/New_York
   SERVERURL: auto
-  SERVERPORT: '51820'
-  PEERS: '1'
+  SERVERPORT: "51820"
+  PEERS: "1"
   PEERDNS: 10.96.0.10
   ALLOWEDIPS: 10.244.0.0/16, 10.96.0.0/12, 192.168.1.0/24
   INTERNAL_SUBNET: 10.8.0.0
-  LOG_CONFS: 'true'
+  LOG_CONFS: "true"

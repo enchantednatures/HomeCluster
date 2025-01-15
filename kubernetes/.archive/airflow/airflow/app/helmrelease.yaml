@@ -44,9 +44,9 @@ spec:
           enabled: true
           secretName: airflow-tls
         annotations:
-          kubernetes.io/tls-acme: 'true'
+          kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: 'true'
+          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           # This should be the in-cluster DNS name for the authentik outpost service
           # as when the external URL is specified here, nginx will overwrite some crucial headers
@@ -67,9 +67,9 @@ spec:
           enabled: true
           secretName: flower-tls
         annotations:
-          kubernetes.io/tls-acme: 'true'
+          kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: 'true'
+          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           # This should be the in-cluster DNS name for the authentik outpost service
           # as when the external URL is specified here, nginx will overwrite some crucial headers

@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   labels:
-    kubevirt.io: ''
+    kubevirt.io: ""
     pod-security.kubernetes.io/enforce: privileged
   name: kubevirt
 ---
@@ -11,7 +11,7 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.kubevirt.io: ''
+    operator.kubevirt.io: ""
   name: kubevirts.kubevirt.io
 spec:
   group: kubevirt.io
@@ -916,7 +916,12 @@ spec:
                               https://ssl-config.mozilla.org/
                             Note that SSLv3.0 is not a supported protocol version due to well known
                             vulnerabilities such as POODLE: https://en.wikipedia.org/wiki/POODLE
-                          enum: [VersionTLS10, VersionTLS11, VersionTLS12, VersionTLS13]
+                          enum: [
+                            VersionTLS10,
+                            VersionTLS11,
+                            VersionTLS12,
+                            VersionTLS13,
+                          ]
                           type: string
                       type: object
                     virtualMachineInstancesPerNode:
@@ -1031,7 +1036,7 @@ spec:
                       referenced object inside the same namespace.
                     properties:
                       name:
-                        default: ''
+                        default: ""
                         description: |-
                           Name of the referent.
                           This field is effectively required, but due to backwards compatibility is
@@ -4056,7 +4061,12 @@ spec:
                               https://ssl-config.mozilla.org/
                             Note that SSLv3.0 is not a supported protocol version due to well known
                             vulnerabilities such as POODLE: https://en.wikipedia.org/wiki/POODLE
-                          enum: [VersionTLS10, VersionTLS11, VersionTLS12, VersionTLS13]
+                          enum: [
+                            VersionTLS10,
+                            VersionTLS11,
+                            VersionTLS12,
+                            VersionTLS13,
+                          ]
                           type: string
                       type: object
                     virtualMachineInstancesPerNode:
@@ -4171,7 +4181,7 @@ spec:
                       referenced object inside the same namespace.
                     properties:
                       name:
-                        default: ''
+                        default: ""
                         description: |-
                           Name of the referent.
                           This field is effectively required, but due to backwards compatibility is
@@ -6314,8 +6324,8 @@ kind: ClusterRole
 metadata:
   name: kubevirt.io:operator
   labels:
-    operator.kubevirt.io: ''
-    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
+    operator.kubevirt.io: ""
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
 rules:
   - apiGroups: [kubevirt.io]
     resources: [kubevirts]
@@ -6333,7 +6343,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    kubevirt.io: ''
+    kubevirt.io: ""
   name: kubevirt-operator
   namespace: kubevirt
 ---
@@ -6341,11 +6351,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   labels:
-    kubevirt.io: ''
+    kubevirt.io: ""
   name: kubevirt-operator
   namespace: kubevirt
 rules:
-  - apiGroups: ['']
+  - apiGroups: [""]
     resourceNames:
       - kubevirt-ca
       - kubevirt-export-ca
@@ -6357,7 +6367,7 @@ rules:
       - kubevirt-exportproxy-certs
     resources: [secrets]
     verbs: [create, get, list, watch, patch, delete]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps]
     verbs: [create, get, list, watch, patch, delete]
   - apiGroups: [route.openshift.io]
@@ -6369,13 +6379,13 @@ rules:
   - apiGroups: [coordination.k8s.io]
     resources: [leases]
     verbs: [get, list, watch, delete, update, create, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps]
     verbs: [get, list, watch]
   - apiGroups: [route.openshift.io]
     resources: [routes]
     verbs: [list, get, watch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [secrets]
     verbs: [list, get, watch]
   - apiGroups: [networking.k8s.io]
@@ -6384,10 +6394,10 @@ rules:
   - apiGroups: [coordination.k8s.io]
     resources: [leases]
     verbs: [get, list, watch, delete, update, create, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps]
     verbs: [get, list, watch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resourceNames: [kubevirt-export-ca]
     resources: [configmaps]
     verbs: [get, list, watch]
@@ -6396,7 +6406,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
-    kubevirt.io: ''
+    kubevirt.io: ""
   name: kubevirt-operator-rolebinding
   namespace: kubevirt
 roleRef:
@@ -6412,16 +6422,16 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    kubevirt.io: ''
+    kubevirt.io: ""
   name: kubevirt-operator
 rules:
   - apiGroups: [kubevirt.io]
     resources: [kubevirts]
     verbs: [get, list, watch, patch, update, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [serviceaccounts, services, endpoints, pods/exec]
     verbs: [get, list, watch, create, update, delete, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps]
     verbs: [patch, delete]
   - apiGroups: [batch]
@@ -6463,16 +6473,16 @@ rules:
   - apiGroups: [monitoring.coreos.com]
     resources: [servicemonitors, prometheusrules]
     verbs: [get, list, watch, create, delete, update, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [namespaces]
     verbs: [get, list, watch, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [pods]
     verbs: [get, list, delete, patch]
   - apiGroups: [kubevirt.io]
     resources: [virtualmachines, virtualmachineinstances]
     verbs: [get, list, watch, patch, update]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [persistentvolumeclaims]
     verbs: [get]
   - apiGroups: [kubevirt.io]
@@ -6484,10 +6494,10 @@ rules:
   - apiGroups: [kubevirt.io]
     resources: [virtualmachineinstancepresets]
     verbs: [watch, list]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps]
     verbs: [get, list, watch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [limitranges]
     verbs: [watch, list]
   - apiGroups: [apiextensions.k8s.io]
@@ -6505,7 +6515,7 @@ rules:
   - apiGroups: [cdi.kubevirt.io]
     resources: [datasources, datavolumes]
     verbs: [get, list, watch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [namespaces]
     verbs: [get, list, watch]
   - apiGroups: [instancetype.kubevirt.io]
@@ -6521,31 +6531,31 @@ rules:
   - apiGroups: [apps]
     resources: [controllerrevisions]
     verbs: [create, list, get]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [namespaces]
     verbs: [get, list, watch, patch]
   - apiGroups: [policy]
     resources: [poddisruptionbudgets]
     verbs: [get, list, watch, delete, create, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [pods, configmaps, endpoints, services]
     verbs: [get, list, watch, delete, update, create, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [events]
     verbs: [update, create, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [secrets]
     verbs: [create]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [pods/finalizers]
     verbs: [update]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [pods/eviction]
     verbs: [create]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [pods/status]
     verbs: [patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [nodes]
     verbs: [get, list, watch, update, patch]
   - apiGroups: [apps]
@@ -6554,7 +6564,7 @@ rules:
   - apiGroups: [apps]
     resources: [controllerrevisions]
     verbs: [watch, list, create, delete, get, update]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [persistentvolumeclaims]
     verbs: [get, list, watch, create, update, delete, patch]
   - apiGroups: [snapshot.kubevirt.io]
@@ -6581,8 +6591,8 @@ rules:
       - virtualmachinepools/scale
     verbs: [watch, list, create, delete, update, patch, get]
   - apiGroups: [kubevirt.io]
-    resources: ['*']
-    verbs: ['*']
+    resources: ["*"]
+    verbs: ["*"]
   - apiGroups: [kubevirt.io]
     resources: [virtualmachines/finalizers]
     verbs: [update]
@@ -6597,8 +6607,8 @@ rules:
       - virtualmachineinstances/sev/injectlaunchsecret
     verbs: [update]
   - apiGroups: [cdi.kubevirt.io]
-    resources: ['*']
-    verbs: ['*']
+    resources: ["*"]
+    verbs: ["*"]
   - apiGroups: [k8s.cni.cncf.io]
     resources: [network-attachment-definitions]
     verbs: [get]
@@ -6633,22 +6643,22 @@ rules:
       - virtualmachineclones/status
       - virtualmachineclones/finalizers
     verbs: [get, list, watch, update, patch, delete]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [namespaces]
     verbs: [get]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [resourcequotas]
     verbs: [list, watch]
   - apiGroups: [kubevirt.io]
     resources: [virtualmachineinstances]
     verbs: [update, list, watch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [nodes]
     verbs: [patch, list, watch, get]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps]
     verbs: [get, list, watch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [events]
     verbs: [create, patch]
   - apiGroups: [apiextensions.k8s.io]
@@ -6935,7 +6945,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    kubevirt.io: ''
+    kubevirt.io: ""
   name: kubevirt-operator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -6965,7 +6975,7 @@ spec:
       labels:
         kubevirt.io: virt-operator
         name: virt-operator
-        prometheus.kubevirt.io: 'true'
+        prometheus.kubevirt.io: "true"
       name: virt-operator
     spec:
       affinity:
@@ -6980,7 +6990,7 @@ spec:
                 topologyKey: kubernetes.io/hostname
               weight: 1
       containers:
-        - args: [--port, '8443', -v, '2']
+        - args: [--port, "8443", -v, "2"]
           command: [virt-operator]
           env:
             - name: VIRT_OPERATOR_IMAGE

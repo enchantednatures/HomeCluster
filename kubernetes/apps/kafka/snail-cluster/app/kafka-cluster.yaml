@@ -19,7 +19,7 @@ spec:
         type: internal
         tls: true
     config:
-      auto.create.topics.enable: 'true'
+      auto.create.topics.enable: "true"
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2

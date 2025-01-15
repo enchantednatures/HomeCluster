@@ -32,7 +32,7 @@ spec:
         enabled: true
         annotations:
           cert-manager.io/cluster-issuer: selfsigned-issuer
-          external-dns/is-public: 'false'
+          external-dns/is-public: "false"
           kubernetes.io/ingress.class: internal
         hosts:
           - host: goldilocks.chastened.lan

@@ -1,15 +1,15 @@
 ---
-version: '3'
+version: "3"
 tasks:
   sops:encrypt:
     desc: Encrypt all sops
     dir: kubernetes
     cmds:
       - |
-        find . -maxdepth 8 -name "*.sops.yaml" | xargs -L1 sops --encrypt --age $(rg -ioP "public key: \K(.*$)" $SOPS_AGE_KEY_FILE) -i
+          find . -maxdepth 8 -name "*.sops.yaml" | xargs -L1 sops --encrypt --age $(rg -ioP "public key: \K(.*$)" $SOPS_AGE_KEY_FILE) -i
   sops:decrypt:
     desc: Encrypt all sops
     dir: kubernetes
     cmds:
       - |-
-        find . -maxdepth 8 -name "*.sops.yaml" | xargs -L1 sops --decrypt --age $(rg -ioP "public key: \K(.*$)" $SOPS_AGE_KEY_FILE) -i
+          find . -maxdepth 8 -name "*.sops.yaml" | xargs -L1 sops --decrypt --age $(rg -ioP "public key: \K(.*$)" $SOPS_AGE_KEY_FILE) -i

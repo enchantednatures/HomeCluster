@@ -79,7 +79,7 @@ metadata:
   namespace: flux-system
 spec:
   hard:
-    pods: '1000'
+    pods: "1000"
   scopeSelector:
     matchExpressions:
       - operator: In
@@ -96,30 +96,30 @@ metadata:
   name: crd-controller-flux-system
 rules:
   - apiGroups: [source.toolkit.fluxcd.io]
-    resources: ['*']
-    verbs: ['*']
+    resources: ["*"]
+    verbs: ["*"]
   - apiGroups: [kustomize.toolkit.fluxcd.io]
-    resources: ['*']
-    verbs: ['*']
+    resources: ["*"]
+    verbs: ["*"]
   - apiGroups: [helm.toolkit.fluxcd.io]
-    resources: ['*']
-    verbs: ['*']
+    resources: ["*"]
+    verbs: ["*"]
   - apiGroups: [notification.toolkit.fluxcd.io]
-    resources: ['*']
-    verbs: ['*']
+    resources: ["*"]
+    verbs: ["*"]
   - apiGroups: [image.toolkit.fluxcd.io]
-    resources: ['*']
-    verbs: ['*']
-  - apiGroups: ['']
+    resources: ["*"]
+    verbs: ["*"]
+  - apiGroups: [""]
     resources: [namespaces, secrets, configmaps, serviceaccounts]
     verbs: [get, list, watch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [events]
     verbs: [create, patch]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps]
     verbs: [get, list, watch, create, update, patch, delete]
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps/status]
     verbs: [get, update, patch]
   - apiGroups: [coordination.k8s.io]
@@ -135,8 +135,8 @@ metadata:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v2.4.0
-    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
-    rbac.authorization.k8s.io/aggregate-to-edit: 'true'
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
   name: flux-edit-flux-system
 rules:
   - apiGroups:
@@ -145,7 +145,7 @@ rules:
       - helm.toolkit.fluxcd.io
       - image.toolkit.fluxcd.io
       - kustomize.toolkit.fluxcd.io
-    resources: ['*']
+    resources: ["*"]
     verbs: [create, delete, deletecollection, patch, update]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -155,9 +155,9 @@ metadata:
     app.kubernetes.io/instance: flux-system
     app.kubernetes.io/part-of: flux
     app.kubernetes.io/version: v2.4.0
-    rbac.authorization.k8s.io/aggregate-to-admin: 'true'
-    rbac.authorization.k8s.io/aggregate-to-edit: 'true'
-    rbac.authorization.k8s.io/aggregate-to-view: 'true'
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
   name: flux-view-flux-system
 rules:
   - apiGroups:
@@ -166,7 +166,7 @@ rules:
       - helm.toolkit.fluxcd.io
       - image.toolkit.fluxcd.io
       - kustomize.toolkit.fluxcd.io
-    resources: ['*']
+    resources: ["*"]
     verbs: [get, list, watch]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -393,7 +393,7 @@ spec:
                           required: [provider]
                           type: object
                         version:
-                          default: '*'
+                          default: "*"
                           description: |-
                             Version semver expression, ignored for charts from v1.GitRepository and
                             v1beta2.Bucket sources. Defaults to latest when omitted.
@@ -1117,14 +1117,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 failures:
@@ -1487,7 +1493,7 @@ spec:
                           required: [provider]
                           type: object
                         version:
-                          default: '*'
+                          default: "*"
                           description: |-
                             Version semver expression, ignored for charts from v1beta2.GitRepository and
                             v1beta2.Bucket sources. Defaults to latest when omitted.
@@ -1890,7 +1896,14 @@ spec:
                                           Op indicates the operation to perform. Its value MUST be one of "add", "remove", "replace", "move", "copy", or
                                           "test".
                                           https://datatracker.ietf.org/doc/html/rfc6902#section-4
-                                        enum: [test, remove, add, replace, move, copy]
+                                        enum: [
+                                          test,
+                                          remove,
+                                          add,
+                                          replace,
+                                          move,
+                                          copy,
+                                        ]
                                         type: string
                                       path:
                                         description: |-
@@ -2276,14 +2289,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 failures:
@@ -2659,7 +2678,7 @@ spec:
                           required: [provider]
                           type: object
                         version:
-                          default: '*'
+                          default: "*"
                           description: |-
                             Version semver expression, ignored for charts from v1beta2.GitRepository and
                             v1beta2.Bucket sources. Defaults to latest when omitted.
@@ -3058,7 +3077,14 @@ spec:
                                           Op indicates the operation to perform. Its value MUST be one of "add", "remove", "replace", "move", "copy", or
                                           "test".
                                           https://datatracker.ietf.org/doc/html/rfc6902#section-4
-                                        enum: [test, remove, add, replace, move, copy]
+                                        enum: [
+                                          test,
+                                          remove,
+                                          add,
+                                          replace,
+                                          move,
+                                          copy,
+                                        ]
                                         type: string
                                       path:
                                         description: |-
@@ -3468,14 +3494,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 failures:
@@ -3722,8 +3754,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: helm-controller
     spec:
@@ -4243,14 +4275,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 inventory:
@@ -4766,14 +4804,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastAppliedRevision:
@@ -5282,7 +5326,7 @@ spec:
                   pattern: ^([0-9]+(\.[0-9]+)?(ms|s|m|h))+$
                   type: string
                 validation:
-                  description: 'Deprecated: Not used in v1beta2.'
+                  description: "Deprecated: Not used in v1beta2."
                   enum: [none, client, server]
                   type: string
                 wait:
@@ -5336,14 +5380,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 inventory:
@@ -5426,8 +5476,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: kustomize-controller
     spec:
@@ -5678,14 +5728,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 observedGeneration:
@@ -5883,14 +5939,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -6217,14 +6279,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 observedGeneration:
@@ -6410,14 +6478,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -6759,14 +6833,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -6958,14 +7038,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 observedGeneration:
@@ -7159,14 +7245,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -7270,8 +7362,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: notification-controller
     spec:
@@ -7652,14 +7744,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -7874,14 +7972,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -8217,14 +8321,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -8560,14 +8670,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 includedArtifacts:
@@ -8937,14 +9053,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 includedArtifacts:
@@ -9296,14 +9418,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 contentConfigChecksum:
@@ -9615,7 +9743,7 @@ spec:
                   required: [provider]
                   type: object
                 version:
-                  default: '*'
+                  default: "*"
                   description: |-
                     Version is the chart version semver expression, ignored for charts from
                     GitRepository and Bucket sources. Defaults to latest when omitted.
@@ -9711,14 +9839,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -9892,7 +10026,7 @@ spec:
                     type: string
                   type: array
                 version:
-                  default: '*'
+                  default: "*"
                   description: |-
                     The chart version semver expression, ignored for charts from GitRepository
                     and Bucket sources. Defaults to latest when omitted.
@@ -9971,14 +10105,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -10195,7 +10335,7 @@ spec:
                   required: [provider]
                   type: object
                 version:
-                  default: '*'
+                  default: "*"
                   description: |-
                     Version is the chart version semver expression, ignored for charts from
                     GitRepository and Bucket sources. Defaults to latest when omitted.
@@ -10291,14 +10431,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -10612,14 +10758,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -10824,14 +10976,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -11102,14 +11260,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 lastHandledReconcileAt:
@@ -11467,14 +11631,20 @@ spec:
                       status:
                         description: status of the condition, one of True, False,
                           Unknown.
-                        enum: ['True', 'False', Unknown]
+                        enum: ["True", "False", Unknown]
                         type: string
                       type:
                         description: type of condition in CamelCase or in foo.example.com/CamelCase.
                         maxLength: 316
                         pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
                         type: string
-                    required: [lastTransitionTime, message, reason, status, type]
+                    required: [
+                      lastTransitionTime,
+                      message,
+                      reason,
+                      status,
+                      type,
+                    ]
                     type: object
                   type: array
                 contentConfigChecksum:
@@ -11589,8 +11759,8 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/port: '8080'
-        prometheus.io/scrape: 'true'
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
       labels:
         app: source-controller
     spec:

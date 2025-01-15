@@ -6,9 +6,9 @@ metadata:
   name: enchanted-api
   namespace: enchanted-natures
   annotations:
-    kubernetes.io/tls-acme: 'true'
+    kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns/is-public: 'true'
+    external-dns/is-public: "true"
     external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   ingressClassName: external
@@ -34,5 +34,5 @@ spec:
                 port:
                   number: 6969
   tls:
-    - hosts: ['api.${SECRET_DOMAIN}', 'production-api.${SECRET_DOMAIN}']
+    - hosts: ["api.${SECRET_DOMAIN}", "production-api.${SECRET_DOMAIN}"]
       secretName: api-tls

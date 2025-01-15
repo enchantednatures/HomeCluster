@@ -67,7 +67,7 @@ spec:
                   apiVersion: v1
                   fieldPath: status.podIP
             - name: KUBERNETES_SERVICE_PORT
-              value: '6443'
+              value: "6443"
           volumeMounts:
             - name: values
               mountPath: /root/app/values.yaml

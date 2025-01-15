@@ -60,7 +60,7 @@ spec:
         className: internal
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-        hosts: [&host 'tempo-query.${SECRET_DOMAIN}']
+        hosts: [&host "tempo-query.${SECRET_DOMAIN}"]
         tls:
           - secretName: tempo-tls
             hosts: [*host]

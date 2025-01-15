@@ -58,6 +58,6 @@ spec:
             headersToUpstreamOnAllow: [set-cookie, x-authentik-*]
             includeRequestHeadersInCheck: [cookie]
             pathPrefix: /outpost.goauthentik.io/auth/envoy
-            port: '9000'
+            port: "9000"
             service: ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local
           name: authentik

@@ -33,6 +33,6 @@ spec:
       className: external
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
-        kubernetes.io/tls-acme: 'true'
-        external-dns/is-public: 'true'
+        kubernetes.io/tls-acme: "true"
+        external-dns/is-public: "true"
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}

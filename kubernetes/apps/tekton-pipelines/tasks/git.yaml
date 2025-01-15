@@ -39,7 +39,7 @@ spec:
         - name: revision
           value: $(params.git-revision)
         - name: deleteExisting
-          value: 'true'
+          value: "true"
     - name: run-unit-tests
       runAfter: [fetch-source]
       taskRef:

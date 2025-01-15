@@ -4,7 +4,7 @@ kind: ClusterRole
 metadata:
   name: gatus
 rules:
-  - apiGroups: ['']
+  - apiGroups: [""]
     resources: [configmaps, secrets]
     verbs: [get, watch, list]
 ---

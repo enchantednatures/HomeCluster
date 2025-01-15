@@ -5,7 +5,7 @@ kind: ScheduledBackup
 metadata:
   name: authentik-db
 spec:
-  schedule: '@hourly'
+  schedule: "@hourly"
   immediate: true
   backupOwnerReference: self
   cluster:

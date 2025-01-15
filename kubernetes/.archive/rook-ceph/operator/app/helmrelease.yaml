@@ -180,7 +180,7 @@ spec:
             limits:
               memory: 96Mi
               cpu: 100m
-    cephCommandsTimeoutSeconds: '20'
+    cephCommandsTimeoutSeconds: "20"
     monitoring:
       enabled: true
       createPrometheusRules: true

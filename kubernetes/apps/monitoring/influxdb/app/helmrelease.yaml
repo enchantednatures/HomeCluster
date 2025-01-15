@@ -55,8 +55,8 @@ spec:
       hostname: &host influxdb.${SECRET_DOMAIN}
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
-        kubernetes.io/tls-acme: 'true'
-        external-dns/is-public: 'true'
+        kubernetes.io/tls-acme: "true"
+        external-dns/is-public: "true"
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 
         # nginx.ingress.kubernetes.io/auth-url: |-

@@ -61,7 +61,7 @@ spec:
         providers:
           - name: default
             orgId: 1
-            folder: ''
+            folder: ""
             type: file
             disableDeletion: false
             editable: true
@@ -152,8 +152,8 @@ spec:
               tracesToMetrics:
                 datasourceUid: Prometheus
                 tags:
-                  - {key: service.name, value: service}
-                  - {key: job}
+                  - { key: service.name, value: service }
+                  - { key: job }
               serviceMap:
                 datasourceUid: Prometheus
               nodeGraph:
@@ -171,19 +171,19 @@ spec:
     dashboards:
       default:
         cloudflared:
-          gnetId: 17457  # https://grafana.com/grafana/dashboards/17457?tab=revisions
+          gnetId: 17457 # https://grafana.com/grafana/dashboards/17457?tab=revisions
           revision: 6
           datasource:
-            - {name: DS_PROMETHEUS, value: Prometheus}
+            - { name: DS_PROMETHEUS, value: Prometheus }
         external-dns:
-          gnetId: 15038  # https://grafana.com/grafana/dashboards/15038?tab=revisions
+          gnetId: 15038 # https://grafana.com/grafana/dashboards/15038?tab=revisions
           revision: 1
           datasource: Prometheus
         cert-manager:
           url: https://raw.githubusercontent.com/monitoring-mixins/website/master/assets/cert-manager/dashboards/cert-manager.json
           datasource: Prometheus
         node-exporter-full:
-          gnetId: 1860  # https://grafana.com/grafana/dashboards/1860?tab=revisions
+          gnetId: 1860 # https://grafana.com/grafana/dashboards/1860?tab=revisions
           revision: 31
           datasource: Prometheus
       flux:
@@ -230,7 +230,7 @@ spec:
       dashboards:
         enabled: true
         searchNamespace: ALL
-        labelValue: ''
+        labelValue: ""
         label: grafana_dashboard
         folderAnnotation: grafana_folder
         provider:
@@ -239,7 +239,7 @@ spec:
       datasources:
         enabled: true
         searchNamespace: ALL
-        labelValue: ''
+        labelValue: ""
     serviceMonitor:
       enabled: true
     ingress:
@@ -247,8 +247,8 @@ spec:
       ingressClassName: external
       annotations:
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        external-dns.alpha.kubernetes.io/is-public: 'true'
-      hosts: [&host 'grafana.${SECRET_DOMAIN}']
+        external-dns.alpha.kubernetes.io/is-public: "true"
+      hosts: [&host "grafana.${SECRET_DOMAIN}"]
       tls:
         - hosts: [*host]
     testFramework:

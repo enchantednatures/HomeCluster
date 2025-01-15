@@ -21,4 +21,4 @@ spec:
       family: ccio
   workloadUpdateStrategy:
     workloadUpdateMethods:
-      - LiveMigrate  # enable if you have deployed either Longhorn or NFS-CSI for shared storage.
+      - LiveMigrate # enable if you have deployed either Longhorn or NFS-CSI for shared storage.

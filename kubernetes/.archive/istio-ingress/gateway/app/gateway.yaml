@@ -13,7 +13,7 @@ spec:
         number: 80
         name: http
         protocol: HTTP
-      hosts: ['external.${SECRET_DOMAIN}', '*.${SECRET_DOMAIN}']
+      hosts: ["external.${SECRET_DOMAIN}", "*.${SECRET_DOMAIN}"]
       # tls:
       #   httpsRedirect: true  # Redirect all HTTP traffic to HTTPS
     - port:
@@ -23,4 +23,4 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: ${SECRET_DOMAIN/./-}-production-tls
-      hosts: ['external.${SECRET_DOMAIN}', '*.${SECRET_DOMAIN}']
+      hosts: ["external.${SECRET_DOMAIN}", "*.${SECRET_DOMAIN}"]

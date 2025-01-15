@@ -7,4 +7,4 @@ metadata:
 spec:
   action: ALLOW
   rules:
-    - {}  # Empty rule matches all traffic
+    - {} # Empty rule matches all traffic

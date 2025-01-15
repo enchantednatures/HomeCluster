@@ -24,8 +24,8 @@ spec:
       retries: 3
   values:
     oauth: {}
-    installCRDs: 'true'
+    installCRDs: "true"
     proxyConfig:
       firewallMode: auto
     apiServerProxyConfig:
-      mode: 'true' # "true", "false", "noauth"
+      mode: "true" # "true", "false", "noauth"

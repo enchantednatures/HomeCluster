@@ -4,8 +4,12 @@ ignore: |
   crds.yaml
 extends: default
 rules:
+  brackets:
+    forbid: true
   truthy:
-    allowed-values: ['true', 'false']
+    allowed-values:
+      - "true"
+      - "false"
   comments:
     min-spaces-from-content: 1
   line-length: disable

@@ -41,7 +41,7 @@ spec:
     service:
       type: ClusterIP
       port: 8080
-      nodePort: ''
+      nodePort: ""
       annotations: {}
     ingress:
       enabled: true
@@ -63,7 +63,7 @@ spec:
     serviceAccount:
       create: true
       labels: {}
-      name: ''
+      name: ""
     rbac:
       create: true
       labels: {}
@@ -74,8 +74,8 @@ spec:
         namespace: monitoring
         labels: {}
         annotations: {}
-        interval: ''
-        scrapeTimeout: ''
+        interval: ""
+        scrapeTimeout: ""
         metricRelabelings: []
         relabelings: []
       dashboards:

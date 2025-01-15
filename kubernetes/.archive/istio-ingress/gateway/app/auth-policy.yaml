@@ -13,7 +13,7 @@ spec:
   provider:
     name: authentik
   rules:
-    - {}  # Apply to all requests
+    - {} # Apply to all requests
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
@@ -37,7 +37,7 @@ spec:
         value:
           name: envoy.ext_authz
           typed_config:
-            '@type': type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+            "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
             http_service:
               server_uri:
                 uri: http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000

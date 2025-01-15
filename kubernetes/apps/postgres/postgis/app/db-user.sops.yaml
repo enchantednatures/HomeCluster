@@ -23,7 +23,7 @@ sops:
         d0Mxc1VUaHplcDNlNWJJSWdJYzBaM00KLmQOUt3evyGVwuYgWiwEfp1oc92lO4S8
         BLOI0RsApjIeYTpiM0VNLq4UKsrF040Kdcea+DpofJvtUZXz8P9mSQ==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: '2024-11-30T06:53:15Z'
+  lastmodified: "2024-11-30T06:53:15Z"
   mac: ENC[AES256_GCM,data:dYQNQy79qrlGWzyVSJqK0/lC9vbrPvrsIwo1HhsfSSfzl/x+jBLpmnzlIE+2cGchYFUJYM3eZxImY9ap7qWpzI/OYRUAxVQ+8VEjuiaEMVETx3guSPcF9X8pUbZddJz9yvSfQ3oFD5bNniYUFXCNWBcQM8K4TH2WLgWdFy19kMY=,iv:kBHKEHFzkmRiRRTxHFpFFGyO++Pi5NyAWDMbmuVxIys=,tag:5i9kSk5WlgA9ImCxt27LGw==,type:str]
   pgp: []
   encrypted_regex: ^(data|stringData)$

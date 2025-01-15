@@ -5,7 +5,7 @@ metadata:
   name: authentik
   namespace: authentik
 spec:
-  hosts: ['authentik.${SECRET_DOMAIN}']
+  hosts: ["authentik.${SECRET_DOMAIN}"]
   gateways: [istio-ingress/external-gateway]
   http:
     - match:

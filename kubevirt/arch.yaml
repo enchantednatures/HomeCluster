@@ -24,7 +24,7 @@ spec:
       labels:
         kubevirt.io/vm: arch-vm
       annotations:
-        kubevirt.io/allow-pod-bridge-network-live-migration: 'true'
+        kubevirt.io/allow-pod-bridge-network-live-migration: "true"
     spec:
       evictionStrategy: LiveMigrate
       domain:

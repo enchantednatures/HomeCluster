@@ -78,10 +78,10 @@ spec:
         ingressClassName: external
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          kubernetes.io/tls-acme: 'true'
-          external-dns/is-public: 'true'
+          kubernetes.io/tls-acme: "true"
+          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        hosts: [&host 'auth.${SECRET_DOMAIN}']
+        hosts: [&host "auth.${SECRET_DOMAIN}"]
         tls:
           - secretName: authentik-tls
             hosts: [*host]
@@ -110,7 +110,7 @@ spec:
       postgresql:
         host: 192.168.1.241
       redis:
-        host: dragonfly.dragonflydb.svc.cluster.local   #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
+        host: dragonfly.dragonflydb.svc.cluster.local #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
     postgresql:
       enabled: false
     redis:
