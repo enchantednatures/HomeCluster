@@ -80,6 +80,7 @@ spec:
             any: true
       extraArgs:
         default-ssl-certificate: networking/${SECRET_DOMAIN/./-}-production-tls
+        udp-services-configmap: $(POD_NAMESPACE)/udp-services
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
