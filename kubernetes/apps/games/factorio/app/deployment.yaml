@@ -34,5 +34,5 @@ spec:
           persistentVolumeClaim:
             claimName: factorio-data
         - name: factorio-config
-          configMap:
-            name: factorio-config
+          secret:
+            secretName: factorio-config
