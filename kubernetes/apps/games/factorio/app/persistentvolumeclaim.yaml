@@ -4,6 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: factorio-data
 spec:
+  storageClassName: openebs-hostpath
   accessModes:
     - ReadWriteOnce
   resources:
