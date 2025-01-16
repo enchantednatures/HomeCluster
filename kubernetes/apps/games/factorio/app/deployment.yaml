@@ -15,24 +15,29 @@ spec:
     spec:
       containers:
         - name: factorio
-          image: factoriotools/factorio:latest
+          image: ofsm/ofsm:latest
           ports:
             - containerPort: 34197
               protocol: UDP
-            - containerPort: 27015
+            - containerPort: 80
               protocol: TCP
           env:
-            - name: LOAD_LATEST_SAVE
-              value: "true"
+            - name: FACTORIO_VERSION
+              value: "2.0.28"
           volumeMounts:
-            - name: factorio-data
-              mountPath: /factorio
             - name: factorio-config
-              mountPath: /factorio/config
+              mountPath: /opt/factorio/config
+            - name: factorio-mods
+              mountPath: /opt/factorio/mods
+            - name: factorio-saves
+              mountPath: /opt/factorio/saves
       volumes:
-        - name: factorio-data
+        - name: factorio-mods
           persistentVolumeClaim:
-            claimName: factorio-data
+            claimName: factorio-mods
+        - name: factorio-saves
+          persistentVolumeClaim:
+            claimName: factorio-saves
         - name: factorio-config
-          secret:
-            secretName: factorio-config
+          persistentVolumeClaim:
+            claimName: factorio-config

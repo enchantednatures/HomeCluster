@@ -14,6 +14,13 @@ spec:
     - host: &host factorio.${SECRET_DOMAIN}
       http:
         paths:
+          - path: /ui
+            pathType: Prefix
+            backend:
+              service:
+                name: factorio-service
+                port:
+                  name: ui
           - path: /
             pathType: Prefix
             backend:

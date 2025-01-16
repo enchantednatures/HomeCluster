@@ -6,4 +6,3 @@ resources:
   - ./service.yaml
   - ./ingress.yaml
   - ./persistentvolumeclaim.yaml
-  - ./secret.sops.yaml

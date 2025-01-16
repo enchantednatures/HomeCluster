@@ -10,9 +10,9 @@ spec:
       port: 34197
       protocol: UDP
       targetPort: 34197
-    - name: rcon
-      port: 27015
+    - name: ui
+      port: 80
       protocol: TCP
-      targetPort: 27015
+      targetPort: 80
   selector:
     app: factorio
