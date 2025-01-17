@@ -26,7 +26,7 @@ spec:
     keepHistory: false
   valuesFrom:
     - targetPath: yamlApplicationConfig
-      kind: secret
+      kind: Secret
       name: kafka-ui-secret
       valuesKey: config.yml
   values:
