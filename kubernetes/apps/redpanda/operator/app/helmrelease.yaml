@@ -24,4 +24,6 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values: {}
+  values:
+    image:
+      tag: v2.3.5-24.3.2
