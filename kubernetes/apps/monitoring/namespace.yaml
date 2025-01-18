@@ -8,7 +8,7 @@ metadata:
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
-    istio-injection: enabled
+    # istio-injection: enabled
 # ---
 # apiVersion: apiserver.config.k8s.io/v1
 # kind: AdmissionConfiguration

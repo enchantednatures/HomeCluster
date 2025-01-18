@@ -6,6 +6,13 @@ metadata:
   namespace: knative-eventing
 spec:
   config:
+    default-br-config: |
+      clusterDefault:
+        brokerClass: Kafka
+        apiVersion: v1
+        kind: ConfigMap
+        name: kafka-broker-config
+        namespace: knative-eventing
     config-br-default-channel:
       channel-template-spec: |
         apiVersion: messaging.knative.dev/v1beta1

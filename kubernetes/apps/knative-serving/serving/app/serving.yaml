@@ -6,7 +6,7 @@ metadata:
 spec:
   ingress:
     istio:
-      enabled: true
+      enabled: false
   config:
     autoscaler:
       enable-scale-to-zero: "true"
