@@ -40,3 +40,10 @@ spec:
       monitor:
         enabled: true
         honorLabels: true
+      prometheusSpec:
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+    kube-state-metrics:
+      metricLabelsAllowlist:
+        - pods=[*]
+        - deployments=[app.kubernetes.io/name,app.kubernetes.io/component,app.kubernetes.io/instance]
