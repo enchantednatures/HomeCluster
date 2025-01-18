@@ -7,3 +7,4 @@ resources:
   - https://github.com/knative-extensions/eventing-kafka-broker/releases/download/knative-v1.16.1/eventing-kafka-controller.yaml
   - https://github.com/knative-extensions/eventing-kafka-broker/releases/download/knative-v1.16.1/eventing-kafka-broker.yaml
   - https://github.com/knative-extensions/eventing-kafka-broker/releases/download/knative-v1.16.1/eventing-kafka-sink.yaml
+  - https://raw.githubusercontent.com/knative-extensions/monitoring/main/servicemonitor.yaml
