@@ -18,6 +18,8 @@ data:
     containerRuntime:
       integration: containerd
       socketPath: /var/run/k3s/containerd/containerd.sock
+    socketLB:
+      hostNamespaceOnly: true
     endpointRoutes:
       enabled: true
     hubble:
