@@ -1,3 +1,13 @@
+# ---
+# apiVersion: postgresql.cnpg.io/v1
+# kind: Database
+# metadata:
+#   name: authentik-db
+# spec:
+#   name: authentik
+#   owner: authentik
+#   cluster:
+#     name: authentik-db
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
@@ -34,6 +44,14 @@ spec:
         passwordSecret:
           name: authentik-db-hunter
         inRoles: [pg_monitor, pg_signal_backend]
+      - name: authentik
+        ensure: present
+        comment: Authentik
+        login: true
+        superuser: false
+        passwordSecret:
+          name: authentik-db-user
+        inRoles: [pg_monitor, pg_signal_backend]
   backup:
     retentionPolicy: 30d
     barmanObjectStore:
@@ -44,8 +62,6 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      # Note: serverName version needs to be incremented
-      # when recovering from an existing cnpg cluster
       serverName: &currentCluster authentik-v0
       s3Credentials:
         accessKeyId:
@@ -54,22 +70,16 @@ spec:
         secretAccessKey:
           name: pg-backup-secret
           key: aws-secret-access-key
-  # Note: previousCluster needs to be set to the name of the previous
-  # cluster when recovering from an existing cnpg cluster
   bootstrap:
-    # initdb:
-    #   database: authentik
-    #   owner: authentik
-    #   secret:
-    #     name: authentik-db-user
-    recovery:
-      recovery:
-        source: tower
-  #     source: &previousCluster postgres-v0
-  #     database: app
-  #     owner: app
-  #     secret:
-  #       name: postgres-app-user
+    initdb:
+      database: authentik
+      owner: authentik
+      import:
+        type: microservice
+        databases:
+          - authentik
+        source:
+          externalCluster: tower
   externalClusters:
     - name: tower
       connectionParameters:
