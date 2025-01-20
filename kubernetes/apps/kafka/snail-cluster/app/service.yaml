@@ -33,11 +33,6 @@ spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
   ports:
-    - name: postgres
-      port: 5432
-      protocol: TCP
-      targetPort: 5432
-  ports:
   - name: tcp-replication
     port: 9091
     protocol: TCP
