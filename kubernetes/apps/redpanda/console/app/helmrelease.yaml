@@ -30,9 +30,8 @@ spec:
 
     service:
       type: LoadBalancer
-      port: 8080
-      loadBalancerClass: tailscale
-      annotations: {}
+      annotations:
+        service.kubernetes.io/load-balancer-class: "tailscale"
     ingress:
       enabled: false
       className: external
