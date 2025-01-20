@@ -4,6 +4,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: authentik-db
+  namespace: authentik
   labels:
     app.kubernetes.io/name: authentik-db
 spec:
@@ -56,18 +57,26 @@ spec:
   # Note: previousCluster needs to be set to the name of the previous
   # cluster when recovering from an existing cnpg cluster
   bootstrap:
-    initdb:
-      database: authentik
-      owner: authentik
-      secret:
-        name: authentik-db-user
+    # initdb:
+    #   database: authentik
+    #   owner: authentik
+    #   secret:
+    #     name: authentik-db-user
   #   recovery:
   #     source: &previousCluster postgres-v0
   #     database: app
   #     owner: app
   #     secret:
   #       name: postgres-app-user
-  # externalClusters:
+  externalClusters:
+    - name: cluster-example
+      connectionParameters:
+        host: 192.168.1.241
+        user: authentik
+        dbname: authentik
+      password:
+        name: tower-db-credentials
+        key: password
   #   - name: *previousCluster
   #     barmanObjectStore:
   #       <<: *barmanObjectStore
