@@ -62,14 +62,16 @@ spec:
     #   owner: authentik
     #   secret:
     #     name: authentik-db-user
-  #   recovery:
+    recovery:
+      recovery:
+        source: tower
   #     source: &previousCluster postgres-v0
   #     database: app
   #     owner: app
   #     secret:
   #       name: postgres-app-user
   externalClusters:
-    - name: cluster-example
+    - name: tower
       connectionParameters:
         host: 192.168.1.241
         user: authentik
