@@ -9,3 +9,4 @@ resources:
   - db-user.sops.yaml
   - scheduled-backup.yaml
   - superusersecret.sops.yaml
+  - hunter-user.sops.yaml
