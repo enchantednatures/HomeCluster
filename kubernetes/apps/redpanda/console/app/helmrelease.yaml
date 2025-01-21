@@ -27,11 +27,7 @@ spec:
         kafka:
           brokers:
             - snail-kafka-bootstrap.kafka.svc.cluster.local:9092
-
-    service:
-      type: LoadBalancer
-      annotations:
-        service.kubernetes.io/load-balancer-class: "tailscale"
+            - kafka-kafka-bootstrap.snail.svc.cluster.local:9092
     ingress:
       enabled: false
       className: external
