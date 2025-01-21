@@ -24,7 +24,7 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: csi-nfs
+    storageClass: openebs-hostpath
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
@@ -54,7 +54,7 @@ spec:
         inRoles: [pg_monitor, pg_signal_backend]
   backup:
     retentionPolicy: 30d
-    barmanObjectStore:
+    barmanObjectStore: &barmanObjectStore
       data:
         compression: bzip2
       wal:
@@ -62,7 +62,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster authentik-v0
+      serverName: &currentCluster authentik-v1
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -71,25 +71,14 @@ spec:
           name: pg-backup-secret
           key: aws-secret-access-key
   bootstrap:
-    initdb:
+    recovery:
+      source: &previousCluster authentik-v0
       database: authentik
       owner: authentik
-      import:
-        type: microservice
-        databases:
-          - authentik
-        source:
-          externalCluster: tower
+      secret:
+        name: authentik-db-user
   externalClusters:
-    - name: tower
-      connectionParameters:
-        host: 192.168.1.241
-        user: authentik
-        dbname: authentik
-      password:
-        name: tower-db-credentials
-        key: password
-  #   - name: *previousCluster
-  #     barmanObjectStore:
-  #       <<: *barmanObjectStore
-  #       serverName: *previousCluster
+    - name: *previousCluster
+      barmanObjectStore:
+        <<: *barmanObjectStore
+        serverName: *previousCluster
