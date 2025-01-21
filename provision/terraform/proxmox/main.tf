@@ -7,7 +7,7 @@ module "talos" {
   }
 
   image = {
-    version = "v1.8.3"
+    version = "v1.9.1"
     schematic = file("${path.module}/talos/image/schematic.yaml")
   }
 
@@ -20,7 +20,7 @@ module "talos" {
     name            = "talos"
     endpoint        = "192.168.1.201"
     gateway         = "192.168.1.1"
-    talos_version   = "v1.7"
+    talos_version   = "v1.9.1"
     proxmox_cluster = "homelab"
   }
 
@@ -32,7 +32,8 @@ module "talos" {
       mac_address   = "BC:24:11:2E:C8:01"
       vm_id         = 800
       cpu           = 8
-      ram_dedicated = 32768
+      ram_dedicated = 16984
+      datastore_id  = "local-lvm"
       disk_size     = 32
     }
     # "ctrl-02" = {
@@ -111,7 +112,7 @@ module "talos" {
       machine_type  = "worker"
       ip            = "192.168.1.215"
       mac_address   = "BC:24:11:2E:08:04"
-      vm_id         = 813
+      vm_id         = 814
       cpu           = 4
       ram_dedicated = 4096
       disk_size     = 16
@@ -124,7 +125,7 @@ module "talos" {
       machine_type  = "worker"
       ip            = "192.168.1.216"
       mac_address   = "BC:24:11:2E:08:05"
-      vm_id         = 813
+      vm_id         = 815
       cpu           = 4
       ram_dedicated = 4096
       disk_size     = 16
