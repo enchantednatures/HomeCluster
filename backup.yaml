@@ -16,3 +16,12 @@ metadata:
 spec:
   cluster:
     name: postgres-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  generateName: authentik-backup-
+  namespace: authentik
+spec:
+  cluster:
+    name: authentik-db
