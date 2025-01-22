@@ -1,13 +1,14 @@
-# ---
-# apiVersion: postgresql.cnpg.io/v1
-# kind: Database
-# metadata:
-#   name: authentik-db
-# spec:
-#   name: authentik
-#   owner: authentik
-#   cluster:
-#     name: authentik-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: authentik-db
+  namespace: authentik
+spec:
+  name: authentik
+  owner: authentik
+  cluster:
+    name: authentik-db
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
@@ -62,7 +63,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster authentik-v1
+      serverName: &currentCluster authentik-v2.0
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -71,14 +72,15 @@ spec:
           name: pg-backup-secret
           key: aws-secret-access-key
   bootstrap:
-    recovery:
-      source: &previousCluster authentik-v0
-      database: authentik
-      owner: authentik
-      secret:
-        name: authentik-db-user
-  externalClusters:
-    - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+    initdb: {}
+  #   recovery:
+  #     source: &previousCluster authentik-v0
+  #     database: authentik
+  #     owner: authentik
+  #     secret:
+  #       name: authentik-db-user
+  # externalClusters:
+  #   - name: *previousCluster
+  #     barmanObjectStore:
+  #       <<: *barmanObjectStore
+  #       serverName: *previousCluster
