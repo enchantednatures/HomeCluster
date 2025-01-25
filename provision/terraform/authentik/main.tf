@@ -1,84 +1,45 @@
-
-data "authentik_group" "minio_admins" {
-  name = "Minio admins"
+resource "authentik_group" "open_webui_users" {
+  name         = "Open WebUI Users"
+  is_superuser = false
 }
 
-resource "authentik_user" "loki_service" {
-  username = "loki-service"
-  name     = "Loki Service"
-  type = "service_account"
-  groups = [data.authentik_group.minio_admins.id]
+resource "authentik_group" "argocd_users" {
+  name         = "Argo CD Users"
+  is_superuser = false
 }
 
-# resource "authentik_token" "loki_token" {
-#   identifier  = "loki-minio-app-password"
-#   user        = authentik_user.loki_service.id
-#   description = "My secret token"
-#   expiring = false
-#   intent = "app_password"
-#   retrieve_key = true
-# }
-
-
-
-
-resource "minio_iam_service_account" "loki_account" {
-  target_user = "minio"
-  description = "Loki"
+resource "authentik_group" "enchanted_natures" {
+  name         = "Enchanted Natures"
+  is_superuser = false
 }
 
-resource "minio_s3_bucket" "loki_chunks_bucket" {
-  bucket = "loki-chunks"
-  acl    = "private"
+resource "authentik_group" "snail" {
+  name         = "snail"
+  is_superuser = false
 }
 
-resource "minio_s3_bucket" "loki_ruler_bucket" {
-  bucket = "loki-ruler"
-  acl    = "private"
+resource "authentik_group" "thanos" {
+  name         = "thanos"
+  is_superuser = false
 }
 
-resource "minio_s3_bucket" "loki_admin_bucket" {
-  bucket = "loki-admin"
-  acl    = "private"
+
+data "authentik_flow" "default-provider-invalidation-flow" {
+  slug = "default-provider-invalidation-flow"
 }
 
-resource "minio_s3_bucket" "tempo_bucket" {
-  bucket = "tempo"
-  acl    = "private"
+data "authentik_flow" "default-authentication-flow" {
+  slug = "default-authentication-flow"
+
+}
+data "authentik_flow" "default-authorization-flow" {
+  slug = "default-provider-authorization-implicit-consent"
 }
 
-# resource "kubernetes_secret" "example" {
-#   metadata {
-#     name = "loki-bucket"
-#     namespace = "monitoring"
-#   }
-
-#   data = {
-#     ACCESS_KEY = minio_iam_service_account.loki_account.access_key
-#     ACCESS_SECRET = minio_iam_service_account.loki_account.secret_key
-#   }
-
-#   type = "stringData"
-# }
-
-resource "authentik_user" "harbor_service" {
-  username = "harbor-service"
-  name     = "Harbor Service"
-  type = "service_account"
-  groups = [data.authentik_group.minio_admins.id]
-}
-
-resource "minio_s3_bucket" "harbor_registry_bucket" {
-  bucket = "harbor-registry"
-  acl    = "private"
-}
-
-resource "minio_s3_bucket" "tekton_bucket" {
-  bucket = "tekton"
-  acl    = "private"
-}
-
-resource "minio_s3_bucket" "tofu_bucket" {
-  bucket = "tofu"
-  acl    = "private"
+data "authentik_property_mapping_provider_scope" "scopes" {
+  managed_list = [
+    "goauthentik.io/providers/oauth2/scope-email",
+    "goauthentik.io/providers/oauth2/scope-profile",
+    "goauthentik.io/providers/oauth2/scope-openid"
+  ]
 }
