@@ -44,6 +44,7 @@ spec:
   maxHistory: 3
   values:
     gateway:
+      enabled: true
       replica: 5
     loki:
       auth_enabled: false
@@ -130,9 +131,6 @@ spec:
         enabled: true
         storageClass: openebs-hostpath
         size: 10Gi
-    gateway:
-      enabled: true
-      replicas: 2
   valuesFrom:
     - targetPath: loki.storage.bucketNames.chunks
       kind: ConfigMap
