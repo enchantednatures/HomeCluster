@@ -40,4 +40,4 @@ spec:
             resources:
               requests:
                 storage: 10Gi
-            storageClassName: csi-nfs
+            storageClassName: openebs-hostpath

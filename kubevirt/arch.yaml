@@ -7,7 +7,7 @@ metadata:
   labels:
     app: arch-vm-pvc
 spec:
-  storageClassName: csi-nfs
+  storageClassName: openebs-hostpath
   accessModes: [ReadWriteOnce]
   resources:
     requests:

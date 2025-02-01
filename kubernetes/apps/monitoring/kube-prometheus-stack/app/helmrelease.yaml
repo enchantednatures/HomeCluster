@@ -155,7 +155,7 @@ spec:
         storageSpec:
           volumeClaimTemplate:
             spec:
-              storageClassName: csi-nfs
+              storageClassName: openebs-hostpath
               resources:
                 requests:
                   storage: 10Gi

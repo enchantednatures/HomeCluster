@@ -87,13 +87,21 @@ spec:
         replicas: 1
         persistence:
           enabled: true
+          storageClass: openebs-hostpath
+          size: 10Gi
+      ruler:
+        replicas: 1
+        persistence:
+          enabled: true
+          storageClass: openebs-hostpath
           size: 10Gi
       read:
-        replicas: 1
+        replicas: 3
       backend:
         replicas: 1
         persistence:
           enabled: true
+          storageClass: openebs-hostpath
           size: 10Gi
       gateway:
         enabled: true
@@ -102,6 +110,29 @@ spec:
         enabled: true
       prometheusRule:
         enabled: true
+    write:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
+    ruler:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
+    read:
+      replicas: 3
+    backend:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
+    gateway:
+      enabled: true
+      replicas: 2
   valuesFrom:
     - targetPath: loki.storage.bucketNames.chunks
       kind: ConfigMap
