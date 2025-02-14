@@ -158,7 +158,7 @@ spec:
               storageClassName: openebs-hostpath
               resources:
                 requests:
-                  storage: 10Gi
+                  storage: 1Gi
     grafana:
       enabled: false
       forceDeployDashboards: true
