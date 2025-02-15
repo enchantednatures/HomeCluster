@@ -7,13 +7,13 @@ module "talos" {
   }
 
   image = {
-    version = "v1.9.1"
+    version   = "v1.9.1"
     schematic = file("${path.module}/talos/image/schematic.yaml")
   }
 
   cilium = {
     install = file("${path.module}/talos/inline-manifests/cilium-install.yaml")
-    values = file("${path.module}/templates/cilium/values.yaml")
+    values  = file("${path.module}/templates/cilium/values.yaml")
   }
 
   cluster = {
@@ -76,7 +76,7 @@ module "talos" {
       vm_id         = 811
       cpu           = 16
       ram_dedicated = 16384
-      disk_size     = 32
+      disk_size     = 128
       datastore_id  = "local-lvm"
       igpu          = true
     }
@@ -89,7 +89,7 @@ module "talos" {
       vm_id         = 812
       cpu           = 8
       ram_dedicated = 16384
-      disk_size     = 32
+      disk_size     = 128
       datastore_id  = "local-lvm"
       igpu          = true
     }
@@ -102,7 +102,7 @@ module "talos" {
       vm_id         = 813
       cpu           = 8
       ram_dedicated = 16384
-      disk_size     = 32
+      disk_size     = 128
       datastore_id  = "local-lvm"
       igpu          = true
     }
@@ -115,7 +115,7 @@ module "talos" {
       vm_id         = 814
       cpu           = 4
       ram_dedicated = 4096
-      disk_size     = 16
+      disk_size     = 64
       datastore_id  = "local-lvm"
       igpu          = true
     }
@@ -128,7 +128,7 @@ module "talos" {
       vm_id         = 815
       cpu           = 4
       ram_dedicated = 4096
-      disk_size     = 16
+      disk_size     = 64
       datastore_id  = "local-lvm"
       igpu          = true
     }
