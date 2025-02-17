@@ -63,7 +63,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster authentik-v2.0
+      serverName: &currentCluster authentik-v2
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -72,15 +72,14 @@ spec:
           name: pg-backup-secret
           key: aws-secret-access-key
   bootstrap:
-    initdb: {}
-  #   recovery:
-  #     source: &previousCluster authentik-v0
-  #     database: authentik
-  #     owner: authentik
-  #     secret:
-  #       name: authentik-db-user
-  # externalClusters:
-  #   - name: *previousCluster
-  #     barmanObjectStore:
-  #       <<: *barmanObjectStore
-  #       serverName: *previousCluster
+    recovery:
+      source: &previousCluster authentik-v0
+      database: authentik
+      owner: authentik
+      secret:
+        name: authentik-db-user
+    externalClusters:
+      - name: *previousCluster
+        barmanObjectStore:
+          <<: *barmanObjectStore
+          serverName: *previousCluster
