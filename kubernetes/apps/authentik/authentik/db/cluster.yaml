@@ -78,8 +78,8 @@ spec:
       owner: authentik
       secret:
         name: authentik-db-user
-    externalClusters:
-      - name: *previousCluster
-        barmanObjectStore:
-          <<: *barmanObjectStore
-          serverName: *previousCluster
+  externalClusters:
+    - name: *previousCluster
+      barmanObjectStore:
+        <<: *barmanObjectStore
+        serverName: *previousCluster
