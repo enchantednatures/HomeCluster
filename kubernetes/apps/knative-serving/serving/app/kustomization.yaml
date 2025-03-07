@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./serving.yaml
   - ./cluster-role.yaml
-  - https://github.com/knative/net-istio/releases/download/knative-v1.16.0/net-istio.yaml
+  # - https://github.com/knative/net-istio/releases/download/knative-v1.16.0/net-istio.yaml
