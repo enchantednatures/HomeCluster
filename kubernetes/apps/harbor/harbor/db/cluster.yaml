@@ -47,7 +47,7 @@ spec:
         inRoles: [pg_monitor, pg_signal_backend]
       - name: harbor
         ensure: present
-        comment: Authentik
+        comment: harbor
         login: true
         superuser: false
         passwordSecret:
@@ -72,15 +72,24 @@ spec:
           name: pg-backup-secret
           key: aws-secret-access-key
   bootstrap:
-    todo: "fixme"
-    # recovery:
-    #   source: &previousCluster harbor-v0
-    #   database: harbor
-    #   owner: harbor
-    #   secret:
-    #     name: harbor-db-user
+    pg_basebackup:
+      source: tower-db
+
+  storage:
+    size: 1Gi
+
   externalClusters:
-    - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+  - name: tower-db
+    connectionParameters:
+      host: 192.168.1.241
+      user: streaming_replica
+      sslmode: verify-full
+    sslKey:
+      name: cluster-example-replication
+      key: tls.key
+    sslCert:
+      name: cluster-example-replication
+      key: tls.crt
+    sslRootCert:
+      name: cluster-example-ca
+      key: ca.crt
