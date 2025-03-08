@@ -36,6 +36,9 @@ spec:
               repository: ghcr.io/home-assistant/home-assistant
               tag: 2025.3.0@sha256:26c51e44d9322c93ffc361ff830ca7d0b08274eebbfea9aac0935e2986cb2544
             ports:
+              - name: http
+                containerPort: 8123
+                protocol: TCP
             env:
               VENV_FOLDER: /venv
             resources:
