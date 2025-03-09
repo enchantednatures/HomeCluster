@@ -38,8 +38,10 @@ spec:
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
+      - --source=istio-gateway
+      - --source=istio-virtualservice
     policy: sync
-    sources: [crd, ingress]
+    sources: [crd, ingress, istio-virtualservice, istio-gateway]
     txtPrefix: k8s.
     txtOwnerId: default
     domainFilters: ["${SECRET_DOMAIN}"]
