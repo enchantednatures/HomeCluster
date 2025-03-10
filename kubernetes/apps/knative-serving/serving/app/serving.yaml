@@ -16,6 +16,9 @@ spec:
         - name: external-gateway
           namespace: istio-ingress
           service: istio-gateway.istio-ingress.svc.cluster.local
+      local-gateway: |
+        namespace: istio-ingress
+        service: istio-gateway.istio-ingress.svc.cluster.local
     autoscaler:
       enable-scale-to-zero: "false"
   high-availability:
