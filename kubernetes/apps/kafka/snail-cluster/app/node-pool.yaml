@@ -10,5 +10,5 @@ spec:
   roles: [broker, controller]
   storage:
     type: persistent-claim
-    size: 50Gi
+    size: 10Gi
     class: csi-nfs
