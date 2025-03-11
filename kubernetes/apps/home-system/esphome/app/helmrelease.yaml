@@ -1,0 +1,49 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: esphome
+  namespace: home-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.2
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  values:
+    esphome:
+      containers:
+        app:
+          image:
+            repository: esphome/esphome
+            tag: 2025.2.2@sha256:3dfeee93031a057642f2d082fa6a938c72ad8ff30bb634c6bbe74f4a2986629a
+          env:
+            ESPHOME_DASHBOARD_USE_PING: true
+          probes:
+            liveness:
+              enabled: true
+            readiness:
+              enabled: true
+            startup:
+              enabled: true
+              spec:
+                failureThreshold: 30
+                periodSeconds: 5
+          resources:
+            requests:
+              cpu: 100m
+              memory: 500Mi
+            limits:
+              memory: 4Gi
+    service:
+      app:
+        controller: esphome
+        ports:
+          http:
+            port: 6052
