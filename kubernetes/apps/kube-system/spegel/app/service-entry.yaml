@@ -1,0 +1,48 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: docker-hub-registry
+  namespace: kube-system
+spec:
+  hosts:
+    - "docker.io"
+    - "registry-1.docker.io"
+    - "auth.docker.io"
+    - "production.cloudflare.docker.com"
+    - "*.docker.io"
+  ports:
+    - number: 80
+      name: http
+      protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: docker-hub-tls
+  namespace: kube-system
+spec:
+  host: "*.docker.io"
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-spegel-egress
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spegel
+  action: ALLOW
+  rules:
+    - to:
+        - operation:
+            hosts: ["*.docker.io", "docker.io", "registry-1.docker.io"]
