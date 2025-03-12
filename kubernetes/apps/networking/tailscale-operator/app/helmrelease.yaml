@@ -28,9 +28,10 @@ spec:
     image:
       repository: docker.io/tailscale/k8s-operator
       tag: v1.80.3
-    proxyImage:
-      repository: docker.io/tailscale/tailscale
-      tag: v1.80.3
+    proxyConfig:
+      image:
+        repository: tailscale/tailscale
+        tag: v1.80.3
     proxyConfig:
       firewallMode: auto
     apiServerProxyConfig:
