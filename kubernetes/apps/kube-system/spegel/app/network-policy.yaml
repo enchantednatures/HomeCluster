@@ -14,6 +14,8 @@ spec:
       ports:
         - port: 29999
           protocol: TCP
+        - port: 5000
+          protocol: TCP
   egress:
     - {}  # Allow all outbound traffic to pull images from external registries
 ---
@@ -34,4 +36,42 @@ spec:
             namespaces: ["*"]  # Allow from all namespaces
       to:
         - operation:
-            ports: ["29999"]
+            ports: ["29999", "5000"]
+---
+# Allow spegel pod-to-pod communication
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-spegel-mirror-communication
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spegel
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/ns/kube-system/sa/spegel"]
+      to:
+        - operation:
+            ports: ["5000"]
+---
+# Allow any pod to communicate with any spegel pod
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all-to-spegel
+  namespace: kube-system
+spec:
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            namespaces: ["*"]
+      to:
+        - operation:
+            ports: ["29999", "5000"]
+        - operation:
+            hosts: ["*.kube-system.svc.cluster.local"]
+            ports: ["29999", "5000"]

@@ -9,6 +9,8 @@ spec:
     - "registry-1.docker.io"
     - "auth.docker.io"
     - "production.cloudflare.docker.com"
+    - "docker.io"
+    - "index.docker.io"
   ports:
     - number: 80
       name: http
@@ -31,6 +33,9 @@ spec:
     - "registry.k8s.io"
     - "quay.io"
     - "gcr.io"
+    - "k8s.gcr.io"
+    - "storage.googleapis.com"
+    - "mirror.gcr.io"
   ports:
     - number: 80
       name: http
@@ -41,6 +46,45 @@ spec:
   resolution: DNS
   location: MESH_EXTERNAL
 ---
+# ServiceEntry for specific registries - AWS ECR
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: aws-ecr-registry
+  namespace: kube-system
+spec:
+  hosts:
+    - "public.ecr.aws"
+  ports:
+    - number: 80
+      name: http
+      protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+---
+# ServiceEntry for Azure Container Registry
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: azure-cr-registry
+  namespace: kube-system
+spec:
+  hosts:
+    - "azurecr.io"
+  ports:
+    - number: 80
+      name: http
+      protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+---
+# DestinationRules for TLS
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
@@ -48,6 +92,17 @@ metadata:
   namespace: kube-system
 spec:
   host: "registry-1.docker.io"
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: docker-io-tls
+  namespace: kube-system
+spec:
+  host: "docker.io"
   trafficPolicy:
     tls:
       mode: SIMPLE
@@ -63,6 +118,40 @@ spec:
     tls:
       mode: SIMPLE
 ---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: quay-io-tls
+  namespace: kube-system
+spec:
+  host: "quay.io"
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: gcr-io-tls
+  namespace: kube-system
+spec:
+  host: "gcr.io"
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: registry-k8s-io-tls
+  namespace: kube-system
+spec:
+  host: "registry.k8s.io"
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+---
+# Global AuthorizationPolicy for registry access
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
@@ -76,5 +165,20 @@ spec:
   rules:
     - to:
         - operation:
-            hosts: ["registry-1.docker.io", "auth.docker.io", "production.cloudflare.docker.com",
-                   "ghcr.io", "registry.k8s.io", "quay.io", "gcr.io"]
+            hosts:
+              [
+                "registry-1.docker.io",
+                "auth.docker.io",
+                "production.cloudflare.docker.com",
+                "docker.io",
+                "index.docker.io",
+                "ghcr.io",
+                "registry.k8s.io",
+                "quay.io",
+                "gcr.io",
+                "k8s.gcr.io",
+                "storage.googleapis.com",
+                "mirror.gcr.io",
+                "public.ecr.aws",
+                "azurecr.io"
+              ]
