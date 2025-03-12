@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo-tailscale
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: tempo
+    app.kubernetes.io/instance: tempo
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: tempo.${SECRET_DOMAIN}
+    lbipam.cilium.io/ips: 192.168.1.244
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+    - name: tempo
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+  selector:
+    app.kubernetes.io/name: tempo

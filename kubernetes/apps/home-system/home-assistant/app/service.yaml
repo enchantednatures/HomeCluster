@@ -1,0 +1,22 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hass-tailscale
+  namespace: home-system
+  labels:
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/instance: home-assistant
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
+    lbipam.cilium.io/ips: 192.168.1.244
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+    - name: hass
+      port: 8123
+      protocol: TCP
+      targetPort: 8123
+  selector:
+    app.kubernetes.io/name: home-assistant

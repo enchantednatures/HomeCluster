@@ -1,0 +1,73 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: harbor-db
+  namespace: harbor
+spec:
+  name: harbor
+  owner: harbor
+  cluster:
+    name: harbor-db
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: harbor-db
+  namespace: harbor
+  labels:
+    app.kubernetes.io/name: harbor-db
+spec:
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
+  instances: 3
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: openebs-hostpath
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: postgres-superuser
+  postgresql:
+    parameters:
+      max_connections: "300"
+      shared_buffers: 512MB
+  monitoring:
+    enablePodMonitor: true
+  managed:
+    roles:
+      - name: hunter
+        ensure: present
+        comment: Hunter
+        login: true
+        superuser: true
+        passwordSecret:
+          name: harbor-db-hunter
+        inRoles: [pg_monitor, pg_signal_backend]
+      - name: harbor
+        ensure: present
+        comment: harbor
+        login: true
+        superuser: false
+        passwordSecret:
+          name: harbor-db-user
+        inRoles: [pg_monitor, pg_signal_backend]
+  backup:
+    retentionPolicy: 30d
+    barmanObjectStore: &barmanObjectStore
+      data:
+        compression: bzip2
+      wal:
+        compression: bzip2
+        maxParallel: 8
+      destinationPath: s3://cloudnative-pg/
+      endpointURL: http://minio-service.networking.svc.cluster.local:9768
+      serverName: &currentCluster harbor-v0
+      s3Credentials:
+        accessKeyId:
+          name: pg-backup-secret
+          key: aws-access-key-id
+        secretAccessKey:
+          name: pg-backup-secret
+          key: aws-secret-access-key

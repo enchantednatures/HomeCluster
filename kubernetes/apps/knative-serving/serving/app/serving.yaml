@@ -1,14 +1,25 @@
----
 apiVersion: operator.knative.dev/v1beta1
 kind: KnativeServing
 metadata:
   name: knative-serving
+  namespace: knative-serving
 spec:
   ingress:
     istio:
-      enabled: false
+      enabled: true
+      knative-ingress-gateway:
+        selector:
+          istio: istio-gateway
   config:
+    istio:
+      external-gateways: |
+        - name: external-gateway
+          namespace: istio-ingress
+          service: istio-gateway.istio-ingress.svc.cluster.local
+      local-gateway: |
+        namespace: istio-ingress
+        service: istio-gateway.istio-ingress.svc.cluster.local
     autoscaler:
-      enable-scale-to-zero: "true"
+      enable-scale-to-zero: "false"
   high-availability:
     replicas: 3
