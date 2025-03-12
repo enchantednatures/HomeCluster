@@ -6,11 +6,31 @@ metadata:
   namespace: kube-system
 spec:
   hosts:
-    - "docker.io"
     - "registry-1.docker.io"
     - "auth.docker.io"
     - "production.cloudflare.docker.com"
-    - "*.docker.io"
+  ports:
+    - number: 80
+      name: http
+      protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+  resolution: DNS
+  location: MESH_EXTERNAL
+---
+# Add a ServiceEntry for ghcr.io and other common registries
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: other-registries
+  namespace: kube-system
+spec:
+  hosts:
+    - "ghcr.io"
+    - "registry.k8s.io"
+    - "quay.io"
+    - "gcr.io"
   ports:
     - number: 80
       name: http
@@ -24,10 +44,21 @@ spec:
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: docker-hub-tls
+  name: registry-tls
   namespace: kube-system
 spec:
-  host: "*.docker.io"
+  host: "registry-1.docker.io"
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: other-registries-tls
+  namespace: kube-system
+spec:
+  host: "ghcr.io"
   trafficPolicy:
     tls:
       mode: SIMPLE
@@ -45,4 +76,5 @@ spec:
   rules:
     - to:
         - operation:
-            hosts: ["*.docker.io", "docker.io", "registry-1.docker.io"]
+            hosts: ["registry-1.docker.io", "auth.docker.io", "production.cloudflare.docker.com",
+                   "ghcr.io", "registry.k8s.io", "quay.io", "gcr.io"]
