@@ -12,6 +12,8 @@
 #     hostPath:
 #       path: /etc/cri/conf.d/hosts
 #       type: DirectoryOrCreate
+podAnnotations:
+  sidecar.istio.io/inject: "false"
 spegel:
   containerdSock: /run/containerd/containerd.sock
   containerdRegistryConfigPath: /etc/cri/conf.d/hosts
