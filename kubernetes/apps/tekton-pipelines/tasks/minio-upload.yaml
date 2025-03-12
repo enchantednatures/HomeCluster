@@ -35,4 +35,3 @@ spec:
         mc cp kraken_get_open_orders minio/$(params.minio-bucket)/kraken_get_open_orders
         mc cp kraken_place_order minio/$(params.minio-bucket)/kraken_place_order
 ---
-...
