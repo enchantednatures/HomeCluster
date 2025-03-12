@@ -8,3 +8,19 @@ spec:
   action: ALLOW
   rules:
     - {} # Empty rule matches all traffic
+---
+# Explicitly allow service-to-service communication
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: global-allow-service-communication
+  namespace: istio-system
+spec:
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["*"]
+      to:
+        - operation:
+            ports: ["*"]

@@ -77,6 +77,9 @@ data:
     k8sServicePort: 6443
     kubeProxyReplacement: true
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
+    # Ensure proper integration with Istio
+    istio:
+      enabled: true
     l2announcements:
       enabled: true
       # https://github.com/cilium/cilium/issues/26586

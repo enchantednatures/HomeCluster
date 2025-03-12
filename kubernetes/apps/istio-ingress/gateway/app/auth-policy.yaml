@@ -13,7 +13,14 @@ spec:
   provider:
     name: authentik
   rules:
-    - {} # Apply to all requests
+    - to:
+        - operation:
+            hosts:
+              - "*.${SECRET_DOMAIN}"
+              - "*.enchantednatures.com"
+            # Exclude system paths that need to be accessible without auth
+            not:
+              paths: ["/healthz", "/metrics", "/.well-known/*"]
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: EnvoyFilter
