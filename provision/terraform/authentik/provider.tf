@@ -34,11 +34,11 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "2.35.1"
+      version = "2.36.0"
     }
     bitwarden = {
       source  = "maxlaverse/bitwarden"
-      version = "0.12.1"
+      version = "0.13.0"
     }
   }
 }
