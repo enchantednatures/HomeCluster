@@ -1,3 +1,4 @@
+---
 # Updated pipeline.yaml
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
@@ -37,7 +38,7 @@ spec:
         - name: revision
           value: $(params.git-revision)
     - name: build-image
-      runAfter: ["fetch-source"]
+      runAfter: [fetch-source]
       taskRef:
         name: kaniko
       workspaces:
@@ -49,7 +50,7 @@ spec:
         - name: DOCKERFILE
           value: ./Dockerfile
     - name: run-tests
-      runAfter: ["fetch-source"]
+      runAfter: [fetch-source]
       taskRef:
         name: docker-build-and-run
       workspaces:
@@ -61,7 +62,7 @@ spec:
         - name: CONTEXT
           value: .
     - name: push-image
-      runAfter: ["build-image", "run-tests"]
+      runAfter: [build-image, run-tests]
       taskRef:
         name: docker-push
       params:
@@ -76,3 +77,4 @@ spec:
         - name: registry-password
           value: $(params.registry-password)
 ---
+...

@@ -1,3 +1,4 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -10,7 +11,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: 6.24.0
+      version: 6.28.0
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -43,6 +44,7 @@ spec:
   maxHistory: 3
   values:
     gateway:
+      enabled: true
       replica: 5
     loki:
       auth_enabled: false
@@ -86,13 +88,21 @@ spec:
         replicas: 1
         persistence:
           enabled: true
+          storageClass: openebs-hostpath
+          size: 10Gi
+      ruler:
+        replicas: 1
+        persistence:
+          enabled: true
+          storageClass: openebs-hostpath
           size: 10Gi
       read:
-        replicas: 1
+        replicas: 3
       backend:
         replicas: 1
         persistence:
           enabled: true
+          storageClass: openebs-hostpath
           size: 10Gi
       gateway:
         enabled: true
@@ -101,6 +111,26 @@ spec:
         enabled: true
       prometheusRule:
         enabled: true
+    write:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
+    ruler:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
+    read:
+      replicas: 3
+    backend:
+      replicas: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
   valuesFrom:
     - targetPath: loki.storage.bucketNames.chunks
       kind: ConfigMap

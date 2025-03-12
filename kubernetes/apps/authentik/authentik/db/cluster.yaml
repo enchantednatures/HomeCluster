@@ -1,9 +1,21 @@
 ---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: authentik-db
+  namespace: authentik
+spec:
+  name: authentik
+  owner: authentik
+  cluster:
+    name: authentik-db
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: authentik-db
+  namespace: authentik
   labels:
     app.kubernetes.io/name: authentik-db
 spec:
@@ -13,19 +25,37 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: csi-nfs
+    storageClass: openebs-hostpath
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
   postgresql:
     parameters:
-      max_connections: '300'
+      max_connections: "300"
       shared_buffers: 512MB
   monitoring:
     enablePodMonitor: true
+  managed:
+    roles:
+      - name: hunter
+        ensure: present
+        comment: Hunter
+        login: true
+        superuser: true
+        passwordSecret:
+          name: authentik-db-hunter
+        inRoles: [pg_monitor, pg_signal_backend]
+      - name: authentik
+        ensure: present
+        comment: Authentik
+        login: true
+        superuser: false
+        passwordSecret:
+          name: authentik-db-user
+        inRoles: [pg_monitor, pg_signal_backend]
   backup:
     retentionPolicy: 30d
-    barmanObjectStore:
+    barmanObjectStore: &barmanObjectStore
       data:
         compression: bzip2
       wal:
@@ -33,9 +63,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      # Note: serverName version needs to be incremented
-      # when recovering from an existing cnpg cluster
-      serverName: &currentCluster authentik-v0
+      serverName: &currentCluster authentik-v2
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -43,23 +71,15 @@ spec:
         secretAccessKey:
           name: pg-backup-secret
           key: aws-secret-access-key
-  # Note: previousCluster needs to be set to the name of the previous
-  # cluster when recovering from an existing cnpg cluster
   bootstrap:
-    initdb:
+    recovery:
+      source: &previousCluster authentik-v0
       database: authentik
       owner: authentik
       secret:
         name: authentik-db-user
-      postInitTemplatsSQL: []
-  #   recovery:
-  #     source: &previousCluster postgres-v0
-  #     database: app
-  #     owner: app
-  #     secret:
-  #       name: postgres-app-user
-  # externalClusters:
-  #   - name: *previousCluster
-  #     barmanObjectStore:
-  #       <<: *barmanObjectStore
-  #       serverName: *previousCluster
+  externalClusters:
+    - name: *previousCluster
+      barmanObjectStore:
+        <<: *barmanObjectStore
+        serverName: *previousCluster

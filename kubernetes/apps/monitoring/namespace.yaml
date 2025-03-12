@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -7,6 +8,7 @@ metadata:
     pod-security.kubernetes.io/enforce: privileged
     pod-security.kubernetes.io/audit: privileged
     pod-security.kubernetes.io/warn: privileged
+    # istio-injection: enabled
 # ---
 # apiVersion: apiserver.config.k8s.io/v1
 # kind: AdmissionConfiguration
@@ -16,9 +18,9 @@ metadata:
 #   - name: PodSecurity
 #     configuration:
 #       defaults:
-#         enforce: "privileged" # Change from baseline to privileged
+#         enforce: "privileged"  # Change from baseline to privileged
 #         enforce-version: "latest"
 #       exemptions:
 #         usernames: []
 #         runtimeClasses: []
-#         namespaces: [monitoring] # Add your namespace here
+#         namespaces: [monitoring]  # Add your namespace here

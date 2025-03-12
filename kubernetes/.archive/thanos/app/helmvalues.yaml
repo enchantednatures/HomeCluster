@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: thanos-values
 data:
-  values.yaml: |
+  values.yaml: |-
     image:
       repository: bitnami/thanos
     query:

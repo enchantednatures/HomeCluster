@@ -7,7 +7,6 @@ resources:
   - ./helmrelease.yaml
 configMapGenerator:
   - name: cloudflared-configmap
-    files:
-      - ./configs/config.yaml
+    files: [./configs/config.yaml]
 generatorOptions:
   disableNameSuffixHash: true

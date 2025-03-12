@@ -9,11 +9,11 @@ metadata:
 spec:
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
   imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
-  instances: 3
+  instances: 1
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: csi-nfs
+    storageClass: openebs-hostpath
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
@@ -23,6 +23,24 @@ spec:
       shared_buffers: 512MB
   monitoring:
     enablePodMonitor: true
+  managed:
+    roles:
+      - name: hunter
+        ensure: present
+        comment: Hunter
+        login: true
+        superuser: true
+        passwordSecret:
+          name: db-hunter
+        inRoles: [pg_monitor, pg_signal_backend]
+      - name: spanner
+        ensure: present
+        comment: Spanner
+        login: true
+        superuser: false
+        passwordSecret:
+          name: spanner-db-user
+        inRoles: [pg_monitor, pg_signal_backend]
   backup:
     retentionPolicy: 30d
     barmanObjectStore: &barmanObjectStore
@@ -35,7 +53,7 @@ spec:
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
       # Note: serverName version needs to be incremented
       # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgres-v1
+      serverName: &currentCluster postgres-v3
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -53,7 +71,7 @@ spec:
     #     name: postgres-app-user
     #   postInitTemplatsSQL: []
     recovery:
-      source: &previousCluster postgres-v0
+      source: &previousCluster postgres-v2
       database: app
       owner: app
       secret:

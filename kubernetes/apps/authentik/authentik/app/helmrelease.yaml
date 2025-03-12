@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: authentik
-      version: 2024.12.1
+      version: 2025.2.1
       sourceRef:
         kind: HelmRepository
         name: authentik
@@ -78,10 +78,10 @@ spec:
         ingressClassName: external
         annotations:
           cert-manager.io/cluster-issuer: letsencrypt-production
-          kubernetes.io/tls-acme: 'true'
-          external-dns/is-public: 'true'
+          kubernetes.io/tls-acme: "true"
+          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        hosts: [&host 'auth.${SECRET_DOMAIN}']
+        hosts: [&host "auth.${SECRET_DOMAIN}"]
         tls:
           - secretName: authentik-tls
             hosts: [*host]
@@ -108,9 +108,9 @@ spec:
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
       postgresql:
-        host: 192.168.1.241
+        host: authentik-db-rw.authentik.svc.cluster.local
       redis:
-        host: dragonfly.dragonflydb.svc.cluster.local   #"{{ .Release.Name }}-redis-master" host: "192.168.1.241" #"{{ .Release.Name }}-redis-master"
+        host: dragonfly.authentik.svc.cluster.local
     postgresql:
       enabled: false
     redis:

@@ -45,8 +45,7 @@ spec:
         - name: output
           workspace: shared-workspace
     - name: build-and-push
-      runAfter:
-        - fetch-source
+      runAfter: [fetch-source]
       taskRef:
         name: kaniko
         kind: Task

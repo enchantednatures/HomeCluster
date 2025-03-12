@@ -4,5 +4,4 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./scrape-config.yaml
-  - ./secret.yaml
   - ./rules.yaml

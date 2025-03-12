@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
@@ -9,23 +10,22 @@ spec:
   params:
     - name: git-url
       type: string
-      description: "URL of the git repo"
+      description: URL of the git repo
     - name: git-revision
       type: string
-      description: "Git revision to checkout"
-      default: "main"
+      description: Git revision to checkout
+      default: main
     - name: image-name
       type: string
-      description: "Name of the image to build"
+      description: Name of the image to build
     - name: image-tag
       type: string
-      description: "Tag for the built image"
-      default: "latest"
+      description: Tag for the built image
+      default: latest
     - name: dockerfile-path
       type: string
-      description: "Path to the Dockerfile"
-      default: "Dockerfile"
-
+      description: Path to the Dockerfile
+      default: Dockerfile
   tasks:
     - name: fetch-source
       taskRef:
@@ -40,9 +40,8 @@ spec:
           value: $(params.git-revision)
         - name: deleteExisting
           value: "true"
-
     - name: run-unit-tests
-      runAfter: ["fetch-source"]
+      runAfter: [fetch-source]
       taskRef:
         name: docker-test
       workspaces:
@@ -50,12 +49,11 @@ spec:
           workspace: shared-workspace
       params:
         - name: context
-          value: "."
+          value: .
         - name: dockerfile
           value: $(params.dockerfile-path)
-
     - name: build-and-push
-      runAfter: ["run-unit-tests"]
+      runAfter: [run-unit-tests]
       taskRef:
         name: kaniko
       workspaces:
@@ -69,7 +67,7 @@ spec:
         - name: DOCKERFILE
           value: $(params.dockerfile-path)
         - name: CONTEXT
-          value: "."
+          value: .
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -109,8 +107,7 @@ spec:
     - name: shared-workspace
       volumeClaimTemplate:
         spec:
-          accessModes:
-            - ReadWriteOnce
+          accessModes: [ReadWriteOnce]
           resources:
             requests:
               storage: 1Gi
@@ -119,8 +116,8 @@ spec:
         secretName: docker-config
   params:
     - name: git-url
-      value: "https://github.com/your-org/your-repo.git"
+      value: https://github.com/your-org/your-repo.git
     - name: image-name
-      value: "registry.example.com/your-image"
+      value: registry.example.com/your-image
     - name: image-tag
-      value: "1.0.0"
+      value: 1.0.0

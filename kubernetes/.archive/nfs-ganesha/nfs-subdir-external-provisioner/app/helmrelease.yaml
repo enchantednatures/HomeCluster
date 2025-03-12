@@ -29,11 +29,9 @@ spec:
       # When set to false leader election will be disabled
       enabled: false
     nfs:
-      server: "192.168.1.89"
+      server: 192.168.1.89
       path: /
-      mountOptions:
-        - nfsvers=4.1
-        - hard
+      mountOptions: [nfsvers=4.1, hard]
     storageClass:
       name: rack-nfs-client
       defaultClass: true

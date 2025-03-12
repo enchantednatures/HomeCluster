@@ -8,8 +8,7 @@ metadata:
     app: open-webui
 spec:
   storageClassName: csi-nfs
-  accessModes:
-    - ReadWriteOnce
+  accessModes: [ReadWriteOnce]
   resources:
     requests:
       storage: 1Gi # Adjust storage size as needed

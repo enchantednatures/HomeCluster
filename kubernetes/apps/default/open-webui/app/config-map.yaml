@@ -6,6 +6,6 @@ metadata:
   namespace: default
 stringData:
   ENABLE_WEBSOCKET_SUPPORT: "true"
-  WEBSOCKET_MANAGER: "redis"
-  WEBSOCKET_REDIS_URL: "redis://open-webui-dragonfly:6379/1"
+  WEBSOCKET_MANAGER: redis
+  WEBSOCKET_REDIS_URL: redis://open-webui-dragonfly:6379/1
   ENABLE_OAUTH_SIGNUP: "true"

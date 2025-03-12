@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -28,19 +29,18 @@ spec:
     # operator:
     ingress:
       enabled: true
-      ingressClassName: "external"
+      ingressClassName: external
       annotations:
-        nginx.ingress.kubernetes.io/auth-url: "http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx"
-        nginx.ingress.kubernetes.io/auth-signin: "https://auth.enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri"
-        nginx.ingress.kubernetes.io/auth-response-headers: "Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid"
+        nginx.ingress.kubernetes.io/auth-url: http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+        nginx.ingress.kubernetes.io/auth-signin: https://auth.enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri
+        nginx.ingress.kubernetes.io/auth-response-headers: Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
         nginx.ingress.kubernetes.io/auth-snippet: |
           proxy_set_header X-Forwarded-Host $http_host;
         kubernetes.io/tls-acme: "true"
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
       template: "{{name}}.{{namespace}}.flink.${SECRET_DOMAIN}/"
-    watchNamespaces:
-      - flink
+    watchNamespaces: [flink]
     webhook:
       create: true

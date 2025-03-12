@@ -29,18 +29,16 @@ spec:
       enabled: true
     dashboard:
       ingress:
-          enabled: true
-          annotations:
-            cert-manager.io/cluster-issuer: "selfsigned-issuer"
-            external-dns/is-public: "false"
-            kubernetes.io/ingress.class: "internal"
-          hosts:
-            - host: goldilocks.chastened.lan
-              paths:
-                - path: /
-                  type: ImplementationSpecific
-
-          tls:
-            - hosts:
-                - goldilocks.chastened.lan
-              secretName: my-dynamic-certificate-tls
+        enabled: true
+        annotations:
+          cert-manager.io/cluster-issuer: selfsigned-issuer
+          external-dns/is-public: "false"
+          kubernetes.io/ingress.class: internal
+        hosts:
+          - host: goldilocks.chastened.lan
+            paths:
+              - path: /
+                type: ImplementationSpecific
+        tls:
+          - hosts: [goldilocks.chastened.lan]
+            secretName: my-dynamic-certificate-tls

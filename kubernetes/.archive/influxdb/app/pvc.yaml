@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: influxdb-data
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: &name influxdb
+    app.kubernetes.io/instance: *name
+spec:
+  storageClassName: csi-nfs
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi

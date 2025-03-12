@@ -1,3 +1,4 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -7,7 +8,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.5.1
+      version: 3.7.2
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -28,10 +29,10 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         containers:
-          *app:
+          atuin:
             image:
               repository: ghcr.io/atuinsh/atuin
-              tag: 18.3.0@sha256:678def8e9d59652a502759ca431f9c5b54ebdd5e9361507c7fcf24705c9862e0
+              tag: 18.4.0@sha256:8c6fa0aea944bf2a39665c9c69df1c2c0f9c05207bda5b942d450142285e3ee1
             env:
               ATUIN_HOST: 0.0.0.0
               ATUIN_PORT: &port 8080
@@ -42,9 +43,7 @@ spec:
             envFrom:
               - secretRef:
                   name: atuin-secret
-            args:
-              - server
-              - start
+            args: [server, start]
             probes:
               liveness: &probes
                 enabled: true
@@ -67,37 +66,35 @@ spec:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
               capabilities:
-                drop:
-                  - ALL
+                drop: [ALL]
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
         runAsGroup: 568
     ingress:
-      *app:
+      atuin:
         className: external
         annotations:
           kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
           external-dns/is-public: "true"
         hosts:
-          - host: &host "atuin.${SECRET_DOMAIN}"
+          - host: &host atuin.${SECRET_DOMAIN}
             paths:
               - path: /
                 service:
                   identifier: *app
                   port: http
         tls:
-          - hosts:
-              - *host
+          - hosts: [*host]
             secretName: atuin-tls
     persistence:
       config:
         type: emptyDir
     service:
-      *app:
+      atuin:
         controller: *app
         ports:
           http:
@@ -105,7 +102,7 @@ spec:
           metrics:
             port: *metricsPort
     serviceMonitor:
-      *app:
+      atuin:
         serviceName: *app
         endpoints:
           - port: metrics

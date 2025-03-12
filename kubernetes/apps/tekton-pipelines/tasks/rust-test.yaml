@@ -1,3 +1,4 @@
+---
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
@@ -11,7 +12,7 @@ spec:
     - name: test
       image: rust:1-slim
       workingDir: /workspace/source
-      script: |
+      script: |-
         #!/bin/sh
         set -eu
         apt-get update && apt-get install -y \
@@ -36,9 +37,7 @@ spec:
         [build]
         jobs = 4
         target-dir = "/workspace/source/target"
-
         [cache]
         dir = "/workspace/source/.cargo-cache"
         EOF
-
         cargo test

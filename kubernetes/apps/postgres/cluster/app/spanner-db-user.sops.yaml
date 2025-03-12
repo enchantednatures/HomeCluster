@@ -1,0 +1,29 @@
+apiVersion: v1
+stringData:
+  password: ENC[AES256_GCM,data:zfge70xceatlR4g39w79e5awfgD0AfVpUYmM2eFjxLGwyju8,iv:QCCrB8jJ7gMb6LgKtm+hoJW3V4Lo8UhhZfjXWEPyqXQ=,tag:QByfY+1zfhcEatYYFfh/oQ==,type:str]
+  username: ENC[AES256_GCM,data:QiRXlCjn6g==,iv:A8fBQqWiiIe2XjuUgxrVePgpE5PrfmcIgk5A0Xj4vOQ=,tag:WWRMpqSNZq+aRof5vzsK0w==,type:str]
+kind: Secret
+metadata:
+  name: spanner-db-user
+  namespace: postgres
+type: kubernetes.io/basic-auth
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBuNzlrYWRPY0RQWWJxWVl6
+        QU5Uek5Tc3ZHai9IQkg2ZmZNbG44SkxTejNNCndIS1lLeVp3bm1uODNtU2RWQmNI
+        QllSbFQzL0hDUFJVbGNzSjFaQll6YVEKLS0tIGlpSGhDTmtSaEpid3ZVYWFGV0ty
+        dmd4MXIzK1Z4Z3dOTjBiYnpWN1hnK0kKoJwBpRL9Cc7EIq7usRuRM+1A+LPlDXHD
+        O4jXlaNcHTMKKBX74dMPaa2r80kSd/o/8Y0kJAaeuMOlsJfvQ9kbbw==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2025-01-31T06:13:28Z"
+  mac: ENC[AES256_GCM,data:BrrWkUzGll7CUW613JhALnF7oW+7QAMnNqCE+GpgI2P4DCPfPjhrq6h7Y6/5HssLB3jpfomEF6S4PBgj9gZ8dYw/XMweDQCla4jkt63bPtRTJ6dmvaZ85xvPsa9JmNtmdxzC2pZh/aGdzbkuEzyyXdn7McsEYwfI5G7wQntK+hA=,iv:6stNBBbU7+5X6ejkW1lTaQkBXcoTaz9DC0/0jmtJBXY=,tag:SyByNbLc/eRep1YAWAUuVQ==,type:str]
+  pgp: []
+  encrypted_regex: ^(data|stringData)$
+  version: 3.9.1

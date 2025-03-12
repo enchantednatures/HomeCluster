@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: arch-vm-pvc
+  namespace: default
+  labels:
+    app: arch-vm-pvc
+spec:
+  storageClassName: openebs-hostpath
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 2Gi

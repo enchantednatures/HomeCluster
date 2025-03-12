@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: factorio-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: factorio
+  template:
+    metadata:
+      labels:
+        app: factorio
+    spec:
+      containers:
+        - name: factorio
+          image: ofsm/ofsm:latest
+          ports:
+            - containerPort: 34197
+              protocol: UDP
+            - containerPort: 80
+              protocol: TCP
+          env:
+            - name: FACTORIO_VERSION
+              value: "2.0.28"
+          volumeMounts:
+            - name: factorio-config
+              mountPath: /opt/factorio/config
+            - name: factorio-mods
+              mountPath: /opt/factorio/mods
+            - name: factorio-saves
+              mountPath: /opt/factorio/saves
+      volumes:
+        - name: factorio-mods
+          persistentVolumeClaim:
+            claimName: factorio-mods
+        - name: factorio-saves
+          persistentVolumeClaim:
+            claimName: factorio-saves
+        - name: factorio-config
+          persistentVolumeClaim:
+            claimName: factorio-config

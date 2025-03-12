@@ -46,7 +46,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app nginx-internal
+  name: &app nginx-misc-ingresses
   namespace: flux-system
 spec:
   targetNamespace: networking
@@ -55,7 +55,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: nginx-certificates
-  path: ./kubernetes/apps/networking/nginx/internal
+  path: ./kubernetes/apps/networking/nginx/ingresses
   prune: true
   sourceRef:
     kind: GitRepository
@@ -68,7 +68,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app nginx-misc-ingresses
+  name: &app istio-virtualservices
   namespace: flux-system
 spec:
   targetNamespace: networking
@@ -76,8 +76,9 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
+    - name: istio-gateway
     - name: nginx-certificates
-  path: ./kubernetes/apps/networking/nginx/ingresses
+  path: ./kubernetes/apps/networking/nginx/virtualservices
   prune: true
   sourceRef:
     kind: GitRepository

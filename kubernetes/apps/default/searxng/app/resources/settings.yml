@@ -1,3 +1,4 @@
+---
 use_default_settings: true
 server:
   limiter: false
@@ -7,10 +8,7 @@ server:
 search:
   autocomplete: duckduckgo
   favicon_resolver: duckduckgo
-  languages:
-    - all
-    - en
-    - en-US
+  languages: [all, en, en-US]
 general:
   instance_name: Enchanted Natures Search
 ui:

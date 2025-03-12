@@ -1,3 +1,4 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -67,7 +68,36 @@ spec:
                 - __meta_kubernetes_pod_uid
                 - __meta_kubernetes_pod_container_name
                 target_label: __path__
-
+          # Add new Tekton-specific job
+          - job_name: tekton-pipelines
+            kubernetes_sd_configs:
+              - role: pod
+                namespaces:
+                  names:
+                    - default
+                    - tekton
+                    - tekton-pipelines
+                    - snail
+            relabel_configs:
+              - source_labels: [__meta_kubernetes_pod_label_tekton_dev_pipeline_run]
+                target_label: pipeline_run
+              - source_labels: [__meta_kubernetes_pod_label_tekton_dev_task_run]
+                target_label: task_run
+              - source_labels: [__meta_kubernetes_pod_container_name]
+                target_label: container
+              - source_labels: [__meta_kubernetes_namespace]
+                target_label: namespace
+              - source_labels: [__meta_kubernetes_pod_name]
+                target_label: pod
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_tekton_dev_(.+)
+                replacement: tekton_$1
+              - replacement: /var/log/pods/*$1/*.log
+                separator: /
+                source_labels:
+                - __meta_kubernetes_pod_uid
+                - __meta_kubernetes_pod_container_name
+                target_label: __path__
     extraVolumes:
       - name: journal
         hostPath:
@@ -75,7 +105,6 @@ spec:
       - name: machine-id
         hostPath:
           path: /etc/machine-id
-
     extraVolumeMounts:
       - name: journal
         mountPath: /var/log/journal
@@ -83,16 +112,13 @@ spec:
       - name: machine-id
         mountPath: /etc/machine-id
         readOnly: true
-
     tolerations:
       - effect: NoSchedule
         operator: Exists
       - effect: NoExecute
         operator: Exists
-
     serviceMonitor:
       enabled: true
-
     resources:
       requests:
         cpu: 100m
@@ -100,7 +126,6 @@ spec:
       limits:
         cpu: 200m
         memory: 256Mi
-
     securityContext:
       privileged: true
       runAsUser: 0

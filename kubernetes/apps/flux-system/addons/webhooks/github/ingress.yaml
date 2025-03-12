@@ -4,14 +4,14 @@ kind: Ingress
 metadata:
   name: flux-webhook
   annotations:
-    external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
     external-dns/is-public: "true"
 spec:
   ingressClassName: external
   rules:
-    - host: &host "flux-webhook.${SECRET_DOMAIN}"
+    - host: &host flux-webhook.${SECRET_DOMAIN}
       http:
         paths:
           - path: /hook/
@@ -22,5 +22,4 @@ spec:
                 port:
                   number: 80
   tls:
-    - hosts:
-        - *host
+    - hosts: [*host]

@@ -7,12 +7,12 @@ metadata:
   labels:
     app: open-webui
   annotations:
-    reloader.stakater.com/auto: 'true'
+    reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
       app: open-webui
-  replicas: 3
+  replicas: 1
   strategy:
     rollingUpdate:
       maxSurge: 200%

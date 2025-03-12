@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: backstage
-      version: 2.3.0
+      version: 2.4.0
       sourceRef:
         kind: HelmRepository
         name: backstage-charts
@@ -28,11 +28,11 @@ spec:
       enabled: true
       tls:
         enabled: true
-        secretName: "backstage-tls"
+        secretName: backstage-tls
       host: backstage.${SECRET_DOMAIN}
       className: external
       annotations:
         cert-manager.io/cluster-issuer: letsencrypt-production
         kubernetes.io/tls-acme: "true"
         external-dns/is-public: "true"
-        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}

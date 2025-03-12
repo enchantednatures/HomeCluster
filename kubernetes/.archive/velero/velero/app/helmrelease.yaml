@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: velero
-      version: 8.2.0
+      version: 8.5.0
       sourceRef:
         kind: HelmRepository
         name: vmware-tanzu
@@ -27,32 +27,29 @@ spec:
   values:
     configuration:
       backupStorageLocation:
-      - name: minio
-        bucket: velero-backups
-        provider: aws
-        accessMode: ReadWrite
-        config:
-          region: us-east-rack-01
-          s3ForcePathStyle: "true"
-          s3Url: http://192.168.1.241:9768
+        - name: minio
+          bucket: velero-backups
+          provider: aws
+          accessMode: ReadWrite
+          config:
+            region: us-east-rack-01
+            s3ForcePathStyle: "true"
+            s3Url: http://192.168.1.241:9768
     credentials:
       useSecret: true
       existingSecret: velero-minio-access-key
-
     initContainers:
       - name: velero-plugin-for-aws
         image: velero/velero-plugin-for-aws:v1.11.1
         volumeMounts:
           - mountPath: /target
             name: plugins
-
     snapshotsEnabled: false
-
     metrics:
       enabled: false
     upgradeCRDs: false
     schedules:
       daily-backup:
-        schedule: "0 6 * * *"
+        schedule: 0 6 * * *
         template:
-          ttl: "120h"
+          ttl: 120h

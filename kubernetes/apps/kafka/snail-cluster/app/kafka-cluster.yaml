@@ -18,14 +18,23 @@ spec:
         port: 9093
         type: internal
         tls: true
+      - name: external
+        port: 9094
+        type: nodeport
+        tls: false
+        configuration:
+          bootstrap:
+            nodePort: 31094
     config:
-      auto.create.topics.enable: 'true'
+      auto.create.topics.enable: "true"
       offsets.topic.replication.factor: 3
       transaction.state.log.replication.factor: 3
       transaction.state.log.min.isr: 2
       default.replication.factor: 3
       min.insync.replicas: 2
       group.min.session.timeout.ms: 250
+      # Add listener configuration
+      listener.name.external.plain.sasl.enabled: false
     metricsConfig:
       type: jmxPrometheusExporter
       valueFrom:
@@ -37,7 +46,6 @@ spec:
     userOperator: {}
   cruiseControl:
     config:
-      # Note that `goals` must be a superset of `default.goals` and `hard.goals`
       goals: >
         com.linkedin.kafka.cruisecontrol.analyzer.goals.RackAwareGoal,
         com.linkedin.kafka.cruisecontrol.analyzer.goals.MinTopicLeadersPerBrokerGoal,
@@ -56,7 +64,6 @@ spec:
         com.linkedin.kafka.cruisecontrol.analyzer.goals.LeaderReplicaDistributionGoal,
         com.linkedin.kafka.cruisecontrol.analyzer.goals.LeaderBytesInDistributionGoal,
         com.linkedin.kafka.cruisecontrol.analyzer.goals.PreferredLeaderElectionGoal
-      # Note that `default.goals` must be a superset `hard.goals`
       default.goals: >
         com.linkedin.kafka.cruisecontrol.analyzer.goals.RackAwareGoal,
         com.linkedin.kafka.cruisecontrol.analyzer.goals.ReplicaCapacityGoal,

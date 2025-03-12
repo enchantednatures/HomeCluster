@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: influxdb
+  namespace: monitoring
+spec:
+  dependsOn:
+    - name: prometheus-operator-crds
+  chart:
+    spec:
+      chart: influxdb2
+      version: 2.1.2
+      sourceRef:
+        kind: HelmRepository
+        name: influx-data
+        namespace: flux-system
+      interval: 15m
+      reconcileStrategy: ChartVersion
+  uninstall:
+    keepHistory: false
+  interval: 5m
+  driftDetection:
+    mode: enabled
+  maxHistory: 3
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  # https://github.com/influxdata/helm-charts/blob/master/charts/influxdb2/values.yaml
+  values:
+    image:
+      repository: influxdb
+      tag: 2.7.11
+    adminUser:
+      organization: influxdata
+      bucket: default
+      user: admin
+      retention_policy: 0s
+      existingSecret: influxdb-secret
+    persistence:
+      enabled: true
+      useExisting: true
+      name: influxdb-data
+    env:
+      - name: TZ
+        value: ${TIMEZONE}
+    ingress:
+      enabled: true
+      className: external
+      hostname: &host influxdb.${SECRET_DOMAIN}
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-production
+        kubernetes.io/tls-acme: "true"
+        external-dns/is-public: "true"
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+
+        # nginx.ingress.kubernetes.io/auth-url: |-
+        #   http://ak-outpost-nginx.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+        #  # If you're using domain-level auth, use the authentication URL instead of the application URL
+        # nginx.ingress.kubernetes.io/auth-signin: |-
+        #   https://enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri
+        # nginx.ingress.kubernetes.io/auth-response-headers: |-
+        #   Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+        # nginx.ingress.kubernetes.io/auth-snippet: |
+        #   proxy_set_header X-Forwarded-Host $http_host;
+      path: /
+      tls: true
+      secretName: influx-tls
+    pdb:
+      create: false

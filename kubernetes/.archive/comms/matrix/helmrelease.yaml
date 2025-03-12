@@ -1,3 +1,4 @@
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -9,7 +10,7 @@ spec:
     spec:
       # renovate: registryUrl=https://ananace.gitlab.io/charts
       chart: matrix-synapse
-      version: 3.11.0
+      version: 3.11.4
       sourceRef:
         kind: HelmRepository
         name: ananace-charts
@@ -21,7 +22,7 @@ spec:
   values:
     image:
       repository: ghcr.io/element-hq/synapse
-      tag: v1.121.1
+      tag: v1.125.0
     serverName: ${SECRET_DOMAIN}
     publicServerName: matrix.${SECRET_DOMAIN}
     wellknown:
@@ -33,10 +34,10 @@ spec:
       default:
         resources:
           limits:
-            #      cpu: 1000m # One CPU core
+            #      cpu: 1000m  # One CPU core
             memory: 1Gi
           requests:
-            #      cpu: 400m # 0.4 of core
+            #      cpu: 400m  # 0.4 of core
             memory: 512Mi
       media_repository:
         enabled: true
@@ -52,50 +53,50 @@ spec:
         listeners: [client]
         csPaths:
           ## Client API requests
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/createRoom$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/publicRooms$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/joined_members$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/context/"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/members$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/state$"
-          - "/_matrix/client/v1/rooms/.*/hierarchy$"
-          - "/_matrix/client/unstable/org.matrix.msc2716/rooms/.*/batch_send$"
-          - "/_matrix/client/unstable/im.nheko.summary/rooms/.*/summary$"
-          - "/_matrix/client/(r0|v3|unstable)/account/3pid$"
-          - "/_matrix/client/(r0|v3|unstable)/account/whoami$"
-          - "/_matrix/client/(r0|v3|unstable)/devices$"
-          - "/_matrix/client/versions$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/voip/turnServer$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/event/"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/joined_rooms$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/search$"
+          - /_matrix/client/(api/v1|r0|v3|unstable)/createRoom$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/publicRooms$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/joined_members$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/context/
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/members$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/state$
+          - /_matrix/client/v1/rooms/.*/hierarchy$
+          - /_matrix/client/unstable/org.matrix.msc2716/rooms/.*/batch_send$
+          - /_matrix/client/unstable/im.nheko.summary/rooms/.*/summary$
+          - /_matrix/client/(r0|v3|unstable)/account/3pid$
+          - /_matrix/client/(r0|v3|unstable)/account/whoami$
+          - /_matrix/client/(r0|v3|unstable)/devices$
+          - /_matrix/client/versions$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/voip/turnServer$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/event/
+          - /_matrix/client/(api/v1|r0|v3|unstable)/joined_rooms$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/search$
           ## Encryption requests
-          - "/_matrix/client/(r0|v3|unstable)/keys/query$"
-          - "/_matrix/client/(r0|v3|unstable)/keys/changes$"
-          - "/_matrix/client/(r0|v3|unstable)/keys/claim$"
-          - "/_matrix/client/(r0|v3|unstable)/room_keys/"
+          - /_matrix/client/(r0|v3|unstable)/keys/query$
+          - /_matrix/client/(r0|v3|unstable)/keys/changes$
+          - /_matrix/client/(r0|v3|unstable)/keys/claim$
+          - /_matrix/client/(r0|v3|unstable)/room_keys/
           ## Registration/login requests
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/login$"
-          - "/_matrix/client/(r0|v3|unstable)/register$"
-          - "/_matrix/client/v1/register/m.login.registration_token/validity$"
+          - /_matrix/client/(api/v1|r0|v3|unstable)/login$
+          - /_matrix/client/(r0|v3|unstable)/register$
+          - /_matrix/client/v1/register/m.login.registration_token/validity$
           ## Event sending requests
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/redact"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/send"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/state/"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/(join|invite|leave|ban|unban|kick)$"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/join/"
-          - "/_matrix/client/(api/v1|r0|v3|unstable)/profile/"
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/redact
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/send
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/state/
+          - /_matrix/client/(api/v1|r0|v3|unstable)/rooms/.*/(join|invite|leave|ban|unban|kick)$
+          - /_matrix/client/(api/v1|r0|v3|unstable)/join/
+          - /_matrix/client/(api/v1|r0|v3|unstable)/profile/
           ## User directory search requests
-          - "/_matrix/client/(r0|v3|unstable)/user_directory/search"
+          - /_matrix/client/(r0|v3|unstable)/user_directory/search
       synchrotron:
         enabled: true
         generic: true
         listeners: [client]
         csPaths:
-          - "/_matrix/client/(v2_alpha|r0|v3)/sync$"
-          - "/_matrix/client/(api/v1|v2_alpha|r0|v3)/events$"
-          - "/_matrix/client/(api/v1|r0|v3)/initialSync$"
-          - "/_matrix/client/(api/v1|r0|v3)/rooms/[^/]+/initialSync$"
+          - /_matrix/client/(v2_alpha|r0|v3)/sync$
+          - /_matrix/client/(api/v1|v2_alpha|r0|v3)/events$
+          - /_matrix/client/(api/v1|r0|v3)/initialSync$
+          - /_matrix/client/(api/v1|r0|v3)/rooms/[^/]+/initialSync$
       frontend_proxy:
         enabled: false
     extraConfig:
@@ -113,13 +114,10 @@ spec:
         - idp_id: authentik
           idp_name: Skylab SSO
           discover: true
-          issuer: "https://auth.${SECRET_DOMAIN}/application/o/matrix/"
-          client_id: "matrix"
+          issuer: https://auth.${SECRET_DOMAIN}/application/o/matrix/
+          client_id: matrix
           client_secret: ${SECRET_AUTHENTIK_MATRIX_CLIENT}
-          scopes:
-            - "openid"
-            - "profile"
-            - "email"
+          scopes: [openid, profile, email]
           user_mapping_provider:
             config:
               localpart_template: "{{ user.nickname }}"
@@ -134,11 +132,10 @@ spec:
         external-dns-cf/is-dns-public: "true"
         external-dns.target/enabled: "true"
         external-dns.alpha.kubernetes.io/cloudflare-proxied: "true"
-        external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
       tls:
         - secretName: matrix-tls
-          hosts:
-            - matrix.${SECRET_DOMAIN}
+          hosts: ["matrix.${SECRET_DOMAIN}"]
     postgresql:
       enabled: true
     # externalPostgresql:
@@ -149,7 +146,7 @@ spec:
     #   existingSecretPasswordKey: PASSWORD
     #   database: "synapse"
     # Will not want to work w/o pass
-    #externalRedis:
+    # externalRedis:
     #  host: redis.databases.svc.cluster.local
     #  port: 6379
     #  dbid: 1

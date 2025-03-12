@@ -19,12 +19,12 @@ spec:
           image: busybox
           command:
             - sh
-            - "-c"
+            - -c
             - |
-              mkdir -p /config/wg_confs
-              ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}')
-              sed "s/ENI/$ENI/g" /etc/wireguard-secret/wg0.conf.template > /config/wg_confs/wg0.conf
-              chmod 400 /config/wg_confs/wg0.conf
+                mkdir -p /config/wg_confs
+                ENI=$(ip route get 8.8.8.8 | grep 8.8.8.8 | awk '{print $5}')
+                sed "s/ENI/$ENI/g" /etc/wireguard-secret/wg0.conf.template > /config/wg_confs/wg0.conf
+                chmod 400 /config/wg_confs/wg0.conf
           securityContext:
             privileged: true
           volumeMounts:
@@ -37,8 +37,7 @@ spec:
           image: linuxserver/wireguard:latest
           securityContext:
             capabilities:
-              add:
-                - NET_ADMIN
+              add: [NET_ADMIN]
             privileged: true
           envFrom:
             - configMapRef:

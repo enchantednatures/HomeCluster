@@ -9,8 +9,7 @@ spec:
   template:
     defaultVolumesToRestic: true
     hooks: {}
-    includedNamespaces:
-      - postgres
+    includedNamespaces: [postgres]
     metadata: {}
     storageLocation: minio
     ttl: 12h0m0s

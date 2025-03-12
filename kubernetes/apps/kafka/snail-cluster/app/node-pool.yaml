@@ -7,10 +7,8 @@ metadata:
     strimzi.io/cluster: snail
 spec:
   replicas: 5
-  roles:
-    - broker
-    - controller
+  roles: [broker, controller]
   storage:
     type: persistent-claim
-    size: 50Gi
+    size: 10Gi
     class: csi-nfs

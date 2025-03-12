@@ -1,3 +1,4 @@
+---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
@@ -6,4 +7,3 @@ metadata:
 spec:
   interval: 1h
   url: https://downloads.apache.org/flink/flink-kubernetes-operator-1.10.0/
-

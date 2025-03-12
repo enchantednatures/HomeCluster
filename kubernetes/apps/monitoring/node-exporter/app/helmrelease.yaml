@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prometheus-node-exporter
-      version: 4.43.1
+      version: 4.44.1
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
@@ -36,10 +36,10 @@ spec:
         jobLabel: jobLabel
         metricRelabelings:
           - action: replace
-            sourceLabels: ["__meta_kubernetes_pod_node_name"]
+            sourceLabels: [__meta_kubernetes_pod_node_name]
             targetLabel: kubernetes_node
           - action: drop
-            sourceLabels: ["mountpoint"]
+            sourceLabels: [mountpoint]
             regex: /var/lib/kubelet/pods.+
           - action: labeldrop
             regex: (pod)

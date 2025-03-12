@@ -1,7 +1,4 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - ./namespace.yaml
-  - ./api/ks.yaml
-  - ./web-app/ks.yaml
+resources: [./namespace.yaml, ./api/ks.yaml, ./web-app/ks.yaml]

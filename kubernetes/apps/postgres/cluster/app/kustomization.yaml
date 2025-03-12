@@ -9,3 +9,5 @@ resources:
   - db-user.sops.yaml
   - scheduled-backup.yaml
   - superusersecret.sops.yaml
+  - db-hunter.sops.yaml
+  - spanner-db-user.sops.yaml

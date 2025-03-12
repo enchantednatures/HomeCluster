@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,15 +23,13 @@ spec:
       strategy: rollback
       retries: 3
   values:
-    artifactUrl: "/tmp/arroyo-test"
-    checkpointUrl: "/tmp/arroyo-test"
-
+    artifactUrl: /tmp/arroyo-test
+    checkpointUrl: /tmp/arroyo-test
     volumes:
       - name: checkpoints
         hostPath:
           path: /tmp/arroyo-test
           type: DirectoryOrCreate
-
     volumeMounts:
       - name: checkpoints
         mountPath: /tmp/arroyo-test

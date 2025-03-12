@@ -1,4 +1,7 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: [./serving.yaml, ./cluster-role.yaml]
+resources:
+  - ./serving.yaml
+  - ./cluster-role.yaml
+  # - https://github.com/knative/net-istio/releases/download/knative-v1.16.0/net-istio.yaml

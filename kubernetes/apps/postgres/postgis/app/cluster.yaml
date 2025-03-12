@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -12,7 +13,7 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: csi-nfs
+    storageClass: openebs-hostpath
   enableSuperuserAccess: true
   superuserSecret:
     name: postgis-superuser
@@ -20,14 +21,14 @@ spec:
     parameters:
       max_connections: "300"
       # Memory configuration - optimized for 4GB total RAM
-      shared_buffers: "1GB" # 25% of RAM
-      effective_cache_size: "3GB" # 75% of RAM
-      work_mem: "32MB"
-      maintenance_work_mem: "256MB"
+      shared_buffers: 1GB # 25% of RAM
+      effective_cache_size: 3GB # 75% of RAM
+      work_mem: 32MB
+      maintenance_work_mem: 256MB
       # Write-ahead log
-      wal_level: "logical"
-      max_wal_size: "1GB"
-      min_wal_size: "512MB"
+      wal_level: logical
+      max_wal_size: 1GB
+      min_wal_size: 512MB
       # Query planner
       random_page_cost: "1.1" # Assuming SSD storage
       effective_io_concurrency: "100"

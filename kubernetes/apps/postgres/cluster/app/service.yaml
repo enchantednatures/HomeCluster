@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: &app postgres
+  namespace: postgres
   labels:
     app.kubernetes.io/name: *app
     app.kubernetes.io/instance: *app
@@ -11,6 +12,7 @@ metadata:
     lbipam.cilium.io/ips: 192.168.1.244
 spec:
   type: LoadBalancer
+  loadBalancerClass: tailscale
   ports:
     - name: postgres
       port: 5432

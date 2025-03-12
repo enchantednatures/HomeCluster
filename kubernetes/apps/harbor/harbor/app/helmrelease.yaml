@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: harbor
-      version: 1.16.0
+      version: 1.16.2
       sourceRef:
         kind: HelmRepository
         name: harbor-charts
@@ -61,9 +61,9 @@ spec:
         controller: default
         annotations:
           kubernetes.io/ingress.class: external
-          kubernetes.io/tls-acme: 'true'
+          kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns/is-public: 'true'
+          external-dns/is-public: "true"
           external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
     externalURL: https://harbor.${SECRET_DOMAIN}
     internalTLS:
@@ -136,7 +136,7 @@ spec:
       enabled: true
       insecure: false
       # gitHubToken the GitHub access token to download Trivy DB
-      gitHubToken: ''
+      gitHubToken: ""
       timeout: 5m0s
       resources:
         requests:
@@ -165,7 +165,7 @@ spec:
       external:
         host: postgres-db-rw.postgres.svc.cluster.local
         port: 5432
-        username: harbor  # todo
+        username: harbor # todo
         password: harbor
         coreDatabase: registry
         notaryServerDatabase: notary_server
@@ -178,12 +178,12 @@ spec:
       type: external
       external:
         addr: harbor-dragonfly:6379
-        coreDatabaseIndex: '0'
-        jobserviceDatabaseIndex: '1'
-        registryDatabaseIndex: '2'
-        chartmuseumDatabaseIndex: '3'
-        trivyAdapterIndex: '5'
-        password: ''
+        coreDatabaseIndex: "0"
+        jobserviceDatabaseIndex: "1"
+        registryDatabaseIndex: "2"
+        chartmuseumDatabaseIndex: "3"
+        trivyAdapterIndex: "5"
+        password: ""
     exporter:
       replicas: 1
       resources:

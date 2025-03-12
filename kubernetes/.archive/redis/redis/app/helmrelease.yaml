@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -8,7 +9,7 @@ spec:
   chart:
     spec:
       chart: redis
-      version: 20.6.1
+      version: 20.11.3
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -28,7 +29,7 @@ spec:
     image:
       registry: docker.io
       repository: bitnami/redis
-      tag: 7.4.1-debian-12-r3
+      tag: 7.4.2-debian-12-r5
       pullPolicy: IfNotPresent
       debug: false
     architecture: standalone
@@ -36,8 +37,8 @@ spec:
       enabled: true
       sentinel: true
       redisUsername: authentik
-      existingSecret: "authentik-redis"
-      existingSecretPasswordKey: "password"
+      existingSecret: authentik-redis
+      existingSecretPasswordKey: password
       usePasswordFiles: false
     commonConfiguration: |-
       # Enable AOF https://redis.io/topics/persistence#append-only-file
@@ -106,7 +107,7 @@ spec:
       image:
         registry: docker.io
         repository: bitnami/redis-exporter
-        tag: 1.67.0-debian-12-r0
+        tag: 1.68.0-debian-12-r0
         pullPolicy: IfNotPresent
         ## Optionally specify an array of imagePullSecrets.
         ## Secrets must be manually created in the namespace.
@@ -122,7 +123,7 @@ spec:
       ## @param metrics.redisTargetHost A way to specify an alternative Redis&trade; hostname
       ## Useful for certificate CN/SAN matching
       ##
-      redisTargetHost: "localhost"
+      redisTargetHost: localhost
       ## @param metrics.extraArgs Extra arguments for Redis&trade; exporter, for example:
       ## e.g.:
       ## extraArgs:
