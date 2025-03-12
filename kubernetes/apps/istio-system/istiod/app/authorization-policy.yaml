@@ -26,6 +26,7 @@ metadata:
   name: allow-all
   namespace: kafka
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -35,6 +36,7 @@ metadata:
   name: allow-all
   namespace: networking
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -44,6 +46,7 @@ metadata:
   name: allow-all
   namespace: redpanda
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -53,6 +56,7 @@ metadata:
   name: allow-all
   namespace: monitoring
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -62,6 +66,7 @@ metadata:
   name: allow-all
   namespace: authentik
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -71,6 +76,7 @@ metadata:
   name: allow-all
   namespace: harbor
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -80,6 +86,7 @@ metadata:
   name: allow-all
   namespace: knative
 spec:
+  action: ALLOW
   rules:
     - {}
 
@@ -90,6 +97,7 @@ metadata:
   name: allow-all
   namespace: knative-serving
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -99,6 +107,7 @@ metadata:
   name: allow-all
   namespace: knative-eventing
 spec:
+  action: ALLOW
   rules:
     - {}
 
@@ -109,6 +118,7 @@ metadata:
   name: allow-all
   namespace: postgres
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -118,6 +128,7 @@ metadata:
   name: allow-all
   namespace: istio-ingress
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -127,6 +138,7 @@ metadata:
   name: allow-all
   namespace: kube-system
 spec:
+  action: ALLOW
   rules:
     - {}
 ---
@@ -136,5 +148,6 @@ metadata:
   name: allow-all
   namespace: flux-system
 spec:
+  action: ALLOW
   rules:
     - {}
