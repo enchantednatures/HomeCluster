@@ -26,8 +26,8 @@ spec:
       config:
         kafka:
           brokers:
-            - snail-kafka-bootstrap.kafka.svc.cluster.local:9092
-            # - kafka-kafka-bootstrap.snail.svc.cluster.local:9092
+            - kafka-kafka-bootstrap.snail.svc.cluster.local:9092
+            # - snail-kafka-bootstrap.kafka.svc.cluster.local:9092
     ingress:
       enabled: false
       className: external
