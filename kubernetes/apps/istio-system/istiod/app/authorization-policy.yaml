@@ -13,13 +13,110 @@ spec:
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: global-allow-service-communication
-  namespace: istio-system
+  name: allow-all
+  namespace: snail
 spec:
   action: ALLOW
   rules:
-    - from:
-        - source:
-            principals: ["*"]
-      to:
-        - operation: {}
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: kafka
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: networking
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: redpanda
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: monitoring
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: authentik
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: harbor
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: knative
+spec:
+  rules:
+    - {}
+
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: knative-serving
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: knative-eventing
+spec:
+  rules:
+    - {}
+
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: postgres
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: istio-ingress
+spec:
+  rules:
+    - {}
