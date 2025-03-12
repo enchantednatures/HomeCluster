@@ -5,3 +5,4 @@ resources:
   - ./namespace.yaml
   - ./home-assistant/ks.yaml
   - ./home-system-rabbitmq/ks.yaml
+  - ./node-red/ks.yaml
