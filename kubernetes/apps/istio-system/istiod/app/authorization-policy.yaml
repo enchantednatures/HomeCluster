@@ -22,5 +22,4 @@ spec:
         - source:
             principals: ["*"]
       to:
-        - operation:
-            ports: ["*"]
+        - operation: {}
