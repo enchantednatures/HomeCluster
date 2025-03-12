@@ -1,0 +1,35 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-spegel-registry
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: spegel
+  ingress:
+    - from:
+        - namespaceSelector: {}  # Allow from all namespaces
+      ports:
+        - port: 29999
+          protocol: TCP
+---
+# This Istio AuthorizationPolicy explicitly allows all pods to access spegel registry
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-spegel-registry-access
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: spegel
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            namespaces: ["*"]  # Allow from all namespaces
+      to:
+        - operation:
+            ports: ["29999"]
