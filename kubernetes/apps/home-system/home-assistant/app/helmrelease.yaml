@@ -4,6 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: home-assistant
+  namespace: home-system
 spec:
   interval: 30m
   chart:
