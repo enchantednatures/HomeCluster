@@ -120,3 +120,21 @@ metadata:
 spec:
   rules:
     - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: kube-system
+spec:
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all
+  namespace: flux-system
+spec:
+  rules:
+    - {}
