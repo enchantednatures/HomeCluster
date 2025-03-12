@@ -25,9 +25,9 @@ spec:
           reloader.stakater.com/auto: "true"
         pod:
           securityContext:
-            runAsUser: 65534
-            runAsGroup: 65533
-            fsGroup: 65533
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
             fsGroupChangePolicy: OnRootMismatch
 
         containers:
@@ -41,6 +41,8 @@ spec:
                 protocol: TCP
             env:
               VENV_FOLDER: /venv
+              PUID: "1000"
+              PGID: "1000"
             resources:
               requests:
                 cpu: 47m
@@ -48,8 +50,8 @@ spec:
               limits:
                 memory: 2Gi
             securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
+              allowPrivilegeEscalation: true
+              readOnlyRootFilesystem: false
               capabilities:
                 drop:
                   - ALL
