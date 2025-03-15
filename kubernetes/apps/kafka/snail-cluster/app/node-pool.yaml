@@ -3,6 +3,7 @@ apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
   name: kafka
+  namespace: kafka
   labels:
     strimzi.io/cluster: snail
 spec:
