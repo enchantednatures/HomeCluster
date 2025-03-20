@@ -180,5 +180,5 @@ spec:
                 "storage.googleapis.com",
                 "mirror.gcr.io",
                 "public.ecr.aws",
-                "azurecr.io"
+                "azurecr.io",
               ]

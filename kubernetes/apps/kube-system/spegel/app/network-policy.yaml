@@ -10,14 +10,14 @@ spec:
       app.kubernetes.io/name: spegel
   ingress:
     - from:
-        - namespaceSelector: {}  # Allow from all namespaces
+        - namespaceSelector: {} # Allow from all namespaces
       ports:
         - port: 29999
           protocol: TCP
         - port: 5000
           protocol: TCP
   egress:
-    - {}  # Allow all outbound traffic to pull images from external registries
+    - {} # Allow all outbound traffic to pull images from external registries
 ---
 # This Istio AuthorizationPolicy explicitly allows all pods to access spegel registry
 apiVersion: security.istio.io/v1beta1
@@ -33,7 +33,7 @@ spec:
   rules:
     - from:
         - source:
-            namespaces: ["*"]  # Allow from all namespaces
+            namespaces: ["*"] # Allow from all namespaces
       to:
         - operation:
             ports: ["29999", "5000"]
