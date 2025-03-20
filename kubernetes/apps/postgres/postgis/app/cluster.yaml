@@ -59,7 +59,7 @@ spec:
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
       # Note: serverName version needs to be incremented
       # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgis-v1
+      serverName: &currentCluster postgis-v2
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-postgis-secret
@@ -81,7 +81,7 @@ spec:
     #     - CREATE EXTENSION fuzzystrmatch;
     #     - CREATE EXTENSION postgis_tiger_geocoder;
     recovery:
-      source: &previousCluster postgis-v0
+      source: &previousCluster postgis-v1
       database: app
       owner: app
       secret:
