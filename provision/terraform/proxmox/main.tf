@@ -62,7 +62,7 @@ module "talos" {
       mac_address   = "BC:24:11:2E:08:00"
       vm_id         = 810
       cpu           = 8
-      ram_dedicated = 16384
+      ram_dedicated = 8192
       disk_size     = 64
       datastore_id  = "local-lvm"
       igpu          = true
@@ -75,8 +75,8 @@ module "talos" {
       mac_address   = "BC:24:11:2E:08:01"
       vm_id         = 811
       cpu           = 16
-      ram_dedicated = 16384
-      disk_size     = 128
+      ram_dedicated = 32768
+      disk_size     = 256
       datastore_id  = "local-lvm"
       igpu          = true
     }
@@ -107,30 +107,30 @@ module "talos" {
       igpu          = true
     }
 
-    "work-04" = {
-      host_node     = "pve"
-      machine_type  = "worker"
-      ip            = "192.168.1.215"
-      mac_address   = "BC:24:11:2E:08:04"
-      vm_id         = 814
-      cpu           = 4
-      ram_dedicated = 4096
-      disk_size     = 64
-      datastore_id  = "local-lvm"
-      igpu          = true
-    }
+    # "work-04" = {
+    #   host_node     = "pve"
+    #   machine_type  = "worker"
+    #   ip            = "192.168.1.215"
+    #   mac_address   = "BC:24:11:2E:08:04"
+    #   vm_id         = 814
+    #   cpu           = 4
+    #   ram_dedicated = 4096
+    #   disk_size     = 64
+    #   datastore_id  = "local-lvm"
+    #   igpu          = true
+    # }
 
-    "work-05" = {
-      host_node     = "pve"
-      machine_type  = "worker"
-      ip            = "192.168.1.216"
-      mac_address   = "BC:24:11:2E:08:05"
-      vm_id         = 815
-      cpu           = 4
-      ram_dedicated = 4096
-      disk_size     = 64
-      datastore_id  = "local-lvm"
-      igpu          = true
-    }
+    # "work-05" = {
+    #   host_node     = "pve"
+    #   machine_type  = "worker"
+    #   ip            = "192.168.1.216"
+    #   mac_address   = "BC:24:11:2E:08:05"
+    #   vm_id         = 815
+    #   cpu           = 4
+    #   ram_dedicated = 4096
+    #   disk_size     = 64
+    #   datastore_id  = "local-lvm"
+    #   igpu          = true
+    # }
   }
 }
