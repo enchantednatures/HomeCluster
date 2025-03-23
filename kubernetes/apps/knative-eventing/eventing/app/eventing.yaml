@@ -38,3 +38,13 @@ metadata:
   namespace: knative-eventing
 data:
   eventtype-auto-create: "enabled"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-tracing
+  namespace: knative-eventing
+data:
+  backend: "zipkin"
+  zipkin-endpoint: "http://tempo.monitoring.svc.cluster.local:9411/api/v2/spans"
+  sample-rate: "0.5"
