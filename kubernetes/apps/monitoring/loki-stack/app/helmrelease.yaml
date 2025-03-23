@@ -43,7 +43,7 @@ spec:
     mode: enabled
   maxHistory: 3
   values:
-    deploymentMode: "SimpleScalableDeploy"
+    deploymentMode: "Distributed"
     gateway:
       enabled: true
       replica: 5
