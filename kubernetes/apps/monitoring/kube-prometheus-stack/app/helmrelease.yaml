@@ -125,7 +125,36 @@ spec:
     kubeProxy:
       enabled: false # Disabled due to eBPF
     nodeExporter:
-      enabled: false # Disabled due to eBPF
+      enabled: true
+      fullnameOverride: node-exporter
+      releaseLabel: true
+      podLabels:
+        jobLabel: node-exporter
+      extraArgs:
+        - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+        - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+      prometheus:
+        monitor:
+          enabled: true
+          jobLabel: jobLabel
+          metricRelabelings:
+            - action: replace
+              sourceLabels: [__meta_kubernetes_pod_node_name]
+              targetLabel: kubernetes_node
+            - action: drop
+              sourceLabels: [mountpoint]
+              regex: /var/lib/kubelet/pods.+
+            - action: labeldrop
+              regex: (pod)
+      rbac:
+        pspEnabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 32Mi
+        limits:
+          cpu: 250m
+          memory: 64Mi
     prometheus:
       ingress:
         enabled: true
