@@ -115,6 +115,7 @@ spec:
             access: proxy
             url: http://loki-gateway.monitoring.svc.cluster.local:80
             jsonData:
+              manageAlerts: true
               maxLines: 250
           - name: Alertmanager-Kube-Prometheus-Stack
             type: alertmanager
@@ -122,6 +123,7 @@ spec:
             url: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
             jsonData:
               implementation: prometheus
+              handleGrafanaManagedAlerts: true
             isDefault: false
           - name: Prometheus
             type: prometheus
@@ -129,6 +131,7 @@ spec:
             access: proxy
             url: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
             jsonData:
+              manageAlerts: true
               prometheusType: Prometheus
             isDefault: false
           - name: Tempo
