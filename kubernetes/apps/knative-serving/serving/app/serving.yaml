@@ -11,6 +11,8 @@ spec:
         selector:
           istio: istio-gateway
   config:
+    logging.enable-request-log: "true"
+    logging.enable-probe-request-log: "true"
     istio:
       external-gateways: |
         - name: external-gateway
