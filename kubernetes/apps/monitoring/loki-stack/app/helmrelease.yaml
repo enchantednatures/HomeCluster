@@ -43,17 +43,30 @@ spec:
     mode: enabled
   maxHistory: 3
   values:
-    deploymentMode: "SimpleScalable<->Distributed"
+    deploymentMode: "Distributed"
+
+    # Gateway configuration
     gateway:
       enabled: true
-      replica: 5
+      service:
+        type: ClusterIP
+      replicas: 2
+
+    # Loki configuration
     loki:
       auth_enabled: false
       commonConfig:
         path_prefix: /var/loki
         replication_factor: 1
       limits_config:
-        allow_structured_metadata: false
+        allow_structured_metadata: true
+        volume_enabled: true
+      ingester:
+        chunk_encoding: snappy
+      querier:
+        max_concurrent: 4
+      pattern_ingester:
+        enabled: true
       schemaConfig:
         configs:
           - from: "2020-10-24"
@@ -61,7 +74,7 @@ spec:
             object_store: s3
             schema: v13
             index:
-              prefix: index_
+              prefix: loki_index_
               period: 24h
       storage:
         type: s3
@@ -83,55 +96,76 @@ spec:
           s3: s3://loki-chunks
           s3forcepathstyle: true
           insecure: false
-          # signatureVersion: v4
           endpoint: http://minio-service.networking.svc.cluster.local:9768
-      write:
-        replicas: 1
-        persistence:
-          enabled: true
-          storageClass: openebs-hostpath
-          size: 10Gi
-      ruler:
-        replicas: 1
-        persistence:
-          enabled: true
-          storageClass: openebs-hostpath
-          size: 10Gi
-      read:
-        replicas: 3
-      backend:
-        replicas: 1
-        persistence:
-          enabled: true
-          storageClass: openebs-hostpath
-          size: 10Gi
-      gateway:
-        enabled: true
-        replicas: 1
       serviceMonitor:
         enabled: true
       prometheusRule:
         enabled: true
-    write:
+
+    # Microservices components
+    ingester:
+      replicas: 3
+      zoneAwareReplication:
+        enabled: false
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
+
+    querier:
+      replicas: 3
+      maxUnavailable: 2
+
+    queryFrontend:
+      replicas: 2
+      maxUnavailable: 1
+
+    queryScheduler:
+      replicas: 2
+
+    distributor:
+      replicas: 3
+      maxUnavailable: 2
+
+    compactor:
       replicas: 1
       persistence:
         enabled: true
         storageClass: openebs-hostpath
         size: 10Gi
+
+    indexGateway:
+      replicas: 2
+      maxUnavailable: 1
+      persistence:
+        enabled: true
+        storageClass: openebs-hostpath
+        size: 10Gi
+
     ruler:
       replicas: 1
       persistence:
         enabled: true
         storageClass: openebs-hostpath
         size: 10Gi
-    read:
-      replicas: 3
+
+    # Disable unused components
+    bloomPlanner:
+      replicas: 0
+    bloomBuilder:
+      replicas: 0
+    bloomGateway:
+      replicas: 0
+
+    # Disable legacy components
     backend:
-      replicas: 1
-      persistence:
-        enabled: true
-        storageClass: openebs-hostpath
-        size: 10Gi
+      replicas: 0
+    read:
+      replicas: 0
+    write:
+      replicas: 0
+    singleBinary:
+      replicas: 0
   valuesFrom:
     - targetPath: loki.storage.bucketNames.chunks
       kind: ConfigMap
