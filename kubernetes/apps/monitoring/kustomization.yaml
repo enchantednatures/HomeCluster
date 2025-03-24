@@ -12,4 +12,4 @@ resources:
   - ./prometheus-operator-crds//ks.yaml
   - ./promtail/ks.yaml
   # - ./influxdb/ks.yaml
-  - ./node-exporter/ks.yaml
+  # - ./node-exporter/ks.yaml
