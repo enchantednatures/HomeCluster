@@ -25,6 +25,7 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    replicas: 3
     deploymentStrategy:
       type: Recreate
     admin:
@@ -47,7 +48,8 @@ spec:
         token_url: https://auth.${SECRET_DOMAIN}/application/o/token/
         api_url: https://auth.${SECRET_DOMAIN}/application/o/userinfo/
         # Optionally map user groups to Grafana roles
-        role_attribute_path: contains(groups, 'Grafana Admins') && 'Admin' || contains(groups,
+        role_attribute_path:
+          contains(groups, 'Grafana Admins') && 'Admin' || contains(groups,
           'Grafana Editors') && 'Editor' || 'Viewer'
       auth.basic:
         enabled: false
@@ -222,6 +224,24 @@ spec:
         kafka:
           url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/0.45.0/examples/metrics/grafana-dashboards/strimzi-kafka.json
           datasource: Prometheus
+    alerting:
+      alertmanagers:
+        - name: discord-webhook
+          namespace: monitoring
+          service: alertmanager
+          port: web
+          pathPrefix: /
+          scheme: http
+          timeout: 10s
+          apiVersion: v1
+          webhook:
+            url:
+              valueFrom:
+                secretKeyRef:
+                  name: discord-webhook-url
+                  key: url
+            sendResolved: true
+
     sidecar:
       dashboards:
         enabled: true

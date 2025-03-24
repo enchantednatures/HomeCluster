@@ -5,6 +5,7 @@ resources:
   - ./secret.sops.yaml
   - ./oauth-secret.sops.yaml
   - ./helmrelease.yaml
+  - ./webhook.sops.yaml
   # - ./virtual-service.yaml
   # - https://raw.githubusercontent.com/knative-extensions/monitoring/main/grafana/dashboards.yaml
   # - https://raw.githubusercontent.com/knative/docs/main/docs/serving/observability/metrics/collector.yaml
