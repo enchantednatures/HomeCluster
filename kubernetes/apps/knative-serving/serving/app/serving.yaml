@@ -20,6 +20,6 @@ spec:
         namespace: istio-ingress
         service: istio-gateway.istio-ingress.svc.cluster.local
     autoscaler:
-      enable-scale-to-zero: "false"
+      enable-scale-to-zero: "true"
   high-availability:
     replicas: 3
