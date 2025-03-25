@@ -137,10 +137,6 @@ spec:
     indexGateway:
       replicas: 2
       maxUnavailable: 1
-      persistence:
-        enabled: true
-        storageClass: openebs-hostpath
-        size: 10Gi
 
     ruler:
       replicas: 1
