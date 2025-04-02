@@ -1,5 +1,10 @@
 # tofu/talos/machine-config/worker.yaml.tftpl
 machine:
+  files:
+      - path: /var/openebs/local
+        op: create
+        directory: true
+        permissions: 0755
   kubelet:
     extraMounts:
       - destination: /var/openebs/local
