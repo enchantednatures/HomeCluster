@@ -1,0 +1,9 @@
+---
+# kubernetes/apps/networking/nginx/virtualservices/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: networking
+resources:
+  - ../ingresses/minio-ui-virtualservice.yaml
+  - ../ingresses/minio-service-virtualservice.yaml
+  - ../ingresses/pve-virtualservice.yaml
