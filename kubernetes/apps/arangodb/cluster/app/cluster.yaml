@@ -1,0 +1,25 @@
+apiVersion: "database.arangodb.com/v1"
+kind: "ArangoDeployment"
+metadata:
+  name: "arangodb-cluster"
+  namespace: "arangodb"
+spec:
+  mode: Cluster
+  environment: Production
+  agents:
+    count: 3
+    args:
+      - --log.level=debug
+    resources:
+      requests:
+        storage: 8Gi
+    storageClassName: openebs-hostpath
+  dbservers:
+    count: 3
+    resources:
+      requests:
+        storage: 8Gi
+    storageClassName: openebs-hostpath
+  coordinators:
+    count: 3
+  image: "arangodb/arangodb:3.12"
