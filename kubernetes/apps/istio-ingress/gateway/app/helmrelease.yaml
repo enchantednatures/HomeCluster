@@ -33,7 +33,7 @@ spec:
         annotations:
           external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
         service:
-          externalTrafficPolicy: Cluster
+          externalTrafficPolicy: Local
         resources:
           requests:
             cpu: 10m
