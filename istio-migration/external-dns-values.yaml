@@ -1,0 +1,15 @@
+---
+# Updates for external-dns to work with Istio gateway/virtual services
+extraArgs:
+  - --provider=cloudflare
+  - --source=istio-gateway
+  - --source=istio-virtualservice
+  - --source=crd
+  - --cloudflare-proxied
+  - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
+  - --crd-source-kind=DNSEndpoint
+policy: sync
+sources: [istio-gateway, istio-virtualservice, crd]
+txtPrefix: k8s.
+txtOwnerId: default
+domainFilters: ["${SECRET_DOMAIN}"]
