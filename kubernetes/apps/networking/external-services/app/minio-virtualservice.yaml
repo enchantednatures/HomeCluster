@@ -1,0 +1,18 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio-ui
+  namespace: networking
+  annotations:
+    external-dns/is-public: "true"
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+spec:
+  hosts: ["minio.${SECRET_DOMAIN}"]
+  gateways: [istio-ingress/external-gateway]
+  http:
+    - route:
+        - destination:
+            host: minio-ui.networking.svc.cluster.local
+            port:
+              number: 9769
