@@ -24,7 +24,7 @@ terraform {
     }
     proxmox = {
       source  = "bpg/proxmox"
-      version = "0.74"
+      version = "0.75"
     }
     restapi = {
       source  = "Mastercard/restapi"
