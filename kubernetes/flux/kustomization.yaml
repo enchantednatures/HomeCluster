@@ -6,3 +6,4 @@ resources:
   - ./vars
   - ./repositories
   - ./flux-system
+  - ./core.yaml
