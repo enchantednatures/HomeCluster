@@ -48,4 +48,4 @@ resources: [gotk-components.yaml, gotk-sync.yaml]
 #         value: --helm-cache-purge-interval=5m
 #     target:
 #       kind: Deployment
-#       name: source-controller
+# apps       name: source-controller
