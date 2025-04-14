@@ -48,4 +48,4 @@ patches:
         value: --helm-cache-purge-interval=5m
     target:
       kind: Deployment
-apps       name: source-controller
+      name: source-controller
