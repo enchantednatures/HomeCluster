@@ -28,4 +28,3 @@ spec:
                 name: arangodb-cluster
                 port:
                   number: 8529
----
