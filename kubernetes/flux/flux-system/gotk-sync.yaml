@@ -6,7 +6,6 @@ metadata:
   namespace: flux-system
 spec:
   interval: 30m
-  prune: true
   ref:
     branch: main
   url: https://github.com/enchantednatures/HomeCluster.git
@@ -39,4 +38,3 @@ spec:
         name: cluster-settings
       - kind: Secret
         name: cluster-secrets
-
