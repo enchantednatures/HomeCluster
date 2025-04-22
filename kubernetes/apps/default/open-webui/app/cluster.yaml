@@ -33,7 +33,7 @@ spec:
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
       # Note: serverName version needs to be incremented
       # when recovering from an existing cnpg cluster
-      serverName: &currentCluster openwebui-v4
+      serverName: &currentCluster openwebui-v5
       s3Credentials:
         accessKeyId:
           name: openwebui-pg-secret
@@ -51,7 +51,7 @@ spec:
     #     name: openwebui-app-user
     #   postInitTemplateSQL: []
     recovery:
-      source: &previousCluster openwebui-v3
+      source: &previousCluster openwebui-v4
       database: app
       owner: app
       secret:
