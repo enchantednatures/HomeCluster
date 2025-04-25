@@ -22,12 +22,11 @@ spec:
     remediation:
       retries: 3
   values:
-    console:
-      config:
-        kafka:
-          brokers:
-            # - kafka-kafka-bootstrap.snail.svc.cluster.local:9092
-            - snail-kafka-bootstrap.kafka.svc.cluster.local:9092
+    config:
+      kafka:
+        brokers:
+          # - kafka-kafka-bootstrap.snail.svc.cluster.local:9092
+          - snail-kafka-bootstrap.kafka.svc.cluster.local:9092
     ingress:
       enabled: false
       className: external
