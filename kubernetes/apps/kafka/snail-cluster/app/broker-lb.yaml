@@ -1,0 +1,60 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app snail-kafka-broker-tailscale
+  namespace: kafka
+  labels:
+    app.kubernetes.io/instance: snail
+    app.kubernetes.io/managed-by: strimzi-cluster-operator
+    app.kubernetes.io/name: kafka
+    app.kubernetes.io/part-of: strimzi-snail
+    strimzi.io/cluster: snail
+    strimzi.io/component-type: kafka
+    strimzi.io/discovery: "true"
+    strimzi.io/kind: Kafka
+    strimzi.io/name: snail-kafka
+  # annotations:
+  #   external-dns.alpha.kubernetes.io/hostname: postgres.${SECRET_DOMAIN}
+  annotations:
+    strimzi.io/discovery: |-
+      [ {
+      "port" : 9092,
+      "tls" : false,
+      "protocol" : "kafka",
+      "auth" : "none"
+      }, {
+      "port" : 9093,
+      "tls" : true,
+      "protocol" : "kafka",
+      "auth" : "none"
+      } ]
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+    - name: tcp-ctrlplane
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - name: tcp-replication
+      port: 9091
+      protocol: TCP
+      targetPort: 9091
+    - name: tcp-kafkaagent
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    - name: tcp-clients
+      port: 9092
+      protocol: TCP
+      targetPort: 9092
+    - name: tcp-clientstls
+      port: 9093
+      protocol: TCP
+      targetPort: 9093
+  selector:
+    strimzi.io/broker-role: "true"
+    strimzi.io/cluster: snail
+    strimzi.io/kind: Kafka
+    strimzi.io/name: snail-kafka
