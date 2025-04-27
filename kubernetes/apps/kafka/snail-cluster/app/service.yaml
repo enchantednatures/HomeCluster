@@ -14,8 +14,8 @@ metadata:
     strimzi.io/discovery: "true"
     strimzi.io/kind: Kafka
     strimzi.io/name: snail-kafka
-  # annotations:
-  #   external-dns.alpha.kubernetes.io/hostname: postgres.${SECRET_DOMAIN}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: kafka.${SECRET_DOMAIN}
   annotations:
     strimzi.io/discovery: |-
       [ {
