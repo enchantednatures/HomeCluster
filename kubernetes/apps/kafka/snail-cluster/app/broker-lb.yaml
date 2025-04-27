@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: &app snail-tailscale
+  name: snail-kafka-broker-tailscale
   namespace: kafka
   labels:
     app.kubernetes.io/instance: snail
@@ -14,8 +14,8 @@ metadata:
     strimzi.io/discovery: "true"
     strimzi.io/kind: Kafka
     strimzi.io/name: snail-kafka
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: kafka.${SECRET_DOMAIN}
+  # annotations:
+  #   external-dns.alpha.kubernetes.io/hostname: postgres.${SECRET_DOMAIN}
   annotations:
     strimzi.io/discovery: |-
       [ {
@@ -33,10 +33,18 @@ spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
   ports:
+    - name: tcp-ctrlplane
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
     - name: tcp-replication
       port: 9091
       protocol: TCP
       targetPort: 9091
+    - name: tcp-kafkaagent
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
     - name: tcp-clients
       port: 9092
       protocol: TCP
