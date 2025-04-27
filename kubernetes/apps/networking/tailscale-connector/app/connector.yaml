@@ -6,6 +6,7 @@ metadata:
   namespace: networking
 spec:
   hostname: ts-cluster-cidrs
+  exitNode: true
   tags:
     - tag:k8s
   subnetRouter:
