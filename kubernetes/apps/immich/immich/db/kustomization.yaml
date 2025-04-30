@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - cluster.yaml
+  - db-hunter.sops.yaml
+  - db-user.sops.yaml
+  - immich-db-user.sops.yaml
+  - scheduled-backup.yaml
+  - secret.sops.yaml
+  - superusersecret.sops.yaml

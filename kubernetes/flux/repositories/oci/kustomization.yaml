@@ -5,6 +5,7 @@ resources:
   - ./bitnami-schema-registry.yaml
   - ./bitnami.yaml
   - ./bjw-s.yaml
+  - ./immich.yaml
   - ./prometheus-community.yaml
   - ./spegel.yaml
   - ./weave-gitops.yaml

@@ -1,0 +1,67 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-cache immich-dragonfly
+  namespace: flux-system
+spec:
+  targetNamespace: immich
+  dependsOn:
+    - name: dragonflydb-operator
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-cache
+  path: ./kubernetes/apps/immich/immich/dragonfly/
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-db immich-db
+  namespace: flux-system
+spec:
+  targetNamespace: immich
+  dependsOn:
+    - name: cloudnative-pg
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-db
+  path: ./kubernetes/apps/immich/immich/db/
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+# ---
+# apiVersion: kustomize.toolkit.fluxcd.io/v1
+# kind: Kustomization
+# metadata:
+#   name: &app immich
+#   namespace: flux-system
+# spec:
+#   targetNamespace: immich
+#   dependsOn:
+#     - name: immich-dragonfly
+#     - name: immich-db
+#   commonMetadata:
+#     labels:
+#       app.kubernetes.io/name: *app
+#   path: ./kubernetes/apps/immich/immich/app
+#   prune: true
+#   sourceRef:
+#     kind: GitRepository
+#     name: home-kubernetes
+#   wait: true
+#   interval: 30m
+#   retryInterval: 1m
+#   timeout: 5m

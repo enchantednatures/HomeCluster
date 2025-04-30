@@ -1,0 +1,29 @@
+apiVersion: v1
+stringData:
+    password: ENC[AES256_GCM,data:R99SW6E7T949yRgL+TmRrMAmvgdZiBfNNGUlqJ19Zm1xSO+k,iv:qgGTho4XExzkFNnmTcttvzSyFOTrJ+wSn10qeId+/FI=,tag:EfUbjdILnIf5W9gR0zmAkw==,type:str]
+    username: ENC[AES256_GCM,data:0utO+AqsRBotNFBMCrhTFlukGJbFVtg=,iv:fY3kdbyPxK89j+ee1u+spibVzYpGM/2x51s2lE2NFbQ=,tag:BwR2uIb//YjNGkh+yYiSug==,type:str]
+kind: Secret
+metadata:
+    name: immich-db-user
+    namespace: immich
+type: kubernetes.io/basic-auth
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBKTVYzeDl5ZHkxTzZ6Vmxr
+            bkY4UHMwMHJLWGZUWlpoT2tuVVFlb2pBd0RBCklZMWNrc0NZc2h0dFRxTWJoU0dP
+            bnZjTUZyYXplZkxKOThTZ0VBL3B5cTAKLS0tIDN2T0Y1ZmFjNnNrOFI0cTRvcTA0
+            cVJJSjBFUlJhTk5weUVvT1ZrV3dib28KLD26/80u1/knrvD78QRaFlvUizx95EqM
+            glhIXPmc+ZwqNICMgcZnYM08AA4IpTL+e79X8p+dHCIGgnbHCvdFew==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2025-04-30T07:52:21Z"
+    mac: ENC[AES256_GCM,data:sCYbMvw3io3XIgqqkK7bvciXJZN4xzNzydWIpGEjtdbiH6SMSxaerqu604SmpE1fab6oUo/IiBVBahAhW1ZlusOKIRQ/4FKB5P3tf3axHJ4jh1ZHhpy+sJOSIV2h9LCLOI7k+y/Sj0ocq0jSIF+7gHDg31MV3Ikc9K5AkpRbuLA=,iv:XPc1a//W+86vq1XDZ+2Lg41Ztio3YvD61zU/kFf/Kas=,tag:o2XDP9H6aaQ0akhHP8Hi2g==,type:str]
+    pgp: []
+    encrypted_regex: ^(data|stringData)$
+    version: 3.9.1
