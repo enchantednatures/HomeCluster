@@ -1,5 +1,5 @@
 ---
-apiVersion: postgresql.cnpg.io/v1
+apiVersion: postgresql.cnpg.io/v2
 kind: Database
 metadata:
   name: harbor-db
@@ -10,8 +10,8 @@ spec:
   cluster:
     name: harbor-db
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
-apiVersion: postgresql.cnpg.io/v1
+# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v2.json
+apiVersion: postgresql.cnpg.io/v2
 kind: Cluster
 metadata:
   name: harbor-db
@@ -63,7 +63,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster harbor-v1
+      serverName: &currentCluster harbor-v2
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -74,7 +74,7 @@ spec:
 
   bootstrap:
     recovery:
-      source: &previousCluster harbor-v0
+      source: &previousCluster harbor-v1
       database: harbor
       owner: harbor
       secret:
