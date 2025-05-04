@@ -10,7 +10,6 @@ spec:
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
   imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.3-v0.2.1
   instances: 1
-  primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
     storageClass: openebs-hostpath
@@ -25,8 +24,6 @@ spec:
     shared_preload_libraries:
       - "vectors.so"
     enableAlterSystem: true
-  storage:
-    size: 8Gi
   monitoring:
     enablePodMonitor: false
   managed:
