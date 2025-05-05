@@ -1,5 +1,5 @@
 ---
-apiVersion: postgresql.cnpg.io/v2
+apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
   name: harbor-db
@@ -11,7 +11,7 @@ spec:
     name: harbor-db
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v2.json
-apiVersion: postgresql.cnpg.io/v2
+apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: harbor-db
