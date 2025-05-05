@@ -36,6 +36,8 @@ spec:
     envFromSecrets:
       - name: grafana-oauth-secret
     grafana.ini:
+      server: # Add this section
+        cookie_secure: true
       auth:
         signout_redirect_url: https://auth.${SECRET_DOMAIN}/application/o/grafana/end-session/
         oauth_auto_login: true
