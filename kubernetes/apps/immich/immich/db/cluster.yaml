@@ -25,7 +25,7 @@ spec:
       - "vectors.so"
     enableAlterSystem: true
   monitoring:
-    enablePodMonitor: false
+    enablePodMonitor: true
   managed:
     roles:
       - name: hunter
