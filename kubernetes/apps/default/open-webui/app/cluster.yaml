@@ -31,8 +31,6 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      # Note: serverName version needs to be incremented
-      # when recovering from an existing cnpg cluster
       serverName: &currentCluster openwebui-v6
       s3Credentials:
         accessKeyId:
@@ -41,15 +39,7 @@ spec:
         secretAccessKey:
           name: openwebui-pg-secret
           key: aws-secret-access-key
-  # Note: previousCluster needs to be set to the name of the previous
-  # cluster when recovering from an existing cnpg cluster
   bootstrap:
-    # initdb:
-    #   database: app
-    #   owner: app
-    #   secret:
-    #     name: openwebui-app-user
-    #   postInitTemplateSQL: []
     recovery:
       source: &previousCluster openwebui-v5
       database: app
