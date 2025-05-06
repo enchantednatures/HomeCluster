@@ -25,6 +25,7 @@ resources:
   - ./hajimari.yaml
   - ./harbor-charts.yaml
   - ./hyperswitch-charts.yaml
+  - ./immich.yaml
   - ./influx-data.yaml
   - ./infracloudio.yaml
   - ./ingress-nginx.yaml
