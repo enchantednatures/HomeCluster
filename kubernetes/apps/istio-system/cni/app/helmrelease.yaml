@@ -16,6 +16,10 @@ spec:
         kind: HelmRepository
         name: istio
         namespace: flux-system
+      dependencies:
+        - name: cilium
+          version: 1.10.4
+          repository: https://helm.cilium.io/
   maxHistory: 2
   install:
     remediation:
@@ -26,4 +30,7 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values: {}
+  values:
+    cni:
+      enabled: true
+      excludeNamespaces: [ "kube-system", "istio-system" ]

@@ -39,11 +39,6 @@ spec:
         zipkin:
           address: tempo.monitoring.svc.cluster.local:9411
     meshConfig:
-      # serviceSettings:
-      #   - settings:
-      #       clusterLocal: true
-      #     hosts:
-      #       - "kiali.istio-system.svc.cluster.local"
       accessLogFile: /dev/stdout
       accessLogEncoding: JSON
       enableTracing: true
@@ -61,3 +56,7 @@ spec:
             port: "9000"
             service: ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local
           name: authentik
+      certificates:
+        - secretName: istio-ingressgateway-certs
+          dnsNames:
+            - "*.enchantednatures.com"

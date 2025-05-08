@@ -31,6 +31,7 @@ spec:
     service:
       name: kube-dns
       clusterIP: ${COREDNS_ADDR}
+      externalTrafficPolicy: Local
     serviceAccount:
       create: true
     deployment:
@@ -60,6 +61,7 @@ spec:
             parameters: . /etc/resolv.conf
             configBlock: |-
               max_concurrent 1000
+              forward . /etc/resolv.conf
           - name: cache
             parameters: 30
           - name: loop
