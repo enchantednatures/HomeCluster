@@ -1,0 +1,17 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - wildcard-certificate.yaml
+  - gateway.yaml
+  - minio-virtualservice.yaml
+  - pve-virtualservice.yaml
+
+configMapGenerator:
+  - name: cloudflared-configmap
+    namespace: networking
+    files:
+      - config.yaml=cloudflared-config.yaml
+
+patchesStrategicMerge:
+  - external-dns-values.yaml
