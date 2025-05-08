@@ -18,3 +18,4 @@ resources:
   - ./scheduled-backup.yaml
   - ./superusersecret.sops.yaml
   - ./config-map.yaml
+  - ./virtualservice.yaml
