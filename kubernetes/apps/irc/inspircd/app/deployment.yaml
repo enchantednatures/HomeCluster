@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inspircd
+  labels:
+    app: inspircd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inspircd
+  template:
+    metadata:
+      labels:
+        app: inspircd
+    spec:
+      containers:
+        - name: inspircd
+          image: inspircd/inspircd-docker:inspircd-3
+          ports:
+            - containerPort: 6667
+              name: irc
+            - containerPort: 6697
+              name: ircs
+          volumeMounts:
+            - name: inspircd-config
+              mountPath: /inspircd/conf/inspircd.conf
+              subPath: inspircd.conf
+            - name: inspircd-data
+              mountPath: /inspircd/data
+            - name: inspircd-logs
+              mountPath: /inspircd/logs
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+      volumes:
+        - name: inspircd-config
+          configMap:
+            name: inspircd-config
+        - name: inspircd-data
+          persistentVolumeClaim:
+            claimName: inspircd-data-pvc
+        - name: inspircd-logs
+          persistentVolumeClaim:
+            claimName: inspircd-logs-pvc

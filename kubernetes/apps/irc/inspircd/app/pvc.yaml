@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: inspircd-data-pvc
+  labels:
+    app: inspircd
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: csi-driver-nfs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: inspircd-logs-pvc
+  labels:
+    app: inspircd
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: csi-driver-nfs
