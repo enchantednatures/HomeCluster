@@ -42,3 +42,4 @@ metadata:
   namespace: knative-eventing
 data:
   eventtype-auto-create: "enabled"
+  istio: "enabled"
