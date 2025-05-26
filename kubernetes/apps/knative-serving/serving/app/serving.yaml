@@ -9,19 +9,30 @@ spec:
       enabled: true
       knative-ingress-gateway:
         selector:
-          istio: istio-gateway
+          istio: gateway  # This should match your gateway selector
   config:
-    logging.enable-request-log: "true"
-    logging.enable-probe-request-log: "true"
+    network:
+      ingress-class: "istio.ingress.networking.knative.dev/ingress-class"
+    logging:
+      loglevel.controller: "info"
+      loglevel.autoscaler: "info"
+      loglevel.queueproxy: "info"
+      loglevel.webhook: "info"
+      loglevel.activator: "info"
+    observability:
+      logging.enable-request-log: "true"
+      # logging.enable-probe-request-log: "true"
+      metrics.backend-destination: "prometheus"
     istio:
-      external-gateways: |
-        - name: external-gateway
-          namespace: istio-ingress
-          service: istio-gateway.istio-ingress.svc.cluster.local
-      local-gateway: |
-        namespace: istio-ingress
-        service: istio-gateway.istio-ingress.svc.cluster.local
+      gateway.knative-serving.knative-ingress-gateway: "istio-ingress/istio-gateway"
+      local-gateway.knative-serving.cluster-local-gateway: "istio-ingress/istio-gateway"
     autoscaler:
       enable-scale-to-zero: "true"
+      scale-to-zero-grace-period: "30s"
+      stable-window: "60s"
+      panic-window-percentage: "10"
+      max-scale-up-rate: "1000"
+      max-scale-down-rate: "2"
+      target-burst-capacity: "200"
   high-availability:
-    replicas: 3
+    replicas: 2  # Reduced for home lab
