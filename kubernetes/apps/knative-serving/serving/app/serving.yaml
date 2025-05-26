@@ -25,8 +25,8 @@ spec:
       metrics.backend-destination: "prometheus"
     istio:
       # Fixed: Points to your actual Istio gateway service in istio-ingress namespace
-      gateway.knative-serving.knative-ingress-gateway: "istio-ingress/istio-ingressgateway"
-      local-gateway.knative-serving.cluster-local-gateway: "istio-ingress/istio-ingressgateway"
+      gateway.knative-serving.knative-ingress-gateway: "istio-gateway.istio-ingress.svc.cluster.local"
+      local-gateway.knative-serving.cluster-local-gateway: "istio-gateway.istio-ingress.svc.cluster.local"
     autoscaler:
       enable-scale-to-zero: "true"
       scale-to-zero-grace-period: "30s"
