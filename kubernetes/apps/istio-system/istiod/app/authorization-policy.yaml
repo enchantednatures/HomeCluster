@@ -2,7 +2,7 @@
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-istio-system
   namespace: istio-system
 spec:
   action: ALLOW
@@ -13,7 +13,7 @@ spec:
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-snail
   namespace: snail
 spec:
   action: ALLOW
@@ -23,7 +23,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-kafka
   namespace: kafka
 spec:
   action: ALLOW
@@ -33,7 +33,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-networking
   namespace: networking
 spec:
   action: ALLOW
@@ -43,7 +43,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-redpanda
   namespace: redpanda
 spec:
   action: ALLOW
@@ -53,7 +53,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-monitoring
   namespace: monitoring
 spec:
   action: ALLOW
@@ -63,7 +63,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-authentik
   namespace: authentik
 spec:
   action: ALLOW
@@ -73,7 +73,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-harbor
   namespace: harbor
 spec:
   action: ALLOW
@@ -83,18 +83,17 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-knative
   namespace: knative
 spec:
   action: ALLOW
   rules:
     - {}
-
 ---
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-knative-serving
   namespace: knative-serving
 spec:
   action: ALLOW
@@ -104,18 +103,17 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-knative-eventing
   namespace: knative-eventing
 spec:
   action: ALLOW
   rules:
     - {}
-
 ---
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-postgres
   namespace: postgres
 spec:
   action: ALLOW
@@ -125,7 +123,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-istio-ingress
   namespace: istio-ingress
 spec:
   action: ALLOW
@@ -135,7 +133,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-kube-system
   namespace: kube-system
 spec:
   action: ALLOW
@@ -145,7 +143,7 @@ spec:
 apiVersion: security.istio.io/v1
 kind: AuthorizationPolicy
 metadata:
-  name: allow-all
+  name: allow-all-flux-system
   namespace: flux-system
 spec:
   action: ALLOW
