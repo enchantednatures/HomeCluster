@@ -26,4 +26,19 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values: {}
+  values:
+    cni:
+      # Enable chained mode - this makes Istio CNI work as a plugin to Cilium
+      chained: true
+      cniBinDir: /opt/cni/bin
+      cniConfDir: /etc/cni/net.d
+      # Don't overwrite Cilium's config, chain with it instead
+      cniConfFileName: "05-cilium.conflist"
+      # Reduce reconciliation to prevent constant rewrites
+      reconcileInterval: "60s"
+      logLevel: warn  # Reduce log noise
+      # Repair configuration
+      repair:
+        enabled: true
+        hub: docker.io/istio
+        tag: 1.25.1
