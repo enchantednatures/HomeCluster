@@ -6,6 +6,7 @@ metadata:
 data:
   values.yaml: |-
     autoDirectNodeRoutes: true
+    bpf-lb-sock-hostns
     bpf:
       masquerade: true
     bgp:
@@ -15,6 +16,8 @@ data:
       id: 1
     cni:
       exclusive: false
+    socketLb:
+      hostNamespaceOnly: true
     containerRuntime:
       integration: containerd
       socketPath: /var/run/k3s/containerd/containerd.sock
@@ -75,7 +78,7 @@ data:
     ipv4NativeRoutingCIDR: "${CLUSTER_CIDR}"
     k8sServiceHost: "${KUBE_VIP_ADDR}"
     k8sServicePort: 6443
-    kubeProxyReplacement: true
+    kubeProxyReplacement: false
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
     # Ensure proper integration with Istio
     istio:

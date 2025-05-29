@@ -149,3 +149,46 @@ spec:
   action: ALLOW
   rules:
     - {}
+---
+# Allow access to Kubernetes API server from all namespaces
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kubernetes-api-server
+  namespace: istio-system
+spec:
+  host: kubernetes.default.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+# Additional destination rule for direct API server access
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kubernetes-api-server-ip
+  namespace: istio-system
+spec:
+  host: "10.96.0.1"
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+# ServiceEntry to allow access to Kubernetes API server
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kubernetes-api-server
+  namespace: istio-system
+spec:
+  hosts:
+  - kubernetes.default.svc.cluster.local
+  - "10.96.0.1"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  endpoints:
+  - address: "10.96.0.1"

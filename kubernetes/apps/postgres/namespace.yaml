@@ -6,3 +6,90 @@ metadata:
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
     istio-injection: enabled
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: postgres-permissive
+  namespace: postgres
+spec:
+  # Apply to all workloads in postgres namespace
+  mtls:
+    mode: PERMISSIVE # Allows both mTLS and plain text
+---
+apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default-permissive
+  namespace: istio-system
+spec:
+  # Global default - makes entire mesh permissive
+  mtls:
+    mode: PERMISSIVE
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: postgres-allow-all
+  namespace: postgres
+spec:
+  # Empty rules means allow all traffic
+  rules:
+    - {}
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-kubernetes-api
+  namespace: postgres
+spec:
+  rules:
+    - to:
+        - operation:
+            hosts: ["kubernetes.default.svc.cluster.local", "10.96.0.1"]
+    - from:
+        - source:
+            principals: ["cluster.local/ns/postgres/sa/*"]
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kubernetes-api-server
+  namespace: postgres
+spec:
+  hosts:
+    - kubernetes.default.svc.cluster.local
+    - 10.96.0.1
+  ports:
+    - number: 443
+      name: https-api
+      protocol: HTTPS
+    - number: 6443
+      name: https-api-alt
+      protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  endpoints:
+    - address: 10.96.0.1
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kubernetes-api-server
+  namespace: postgres
+spec:
+  host: kubernetes.default.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: SIMPLE # Don't use Istio mTLS for API server
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kubernetes-api-server-ip
+  namespace: postgres
+spec:
+  host: 10.96.0.1
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
