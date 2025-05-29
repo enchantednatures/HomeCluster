@@ -10,16 +10,6 @@ metadata:
 apiVersion: security.istio.io/v1beta1
 kind: PeerAuthentication
 metadata:
-  name: postgres-permissive
-  namespace: postgres
-spec:
-  # Apply to all workloads in postgres namespace
-  mtls:
-    mode: PERMISSIVE # Allows both mTLS and plain text
----
-apiVersion: security.istio.io/v1beta1
-kind: PeerAuthentication
-metadata:
   name: default-permissive
   namespace: istio-system
 spec:
