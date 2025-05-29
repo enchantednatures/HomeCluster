@@ -37,6 +37,7 @@ resources:
   - ./kafka-ui.yaml
   - ./kedacore.yaml
   - ./kestra-charts.yaml
+  - ./kiali.yaml
   - ./kubernetes-dashboard.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
