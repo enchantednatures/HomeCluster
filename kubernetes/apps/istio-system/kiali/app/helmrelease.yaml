@@ -1,0 +1,37 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kiali
+  namespace: istio-system
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: kiali-server
+      version: 1.86.0
+      sourceRef:
+        kind: HelmRepository
+        name: kiali
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    auth:
+      strategy: anonymous
+    external_services:
+      prometheus:
+        url: "http://prometheus-operator.monitoring.svc.cluster.local:9090"
+      grafana:
+        url: "http://grafana.monitoring.svc.cluster.local"
+      tracing:
+        enabled: true
+        in_cluster_url: "http://tempo.monitoring.svc.cluster.local:16686"
+    deployment:
+      ingress:
+        enabled: false
