@@ -40,46 +40,46 @@ spec:
     - from:
         - source:
             principals: ["cluster.local/ns/postgres/sa/*"]
----
-apiVersion: networking.istio.io/v1beta1
-kind: ServiceEntry
-metadata:
-  name: kubernetes-api-server
-  namespace: postgres
-spec:
-  hosts:
-    - kubernetes.default.svc.cluster.local
-    - 10.96.0.1
-  ports:
-    - number: 443
-      name: https-api
-      protocol: HTTPS
-    - number: 6443
-      name: https-api-alt
-      protocol: HTTPS
-  location: MESH_EXTERNAL
-  resolution: STATIC
-  endpoints:
-    - address: 10.96.0.1
----
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: kubernetes-api-server
-  namespace: postgres
-spec:
-  host: kubernetes.default.svc.cluster.local
-  trafficPolicy:
-    tls:
-      mode: SIMPLE # Don't use Istio mTLS for API server
----
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: kubernetes-api-server-ip
-  namespace: postgres
-spec:
-  host: 10.96.0.1
-  trafficPolicy:
-    tls:
-      mode: SIMPLE
+# ---
+# apiVersion: networking.istio.io/v1beta1
+# kind: ServiceEntry
+# metadata:
+#   name: kubernetes-api-server
+#   namespace: postgres
+# spec:
+#   hosts:
+#     - kubernetes.default.svc.cluster.local
+#     - 10.96.0.1
+#   ports:
+#     - number: 443
+#       name: https-api
+#       protocol: HTTPS
+#     - number: 6443
+#       name: https-api-alt
+#       protocol: HTTPS
+#   location: MESH_EXTERNAL
+#   resolution: STATIC
+#   endpoints:
+#     - address: 10.96.0.1
+# ---
+# apiVersion: networking.istio.io/v1beta1
+# kind: DestinationRule
+# metadata:
+#   name: kubernetes-api-server
+#   namespace: postgres
+# spec:
+#   host: kubernetes.default.svc.cluster.local
+#   trafficPolicy:
+#     tls:
+#       mode: SIMPLE # Don't use Istio mTLS for API server
+# ---
+# apiVersion: networking.istio.io/v1beta1
+# kind: DestinationRule
+# metadata:
+#   name: kubernetes-api-server-ip
+#   namespace: postgres
+# spec:
+#   host: 10.96.0.1
+#   trafficPolicy:
+#     tls:
+#       mode: SIMPLE
