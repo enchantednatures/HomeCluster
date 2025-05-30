@@ -16,16 +16,16 @@ metadata:
   namespace: postgres
 spec:
   hosts:
-  - kubernetes.default.svc.cluster.local
-  - "10.96.0.1"
+    - kubernetes.default.svc.cluster.local
+    - "10.96.0.1"
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
+    - number: 443
+      name: https
+      protocol: HTTPS
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-  - address: "10.96.0.1"
+    - address: "10.96.0.1"
 ---
 # Destination rule for Kubernetes API server in postgres namespace
 apiVersion: networking.istio.io/v1beta1
@@ -45,7 +45,7 @@ metadata:
   name: kubernetes-api-server-ip
   namespace: postgres
 spec:
-  host: "10.96.0.1"
+  host: kubernetes.default.svc.cluster.local  # Use the proper service FQDN
   trafficPolicy:
     tls:
       mode: DISABLE
