@@ -32,9 +32,18 @@ spec:
         requests:
           cpu: 100m
           memory: 2048Mi
+      env:
+        # Disable CNI and use init containers instead
+        EXTERNAL_ISTIOD: false
+        PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
     global:
       logAsJson: true
       meshID: enchantednatures
+      # Use init containers instead of CNI
+      istioNamespace: istio-system
+      # Disable CNI
+      cni:
+        enabled: false
       tracer:
         zipkin:
           address: tempo.monitoring.svc.cluster.local:9411

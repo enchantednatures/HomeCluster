@@ -15,7 +15,7 @@ data:
       name: home-cluster
       id: 1
     cni:
-      exclusive: false
+      exclusive: true
     socketLb:
       hostNamespaceOnly: true
     containerRuntime:
@@ -78,11 +78,9 @@ data:
     ipv4NativeRoutingCIDR: "${CLUSTER_CIDR}"
     k8sServiceHost: "${KUBE_VIP_ADDR}"
     k8sServicePort: 6443
-    kubeProxyReplacement: false
+    kubeProxyReplacement: true
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
-    # Ensure proper integration with Istio
-    istio:
-      enabled: true
+    # Removed Istio integration since we're using init containers
     l2announcements:
       enabled: true
       # https://github.com/cilium/cilium/issues/26586
