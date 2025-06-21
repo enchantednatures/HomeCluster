@@ -172,12 +172,12 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - kubernetes.default.svc.cluster.local
+    - kubernetes.default.svc.cluster.local
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
+    - number: 443
+      name: https
+      protocol: HTTPS
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-  - address: "10.96.0.1"
+    - address: "10.96.0.1"
