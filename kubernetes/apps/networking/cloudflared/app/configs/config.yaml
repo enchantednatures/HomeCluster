@@ -3,11 +3,7 @@ originRequest:
   http2Origin: true
 ingress:
   - hostname: ${SECRET_DOMAIN}
-    service: https://istio-gateway.istio-ingress.svc.cluster.local:443
-    originRequest:
-      originServerName: external.${SECRET_DOMAIN}
+    service: http://istio-gateway.istio-ingress.svc.cluster.local:80
   - hostname: "*.${SECRET_DOMAIN}"
-    service: https://istio-gateway.istio-ingress.svc.cluster.local:443
-    originRequest:
-      originServerName: external.${SECRET_DOMAIN}
+    service: http://istio-gateway.istio-ingress.svc.cluster.local:80
   - service: http_status:404
