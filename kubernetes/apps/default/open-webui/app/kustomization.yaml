@@ -6,7 +6,6 @@ metadata:
   namespace: default
 resources:
   - ./deployment.yaml
-  - ./ingress.yaml
   - ./service.yaml
   - ./pvc.yaml
   - ./secret.sops.yaml
