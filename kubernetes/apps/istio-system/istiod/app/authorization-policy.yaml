@@ -161,18 +161,8 @@ spec:
   trafficPolicy:
     tls:
       mode: DISABLE
----
-# Additional destination rule for direct API server access
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: kubernetes-api-server-ip
-  namespace: istio-system
-spec:
-  host: "10.96.0.1"
-  trafficPolicy:
-    tls:
-      mode: DISABLE
+# Removed problematic DestinationRule with IP host - causes validation error
+# The kubernetes-api-server DestinationRule above is sufficient
 ---
 # ServiceEntry to allow access to Kubernetes API server
 apiVersion: networking.istio.io/v1beta1

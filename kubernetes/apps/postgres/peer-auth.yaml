@@ -37,14 +37,4 @@ spec:
   trafficPolicy:
     tls:
       mode: DISABLE
----
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: kubernetes-api-server-ip
-  namespace: postgres
-spec:
-  host: kubernetes.default.svc.cluster.local  # Use the proper service FQDN
-  trafficPolicy:
-    tls:
-      mode: DISABLE
+# Removed duplicate DestinationRule - kubernetes-api-server above is sufficient
