@@ -1,0 +1,20 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio-ui
+  namespace: networking
+spec:
+  hosts:
+    - minio.enchantednatures.com
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: minio-ui.networking.svc.cluster.local
+            port:
+              number: 9769

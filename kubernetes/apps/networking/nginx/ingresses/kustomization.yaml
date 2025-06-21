@@ -9,3 +9,4 @@ resources:
   - ./minio-service.endpoints.yaml
   - ./pve.ingress.yaml
   - ./pve.service.yaml
+  - ./minio-ui-virtualservice.yaml
