@@ -6,7 +6,7 @@ metadata:
   namespace: elastic
 spec:
   hosts:
-    - kibana.enchantednatures.com
+    - kibana.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

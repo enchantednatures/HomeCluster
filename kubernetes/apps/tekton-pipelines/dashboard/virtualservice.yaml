@@ -6,7 +6,7 @@ metadata:
   namespace: tekton-pipelines
 spec:
   hosts:
-    - tekton.enchantednatures.com
+    - tekton.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

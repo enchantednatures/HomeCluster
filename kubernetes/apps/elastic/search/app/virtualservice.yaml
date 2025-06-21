@@ -6,7 +6,7 @@ metadata:
   namespace: elastic
 spec:
   hosts:
-    - elastic.enchantednatures.com
+    - elastic.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

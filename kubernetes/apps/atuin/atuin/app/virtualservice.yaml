@@ -6,7 +6,7 @@ metadata:
   namespace: atuin
 spec:
   hosts:
-    - atuin.enchantednatures.com
+    - atuin.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

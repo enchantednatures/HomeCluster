@@ -6,7 +6,7 @@ metadata:
   namespace: authentik
 spec:
   hosts:
-    - auth.enchantednatures.com
+    - auth.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

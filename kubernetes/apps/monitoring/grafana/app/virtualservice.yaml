@@ -6,7 +6,7 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-    - grafana.enchantednatures.com
+    - grafana.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

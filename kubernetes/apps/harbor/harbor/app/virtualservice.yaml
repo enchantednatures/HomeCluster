@@ -6,7 +6,7 @@ metadata:
   namespace: harbor
 spec:
   hosts:
-    - harbor.enchantednatures.com
+    - harbor.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

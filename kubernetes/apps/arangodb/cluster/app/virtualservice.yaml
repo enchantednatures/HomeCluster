@@ -6,7 +6,7 @@ metadata:
   namespace: arangodb
 spec:
   hosts:
-    - arango.enchantednatures.com
+    - arango.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:
