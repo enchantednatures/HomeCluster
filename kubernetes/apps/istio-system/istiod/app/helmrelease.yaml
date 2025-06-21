@@ -36,12 +36,14 @@ spec:
         # Disable CNI and use init containers instead
         EXTERNAL_ISTIOD: false
         PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
+        # Disable automatic DestinationRule creation for kubernetes API
+        PILOT_ENABLE_KUBERNETES_GATEWAY_API: false
     global:
       logAsJson: true
       meshID: enchantednatures
-      # Use init containers instead of CNI
+      # Use init containers instead of CNI to avoid Cilium conflicts
       istioNamespace: istio-system
-      # Disable CNI
+      # Disable CNI completely
       cni:
         enabled: false
       tracer:
