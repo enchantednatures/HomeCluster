@@ -5,6 +5,8 @@ kind: Gateway
 metadata:
   name: external-gateway
   namespace: istio-ingress
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   selector:
     istio: gateway

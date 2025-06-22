@@ -5,4 +5,3 @@ resources:
   - ./dnsendpoint-crd.yaml
   - ./secret.sops.yaml
   - ./helmrelease.yaml
-  - ./istio-virtualservices-cname.yaml

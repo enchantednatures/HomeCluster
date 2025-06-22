@@ -4,8 +4,6 @@ kind: VirtualService
 metadata:
   name: atuin
   namespace: atuin
-  annotations:
-    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - atuin.${SECRET_DOMAIN}

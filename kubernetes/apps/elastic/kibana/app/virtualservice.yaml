@@ -4,8 +4,6 @@ kind: VirtualService
 metadata:
   name: kibana
   namespace: elastic
-  annotations:
-    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - kibana.${SECRET_DOMAIN}
