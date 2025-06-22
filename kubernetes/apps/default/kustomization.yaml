@@ -7,3 +7,4 @@ resources:
   - ./open-webui-pipelines/ks.yaml
   - ./dbman/ks.yaml
   - ./searxng/ks.yaml
+  - ./sa.yaml

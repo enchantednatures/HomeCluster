@@ -1,0 +1,79 @@
+# sa.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: opencode
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: limited-admin-role
+rules:
+  # Read everything in all namespaces EXCEPT for reading secret values
+  - apiGroups: [""]
+    resources:
+      [
+        "pods",
+        "configmaps",
+        "services",
+        "endpoints",
+        "serviceaccounts",
+        "persistentvolumeclaims",
+        "persistentvolumes",
+        "nodes",
+      ]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "statefulsets", "replicasets", "daemonsets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses", "networkpolicies"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses", "csinodes", "csidrivers"]
+    verbs: ["get", "list", "watch"]
+  # Explicitly allow listing secret names but not getting their values
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["list", "watch"] # Allow listing/watching secret names, but not 'get' which reveals values
+
+  # Delete pods in all namespaces
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+
+  # Force a Flux reconciliation
+  # This typically involves patching or annotating a Flux object.
+  # The specific resources and verbs might vary slightly based on your Flux version and objects.
+  # Common ones are `kustomizations.source.toolkit.fluxcd.io` and `helmreleases.helm.toolkit.fluxcd.io`
+  # and the verb is usually "patch" or "update" to trigger a reconciliation.
+  - apiGroups: ["source.toolkit.fluxcd.io"]
+    resources: ["gitrepositories", "helmrepositories", "buckets"]
+    verbs: ["get", "list", "watch", "patch", "update"] # patch/update for annotations
+  - apiGroups: ["kustomize.toolkit.fluxcd.io"]
+    resources: ["kustomizations"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+  - apiGroups: ["helm.toolkit.fluxcd.io"]
+    resources: ["helmreleases"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+---
+# clusterrolebinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: limited-admin-binding
+subjects:
+  - kind: ServiceAccount
+    name: opencode
+    namespace: default # Must match the namespace of your ServiceAccount
+roleRef:
+  kind: ClusterRole
+  name: limited-admin-role
+  apiGroup: rbac.authorization.k8s.io

@@ -23,20 +23,26 @@ spec:
       strategy: rollback
       retries: 3
   values:
-    oauth: {}
+    oauth:
+      clientId:
+        valueFrom:
+          secretKeyRef:
+            name: operator-oauth
+            key: client_id
+      clientSecret:
+        valueFrom:
+          secretKeyRef:
+            name: operator-oauth
+            key: client_secret
     installCRDs: "true"
     image:
       repository: docker.io/tailscale/k8s-operator
       tag: v1.84.2
-    operatorConfig:
-      podAnnotations:
-        sidecar.istio.io/inject: "false"
+    operatorConfig: {}
     proxyConfig:
       image:
         repository: tailscale/tailscale
         tag: v1.84.2
       firewallMode: auto
-      annotations:
-        sidecar.istio.io/inject: "false"
     apiServerProxyConfig:
       mode: "true" # "true", "false", "noauth"
