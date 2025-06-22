@@ -32,7 +32,7 @@ spec:
     tls:
       mode: DISABLE
 ---
-# VirtualService for MinIO UI with proper headers and API routing
+# VirtualService for MinIO Console - simplified routing
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
@@ -44,23 +44,6 @@ spec:
   gateways:
   - istio-ingress/external-gateway
   http:
-  # Route API calls to the MinIO API service
-  - match:
-    - uri:
-        prefix: /minio/
-    - uri:
-        prefix: /api/
-    route:
-    - destination:
-        host: minio-external.local
-        port:
-          number: 9768
-    headers:
-      request:
-        set:
-          X-Forwarded-Proto: https
-          X-Forwarded-Host: minio.${SECRET_DOMAIN}
-  # Route everything else to the console
   - match:
     - uri:
         prefix: /
@@ -74,11 +57,7 @@ spec:
         set:
           X-Forwarded-Proto: https
           X-Forwarded-Host: minio.enchantednatures.com
-          MINIO_BROWSER_REDIRECT_URL: https://minio.enchantednatures.com
-      response:
-        set:
-          X-Frame-Options: SAMEORIGIN
-          X-Content-Type-Options: nosniff
+          Host: minio.enchantednatures.com
 ---
 # VirtualService for MinIO API/S3 service
 apiVersion: networking.istio.io/v1beta1
@@ -105,3 +84,4 @@ spec:
         set:
           X-Forwarded-Proto: https
           X-Forwarded-Host: s3.enchantednatures.com
+          Host: s3.enchantednatures.com

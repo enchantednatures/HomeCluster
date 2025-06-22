@@ -2,8 +2,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./helmrelease.yaml
-  - ./scrape-config.yaml
-  - ./rules.yaml
-  - ./virtualservice.yaml
   - ./istio-config.yaml
+  - ./monitoring
+  - ./notifications/github
+  - ./webhooks

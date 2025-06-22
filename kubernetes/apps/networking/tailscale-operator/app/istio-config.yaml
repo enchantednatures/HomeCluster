@@ -1,0 +1,62 @@
+---
+# ServiceEntry to allow Tailscale pods to access Kubernetes API
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kubernetes-api-tailscale
+  namespace: networking
+spec:
+  hosts:
+    - kubernetes.default.svc.cluster.local
+  ports:
+    - number: 443
+      name: https
+      protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# DestinationRule to disable TLS for Kubernetes API access
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kubernetes-api-tailscale
+  namespace: networking
+spec:
+  host: kubernetes.default.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+# Sidecar configuration to allow egress to Kubernetes API and external traffic
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: tailscale-sidecar
+  namespace: networking
+spec:
+  workloadSelector:
+    labels:
+      tailscale.com/managed: "true"
+  egress:
+    - hosts:
+        - "./*"
+        - "istio-system/*"
+        - "kubernetes.default.svc.cluster.local"
+    - hosts:
+        - "./*"
+      port:
+        number: 443
+        name: https
+        protocol: HTTPS
+    - hosts:
+        - "*/*"
+      port:
+        number: 41641
+        name: tailscale-derp
+        protocol: TCP
+    - hosts:
+        - "*/*"
+      port:
+        number: 3478
+        name: tailscale-stun
+        protocol: UDP

@@ -1,0 +1,160 @@
+---
+# ServiceEntry to allow access to GitHub
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: github-com
+  namespace: flux-system
+spec:
+  hosts:
+  - github.com
+  - "*.github.com"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  - number: 80
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# ServiceEntry to allow access to GitLab
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: gitlab-com
+  namespace: flux-system
+spec:
+  hosts:
+  - gitlab.com
+  - "*.gitlab.com"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  - number: 80
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# ServiceEntry to allow access to common Git hosting services
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: git-services
+  namespace: flux-system
+spec:
+  hosts:
+  - bitbucket.org
+  - "*.bitbucket.org"
+  - codeberg.org
+  - "*.codeberg.org"
+  - git.sr.ht
+  - "*.sr.ht"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  - number: 80
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# ServiceEntry to allow access to Helm chart repositories
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: helm-repositories
+  namespace: flux-system
+spec:
+  hosts:
+  - charts.helm.sh
+  - "*.charts.helm.sh"
+  - helm.sh
+  - "*.helm.sh"
+  - kubernetes-charts.storage.googleapis.com
+  - "*.storage.googleapis.com"
+  - registry-1.docker.io
+  - "*.docker.io"
+  - quay.io
+  - "*.quay.io"
+  - gcr.io
+  - "*.gcr.io"
+  - ghcr.io
+  - "*.ghcr.io"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  - number: 80
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# ServiceEntry for all external HTTPS traffic
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: allow-all-external-https
+  namespace: flux-system
+spec:
+  hosts:
+  - "*"
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  - number: 80
+    name: http
+    protocol: HTTP
+  - number: 53
+    name: dns-udp
+    protocol: UDP
+  - number: 53
+    name: dns-tcp
+    protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# Sidecar configuration for Flux controllers to allow all external egress
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: flux-controllers
+  namespace: flux-system
+spec:
+  workloadSelector:
+    labels:
+      app.kubernetes.io/part-of: flux
+  egress:
+  - hosts:
+    - "./*"
+    - "istio-system/*"
+  - hosts:
+    - "*/*"
+    port:
+      number: 443
+      name: https
+      protocol: HTTPS
+  - hosts:
+    - "*/*"
+    port:
+      number: 80
+      name: http
+      protocol: HTTP
+  - hosts:
+    - "*/*"
+    port:
+      number: 53
+      name: dns
+      protocol: UDP
+  - hosts:
+    - "*/*"
+    port:
+      number: 22
+      name: ssh
+      protocol: TCP

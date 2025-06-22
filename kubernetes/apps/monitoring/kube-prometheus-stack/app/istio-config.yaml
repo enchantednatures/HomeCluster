@@ -1,0 +1,112 @@
+---
+# ServiceEntry to allow admission webhooks to access Kubernetes API
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kubernetes-api-admission
+  namespace: monitoring
+spec:
+  hosts:
+  - kubernetes.default.svc.cluster.local
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# DestinationRule for Kubernetes API access
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kubernetes-api-admission
+  namespace: monitoring
+spec:
+  host: kubernetes.default.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+# Sidecar configuration for admission webhook jobs
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: admission-webhook-sidecar
+  namespace: monitoring
+spec:
+  workloadSelector:
+    labels:
+      app.kubernetes.io/name: kube-prometheus-stack-admission
+  egress:
+  - hosts:
+    - "./*"
+    - "istio-system/*"
+    - "kubernetes.default.svc.cluster.local"
+  - hosts:
+    - "*/*"
+    port:
+      number: 443
+      name: https
+      protocol: HTTPS
+  - hosts:
+    - "*/*"
+    port:
+      number: 53
+      name: dns
+      protocol: UDP
+---
+# Sidecar configuration for prometheus operator pods
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: prometheus-operator-sidecar
+  namespace: monitoring
+spec:
+  workloadSelector:
+    labels:
+      app.kubernetes.io/name: kube-prometheus-stack-operator
+  egress:
+  - hosts:
+    - "./*"
+    - "istio-system/*"
+    - "kubernetes.default.svc.cluster.local"
+  - hosts:
+    - "*/*"
+    port:
+      number: 443
+      name: https
+      protocol: HTTPS
+  - hosts:
+    - "*/*"
+    port:
+      number: 53
+      name: dns
+      protocol: UDP
+---
+# AuthorizationPolicy to allow admission webhook traffic
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-admission-webhooks
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-prometheus-stack-admission
+  action: ALLOW
+  rules:
+  - {}
+---
+# AuthorizationPolicy to allow prometheus operator traffic
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-prometheus-operator
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-prometheus-stack-operator
+  action: ALLOW
+  rules:
+  - {}
