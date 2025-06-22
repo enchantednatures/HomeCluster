@@ -9,4 +9,4 @@ spec:
   trafficPolicy:
     tls:
       mode: SIMPLE
-      caCertificates: /etc/ssl/certs/ca-certificates.crt
+      insecureSkipVerify: true
