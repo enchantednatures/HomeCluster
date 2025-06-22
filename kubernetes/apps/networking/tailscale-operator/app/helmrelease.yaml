@@ -28,10 +28,15 @@ spec:
     image:
       repository: docker.io/tailscale/k8s-operator
       tag: v1.84.2
+    operatorConfig:
+      podAnnotations:
+        sidecar.istio.io/inject: "false"
     proxyConfig:
       image:
         repository: tailscale/tailscale
         tag: v1.84.2
       firewallMode: auto
+      podAnnotations:
+        sidecar.istio.io/inject: "false"
     apiServerProxyConfig:
       mode: "true" # "true", "false", "noauth"
