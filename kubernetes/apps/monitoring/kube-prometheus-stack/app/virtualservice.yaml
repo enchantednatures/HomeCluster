@@ -4,6 +4,8 @@ kind: VirtualService
 metadata:
   name: kube-prometheus-stack-prometheus
   namespace: monitoring
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - prometheus.${SECRET_DOMAIN}

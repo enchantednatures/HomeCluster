@@ -4,6 +4,8 @@ kind: VirtualService
 metadata:
   name: arangodb
   namespace: arangodb
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - arango.${SECRET_DOMAIN}

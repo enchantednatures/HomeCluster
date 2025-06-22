@@ -4,6 +4,8 @@ kind: VirtualService
 metadata:
   name: elasticsearch
   namespace: elastic
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - elastic.${SECRET_DOMAIN}

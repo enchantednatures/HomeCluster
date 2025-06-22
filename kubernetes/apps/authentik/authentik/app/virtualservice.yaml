@@ -4,6 +4,8 @@ kind: VirtualService
 metadata:
   name: authentik-server
   namespace: authentik
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - auth.${SECRET_DOMAIN}

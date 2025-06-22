@@ -4,6 +4,8 @@ kind: VirtualService
 metadata:
   name: tekton-dashboards
   namespace: tekton-pipelines
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - tekton.${SECRET_DOMAIN}

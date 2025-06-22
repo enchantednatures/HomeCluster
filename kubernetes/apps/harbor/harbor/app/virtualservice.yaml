@@ -4,6 +4,8 @@ kind: VirtualService
 metadata:
   name: harbor-ingress
   namespace: harbor
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - harbor.${SECRET_DOMAIN}

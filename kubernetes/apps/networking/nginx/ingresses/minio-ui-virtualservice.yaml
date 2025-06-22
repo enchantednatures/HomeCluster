@@ -4,6 +4,8 @@ kind: VirtualService
 metadata:
   name: minio-ui
   namespace: networking
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - minio.${SECRET_DOMAIN}
