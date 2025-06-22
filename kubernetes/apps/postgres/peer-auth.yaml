@@ -25,16 +25,3 @@ spec:
   resolution: STATIC
   endpoints:
     - address: "10.96.0.1"
----
-# Destination rule for Kubernetes API server in postgres namespace
-apiVersion: networking.istio.io/v1beta1
-kind: DestinationRule
-metadata:
-  name: kubernetes-api-server
-  namespace: postgres
-spec:
-  host: kubernetes.default.svc.cluster.local
-  trafficPolicy:
-    tls:
-      mode: DISABLE
-# Removed duplicate DestinationRule - kubernetes-api-server above is sufficient
