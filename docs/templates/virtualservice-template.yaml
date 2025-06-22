@@ -1,0 +1,29 @@
+---
+# VirtualService Template for Automatic DNS
+# Copy this template and customize for new applications
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: APP_NAME
+  namespace: APP_NAMESPACE
+spec:
+  hosts:
+    - APP_NAME.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway  # This gateway has external-dns annotation
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: APP_SERVICE.APP_NAMESPACE.svc.cluster.local
+            port:
+              number: APP_PORT
+
+# Instructions:
+# 1. Replace APP_NAME with your application name
+# 2. Replace APP_NAMESPACE with your application namespace  
+# 3. Replace APP_SERVICE with your service name
+# 4. Replace APP_PORT with your service port
+# 5. DNS records will be created automatically via external-dns
