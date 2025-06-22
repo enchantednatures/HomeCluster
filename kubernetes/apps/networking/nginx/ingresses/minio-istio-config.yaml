@@ -1,0 +1,107 @@
+---
+# ServiceEntry for external MinIO server
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: minio-external
+  namespace: networking
+spec:
+  hosts:
+  - minio-external.local
+  ports:
+  - number: 9769
+    name: minio-console
+    protocol: HTTP
+  - number: 9768
+    name: minio-api
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: STATIC
+  endpoints:
+  - address: 192.168.1.241
+---
+# DestinationRule for MinIO to handle traffic properly
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: minio-external
+  namespace: networking
+spec:
+  host: minio-external.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+# VirtualService for MinIO UI with proper headers and API routing
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio-ui-fixed
+  namespace: networking
+spec:
+  hosts:
+  - minio.enchantednatures.com
+  gateways:
+  - istio-ingress/external-gateway
+  http:
+  # Route API calls to the MinIO API service
+  - match:
+    - uri:
+        prefix: /minio/
+    - uri:
+        prefix: /api/
+    route:
+    - destination:
+        host: minio-external.local
+        port:
+          number: 9768
+    headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+          X-Forwarded-Host: minio.${SECRET_DOMAIN}
+  # Route everything else to the console
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: minio-external.local
+        port:
+          number: 9769
+    headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+          X-Forwarded-Host: minio.enchantednatures.com
+          MINIO_BROWSER_REDIRECT_URL: https://minio.enchantednatures.com
+      response:
+        set:
+          X-Frame-Options: SAMEORIGIN
+          X-Content-Type-Options: nosniff
+---
+# VirtualService for MinIO API/S3 service
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: minio-service-fixed
+  namespace: networking
+spec:
+  hosts:
+  - s3.enchantednatures.com
+  gateways:
+  - istio-ingress/external-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: minio-external.local
+        port:
+          number: 9768
+    headers:
+      request:
+        set:
+          X-Forwarded-Proto: https
+          X-Forwarded-Host: s3.enchantednatures.com
