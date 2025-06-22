@@ -5,3 +5,4 @@ resources:
   - ./cluster.yaml
   - ./service.yaml
   - ./virtualservice.yaml
+  - ./destinationrule.yaml

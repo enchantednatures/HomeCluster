@@ -18,3 +18,7 @@ spec:
             host: arangodb-cluster.arangodb.svc.cluster.local
             port:
               number: 8529
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
