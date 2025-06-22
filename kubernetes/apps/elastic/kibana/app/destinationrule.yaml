@@ -1,0 +1,12 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kibana
+  namespace: elastic
+spec:
+  host: kibana-kb-http.elastic.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: SIMPLE
+      caCertificates: /etc/ssl/certs/ca-certificates.crt

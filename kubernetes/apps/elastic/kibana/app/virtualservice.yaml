@@ -18,3 +18,7 @@ spec:
             host: kibana-kb-http.elastic.svc.cluster.local
             port:
               number: 5601
+          headers:
+            request:
+              set:
+                x-forwarded-proto: https
