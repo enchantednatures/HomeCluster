@@ -1,0 +1,45 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: prometheus-monitoring
+  namespace: istio-system
+spec:
+  hosts:
+  - kube-prometheus-stack-prometheus.monitoring.svc.cluster.local
+  ports:
+  - number: 9090
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: grafana-monitoring
+  namespace: istio-system
+spec:
+  hosts:
+  - grafana.monitoring.svc.cluster.local
+  ports:
+  - number: 80
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: tempo-monitoring
+  namespace: istio-system
+spec:
+  hosts:
+  - tempo.monitoring.svc.cluster.local
+  ports:
+  - number: 3200
+    name: http
+    protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
