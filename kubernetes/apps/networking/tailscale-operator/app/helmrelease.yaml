@@ -36,7 +36,7 @@ spec:
         repository: tailscale/tailscale
         tag: v1.84.2
       firewallMode: auto
-      podAnnotations:
+      annotations:
         sidecar.istio.io/inject: "false"
     apiServerProxyConfig:
       mode: "true" # "true", "false", "noauth"
