@@ -1,0 +1,47 @@
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: istio-virtualservices-cname
+spec:
+  endpoints:
+    # VirtualService hosts pointing to Cloudflare tunnel CNAME
+    - dnsName: arango.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: atuin.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: auth.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: elastic.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: gitops.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: grafana.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: harbor.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: kibana.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: minio.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: open-webui.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: prometheus.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: search.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
+    - dnsName: tekton.${SECRET_DOMAIN}
+      recordType: CNAME
+      targets: ["external.${SECRET_DOMAIN}"]
