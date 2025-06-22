@@ -36,7 +36,7 @@ metadata:
 spec:
   workloadSelector:
     labels:
-      app.kubernetes.io/name: kube-prometheus-stack-admission
+      app: kube-prometheus-stack-admission-create
   egress:
   - hosts:
     - "./*"
@@ -110,3 +110,20 @@ spec:
   action: ALLOW
   rules:
   - {}
+---
+# ProxyConfig to reduce resource usage for admission webhook jobs
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: admission-webhook-proxy-config
+  namespace: monitoring
+spec:
+  meshConfig:
+    defaultConfig:
+      proxyStatsMatcher:
+        inclusionRegexps:
+        - ".*circuit_breakers.*"
+        - ".*upstream_rq_retry.*"
+        - ".*_cx_.*"
+        exclusionRegexps:
+        - ".*osconfig.*"

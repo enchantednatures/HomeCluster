@@ -1,0 +1,12 @@
+---
+# Sidecar configuration to exclude admission webhook jobs from Istio injection
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: exclude-admission-webhooks
+  namespace: monitoring
+spec:
+  workloadSelector:
+    labels:
+      app.kubernetes.io/name: kube-prometheus-stack-admission
+  egress: []
