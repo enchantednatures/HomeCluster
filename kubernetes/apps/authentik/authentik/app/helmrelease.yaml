@@ -74,17 +74,7 @@ spec:
       enabled: true
     server:
       ingress:
-        enabled: true
-        ingressClassName: external
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          kubernetes.io/tls-acme: "true"
-          external-dns/is-public: "true"
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        hosts: [&host "auth.${SECRET_DOMAIN}"]
-        tls:
-          - secretName: authentik-tls
-            hosts: [*host]
+        enabled: false
       resources:
         server:
           requests:
@@ -97,6 +87,7 @@ spec:
     geoip:
       enabled: false
     authentik:
+      url: https://auth.${SECRET_DOMAIN}
       email:
         from: id@${SECRET_DOMAIN}
         host: smtp.gmail.com
