@@ -13,6 +13,11 @@ spec:
     - match:
         - uri:
             prefix: /
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+            X-Forwarded-Port: "443"
       route:
         - destination:
             host: authentik-server.authentik.svc.cluster.local

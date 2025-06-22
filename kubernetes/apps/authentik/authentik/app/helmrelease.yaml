@@ -102,6 +102,9 @@ spec:
         host: authentik-db-rw.authentik.svc.cluster.local
       redis:
         host: dragonfly.authentik.svc.cluster.local
+      # Trust proxy headers for HTTPS detection
+      web:
+        trusted_proxies: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
     postgresql:
       enabled: false
     redis:
