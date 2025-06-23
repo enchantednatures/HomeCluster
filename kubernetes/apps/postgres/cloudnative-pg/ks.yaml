@@ -6,6 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
+    - name: istio-gateway
     - name: csi-driver-nfs
     - name: prometheus-operator-crds
   targetNamespace: postgres

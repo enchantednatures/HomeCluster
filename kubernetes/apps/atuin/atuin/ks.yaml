@@ -7,6 +7,7 @@ metadata:
 spec:
   targetNamespace: atuin
   dependsOn:
+    - name: istio-gateway
     - name: cloudnative-pg
   commonMetadata:
     labels:

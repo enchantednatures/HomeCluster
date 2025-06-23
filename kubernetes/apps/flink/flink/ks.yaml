@@ -6,8 +6,9 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: flink
-  # dependsOn:
-  #   - name: cloudnative-pg
+  dependsOn:
+    - name: istio-gateway
+    - name: cloudnative-pg
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
