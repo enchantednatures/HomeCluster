@@ -15,15 +15,9 @@ spec:
         tcpKeepalive:
           time: 7200s
           interval: 75s
-      http:
-        http1MaxPendingRequests: 10
-        maxRequestsPerConnection: 2
+
     outlierDetection:
       consecutiveErrors: 3
       interval: 30s
       baseEjectionTime: 30s
       maxEjectionPercent: 50
-    retryPolicy:
-      attempts: 3
-      perTryTimeout: 10s
-      retryOn: connect-failure,refused-stream
