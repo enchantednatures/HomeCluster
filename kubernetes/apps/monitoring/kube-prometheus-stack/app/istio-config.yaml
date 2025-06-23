@@ -7,11 +7,11 @@ metadata:
   namespace: monitoring
 spec:
   hosts:
-  - kubernetes.default.svc.cluster.local
+    - kubernetes.default.svc.cluster.local
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
+    - number: 443
+      name: https
+      protocol: HTTPS
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -38,22 +38,22 @@ spec:
     labels:
       app: kube-prometheus-stack-admission-create
   egress:
-  - hosts:
-    - "./*"
-    - "istio-system/*"
-    - "kubernetes.default.svc.cluster.local"
-  - hosts:
-    - "*/*"
-    port:
-      number: 443
-      name: https
-      protocol: HTTPS
-  - hosts:
-    - "*/*"
-    port:
-      number: 53
-      name: dns
-      protocol: UDP
+    - hosts:
+        - "./*"
+        - "istio-system/*"
+        - "kubernetes.default.svc.cluster.local"
+    - hosts:
+        - "*/*"
+      port:
+        number: 443
+        name: https
+        protocol: HTTPS
+    - hosts:
+        - "*/*"
+      port:
+        number: 53
+        name: dns
+        protocol: UDP
 ---
 # Sidecar configuration for prometheus operator pods
 apiVersion: networking.istio.io/v1beta1
@@ -66,22 +66,22 @@ spec:
     labels:
       app.kubernetes.io/name: kube-prometheus-stack-operator
   egress:
-  - hosts:
-    - "./*"
-    - "istio-system/*"
-    - "kubernetes.default.svc.cluster.local"
-  - hosts:
-    - "*/*"
-    port:
-      number: 443
-      name: https
-      protocol: HTTPS
-  - hosts:
-    - "*/*"
-    port:
-      number: 53
-      name: dns
-      protocol: UDP
+    - hosts:
+        - "./*"
+        - "istio-system/*"
+        - "kubernetes.default.svc.cluster.local"
+    - hosts:
+        - "*/*"
+      port:
+        number: 443
+        name: https
+        protocol: HTTPS
+    - hosts:
+        - "*/*"
+      port:
+        number: 53
+        name: dns
+        protocol: UDP
 ---
 # AuthorizationPolicy to allow admission webhook traffic
 apiVersion: security.istio.io/v1beta1
@@ -95,7 +95,7 @@ spec:
       app.kubernetes.io/name: kube-prometheus-stack-admission
   action: ALLOW
   rules:
-  - {}
+    - {}
 ---
 # AuthorizationPolicy to allow prometheus operator traffic
 apiVersion: security.istio.io/v1beta1
@@ -109,7 +109,7 @@ spec:
       app.kubernetes.io/name: kube-prometheus-stack-operator
   action: ALLOW
   rules:
-  - {}
+    - {}
 ---
 # ProxyConfig to reduce resource usage for admission webhook jobs
 apiVersion: install.istio.io/v1alpha1
@@ -122,8 +122,8 @@ spec:
     defaultConfig:
       proxyStatsMatcher:
         inclusionRegexps:
-        - ".*circuit_breakers.*"
-        - ".*upstream_rq_retry.*"
-        - ".*_cx_.*"
+          - ".*circuit_breakers.*"
+          - ".*upstream_rq_retry.*"
+          - ".*_cx_.*"
         exclusionRegexps:
-        - ".*osconfig.*"
+          - ".*osconfig.*"

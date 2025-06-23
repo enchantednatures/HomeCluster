@@ -6,11 +6,11 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - kube-prometheus-stack-prometheus.monitoring.svc.cluster.local
+    - kube-prometheus-stack-prometheus.monitoring.svc.cluster.local
   ports:
-  - number: 9090
-    name: http
-    protocol: HTTP
+    - number: 9090
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -21,11 +21,11 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - grafana.monitoring.svc.cluster.local
+    - grafana.monitoring.svc.cluster.local
   ports:
-  - number: 80
-    name: http
-    protocol: HTTP
+    - number: 80
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -36,10 +36,10 @@ metadata:
   namespace: istio-system
 spec:
   hosts:
-  - tempo.monitoring.svc.cluster.local
+    - tempo.monitoring.svc.cluster.local
   ports:
-  - number: 3200
-    name: http
-    protocol: HTTP
+    - number: 3200
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS

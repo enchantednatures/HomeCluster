@@ -9,10 +9,10 @@ spec:
       enabled: true
       knative-ingress-gateway:
         selector:
-          istio: istio-gateway  # Matches your Gateway selector
+          istio: istio-gateway # Matches your Gateway selector
   config:
     network:
-      ingress-class: "istio"  # Matches your IngressClass name
+      ingress-class: "istio" # Matches your IngressClass name
     logging:
       loglevel.controller: "info"
       loglevel.autoscaler: "info"
@@ -36,4 +36,4 @@ spec:
       max-scale-down-rate: "2"
       target-burst-capacity: "200"
   high-availability:
-    replicas: 2  # Reduced for home lab
+    replicas: 2 # Reduced for home lab

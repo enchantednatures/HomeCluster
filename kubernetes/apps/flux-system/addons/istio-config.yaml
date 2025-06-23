@@ -7,15 +7,15 @@ metadata:
   namespace: flux-system
 spec:
   hosts:
-  - github.com
-  - "*.github.com"
+    - github.com
+    - "*.github.com"
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
-  - number: 80
-    name: http
-    protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+    - number: 80
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -27,15 +27,15 @@ metadata:
   namespace: flux-system
 spec:
   hosts:
-  - gitlab.com
-  - "*.gitlab.com"
+    - gitlab.com
+    - "*.gitlab.com"
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
-  - number: 80
-    name: http
-    protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+    - number: 80
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -47,19 +47,19 @@ metadata:
   namespace: flux-system
 spec:
   hosts:
-  - bitbucket.org
-  - "*.bitbucket.org"
-  - codeberg.org
-  - "*.codeberg.org"
-  - git.sr.ht
-  - "*.sr.ht"
+    - bitbucket.org
+    - "*.bitbucket.org"
+    - codeberg.org
+    - "*.codeberg.org"
+    - git.sr.ht
+    - "*.sr.ht"
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
-  - number: 80
-    name: http
-    protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+    - number: 80
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -71,27 +71,27 @@ metadata:
   namespace: flux-system
 spec:
   hosts:
-  - charts.helm.sh
-  - "*.charts.helm.sh"
-  - helm.sh
-  - "*.helm.sh"
-  - kubernetes-charts.storage.googleapis.com
-  - "*.storage.googleapis.com"
-  - registry-1.docker.io
-  - "*.docker.io"
-  - quay.io
-  - "*.quay.io"
-  - gcr.io
-  - "*.gcr.io"
-  - ghcr.io
-  - "*.ghcr.io"
+    - charts.helm.sh
+    - "*.charts.helm.sh"
+    - helm.sh
+    - "*.helm.sh"
+    - kubernetes-charts.storage.googleapis.com
+    - "*.storage.googleapis.com"
+    - registry-1.docker.io
+    - "*.docker.io"
+    - quay.io
+    - "*.quay.io"
+    - gcr.io
+    - "*.gcr.io"
+    - ghcr.io
+    - "*.ghcr.io"
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
-  - number: 80
-    name: http
-    protocol: HTTP
+    - number: 443
+      name: https
+      protocol: HTTPS
+    - number: 80
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -103,20 +103,20 @@ metadata:
   namespace: flux-system
 spec:
   hosts:
-  - "*"
+    - "*"
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
-  - number: 80
-    name: http
-    protocol: HTTP
-  - number: 53
-    name: dns-udp
-    protocol: UDP
-  - number: 53
-    name: dns-tcp
-    protocol: TCP
+    - number: 443
+      name: https
+      protocol: HTTPS
+    - number: 80
+      name: http
+      protocol: HTTP
+    - number: 53
+      name: dns-udp
+      protocol: UDP
+    - number: 53
+      name: dns-tcp
+      protocol: TCP
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -131,30 +131,30 @@ spec:
     labels:
       app.kubernetes.io/part-of: flux
   egress:
-  - hosts:
-    - "./*"
-    - "istio-system/*"
-  - hosts:
-    - "*/*"
-    port:
-      number: 443
-      name: https
-      protocol: HTTPS
-  - hosts:
-    - "*/*"
-    port:
-      number: 80
-      name: http
-      protocol: HTTP
-  - hosts:
-    - "*/*"
-    port:
-      number: 53
-      name: dns
-      protocol: UDP
-  - hosts:
-    - "*/*"
-    port:
-      number: 22
-      name: ssh
-      protocol: TCP
+    - hosts:
+        - "./*"
+        - "istio-system/*"
+    - hosts:
+        - "*/*"
+      port:
+        number: 443
+        name: https
+        protocol: HTTPS
+    - hosts:
+        - "*/*"
+      port:
+        number: 80
+        name: http
+        protocol: HTTP
+    - hosts:
+        - "*/*"
+      port:
+        number: 53
+        name: dns
+        protocol: UDP
+    - hosts:
+        - "*/*"
+      port:
+        number: 22
+        name: ssh
+        protocol: TCP

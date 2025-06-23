@@ -42,7 +42,10 @@ rules:
   # Explicitly allow listing secret names but not getting their values
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["list", "watch"] # Allow listing/watching secret names, but not 'get' which reveals values
+    verbs: [
+      "list",
+      "watch",
+    ] # Allow listing/watching secret names, but not 'get' which reveals values
 
   # Delete pods in all namespaces
   - apiGroups: [""]
@@ -56,7 +59,13 @@ rules:
   # and the verb is usually "patch" or "update" to trigger a reconciliation.
   - apiGroups: ["source.toolkit.fluxcd.io"]
     resources: ["gitrepositories", "helmrepositories", "buckets"]
-    verbs: ["get", "list", "watch", "patch", "update"] # patch/update for annotations
+    verbs: [
+      "get",
+      "list",
+      "watch",
+      "patch",
+      "update",
+    ] # patch/update for annotations
   - apiGroups: ["kustomize.toolkit.fluxcd.io"]
     resources: ["kustomizations"]
     verbs: ["get", "list", "watch", "patch", "update"]

@@ -48,4 +48,3 @@ spec:
       replicated:
         mayastor:
           enabled: false
-

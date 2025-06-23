@@ -10,7 +10,7 @@ spec:
   hosts:
     - APP_NAME.${SECRET_DOMAIN}
   gateways:
-    - istio-ingress/external-gateway  # This gateway has external-dns annotation
+    - istio-ingress/external-gateway # This gateway has external-dns annotation
   http:
     - match:
         - uri:
@@ -23,7 +23,7 @@ spec:
 
 # Instructions:
 # 1. Replace APP_NAME with your application name
-# 2. Replace APP_NAMESPACE with your application namespace  
+# 2. Replace APP_NAMESPACE with your application namespace
 # 3. Replace APP_SERVICE with your service name
 # 4. Replace APP_PORT with your service port
 # 5. DNS records will be created automatically via external-dns

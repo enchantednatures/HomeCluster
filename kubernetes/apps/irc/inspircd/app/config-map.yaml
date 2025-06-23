@@ -8,35 +8,35 @@ metadata:
 data:
   inspircd.conf: |
     # InspIRCd Configuration File
-    
+
     <define name="bindip" value="0.0.0.0">
     <define name="localips" value="&bindip;/24">
-    
+
     # Server information
     <server
         name="irc.${SECRET_DOMAIN}"
         description="HomeCluster IRC Server"
         id="000"
         network="HomeNet">
-    
+
     # Administrator information
     <admin
         name="Admin"
         nick="admin"
         email="admin@${SECRET_DOMAIN}">
-    
+
     # Bind to ports
     <bind
         address="&bindip;"
         port="6667"
         type="clients">
-    
+
     <bind
         address="&bindip;"
         port="6697"
         type="clients"
         ssl="gnutls">
-    
+
     # Load modules
     <module name="ssl_gnutls">
     <module name="sslmodes">
@@ -50,24 +50,24 @@ data:
     <module name="oper">
     <module name="password_hash">
     <module name="sha256">
-    
+
     # SSL Configuration
     <gnutls
         certfile="/inspircd/conf/cert.pem"
         keyfile="/inspircd/conf/key.pem"
         dhfile="/inspircd/conf/dhparams.pem">
-    
+
     # Operator configuration
     <oper
         name="admin"
         password="$6$rounds=100000$salt$hash"
         host="*@*"
         type="NetAdmin">
-    
+
     <type
         name="NetAdmin"
         classes="OperChat BanControl HostChange Shutdown ServerLink">
-    
+
     # Channel modes
     <options
         prefixquit="Quit: "
@@ -88,7 +88,7 @@ data:
         moronbanner="You're banned!"
         exemptchanops="nonick:v flood:o"
         invitebypassmodes="yes">
-    
+
     # Security settings
     <security
         announceinvites="dynamic"
@@ -105,7 +105,7 @@ data:
         restrictbannedusers="yes"
         genericoper="no"
         userstats="Pu">
-    
+
     # Performance settings
     <performance
         netbuffersize="10240"
@@ -113,13 +113,13 @@ data:
         softlimit="12800"
         quietbursts="yes"
         nouserdns="no">
-    
+
     # Logging
     <log method="file" type="* -USERINPUT -USEROUTPUT" level="default" target="/inspircd/logs/ircd.log">
-    
+
     # Default channels
     <badchan name="#test" allowopers="yes" reason="Test channel">
-    
+
     # Connect classes
     <connect
         name="main"
@@ -138,7 +138,7 @@ data:
         useident="no"
         limit="5000"
         modes="+x">
-    
+
     # Include additional config files
     # <include file="opers.conf">
     # <include file="links.conf">

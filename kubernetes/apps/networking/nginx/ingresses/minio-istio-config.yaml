@@ -7,18 +7,18 @@ metadata:
   namespace: networking
 spec:
   hosts:
-  - minio-external.local
+    - minio-external.local
   ports:
-  - number: 9769
-    name: minio-console
-    protocol: HTTP
-  - number: 9768
-    name: minio-api
-    protocol: HTTP
+    - number: 9769
+      name: minio-console
+      protocol: HTTP
+    - number: 9768
+      name: minio-api
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-  - address: 192.168.1.241
+    - address: 192.168.1.241
 ---
 # DestinationRule for MinIO to handle traffic properly
 apiVersion: networking.istio.io/v1beta1
@@ -40,24 +40,24 @@ metadata:
   namespace: networking
 spec:
   hosts:
-  - minio.enchantednatures.com
+    - minio.enchantednatures.com
   gateways:
-  - istio-ingress/external-gateway
+    - istio-ingress/external-gateway
   http:
-  - match:
-    - uri:
-        prefix: /
-    route:
-    - destination:
-        host: minio-external.local
-        port:
-          number: 9769
-    headers:
-      request:
-        set:
-          X-Forwarded-Proto: https
-          X-Forwarded-Host: minio.enchantednatures.com
-          Host: minio.enchantednatures.com
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: minio-external.local
+            port:
+              number: 9769
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+            X-Forwarded-Host: minio.enchantednatures.com
+            Host: minio.enchantednatures.com
 ---
 # VirtualService for MinIO API/S3 service
 apiVersion: networking.istio.io/v1beta1
@@ -67,21 +67,21 @@ metadata:
   namespace: networking
 spec:
   hosts:
-  - s3.enchantednatures.com
+    - s3.enchantednatures.com
   gateways:
-  - istio-ingress/external-gateway
+    - istio-ingress/external-gateway
   http:
-  - match:
-    - uri:
-        prefix: /
-    route:
-    - destination:
-        host: minio-external.local
-        port:
-          number: 9768
-    headers:
-      request:
-        set:
-          X-Forwarded-Proto: https
-          X-Forwarded-Host: s3.enchantednatures.com
-          Host: s3.enchantednatures.com
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: minio-external.local
+            port:
+              number: 9768
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+            X-Forwarded-Host: s3.enchantednatures.com
+            Host: s3.enchantednatures.com
