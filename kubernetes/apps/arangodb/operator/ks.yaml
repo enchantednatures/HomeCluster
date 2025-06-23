@@ -5,6 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: arangodb
+  dependsOn:
+    - istio-gateway
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
