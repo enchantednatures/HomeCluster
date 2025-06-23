@@ -6,6 +6,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: home-system
+  dependsOn:
+    - name: rabbitmq-operator
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
