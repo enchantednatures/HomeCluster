@@ -7,7 +7,6 @@ metadata:
 spec:
   targetNamespace: dragonflydb
   dependsOn:
-    - name: istio-gateway
     - name: dragonflydb-operator
   commonMetadata:
     labels:

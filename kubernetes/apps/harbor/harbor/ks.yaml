@@ -6,6 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
+    - name: istio-gateway
     - name: csi-driver-nfs
   targetNamespace: harbor
   commonMetadata:
@@ -29,6 +30,7 @@ metadata:
 spec:
   targetNamespace: harbor
   dependsOn:
+    - name: istio-gateway
     - name: cloudnative-pg
   commonMetadata:
     labels:

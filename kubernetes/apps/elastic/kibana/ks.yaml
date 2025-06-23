@@ -6,6 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
+    - name: istio-gateway
     - name: elasticsearch
   targetNamespace: elastic
   commonMetadata:

@@ -5,6 +5,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: redpanda
+  dependsOn:
+    - name: istio-gateway
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
