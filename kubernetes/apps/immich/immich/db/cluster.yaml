@@ -56,7 +56,7 @@ spec:
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
       # Note: serverName version needs to be incremented
       # when recovering from an existing cnpg cluster
-      serverName: &currentCluster immich-v1
+      serverName: &currentCluster immich-v2
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -83,7 +83,7 @@ spec:
     #     # - CREATE EXTENSION IF NOT EXISTS "vector";
     #     # - ALTER ROLE "immich" WITH "superuser";
     recovery:
-      source: &previousCluster immich-0
+      source: &previousCluster immich-1
       database: immich
       owner: immich
       secret:
