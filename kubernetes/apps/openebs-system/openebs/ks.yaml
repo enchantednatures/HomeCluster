@@ -6,6 +6,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: openebs-system
+  dependsOn:
+    - name: istiod
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
