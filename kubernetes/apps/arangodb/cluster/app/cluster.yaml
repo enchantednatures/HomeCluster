@@ -23,3 +23,9 @@ spec:
   coordinators:
     count: 3
   image: arangodb/arangodb:3.12
+  gateway:
+    createUsers: true # Allows user creation by default from the SSO
+    authentication:
+      type: OpenID # Picks the OpenID Type of the authentication
+      secret:
+        name: openid-secret # Created Secret based on the Documentation

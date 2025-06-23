@@ -26,7 +26,7 @@ spec:
       strategy: anonymous
     external_services:
       prometheus:
-        url: "http://prometheus-operator.monitoring.svc.cluster.local:9090"
+        url: "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
       grafana:
         url: "http://grafana.monitoring.svc.cluster.local"
       tracing:

@@ -34,12 +34,11 @@ spec:
             name: external-dns-secret
             key: api-token
     extraArgs:
-      - --ingress-class=external
       - --cloudflare-proxied
       - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
       - --crd-source-kind=DNSEndpoint
     policy: sync
-    sources: [crd, ingress]
+    sources: [crd, ingress, istio-gateway, istio-virtualservice]
     txtPrefix: k8s.
     txtOwnerId: default
     domainFilters: ["${SECRET_DOMAIN}"]
@@ -47,3 +46,4 @@ spec:
     #   enabled: true
     podAnnotations:
       secret.reloader.stakater.com/reload: external-dns-secret
+      sidecar.istio.io/inject: "false"

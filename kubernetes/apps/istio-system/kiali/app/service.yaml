@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: &app kiali-tailscale
+  namespace: istio-system
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: kiali.${SECRET_DOMAIN}
+    lbipam.cilium.io/ips: 192.168.1.244
+spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
+  ports:
+    - name: http
+      port: 20001
+      protocol: TCP
+      targetPort: 20001
+  selector:
+    app.kubernetes.io/instance: kiali
+    app.kubernetes.io/name: kiali

@@ -5,3 +5,4 @@ resources:
   - ./helmrelease.yaml
   - ./scrape-config.yaml
   - ./rules.yaml
+  - ./virtualservice.yaml

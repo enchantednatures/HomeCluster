@@ -7,3 +7,4 @@ resources:
   - ./dragonfly.yaml
   - ./harbor-postgres.sops.yaml
   - ./harbor-minio-credentials.sops.yaml
+  - ./virtualservice.yaml

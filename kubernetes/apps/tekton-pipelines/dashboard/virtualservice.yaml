@@ -1,0 +1,20 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: tekton-dashboards
+  namespace: tekton-pipelines
+spec:
+  hosts:
+    - tekton.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: tekton-dashboard.tekton-pipelines.svc.cluster.local
+            port:
+              number: 9097

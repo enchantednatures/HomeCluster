@@ -6,7 +6,7 @@ metadata:
   namespace: default
 spec:
   hosts:
-    - open-webui.enchantednatures.com
+    - open-webui.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

@@ -1,0 +1,20 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: atuin
+  namespace: atuin
+spec:
+  hosts:
+    - atuin.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: atuin.atuin.svc.cluster.local
+            port:
+              number: 8080

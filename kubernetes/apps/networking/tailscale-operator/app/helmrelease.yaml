@@ -23,11 +23,22 @@ spec:
       strategy: rollback
       retries: 3
   values:
-    oauth: {}
+    oauth:
+      clientId:
+        valueFrom:
+          secretKeyRef:
+            name: operator-oauth
+            key: client_id
+      clientSecret:
+        valueFrom:
+          secretKeyRef:
+            name: operator-oauth
+            key: client_secret
     installCRDs: "true"
     image:
       repository: docker.io/tailscale/k8s-operator
       tag: v1.84.2
+    operatorConfig: {}
     proxyConfig:
       image:
         repository: tailscale/tailscale

@@ -5,3 +5,4 @@ metadata:
   name: irc
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
+    istio-injection: enabled
