@@ -7,6 +7,8 @@ spec:
   targetNamespace: arangodb
   dependsOn:
     - name: istio-gateway
+    - name: arangodb-operator
+    - name: openebs
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
