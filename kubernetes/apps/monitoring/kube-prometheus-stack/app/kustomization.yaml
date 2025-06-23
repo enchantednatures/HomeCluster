@@ -6,4 +6,3 @@ resources:
   - ./scrape-config.yaml
   - ./rules.yaml
   - ./virtualservice.yaml
-  - ./istio-config.yaml
