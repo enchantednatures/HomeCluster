@@ -5,6 +5,9 @@ metadata:
   name: cloudnative-pg
 spec:
   interval: 15m
+  dependsOn:
+    - name: openebs
+      namespace: openebs-system
   chart:
     spec:
       chart: cloudnative-pg

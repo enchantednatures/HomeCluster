@@ -8,6 +8,7 @@ spec:
   dependsOn:
     - name: istio-gateway
     - name: csi-driver-nfs
+    - name: openebs
     - name: prometheus-operator-crds
   targetNamespace: postgres
   commonMetadata:
