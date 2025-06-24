@@ -16,47 +16,6 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: istio-ingress
-        - podSelector:
-            matchLabels:
-              istio: gateway
-      ports:
-        - protocol: TCP
-          port: 80
-        - protocol: TCP
-          port: 443
-    # Allow DNS resolution
-    - to: []
-      ports:
-        - protocol: UDP
-          port: 53
-        - protocol: TCP
-          port: 53
-    # Allow HTTPS outbound for Cloudflare tunnel
-    - to: []
-      ports:
-        - protocol: TCP
-          port: 443
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: istio-gateway-ingress
-  namespace: istio-ingress
-spec:
-  podSelector:
-    matchLabels:
-      istio: gateway
-  policyTypes:
-    - Ingress
-  ingress:
-    # Allow traffic from Cloudflare tunnel
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: networking
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/name: cloudflared
       ports:
         - protocol: TCP
           port: 80
@@ -64,3 +23,22 @@ spec:
           port: 443
         - protocol: TCP
           port: 15021
+    # Allow DNS resolution to any destination
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow HTTPS and QUIC to any destination (for Cloudflare edge)
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: UDP
+          port: 443
+    # Allow HTTP to any destination
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 80
