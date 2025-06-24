@@ -7,11 +7,11 @@ metadata:
   namespace: authentik
 spec:
   hosts:
-  - kubernetes.default.svc.cluster.local
+    - kubernetes.default.svc.cluster.local
   ports:
-  - number: 443
-    name: https
-    protocol: HTTPS
+    - number: 443
+      name: https
+      protocol: HTTPS
   location: MESH_EXTERNAL
   resolution: DNS
 ---
@@ -23,10 +23,10 @@ metadata:
   namespace: authentik
 spec:
   hosts:
-  - minio-service.networking.svc.cluster.local
+    - minio-service.networking.svc.cluster.local
   ports:
-  - number: 9768
-    name: http
-    protocol: HTTP
+    - number: 9768
+      name: http
+      protocol: HTTP
   location: MESH_EXTERNAL
   resolution: DNS
