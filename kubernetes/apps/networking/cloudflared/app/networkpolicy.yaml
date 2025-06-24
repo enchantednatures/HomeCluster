@@ -23,22 +23,5 @@ spec:
           port: 443
         - protocol: TCP
           port: 15021
-    # Allow DNS resolution to any destination
+    # Allow all outbound traffic (for Cloudflare edge connectivity)
     - to: []
-      ports:
-        - protocol: UDP
-          port: 53
-        - protocol: TCP
-          port: 53
-    # Allow HTTPS and QUIC to any destination (for Cloudflare edge)
-    - to: []
-      ports:
-        - protocol: TCP
-          port: 443
-        - protocol: UDP
-          port: 443
-    # Allow HTTP to any destination
-    - to: []
-      ports:
-        - protocol: TCP
-          port: 80
