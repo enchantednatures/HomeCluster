@@ -5,7 +5,8 @@ metadata:
   name: postgres
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
-    istio-injection: enabled
+    istio-injection: disabled
+    istio.io/dataplane-mode: ambient
 # ---
 # apiVersion: security.istio.io/v1beta1
 # kind: PeerAuthentication
