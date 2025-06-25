@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: production-platform
+
+resources:
+  # Base platform components
+  - ../../../bootstrap/platform
+
+  # Storage systems
+  - ../../../apps/openebs-system/openebs
+  - ../../../apps/kube-system/csi-driver-nfs
+  - ../../../apps/kube-system/snapshot-controller
+
+  # Monitoring stack
+  - ../../../apps/monitoring/prometheus-operator-crds
+  - ../../../apps/monitoring/kube-prometheus-stack
+  - ../../../apps/monitoring/grafana
+  - ../../../apps/monitoring/loki-stack
+  - ../../../apps/monitoring/promtail
+  - ../../../apps/monitoring/tempo
+  - ../../../apps/monitoring/node-exporter
+  - ../../../apps/monitoring/kube-state-metrics
+
+  # Operators
+  - ../../../apps/rabbitmq-operator/rabbitmq-operator
+
+  # Application workloads
+  - ../../../apps/atuin/atuin
+  - ../../../apps/immich/immich
+  - ../../../apps/harbor/harbor
+  - ../../../apps/flink/flink
+
+  # Production optimization
+  - ../../../apps/kube-system/goldilocks
+  - ../../../apps/kube-system/spegel
+
+  # Production networking (Istio gateways, ingress)
+  - ../../../apps/istio-ingress/gateway
+
+  # MinIO service entries for production external access
+  - ../../../apps/monitoring/minio-serviceentry.yaml

@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: local-platform
+
+resources:
+  # Base platform components
+  - ../../../bootstrap/platform
+
+  # Essential monitoring (lightweight for local)
+  - ../../../apps/monitoring/prometheus-operator-crds
+  - ../../../apps/monitoring/kube-prometheus-stack
+  - ../../../apps/monitoring/grafana
+
+  # Local Istio gateway for testing
+  - ../../../apps/istio-ingress/gateway
+
+# Local environment patches
+patches:
+  # Use NodePort services for local access instead of LoadBalancer
+  - target:
+      kind: HelmRelease
+      name: istio-gateway
+    patch: |-
+      - op: replace
+        path: /spec/values/service/type
+        value: NodePort
+  
+  # Lightweight monitoring config for local development
+  - target:
+      kind: HelmRelease
+      name: kube-prometheus-stack
+    patch: |-
+      - op: replace
+        path: /spec/values/prometheus/prometheusSpec/retention
+        value: "1d"
+      - op: replace
+        path: /spec/values/prometheus/prometheusSpec/storageSpec
+        value:
+          volumeClaimTemplate:
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 1Gi
+  
+  # Disable external MinIO access in local environment
+  - target:
+      kind: ServiceEntry
+      name: minio-external
+    patch: |-
+      $patch: delete

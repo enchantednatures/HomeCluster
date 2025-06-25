@@ -1,0 +1,68 @@
+---
+# Bootstrap Phase 0: Foundation (CRDs, Namespaces, Basic Resources)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-0-foundation
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/bootstrap/foundation
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  wait: true
+  timeout: 15m
+---
+# Bootstrap Phase 1: System Infrastructure
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-1-system
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cluster-0-foundation
+  interval: 10m
+  path: ./kubernetes/bootstrap/system
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  wait: true
+  timeout: 15m
+---
+# Bootstrap Phase 2: Platform Services
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-2-platform
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cluster-1-system
+  interval: 10m
+  path: ./kubernetes/bootstrap/platform
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+  wait: true
+  timeout: 15m
+---
+# Applications (current structure)
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: cluster-apps
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: cluster-2-platform
+  interval: 10m
+  path: ./kubernetes/apps
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes

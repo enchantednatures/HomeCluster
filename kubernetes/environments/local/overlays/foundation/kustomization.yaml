@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: local-foundation
+
+resources:
+  # Base foundation components
+  - ../../../bootstrap/foundation
+
+  # Essential namespaces for local development
+  - ../../../apps/kube-system/namespace.yaml
+  - ../../../apps/monitoring/namespace.yaml
+  - ../../../apps/istio-system/namespace.yaml

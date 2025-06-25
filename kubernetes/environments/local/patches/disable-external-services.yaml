@@ -1,0 +1,29 @@
+---
+# Disable external services that don't make sense in local development
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: local-platform-exclusions
+  namespace: flux-system
+spec:
+  # This kustomization specifically excludes external services
+  interval: 10m
+  path: ./kubernetes/environments/local/platform
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+---
+# Patch to disable external-dns for local development
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: local-overrides
+  namespace: flux-system
+data:
+  # Local development overrides
+  disable_external_dns: "true"
+  disable_cloudflared: "true"
+  disable_tailscale: "true"
+  # Use NodePort instead of LoadBalancer for local development
+  service_type: "NodePort"

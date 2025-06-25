@@ -1,0 +1,39 @@
+---
+# clusters/production/flux-system/kustomization.yaml
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: home-kubernetes
+  namespace: flux-system
+spec:
+  interval: 30m
+  ref:
+    branch: main
+  url: https://github.com/enchantednatures/HomeCluster.git
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: production-cluster
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/environments/production
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes
+---
+# clusters/local/flux-system/kustomization.yaml  
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: local-cluster
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/environments/local
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: home-kubernetes

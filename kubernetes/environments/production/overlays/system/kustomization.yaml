@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: production-system
+
+resources:
+  # Base system components
+  - ../../../bootstrap/system
+
+  # Core system services for production
+  - ../../../apps/kube-system/cilium
+  - ../../../apps/kube-system/coredns
+  - ../../../apps/kube-system/metrics-server
+  - ../../../apps/kube-system/reloader
+  
+  # Istio service mesh
+  - ../../../apps/istio-system/base
+  - ../../../apps/istio-system/cni
+  - ../../../apps/istio-system/istiod
+
+  # External-facing services (production only)
+  - ../../../apps/networking/cloudflared
+  - ../../../apps/networking/external-dns

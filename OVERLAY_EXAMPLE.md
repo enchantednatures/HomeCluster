@@ -1,0 +1,1 @@
+# Example structure for environment-based overlays

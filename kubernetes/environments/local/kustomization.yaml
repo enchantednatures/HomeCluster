@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: local-environment
+
+resources:
+  # Foundation Phase - Core infrastructure and CRDs
+  - overlays/foundation
+
+  # System Phase - CNI, service mesh, core services 
+  - overlays/system
+
+  # Platform Phase - Operators, storage, networking
+  - overlays/platform
+
+# Local environment patches
+patches:
+  # Disable external services that require real infrastructure
+  - target:
+      kind: HelmRelease
+      name: cloudflared
+    patch: |-
+      $patch: delete
+  - target:
+      kind: HelmRelease
+      name: external-dns
+    patch: |-
+      $patch: delete
