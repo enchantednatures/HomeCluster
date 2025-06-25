@@ -39,12 +39,7 @@ spec:
     alertmanager:
       enabled: true
       ingress:
-        enabled: true
-        pathType: Prefix
-        ingressClassName: internal
-        hosts: [&host "alertmanager.${SECRET_DOMAIN}"]
-        tls:
-          - hosts: [*host]
+        enabled: false
       alertmanagerSpec:
         replicas: 3
         # useExistingSecret: true
@@ -159,21 +154,7 @@ spec:
           memory: 64Mi
     prometheus:
       ingress:
-        enabled: true
-        ingressClassName: external
-        annotations:
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: external.enchantednatures.com
-          external-dns/is-public: "true"
-          kubernetes.io/tls-acme: "true"
-          meta.helm.sh/release-name: kube-prometheus-stack
-          meta.helm.sh/release-namespace: monitoring
-          nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-        pathType: Prefix
-        hosts: ["prometheus.${SECRET_DOMAIN}"]
-        tls:
-          - hosts: ["prometheus.${SECRET_DOMAIN}"]
-            secretName: prometheus-tls
+        enabled: false
       prometheusSpec:
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false

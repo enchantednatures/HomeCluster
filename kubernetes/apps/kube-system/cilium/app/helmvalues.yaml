@@ -50,7 +50,7 @@ data:
         enabled: true
         rollOutPods: true
         ingress:
-          enabled: true
+          enabled: false
           className: external
           annotations:
             kubernetes.io/tls-acme: "true"

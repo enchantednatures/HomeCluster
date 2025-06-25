@@ -2,7 +2,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: kube-prometheus-stack-prometheus
+  name: prometheus
   namespace: monitoring
   annotations:
     external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
@@ -25,7 +25,7 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: kube-prometheus-stack-alertmanager
+  name: alertmanager
   namespace: monitoring
   annotations:
     external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}

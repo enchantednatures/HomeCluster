@@ -5,3 +5,4 @@ resources:
   - ./pvc.yaml
   - ./service.yaml
   - ./helmrelease.yaml
+  - ./virtualservice.yaml

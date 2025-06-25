@@ -2,22 +2,22 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: flux-webhook
-  namespace: flux-system
+  name: hubble-ui
+  namespace: kube-system
   annotations:
     external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-    external-dns/is-public: "true"
+    external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
   hosts:
-    - flux-webhook.${SECRET_DOMAIN}
+    - hubble.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:
     - match:
         - uri:
-            prefix: /hook/
+            prefix: /
       route:
         - destination:
-            host: webhook-receiver.flux-system.svc.cluster.local
+            host: hubble-ui.kube-system.svc.cluster.local
             port:
               number: 80

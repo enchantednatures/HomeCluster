@@ -15,7 +15,7 @@ spec:
             prefix: /
       route:
         - destination:
-            host: minio-ui.networking.svc.cluster.local
+            host: minio-external.local
             port:
               number: 9769
 ---
@@ -35,6 +35,6 @@ spec:
             prefix: /
       route:
         - destination:
-            host: minio-service.networking.svc.cluster.local
+            host: minio-external.local
             port:
               number: 9768

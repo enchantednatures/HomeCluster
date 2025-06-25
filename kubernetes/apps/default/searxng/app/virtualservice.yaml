@@ -4,6 +4,9 @@ kind: VirtualService
 metadata:
   name: searxng
   namespace: default
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
   hosts:
     - search.${SECRET_DOMAIN}

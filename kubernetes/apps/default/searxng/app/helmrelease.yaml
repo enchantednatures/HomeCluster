@@ -68,7 +68,7 @@ spec:
             port: *httpPort
     ingress:
       main:
-        className: external
+        enabled: false
         annotations:
           kubernetes.io/tls-acme: "true"
           cert-manager.io/cluster-issuer: letsencrypt-production

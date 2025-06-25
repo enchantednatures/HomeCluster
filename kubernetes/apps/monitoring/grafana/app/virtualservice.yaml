@@ -4,6 +4,9 @@ kind: VirtualService
 metadata:
   name: grafana
   namespace: monitoring
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
   hosts:
     - grafana.${SECRET_DOMAIN}
