@@ -6,15 +6,18 @@ metadata:
   name: bootstrap-foundation
 
 resources:
-  # All namespace definitions
+  # Core namespaces only (no apps with VirtualServices)
   - ../../apps/kube-system/namespace.yaml
   - ../../apps/monitoring/namespace.yaml
   - ../../apps/istio-system/namespace.yaml
   - ../../apps/openebs-system/namespace.yaml
   - ../../apps/rabbitmq-operator/namespace.yaml
-  - ../../apps/flux-system
   - ../../apps/atuin/namespace.yaml
   - ../../apps/immich/namespace.yaml
   - ../../apps/harbor/namespace.yaml
   - ../../apps/flink/namespace.yaml
   - ../../apps/default/namespace.yaml
+  
+  # Flux webhooks and notifications (but not VirtualServices)
+  - ../../apps/flux-system/addons/notifications
+  - ../../apps/flux-system/addons/monitoring
