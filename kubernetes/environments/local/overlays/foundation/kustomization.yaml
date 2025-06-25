@@ -7,6 +7,6 @@ metadata:
 
 resources:
   # Essential namespaces for local development
-  - ../../../apps/kube-system/namespace.yaml
-  - ../../../apps/monitoring/namespace.yaml
-  - ../../../apps/istio-system/namespace.yaml
+  - ../../../../apps/kube-system/namespace.yaml
+  - ../../../../apps/monitoring/namespace.yaml
+  - ../../../../apps/istio-system/namespace.yaml

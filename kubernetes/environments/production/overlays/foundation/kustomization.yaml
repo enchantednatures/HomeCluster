@@ -7,12 +7,12 @@ metadata:
 
 resources:
   # Production-specific foundation additions
-  - ../../../apps/kube-system/namespace.yaml
-  - ../../../apps/monitoring/namespace.yaml
-  - ../../../apps/istio-system/namespace.yaml
-  - ../../../apps/openebs-system/namespace.yaml
-  - ../../../apps/rabbitmq-operator/namespace.yaml
-  - ../../../apps/atuin/namespace.yaml
-  - ../../../apps/immich/namespace.yaml
-  - ../../../apps/harbor/namespace.yaml
-  - ../../../apps/flink/namespace.yaml
+  - ../../../../apps/kube-system/namespace.yaml
+  - ../../../../apps/monitoring/namespace.yaml
+  - ../../../../apps/istio-system/namespace.yaml
+  - ../../../../apps/openebs-system/namespace.yaml
+  - ../../../../apps/rabbitmq-operator/namespace.yaml
+  - ../../../../apps/atuin/namespace.yaml
+  - ../../../../apps/immich/namespace.yaml
+  - ../../../../apps/harbor/namespace.yaml
+  - ../../../../apps/flink/namespace.yaml

@@ -7,15 +7,15 @@ metadata:
 
 resources:
   # Core system services (local-friendly)
-  - ../../../apps/kube-system/cilium
-  - ../../../apps/kube-system/coredns
-  - ../../../apps/kube-system/metrics-server
-  - ../../../apps/kube-system/reloader
+  - ../../../../apps/kube-system/cilium
+  - ../../../../apps/kube-system/coredns
+  - ../../../../apps/kube-system/metrics-server
+  - ../../../../apps/kube-system/reloader
   
   # Istio service mesh (for local KNative testing)
-  - ../../../apps/istio-system/base
-  - ../../../apps/istio-system/cni
-  - ../../../apps/istio-system/istiod
+  - ../../../../apps/istio-system/base
+  - ../../../../apps/istio-system/cni
+  - ../../../../apps/istio-system/istiod
 
 # Local patches for system components
 patches:

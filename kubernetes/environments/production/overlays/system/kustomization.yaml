@@ -7,16 +7,16 @@ metadata:
 
 resources:
   # Core system services for production
-  - ../../../apps/kube-system/cilium
-  - ../../../apps/kube-system/coredns
-  - ../../../apps/kube-system/metrics-server
-  - ../../../apps/kube-system/reloader
+  - ../../../../apps/kube-system/cilium
+  - ../../../../apps/kube-system/coredns
+  - ../../../../apps/kube-system/metrics-server
+  - ../../../../apps/kube-system/reloader
   
   # Istio service mesh
-  - ../../../apps/istio-system/base
-  - ../../../apps/istio-system/cni
-  - ../../../apps/istio-system/istiod
+  - ../../../../apps/istio-system/base
+  - ../../../../apps/istio-system/cni
+  - ../../../../apps/istio-system/istiod
 
   # External-facing services (production only)
-  - ../../../apps/networking/cloudflared
-  - ../../../apps/networking/external-dns
+  - ../../../../apps/networking/cloudflared
+  - ../../../../apps/networking/external-dns

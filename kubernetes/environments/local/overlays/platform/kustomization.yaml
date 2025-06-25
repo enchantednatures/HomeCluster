@@ -7,12 +7,12 @@ metadata:
 
 resources:
   # Essential monitoring (lightweight for local)
-  - ../../../apps/monitoring/prometheus-operator-crds
-  - ../../../apps/monitoring/kube-prometheus-stack
-  - ../../../apps/monitoring/grafana
+  - ../../../../apps/monitoring/prometheus-operator-crds
+  - ../../../../apps/monitoring/kube-prometheus-stack
+  - ../../../../apps/monitoring/grafana
 
   # Local Istio gateway for testing
-  - ../../../apps/istio-ingress/gateway
+  - ../../../../apps/istio-ingress/gateway
 
 # Local environment patches
 patches:
