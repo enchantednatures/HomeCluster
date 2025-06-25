@@ -1,12 +1,16 @@
 ---
+# VirtualService for MinIO Console (external access)
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: minio-ui
   namespace: networking
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
   hosts:
-    - minio.enchantednatures.com
+    - minio.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:
@@ -19,14 +23,18 @@ spec:
             port:
               number: 9769
 ---
+# VirtualService for MinIO S3 API (external access)
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: minio-service
+  name: minio-s3-external
   namespace: networking
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+    external-dns.alpha.kubernetes.io/is-public: "true"
 spec:
   hosts:
-    - s3.enchantednatures.com
+    - s3.${SECRET_DOMAIN}
   gateways:
     - istio-ingress/external-gateway
   http:

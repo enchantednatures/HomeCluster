@@ -1,26 +1,10 @@
 ---
-# ServiceEntry to allow CloudNative-PG access to Kubernetes API
-apiVersion: networking.istio.io/v1beta1
-kind: ServiceEntry
-metadata:
-  name: kubernetes-api
-  namespace: authentik
-spec:
-  hosts:
-    - kubernetes.default.svc.cluster.local
-  ports:
-    - number: 443
-      name: https
-      protocol: HTTPS
-  location: MESH_EXTERNAL
-  resolution: DNS
----
 # ServiceEntry for external MinIO server
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: minio-external
-  namespace: authentik
+  namespace: monitoring
 spec:
   hosts:
     - minio-external.local
@@ -38,7 +22,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: minio-external
-  namespace: authentik
+  namespace: monitoring
 spec:
   host: minio-external.local
   trafficPolicy:
