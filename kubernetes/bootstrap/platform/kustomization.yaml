@@ -9,7 +9,7 @@ resources:
   # Monitoring and observability
   - ../../apps/monitoring
   
-  # Storage systems
+  # Storage systems (OpenEBS for persistent volumes)
   - ../../apps/openebs-system
   
   # Application platforms

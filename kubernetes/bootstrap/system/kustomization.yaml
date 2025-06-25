@@ -6,8 +6,15 @@ metadata:
   name: bootstrap-system
 
 resources:
-  # Core system services
-  - ../../apps/kube-system
+  # Core system services (individual components)
+  - ../../apps/kube-system/cilium/ks.yaml
+  - ../../apps/kube-system/coredns/ks.yaml
+  - ../../apps/kube-system/metrics-server/ks.yaml
+  - ../../apps/kube-system/reloader/ks.yaml
+  
+  # Storage drivers (needed before platform services)
+  - ../../apps/kube-system/csi-driver-nfs/ks.yaml
+  - ../../apps/kube-system/snapshot-controller/ks.yaml
   
   # Core Istio service mesh (base components only)
   - ../../apps/istio-system/base/ks.yaml
