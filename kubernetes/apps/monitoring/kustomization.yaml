@@ -13,3 +13,4 @@ resources:
   - ./promtail/ks.yaml
   # - ./influxdb/ks.yaml
   # - ./node-exporter/ks.yaml
+  - ./minio-serviceentry.yaml

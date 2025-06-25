@@ -1,0 +1,17 @@
+---
+# Phase 1: System Infrastructure - CNI, Service Mesh, Core System Services
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # CNI and networking foundation
+  - ../../apps/kube-system/cilium/ks.yaml
+  - ../../apps/kube-system/spegel/ks.yaml
+  
+  # Service mesh control plane
+  - ../../apps/istio-system/istiod/ks.yaml
+  - ../../apps/istio-ingress/gateway/ks.yaml
+  
+  # Essential cluster services
+  - ../../apps/kube-system/metrics-server/ks.yaml
+  - ../../apps/kube-system/reloader/ks.yaml
+  - ../../apps/cert-manager/cert-manager-issuers/ks.yaml

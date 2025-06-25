@@ -1,4 +1,8 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: [./namespace.yaml, ./cert-manager/ks.yaml]
+resources:
+  # Core cert-manager moved to bootstrap phases
+  # - ./cert-manager/ks.yaml (moved to bootstrap/foundation)
+  # - ./cert-manager-issuers/ks.yaml (moved to bootstrap/system)
+  []

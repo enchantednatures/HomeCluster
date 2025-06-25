@@ -3,8 +3,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./namespace.yaml
-  - ./cloudflared/ks.yaml
-  - ./external-dns/ks.yaml
-  - ./k8s-gateway/ks.yaml
+  # Core networking moved to bootstrap/platform:
+  # - ./external-dns/ks.yaml (moved to bootstrap/platform)
+  # - ./cloudflared/ks.yaml (moved to bootstrap/platform)
+  # - ./k8s-gateway/ks.yaml (moved to bootstrap/platform)
+  
+  # Additional networking services
   - ./tailscale-operator/ks.yaml
   - ./tailscale-connector/ks.yaml

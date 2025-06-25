@@ -1,0 +1,28 @@
+---
+# Environment-aware bootstrap foundation
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  # Core namespaces that both environments need
+  - ../../apps/cert-manager/namespace.yaml
+  - ../../apps/istio-system/namespace.yaml 
+  - ../../apps/istio-ingress/namespace.yaml
+  - ../../apps/kube-system/namespace.yaml
+  
+  # Critical CRDs that both environments need
+  - ../../apps/cert-manager/cert-manager/ks.yaml
+  - ../../apps/istio-system/base/ks.yaml
+
+# Allow environments to customize foundation
+replacements:
+  - source:
+      kind: ConfigMap
+      name: cluster-settings
+      fieldPath: data.CLUSTER_NAME
+    targets:
+      - select:
+          kind: HelmRelease
+        fieldPaths:
+          - metadata.name
+        options:
+          delimiter: '-'

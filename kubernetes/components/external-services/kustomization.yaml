@@ -1,0 +1,22 @@
+---
+# External Services Component (Production only)
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - ../../apps/networking/external-dns/ks.yaml
+  - ../../apps/networking/cloudflared/ks.yaml
+  - ../../apps/networking/tailscale-operator/ks.yaml
+  - ../../apps/networking/tailscale-connector/ks.yaml
+
+# External services typically need higher resource limits
+patches:
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      labelSelector: app.kubernetes.io/component=external-service
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "256Mi"
