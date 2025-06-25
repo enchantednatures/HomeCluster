@@ -7,19 +7,19 @@ metadata:
 
 resources:
   # Monitoring and observability
-  - ../apps/monitoring
+  - ../../apps/monitoring
   
   # Storage systems
-  - ../apps/openebs-system
+  - ../../apps/openebs-system
   
   # Application platforms
-  - ../apps/postgres
-  - ../apps/kafka
-  - ../apps/dragonflydb
-  - ../apps/arangodb
+  - ../../apps/postgres
+  - ../../apps/kafka
+  - ../../apps/dragonflydb
+  - ../../apps/arangodb
   
   # Operators
-  - ../apps/rabbitmq-operator
+  - ../../apps/rabbitmq-operator
   
   # Core gateway
-  - ../apps/istio-ingress
+  - ../../apps/istio-ingress

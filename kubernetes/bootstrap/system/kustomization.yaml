@@ -7,10 +7,10 @@ metadata:
 
 resources:
   # Core system services
-  - ../apps/kube-system
+  - ../../apps/kube-system
   
   # Istio service mesh
-  - ../apps/istio-system
+  - ../../apps/istio-system
   
   # Network configuration
-  - ../apps/networking
+  - ../../apps/networking

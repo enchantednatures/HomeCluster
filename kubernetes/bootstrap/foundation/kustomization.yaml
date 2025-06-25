@@ -7,14 +7,14 @@ metadata:
 
 resources:
   # All namespace definitions
-  - ../apps/kube-system/namespace.yaml
-  - ../apps/monitoring/namespace.yaml
-  - ../apps/istio-system/namespace.yaml
-  - ../apps/openebs-system/namespace.yaml
-  - ../apps/rabbitmq-operator/namespace.yaml
-  - ../apps/flux-system
-  - ../apps/atuin/namespace.yaml
-  - ../apps/immich/namespace.yaml
-  - ../apps/harbor/namespace.yaml
-  - ../apps/flink/namespace.yaml
-  - ../apps/default/namespace.yaml
+  - ../../apps/kube-system/namespace.yaml
+  - ../../apps/monitoring/namespace.yaml
+  - ../../apps/istio-system/namespace.yaml
+  - ../../apps/openebs-system/namespace.yaml
+  - ../../apps/rabbitmq-operator/namespace.yaml
+  - ../../apps/flux-system
+  - ../../apps/atuin/namespace.yaml
+  - ../../apps/immich/namespace.yaml
+  - ../../apps/harbor/namespace.yaml
+  - ../../apps/flink/namespace.yaml
+  - ../../apps/default/namespace.yaml
