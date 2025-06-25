@@ -4,21 +4,37 @@ version: "3"
 vars:
   CLUSTER_SECRET_SOPS_FILE: "{{.KUBERNETES_DIR}}/flux/vars/cluster-secrets.sops.yaml"
   CLUSTER_SETTINGS_FILE: "{{.KUBERNETES_DIR}}/flux/vars/cluster-settings.yaml"
+  CLUSTER_SETTINGS_USER_FILE: "{{.KUBERNETES_DIR}}/flux/vars/cluster-settings-user.yaml"
   GITHUB_DEPLOY_KEY_FILE: "{{.KUBERNETES_DIR}}/bootstrap/flux/github-deploy-key.sops.yaml"
 tasks:
   bootstrap:
     desc: Bootstrap Flux into a Kubernetes cluster
+    summary: |
+      Bootstrap Flux with current cluster configuration.
+      This will install Flux and apply the current cluster.yaml configuration.
     cmds:
-      - kubectl apply  --server-side --kustomize {{.KUBERNETES_DIR}}/bootstrap/flux
+      - echo "🚀 Bootstrapping Flux..."
+      - kubectl apply --server-side --kustomize {{.KUBERNETES_DIR}}/bootstrap/flux
+      - echo "📦 Installing SOPS Age key..."
       - cat {{.AGE_FILE}} | kubectl -n flux-system create secret generic sops-age --from-file=age.agekey=/dev/stdin
+      - echo "🔐 Applying cluster secrets..."
       - sops --decrypt {{.CLUSTER_SECRET_SOPS_FILE}} | kubectl apply --server-side --filename -
+      - echo "⚙️  Applying cluster settings..."
       - kubectl apply --server-side --filename {{.CLUSTER_SETTINGS_FILE}}
+      - kubectl apply --server-side --filename {{.CLUSTER_SETTINGS_USER_FILE}}
+      - echo "🎯 Applying Flux configuration..."
       - kubectl apply --server-side --kustomize {{.KUBERNETES_DIR}}/flux/config
+      - echo "✅ Flux bootstrap complete!"
     preconditions:
       - msg: Missing kubeconfig
         sh: test -f {{.KUBECONFIG_FILE}}
       - msg: Missing Sops Age key file
         sh: test -f {{.AGE_FILE}}
+      - msg: Missing cluster secrets file
+        sh: test -f {{.CLUSTER_SECRET_SOPS_FILE}}
+      - msg: Missing cluster settings file
+        sh: test -f {{.CLUSTER_SETTINGS_FILE}}
+
   apply:
     desc: Apply a Flux Kustomization resource for a cluster
     summary: |
@@ -47,15 +63,71 @@ tasks:
         sh: test -f {{.KUBECONFIG_FILE}}
       - msg: Missing Flux Kustomization for app {{.path}}
         sh: test -f {{.KUBERNETES_DIR}}/apps/{{.path}}/ks.yaml
+
   reconcile:
     desc: Force update Flux to pull in changes from your Git repository
-    cmd:
-      flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile --namespace flux-system
-      kustomization cluster --with-source
+    summary: |
+      Force reconcile all cluster Kustomizations with source update.
+      This will pull latest changes from Git and apply them.
+    cmds:
+      - echo "🔄 Reconciling Git source..."
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile source git home-kubernetes --namespace flux-system
+      - echo "🔄 Reconciling cluster foundation..."
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile kustomization cluster-0-foundation --namespace flux-system
+      - echo "🔄 Reconciling cluster system..."
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile kustomization cluster-1-system --namespace flux-system
+      - echo "🔄 Reconciling cluster platform..."
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile kustomization cluster-2-platform --namespace flux-system
+      - echo "🔄 Reconciling cluster apps..."
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile kustomization cluster-apps --namespace flux-system
+      - echo "🔄 Reconciling flux config..."
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile kustomization cluster-flux --namespace flux-system
+      - echo "✅ All reconciliations complete!"
     preconditions:
       - msg: Missing kubeconfig
         sh: test -f {{.KUBECONFIG_FILE}}
+
+  reconcile-fast:
+    desc: Fast reconcile of just source and foundation
+    summary: |
+      Quick reconcile of Git source and foundation only.
+      Use this for quick updates during development.
+    cmds:
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile source git home-kubernetes --namespace flux-system
+      - flux --kubeconfig {{.KUBECONFIG_FILE}} reconcile kustomization cluster-0-foundation --namespace flux-system
+    preconditions:
+      - msg: Missing kubeconfig
+        sh: test -f {{.KUBECONFIG_FILE}}
+
+  status:
+    desc: Show status of all Flux Kustomizations
+    summary: |
+      Display the current status of all cluster Kustomizations.
+    cmd: |
+      echo "📊 Flux Kustomization Status:"
+      kubectl --kubeconfig {{.KUBECONFIG_FILE}} get kustomizations -n flux-system | grep cluster-
+    preconditions:
+      - msg: Missing kubeconfig
+        sh: test -f {{.KUBECONFIG_FILE}}
+
+  logs:
+    desc: Show Flux controller logs
+    summary: |
+      Args:
+        controller: Controller to show logs for (default: kustomize-controller)
+        lines: Number of lines to show (default: 50)
+    cmd: |
+      kubectl --kubeconfig {{.KUBECONFIG_FILE}} logs -n flux-system \
+        deployment/{{.controller}} --tail={{.lines}} -f
+    vars:
+      controller: '{{.controller | default "kustomize-controller"}}'
+      lines: '{{.lines | default "50"}}'
+    preconditions:
+      - msg: Missing kubeconfig
+        sh: test -f {{.KUBECONFIG_FILE}}
+
   github-deploy-key:
+    desc: Apply GitHub deploy key for private repository access
     cmds:
       - kubectl create namespace flux-system --dry-run=client -o yaml | kubectl --kubeconfig
         {{.KUBECONFIG_FILE}} apply --filename -
@@ -68,3 +140,33 @@ tasks:
         sh: test -f {{.AGE_FILE}}
       - msg: Missing Github deploy key file
         sh: test -f {{.GITHUB_DEPLOY_KEY_FILE}}
+
+  # Multi-tenancy support tasks
+  switch-environment:
+    desc: Switch to a different environment configuration
+    summary: |
+      Args:
+        env: Environment to switch to (production, local) (required)
+    cmd: |
+      echo "🔄 Switching to {{.env}} environment..."
+      kubectl apply --kubeconfig {{.KUBECONFIG_FILE}} -f {{.KUBERNETES_DIR}}/flux/config/environments/cluster-{{.env}}.yaml
+    requires:
+      vars: [env]
+    preconditions:
+      - msg: Missing kubeconfig
+        sh: test -f {{.KUBECONFIG_FILE}}
+      - msg: Environment config file not found
+        sh: test -f {{.KUBERNETES_DIR}}/flux/config/environments/cluster-{{.env}}.yaml
+
+  validate:
+    desc: Validate Flux configuration files
+    summary: |
+      Validate all Flux configurations for syntax and dependencies.
+    cmd: |
+      echo "🔍 Validating Flux configuration..."
+      flux --kubeconfig {{.KUBECONFIG_FILE}} check --pre
+      echo "🔍 Validating cluster configuration..."
+      kubectl --kubeconfig {{.KUBECONFIG_FILE}} apply --dry-run=client -f {{.KUBERNETES_DIR}}/flux/config/cluster.yaml
+    preconditions:
+      - msg: Missing kubeconfig
+        sh: test -f {{.KUBECONFIG_FILE}}
