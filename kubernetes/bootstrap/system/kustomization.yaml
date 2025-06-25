@@ -1,17 +1,16 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 ---
-# Phase 1: System Infrastructure - CNI, Service Mesh, Core System Services
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+metadata:
+  name: bootstrap-system
+
 resources:
-  # CNI and networking foundation
-  - ../../apps/kube-system/cilium/ks.yaml
-  - ../../apps/kube-system/spegel/ks.yaml
+  # Core system services
+  - ../apps/kube-system
   
-  # Service mesh control plane
-  - ../../apps/istio-system/istiod/ks.yaml
-  - ../../apps/istio-ingress/gateway/ks.yaml
+  # Istio service mesh
+  - ../apps/istio-system
   
-  # Essential cluster services
-  - ../../apps/kube-system/metrics-server/ks.yaml
-  - ../../apps/kube-system/reloader/ks.yaml
-  - ../../apps/cert-manager/cert-manager-issuers/ks.yaml
+  # Network configuration
+  - ../apps/networking

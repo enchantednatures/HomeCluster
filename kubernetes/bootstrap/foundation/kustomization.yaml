@@ -1,28 +1,20 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 ---
-# Environment-aware bootstrap foundation
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  # Core namespaces that both environments need
-  - ../../apps/cert-manager/namespace.yaml
-  - ../../apps/istio-system/namespace.yaml 
-  - ../../apps/istio-ingress/namespace.yaml
-  - ../../apps/kube-system/namespace.yaml
-  
-  # Critical CRDs that both environments need
-  - ../../apps/cert-manager/cert-manager/ks.yaml
-  - ../../apps/istio-system/base/ks.yaml
+metadata:
+  name: bootstrap-foundation
 
-# Allow environments to customize foundation
-replacements:
-  - source:
-      kind: ConfigMap
-      name: cluster-settings
-      fieldPath: data.CLUSTER_NAME
-    targets:
-      - select:
-          kind: HelmRelease
-        fieldPaths:
-          - metadata.name
-        options:
-          delimiter: '-'
+resources:
+  # All namespace definitions
+  - ../apps/kube-system/namespace.yaml
+  - ../apps/monitoring/namespace.yaml
+  - ../apps/istio-system/namespace.yaml
+  - ../apps/openebs-system/namespace.yaml
+  - ../apps/rabbitmq-operator/namespace.yaml
+  - ../apps/flux-system
+  - ../apps/atuin/namespace.yaml
+  - ../apps/immich/namespace.yaml
+  - ../apps/harbor/namespace.yaml
+  - ../apps/flink/namespace.yaml
+  - ../apps/default/namespace.yaml

@@ -1,22 +1,25 @@
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
 ---
-# Phase 2: Platform Services - Operators, Storage, Networking
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+metadata:
+  name: bootstrap-platform
+
 resources:
-  # Storage and CSI drivers
-  - ../../apps/kube-system/csi-driver-nfs/ks.yaml
-  - ../../apps/kube-system/snapshot-controller/ks.yaml
-  - ../../apps/openebs-system/ks.yaml
+  # Monitoring and observability
+  - ../apps/monitoring
   
-  # Database operators
-  - ../../apps/postgres/cloudnative-pg/ks.yaml
-  - ../../apps/dragonflydb/dragonflydb-operator/ks.yaml
-  - ../../apps/rabbitmq-operator/ks.yaml
+  # Storage systems
+  - ../apps/openebs-system
   
-  # Networking services
-  - ../../apps/networking/external-dns/ks.yaml
-  - ../../apps/networking/cloudflared/ks.yaml
-  - ../../apps/networking/k8s-gateway/ks.yaml
+  # Application platforms
+  - ../apps/postgres
+  - ../apps/kafka
+  - ../apps/dragonflydb
+  - ../apps/arangodb
   
-  # Platform monitoring
-  - ../../apps/monitoring/prometheus-operator-crds/ks.yaml
+  # Operators
+  - ../apps/rabbitmq-operator
+  
+  # Core gateway
+  - ../apps/istio-ingress
