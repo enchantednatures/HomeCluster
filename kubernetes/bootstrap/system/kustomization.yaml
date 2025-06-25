@@ -9,8 +9,10 @@ resources:
   # Core system services
   - ../../apps/kube-system
   
-  # Istio service mesh
-  - ../../apps/istio-system
+  # Core Istio service mesh (base components only)
+  - ../../apps/istio-system/base/ks.yaml
+  - ../../apps/istio-system/cni/ks.yaml
+  - ../../apps/istio-system/istiod/ks.yaml
   
   # Network configuration
   - ../../apps/networking

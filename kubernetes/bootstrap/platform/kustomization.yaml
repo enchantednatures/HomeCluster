@@ -23,3 +23,6 @@ resources:
   
   # Core gateway
   - ../../apps/istio-ingress
+  
+  # Istio services that depend on CRDs
+  - ../../apps/istio-system/kiali/ks.yaml

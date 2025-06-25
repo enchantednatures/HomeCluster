@@ -2,10 +2,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  # Core Istio components moved to bootstrap phases
-  # - ./base/ks.yaml (moved to bootstrap/foundation)
-  # - ./istiod/ks.yaml (moved to bootstrap/system)
-  
-  # Additional Istio services that can come later
-  - ./kiali/ks.yaml
-  # - ./cni/ks.yaml  # Disabled CNI, using init containers instead
+  # Kiali moved to platform phase since it depends on Istio CRDs
+  # This kustomization is now empty as core Istio components are in bootstrap/system
+  []
