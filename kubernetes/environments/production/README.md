@@ -21,22 +21,21 @@ This overlay configures the full HomeCluster production environment.
 
 ## Usage
 
-This is the default environment. To ensure it's active:
+To use the production environment:
 
-1. Verify environment setting:
+1. Apply the production Flux configuration:
    ```bash
-   kubectl get configmap cluster-environment -n flux-system -o yaml
+   kubectl apply -f kubernetes/flux/config/cluster-production.yaml
    ```
-2. Should show `environment: "production"`
-3. Apply Flux configuration if needed:
+
+2. Verify deployment:
    ```bash
-   kubectl apply -f kubernetes/flux/config/cluster-multitenant.yaml
+   kubectl get kustomizations -n flux-system
    ```
 
 ## Environment Variables
 
 The following substitutions are available:
-- `${CLUSTER_ENVIRONMENT}`: Set to "production"  
 - All cluster settings from ConfigMaps/Secrets
 - User-specific settings for applications
 

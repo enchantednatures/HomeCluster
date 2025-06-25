@@ -6,9 +6,6 @@ metadata:
   name: local-foundation
 
 resources:
-  # Base foundation components
-  - ../../../bootstrap/foundation
-
   # Essential namespaces for local development
   - ../../../apps/kube-system/namespace.yaml
   - ../../../apps/monitoring/namespace.yaml

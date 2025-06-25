@@ -6,9 +6,6 @@ metadata:
   name: local-platform
 
 resources:
-  # Base platform components
-  - ../../../bootstrap/platform
-
   # Essential monitoring (lightweight for local)
   - ../../../apps/monitoring/prometheus-operator-crds
   - ../../../apps/monitoring/kube-prometheus-stack

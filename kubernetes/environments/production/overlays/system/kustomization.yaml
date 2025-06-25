@@ -6,9 +6,6 @@ metadata:
   name: production-system
 
 resources:
-  # Base system components
-  - ../../../bootstrap/system
-
   # Core system services for production
   - ../../../apps/kube-system/cilium
   - ../../../apps/kube-system/coredns

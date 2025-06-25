@@ -6,9 +6,6 @@ metadata:
   name: production-platform
 
 resources:
-  # Base platform components
-  - ../../../bootstrap/platform
-
   # Storage systems
   - ../../../apps/openebs-system/openebs
   - ../../../apps/kube-system/csi-driver-nfs

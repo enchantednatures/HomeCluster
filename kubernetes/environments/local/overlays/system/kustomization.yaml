@@ -6,9 +6,6 @@ metadata:
   name: local-system
 
 resources:
-  # Base system components
-  - ../../../bootstrap/system
-
   # Core system services (local-friendly)
   - ../../../apps/kube-system/cilium
   - ../../../apps/kube-system/coredns

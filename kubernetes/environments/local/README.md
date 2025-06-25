@@ -22,14 +22,13 @@ This overlay configures a minimal Kubernetes environment suitable for local deve
 To deploy this environment:
 
 1. Ensure you have a local Kubernetes cluster (minikube, kind, etc.)
-2. Set the environment variable in Flux:
+2. Apply the local development Flux configuration:
    ```bash
-   kubectl patch configmap cluster-environment -n flux-system \
-     --patch '{"data":{"environment":"local"}}'
+   kubectl apply -f kubernetes/flux/config/cluster-local.yaml
    ```
-3. Apply the Flux configuration:
+3. Monitor the deployment:
    ```bash
-   kubectl apply -f kubernetes/flux/config/cluster-multitenant.yaml
+   kubectl get kustomizations -n flux-system
    ```
 
 ## Local Access
@@ -43,5 +42,4 @@ Use `kubectl get svc -A` to find the NodePort assignments.
 ## Environment Variables
 
 The following substitutions are available:
-- `${CLUSTER_ENVIRONMENT}`: Set to "local"
 - All standard cluster settings from ConfigMaps/Secrets

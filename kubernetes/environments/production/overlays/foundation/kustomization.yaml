@@ -6,9 +6,6 @@ metadata:
   name: production-foundation
 
 resources:
-  # Base foundation components
-  - ../../../bootstrap/foundation
-
   # Production-specific foundation additions
   - ../../../apps/kube-system/namespace.yaml
   - ../../../apps/monitoring/namespace.yaml

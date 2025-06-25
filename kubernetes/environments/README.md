@@ -64,35 +64,37 @@ kubernetes/
 
 ### Switching to Multi-Tenant Configuration
 
-1. **For Production** (current default):
+1. **For Production** (enhanced version):
    ```bash
-   kubectl apply -f kubernetes/flux/config/cluster-multitenant.yaml
+   kubectl apply -f kubernetes/flux/config/cluster-production.yaml
    ```
 
 2. **For Local Development**:
    ```bash
-   # Update environment setting
-   kubectl patch configmap cluster-environment -n flux-system \
-     --patch '{"data":{"environment":"local"}}'
-   
-   # Apply configuration
-   kubectl apply -f kubernetes/flux/config/cluster-multitenant.yaml
+   kubectl apply -f kubernetes/flux/config/cluster-local.yaml
    ```
 
-### Reverting to Single-Tenant
+### Reverting to Original Configuration
 
 To revert to the original configuration:
 ```bash
 kubectl apply -f kubernetes/flux/config/cluster.yaml
 ```
 
+### Configuration Files
+
+- `cluster.yaml` - Original single-tenant configuration
+- `cluster-production.yaml` - Production multi-tenant overlay
+- `cluster-local.yaml` - Local development overlay
+
 ## Environment Variables
 
 The configuration uses the following substitutions:
 
-- `${CLUSTER_ENVIRONMENT}`: Environment name ("production" or "local")
 - All existing cluster settings from ConfigMaps/Secrets
 - User-specific settings for applications
+
+No additional environment variables are required for basic operation.
 
 ## Architecture Benefits
 
