@@ -15,9 +15,10 @@ data:
       name: home-cluster
       id: 1
     cni:
-      exclusive: true
-    socketLb:
-      hostNamespaceOnly: true
+      exclusive: false
+    socketLB:
+      enabled: true
+      hostNamespaceOnly: false
     containerRuntime:
       integration: containerd
       socketPath: /var/run/k3s/containerd/containerd.sock

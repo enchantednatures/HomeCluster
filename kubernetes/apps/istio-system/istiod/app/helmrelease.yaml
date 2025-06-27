@@ -27,25 +27,25 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    profile: ambient
     pilot:
       resources:
         requests:
           cpu: 100m
           memory: 2048Mi
       env:
-        # Disable CNI and use init containers instead
         EXTERNAL_ISTIOD: false
         PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
-        # Disable automatic DestinationRule creation for kubernetes API
         PILOT_ENABLE_KUBERNETES_GATEWAY_API: false
+        # Enable ambient mode
+        PILOT_ENABLE_AMBIENT: true
     global:
       logAsJson: true
       meshID: enchantednatures
-      # Use init containers instead of CNI to avoid Cilium conflicts
       istioNamespace: istio-system
-      # Disable CNI completely
+      # Enable CNI for ambient mode
       cni:
-        enabled: false
+        enabled: true
       tracer:
         zipkin:
           address: tempo.monitoring.svc.cluster.local:9411

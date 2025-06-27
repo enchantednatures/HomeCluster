@@ -1,0 +1,9 @@
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-all-mesh-wide
+  namespace: istio-system
+spec:
+  rules:
+    - {}
