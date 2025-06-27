@@ -6,7 +6,7 @@ metadata:
 data:
   values.yaml: |-
     autoDirectNodeRoutes: true
-    bpf-lb-sock-hostns
+    bpf-lb-sock-hostns: true
     bpf:
       masquerade: true
     bgp:
