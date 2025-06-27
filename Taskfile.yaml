@@ -34,6 +34,39 @@ includes:
     optional: true
 tasks:
   default: task --list
+  cluster:bootstrap:
+    desc: Full cluster bootstrap - provision infrastructure and setup GitOps
+    prompt: This will apply terraform and setup GitOps. Continue?
+    deps: [workstation:direnv, workstation:venv, sops:age-keygen]
+    cmds:
+      - task: terraform:proxmox:apply
+      - cmd: echo "Waiting for cluster to be ready..."
+      - cmd: sleep 30
+      - cmd: |
+          echo "Waiting for Kubernetes API to be available..."
+          timeout 300 bash -c 'until kubectl cluster-info &>/dev/null; do sleep 5; done'
+      - task: flux:github-deploy-key
+      - task: flux:bootstrap
+      - cmd: echo "=== Cluster bootstrap complete ==="
+      - cmd: echo "Run 'task flux:reconcile' to sync your applications"
+  cluster:rebuild:
+    desc: Destroy and rebuild cluster from scratch
+    prompt: This will DESTROY and recreate your entire cluster. All data will be lost. Continue?
+    deps: [workstation:direnv, workstation:venv, sops:age-keygen]
+    cmds:
+      - task: terraform:proxmox:destroy
+      - cmd: echo "Waiting for infrastructure cleanup..."
+      - cmd: sleep 10
+      - task: terraform:proxmox:apply
+      - cmd: echo "Waiting for cluster to be ready..."
+      - cmd: sleep 30
+      - cmd: |
+          echo "Waiting for Kubernetes API to be available..."
+          timeout 300 bash -c 'until kubectl cluster-info &>/dev/null; do sleep 5; done'
+      - task: flux:github-deploy-key
+      - task: flux:bootstrap
+      - cmd: echo "=== Cluster rebuild complete ==="
+      - cmd: echo "Run 'task flux:reconcile' to sync your applications"
   init:
     desc: Initialize configuration files
     cmds:
