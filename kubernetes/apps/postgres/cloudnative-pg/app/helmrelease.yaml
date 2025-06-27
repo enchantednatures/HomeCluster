@@ -8,6 +8,8 @@ spec:
   dependsOn:
     - name: openebs
       namespace: openebs-system
+    - name: istio-base
+      namespace: istio-system
   chart:
     spec:
       chart: cloudnative-pg
