@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app nginx-certificates
+  name: &app networking-certificates
   namespace: flux-system
 spec:
   targetNamespace: networking
@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: cert-manager-issuers
-  path: ./kubernetes/apps/networking/nginx/certificates
+  path: ./kubernetes/apps/networking/essentials/certificates
   prune: true
   sourceRef:
     kind: GitRepository
@@ -24,7 +24,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app nginx-external
+  name: &app networking-external
   namespace: flux-system
 spec:
   targetNamespace: networking
@@ -32,30 +32,8 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: nginx-certificates
-  path: ./kubernetes/apps/networking/nginx/external
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: home-kubernetes
-  wait: false
-  interval: 30m
-  retryInterval: 1m
-  timeout: 5m
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: &app nginx-misc-ingresses
-  namespace: flux-system
-spec:
-  targetNamespace: networking
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *app
-  dependsOn:
-    - name: nginx-certificates
-  path: ./kubernetes/apps/networking/nginx/ingresses
+    - name: networking-certificates
+  path: ./kubernetes/apps/networking/essentials/external
   prune: true
   sourceRef:
     kind: GitRepository
