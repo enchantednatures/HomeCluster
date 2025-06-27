@@ -1,0 +1,72 @@
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: opentofu-plan-pipeline
+  namespace: tekton-pipelines
+spec:
+  description: |
+    This pipeline clones a Git repo, runs 'tofu plan', and comments the output on a PR.
+  params:
+    - name: repo-url
+      description: The git repository URL.
+    - name: revision
+      description: The git revision (commit sha).
+    - name: pr-number
+      description: The GitHub PR number.
+    - name: repo-full-name
+      description: The GitHub repository full name (e.g., my-org/my-repo).
+    - name: tofu-dir
+      description: Directory containing OpenTofu files
+      default: "."
+  workspaces:
+    - name: shared-data
+    - name: ssh-credentials
+    - name: tofu-backend-config
+  tasks:
+    - name: fetch-repo
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+      workspaces:
+        - name: output
+          workspace: shared-data
+        - name: ssh-directory
+          workspace: ssh-credentials
+    - name: tofu-plan
+      taskRef:
+        name: opentofu-cli
+      runAfter: [fetch-repo]
+      params:
+        - name: COMMANDS
+          value:
+            - "init"
+            - "plan"
+            - "plan-output"
+        - name: TOFU_DIR
+          value: $(params.tofu-dir)
+      workspaces:
+        - name: source
+          workspace: shared-data
+        - name: config
+          workspace: tofu-backend-config
+    - name: comment-on-pr
+      taskRef:
+        name: github-pr-comment
+      runAfter: [tofu-plan]
+      params:
+        - name: REPO_FULL_NAME
+          value: $(params.repo-full-name)
+        - name: PR_NUMBER
+          value: $(params.pr-number)
+        - name: PLAN_FILE
+          value: "plan.txt"
+        - name: COMMENT_TITLE
+          value: "OpenTofu Plan Results"
+      workspaces:
+        - name: plan-dir
+          workspace: shared-data

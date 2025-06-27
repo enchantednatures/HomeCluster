@@ -7,4 +7,6 @@ resources:
   - ./git-clone.yaml
   - ./docker-push.yaml
   - ./docker-build.yaml
+  - ./opentofu-cli.yaml
+  - ./github-pr-comment.yaml
   - https://api.hub.tekton.dev/v1/resource/tekton/task/send-to-webhook-discord/0.1/raw

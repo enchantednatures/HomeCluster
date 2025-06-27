@@ -1,0 +1,20 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: tekton-opentofu-webhook
+  namespace: tekton-pipelines
+spec:
+  hosts:
+    - tekton-webhook.hcasten.dev
+  gateways:
+    - istio-system/default
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: el-opentofu-listener.tekton-pipelines.svc.cluster.local
+            port:
+              number: 8080
