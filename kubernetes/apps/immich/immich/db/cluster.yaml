@@ -83,7 +83,7 @@ spec:
     #     # - CREATE EXTENSION IF NOT EXISTS "vector";
     #     # - ALTER ROLE "immich" WITH "superuser";
     recovery:
-      source: &previousCluster immich-1
+      source: &previousCluster immich-v1
       database: immich
       owner: immich
       secret:

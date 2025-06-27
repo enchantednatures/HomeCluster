@@ -63,7 +63,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster harbor-v3
+      serverName: &currentCluster harbor-v4
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -74,7 +74,7 @@ spec:
 
   bootstrap:
     recovery:
-      source: &previousCluster harbor-v2
+      source: &previousCluster harbor-v3
       database: harbor
       owner: harbor
       secret:
