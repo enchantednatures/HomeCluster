@@ -11,3 +11,4 @@ resources:
   - superusersecret.sops.yaml
   - hunter-user.sops.yaml
   - destinationrule.yaml
+  - ./istio-serviceentry.yaml
