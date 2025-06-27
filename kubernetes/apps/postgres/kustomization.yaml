@@ -6,4 +6,3 @@ resources:
   - ./cloudnative-pg/ks.yaml
   - ./postgis/ks.yaml
   - ./cluster/ks.yaml
-  - ./minio-serviceentry.yaml

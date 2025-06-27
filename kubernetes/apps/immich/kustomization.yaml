@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./immich/ks.yaml
-  - ./minio-serviceentry.yaml
+

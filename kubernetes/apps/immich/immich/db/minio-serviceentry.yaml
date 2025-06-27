@@ -4,7 +4,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: minio-external
-  namespace: monitoring
+  namespace: immich
 spec:
   hosts:
     - minio-external.local
@@ -22,7 +22,7 @@ apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
   name: minio-external
-  namespace: monitoring
+  namespace: immich
 spec:
   host: minio-external.local
   trafficPolicy:
