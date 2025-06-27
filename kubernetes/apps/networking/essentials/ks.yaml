@@ -24,7 +24,7 @@ spec:
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app networking-external
+  name: &app networking-ingresses
   namespace: flux-system
 spec:
   targetNamespace: networking
@@ -33,7 +33,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: networking-certificates
-  path: ./kubernetes/apps/networking/essentials/external
+  path: ./kubernetes/apps/networking/essentials/ingresses
   prune: true
   sourceRef:
     kind: GitRepository
