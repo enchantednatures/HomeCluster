@@ -5,7 +5,6 @@ metadata:
   name: &app tekton-pipelines
   namespace: flux-system
 spec:
-  targetNamespace: tekton-pipelines
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
