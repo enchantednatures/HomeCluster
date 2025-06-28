@@ -30,3 +30,23 @@ variable "age_private_key" {
   type        = string
   sensitive   = true
 }
+
+variable "docker_username" {
+  type = string
+  sensitive = true
+}
+
+variable "docker_password" {
+  type = string
+  sensitive = true
+}
+
+variable "ghcr_username" {
+ type = string
+ sensitive = true
+}
+
+variable "ghcr_token" {
+ type = string
+ sensitive = true
+}
