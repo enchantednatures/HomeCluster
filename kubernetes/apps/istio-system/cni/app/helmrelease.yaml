@@ -33,15 +33,19 @@ spec:
       chained: true
       cniBinDir: /opt/cni/bin
       cniConfDir: /etc/cni/net.d
-      # Don't overwrite Cilium's config, chain with it instead
+      # Chain with Cilium - use the actual conflist name
       cniConfFileName: "05-cilium.conflist"
-      # Reduce reconciliation to prevent constant rewrites
-      reconcileInterval: "60s"
-      logLevel: warn # Reduce log noise
-      # Repair configuration
+      # Increase reconciliation interval to reduce conflicts
+      reconcileInterval: "300s"
+      logLevel: debug # Increase logging to troubleshoot
+      # Disable repair initially to prevent conflicts
       repair:
-        enabled: true
-        hub: docker.io/istio
-        tag: 1.26.2
+        enabled: false
       ambient:
         enabled: true
+      # Add exclusions to prevent breaking cluster networking
+      excludeNamespaces:
+        - kube-system
+        - kube-public
+        - kube-node-lease
+        - flux-system
