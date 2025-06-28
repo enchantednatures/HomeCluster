@@ -92,3 +92,5 @@ cni:
   exclusive: false
 bpf-lb-sock-hostns: true
 tunnel: disabled
+socketLB:
+  hostNamespaceOnly: true
