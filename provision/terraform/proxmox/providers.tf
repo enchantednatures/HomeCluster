@@ -72,8 +72,9 @@ provider "restapi" {
   }
 }
 
+# Kubernetes provider - will connect after kubeconfig is created
 provider "kubernetes" {
-  config_path = local_file.kube_config.filename
+  config_path = try(local_file.kube_config.filename, null)
 }
 
 provider "github" {
@@ -82,12 +83,12 @@ provider "github" {
 
 provider "flux" {
   kubernetes = {
-    config_path = local_file.kube_config.filename
+    config_path = try(local_file.kube_config.filename, null)
   }
   git = {
     url = "ssh://git@github.com/${var.github_owner}/${var.github_repository}.git"
     ssh = {
-      username    = "git"
+      username = "git"
       # private_key = tls_private_key.flux.private_key_pem
       private_key = file("~/.ssh/id_rsa")
     }
