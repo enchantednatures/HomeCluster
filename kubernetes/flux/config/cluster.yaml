@@ -48,7 +48,7 @@ metadata:
 spec:
   interval: 30m
   dependsOn:
-    - cluster
+    - name: cluster
   path: ./kubernetes/crds
   prune: true
   wait: false
