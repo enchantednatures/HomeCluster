@@ -22,6 +22,12 @@ spec:
             host: minio-external.local
             port:
               number: 9769
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+            X-Forwarded-Host: minio.${SECRET_DOMAIN}
+            Host: minio.${SECRET_DOMAIN}
 ---
 # VirtualService for MinIO S3 API (external access)
 apiVersion: networking.istio.io/v1beta1
@@ -46,3 +52,9 @@ spec:
             host: minio-external.local
             port:
               number: 9768
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+            X-Forwarded-Host: s3.${SECRET_DOMAIN}
+            Host: s3.${SECRET_DOMAIN}
