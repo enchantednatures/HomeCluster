@@ -2,16 +2,19 @@
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: kafka
+  name: kafka-service-entry
   namespace: redpanda
 spec:
   hosts:
     - snail-kafka-bootstrap.kafka.svc.cluster.local
   ports:
     - number: 9092
-      name: kafka
+      name: kafka-plain
       protocol: TCP
-  location: MESH_INTERNAL
+    - number: 9093
+      name: kafka-tls
+      protocol: TCP
+  location: MESH_EXTERNAL
   resolution: DNS
 ---
 apiVersion: v1
@@ -49,3 +52,14 @@ spec:
 #   trafficPolicy:
 #     tls:
 #       mode: ISTIO_MUTUAL
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kafka-destination-rule
+  namespace: redpanda
+spec:
+  host: snail-kafka-bootstrap.kafka.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
