@@ -11,7 +11,7 @@ spec:
     - number: 9092
       name: kafka
       protocol: TCP
-  location: MESH_EXTERNAL
+  location: MESH_INTERNAL
   resolution: DNS
 ---
 apiVersion: v1
@@ -25,6 +25,8 @@ metadata:
   annotations:
     # external-dns.alpha.kubernetes.io/hostname: redpanda.${SECRET_DOMAIN}
     lbipam.cilium.io/ips: 192.168.1.244
+    tailscale.com/hostname: redpanda-console
+    tailscale.com/tags: tag:k8s
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
@@ -36,3 +38,14 @@ spec:
   selector:
     app.kubernetes.io/instance: console
     app.kubernetes.io/name: console
+# ---
+# apiVersion: networking.istio.io/v1beta1
+# kind: DestinationRule
+# metadata:
+#   name: kafka-dr
+#   namespace: redpanda
+# spec:
+#   host: snail-kafka-bootstrap.kafka.svc.cluster.local
+#   trafficPolicy:
+#     tls:
+#       mode: ISTIO_MUTUAL
