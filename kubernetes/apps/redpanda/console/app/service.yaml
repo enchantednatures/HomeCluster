@@ -1,4 +1,19 @@
 ---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kafka
+  namespace: redpanda
+spec:
+  hosts:
+    - snail-kafka-bootstrap.kafka.svc.cluster.local
+  ports:
+    - number: 9092
+      name: kafka
+      protocol: TCP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,7 +23,7 @@ metadata:
     app.kubernetes.io/name: *app
     app.kubernetes.io/instance: *app
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: redpanda.${SECRET_DOMAIN}
+    # external-dns.alpha.kubernetes.io/hostname: redpanda.${SECRET_DOMAIN}
     lbipam.cilium.io/ips: 192.168.1.244
 spec:
   type: LoadBalancer
