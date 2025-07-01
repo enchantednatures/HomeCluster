@@ -2,19 +2,68 @@
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
-  name: kafka-service-entry
+  name: kafka-bootstrap-service-entry
   namespace: redpanda
 spec:
   hosts:
     - snail-kafka-bootstrap.kafka.svc.cluster.local
   ports:
+    - number: 9091
+      name: kafka-replication
+      protocol: TCP
     - number: 9092
       name: kafka-plain
       protocol: TCP
     - number: 9093
       name: kafka-tls
       protocol: TCP
-  location: MESH_EXTERNAL
+  location: MESH_INTERNAL
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kafka-brokers-service-entry
+  namespace: redpanda
+spec:
+  hosts:
+    - snail-kafka-brokers.kafka.svc.cluster.local
+  ports:
+    - number: 9090
+      name: kafka-metrics
+      protocol: TCP
+    - number: 9091
+      name: kafka-replication
+      protocol: TCP
+    - number: 8443
+      name: kafka-oauth
+      protocol: TCP
+    - number: 9092
+      name: kafka-plain
+      protocol: TCP
+    - number: 9093
+      name: kafka-tls
+      protocol: TCP
+  location: MESH_INTERNAL
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: kafka-individual-brokers-service-entry
+  namespace: redpanda
+spec:
+  hosts:
+    - snail-kafka-0.kafka.svc.cluster.local
+    - snail-kafka-1.kafka.svc.cluster.local
+    - snail-kafka-2.kafka.svc.cluster.local
+    - snail-kafka-3.kafka.svc.cluster.local
+    - snail-kafka-4.kafka.svc.cluster.local
+  ports:
+    - number: 9094
+      name: kafka-external
+      protocol: TCP
+  location: MESH_INTERNAL
   resolution: DNS
 ---
 apiVersion: v1
@@ -56,10 +105,32 @@ spec:
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: kafka-destination-rule
+  name: kafka-bootstrap-destination-rule
   namespace: redpanda
 spec:
   host: snail-kafka-bootstrap.kafka.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kafka-brokers-destination-rule
+  namespace: redpanda
+spec:
+  host: snail-kafka-brokers.kafka.svc.cluster.local
+  trafficPolicy:
+    tls:
+      mode: DISABLE
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kafka-individual-brokers-destination-rule
+  namespace: redpanda
+spec:
+  host: "*.kafka.svc.cluster.local"
   trafficPolicy:
     tls:
       mode: DISABLE
