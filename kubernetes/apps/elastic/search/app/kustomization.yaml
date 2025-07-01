@@ -1,8 +1,4 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - ./elastic.yaml
-  - ./virtualservice.yaml
-  # - ./elastic-user.yaml
-  # - ./dnddy-elastic-password.sops.yaml
+resources: [./elastic.yaml, ./ingress.yaml, ./virtualservice.yaml]

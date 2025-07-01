@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: grafana
-      version: 9.2.9
+      version: 9.2.7
       sourceRef:
         kind: HelmRepository
         name: grafana
@@ -29,6 +29,7 @@ spec:
     deploymentStrategy:
       type: Recreate
     podAnnotations:
+      sidecar.istio.io/inject: "true"
     admin:
       existingSecret: grafana-admin-secret
     env:
@@ -262,7 +263,14 @@ spec:
     serviceMonitor:
       enabled: true
     ingress:
-      enabled: false
+      enabled: true
+      ingressClassName: external
+      annotations:
+        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
+        external-dns.alpha.kubernetes.io/is-public: "true"
+      hosts: [&host "grafana.${SECRET_DOMAIN}"]
+      tls:
+        - hosts: [*host]
     testFramework:
       enabled: false
     extraSecretMounts:

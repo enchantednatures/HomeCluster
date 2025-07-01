@@ -28,6 +28,7 @@ resources:
   - ./immich.yaml
   - ./influx-data.yaml
   - ./infracloudio.yaml
+  - ./ingress-nginx.yaml
   - ./istio.yaml
   - ./jaeger.yaml
   - ./jetstack.yaml
