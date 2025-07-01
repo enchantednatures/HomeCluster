@@ -6,7 +6,7 @@ resources:
   - ./minio-service.service.yaml
   - ./minio-service.endpoints.yaml
   - ./pve.service.yaml
-  - ./minio-istio-config.yaml
-  - ./minio-virtualservices.yaml
-  - ./pve-virtualservice.yaml
-  - ./pve-destinationrule.yaml
+  # - ./minio-istio-config.yaml
+  # - ./minio-virtualservices.yaml
+  # - ./pve-virtualservice.yaml
+  # - ./pve-destinationrule.yaml
