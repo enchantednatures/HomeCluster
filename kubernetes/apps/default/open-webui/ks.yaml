@@ -8,7 +8,6 @@ metadata:
 spec:
   targetNamespace: default
   dependsOn:
-    - name: istio-gateway
     - name: dragonflydb-operator
     - name: cloudnative-pg
   commonMetadata:

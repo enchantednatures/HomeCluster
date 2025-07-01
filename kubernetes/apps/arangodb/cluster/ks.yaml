@@ -7,7 +7,6 @@ metadata:
 spec:
   targetNamespace: arangodb
   dependsOn:
-    - name: istio-gateway
     - name: arangodb-operator
     - name: openebs
   commonMetadata:

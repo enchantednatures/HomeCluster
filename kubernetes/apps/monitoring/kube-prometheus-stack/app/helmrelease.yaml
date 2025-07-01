@@ -9,8 +9,6 @@ spec:
   dependsOn:
     - name: prometheus-operator-crds
       namespace: monitoring
-    - name: istio-gateway
-      namespace: istio-ingress
   interval: 30m
   timeout: 15m
   chart:
