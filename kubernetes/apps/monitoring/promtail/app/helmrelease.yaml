@@ -119,6 +119,11 @@ spec:
         operator: Exists
     serviceMonitor:
       enabled: true
+    service:
+      type: NodePort
+      nodePort: 30101
+      port: 3101
+      targetPort: 3101
     resources:
       requests:
         cpu: 100m
