@@ -3,6 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cilium-values
+  namespace: kube-system
 data:
   values.yaml: |-
     autoDirectNodeRoutes: true
@@ -21,7 +22,7 @@ data:
       exclusive: false
       chainingMode: "generic-veth"
     containerRuntime:
-      integration: containerd
+      # Removed: integration: containerd
       socketPath: /var/run/k3s/containerd/containerd.sock
     endpointRoutes:
       enabled: true
