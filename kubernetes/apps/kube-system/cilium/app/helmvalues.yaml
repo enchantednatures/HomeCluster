@@ -92,4 +92,4 @@ data:
     rollOutCiliumPods: true
     securityContext:
       privileged: true
-    tunnel: disabled
+    tunnelProtocol: disabled
