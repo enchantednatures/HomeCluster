@@ -6,7 +6,7 @@ metadata:
   name: istio-gateway-cert
   namespace: istio-ingress
 spec:
-  secretName: ${SECRET_DOMAIN/./-}-production-tls
+  secretName: ${SECRET_DOMAIN}-tls
   dnsNames: ["${SECRET_DOMAIN}", "*.${SECRET_DOMAIN}"]
   issuerRef:
     name: letsencrypt-production
