@@ -5,6 +5,12 @@ machine:
       permissions: 0755
       op: create
       content: ""
+    - path: /var/local
+      permissions: 0755
+      op: create
+      content: ""
+  sysctls:
+    vm.nr_hugepages: "1024"
   kubelet:
     extraMounts:
       - destination: /var/openebs/local
@@ -14,8 +20,16 @@ machine:
           - bind
           - rw
           - rshared
+      - destination: /var/local
+        type: bind
+        source: /var/local
+        options:
+          - bind
+          - rshared
+          - rw
   network:
     hostname: ${hostname}
   nodeLabels:
     topology.kubernetes.io/region: ${cluster_name}
     topology.kubernetes.io/zone: ${node_name}
+    openebs.io/engine: "mayastor"
