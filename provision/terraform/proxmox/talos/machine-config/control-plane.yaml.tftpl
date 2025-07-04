@@ -1,10 +1,5 @@
 # tofu/talos/machine-config/control-plane.yaml.tftpl
 machine:
-  files:
-    - path: /var/openebs/local/
-      permissions: 0755
-      op: create
-      content: ""
   kubelet:
     extraMounts:
       - destination: /var/openebs/local
@@ -49,7 +44,7 @@ cluster:
           exemptions:
             namespaces:
               - istio-system
-              - openebs
+              - openebs-system
   inlineManifests:
   - name: cilium-values
     contents: |

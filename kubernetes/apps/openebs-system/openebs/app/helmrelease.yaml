@@ -38,17 +38,19 @@ spec:
     lvm-localpv:
       enabled: false
     mayastor:
-      enabled: true
-      io_engine:
-        nodeSelector:
-          openebs.io/engine: "mayastor"
-      agents:
-        core:
-          nodeSelector:
-            openebs.io/engine: "mayastor"
+      enabled: false
     loki:
       enabled: false
     minio:
       enabled: false
     alloy:
       enabled: false
+    engines:
+      local:
+        lvm:
+          enabled: false
+        zfs:
+          enabled: false
+      replicated:
+        mayastor:
+          enabled: false
