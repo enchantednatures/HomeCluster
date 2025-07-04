@@ -7,6 +7,8 @@ resources:
   # - ./open-webui-pipelines/ks.yaml
   - ./dbman/ks.yaml
   - ./searxng/ks.yaml
+  - ./kokoro-fastapi/ks.yaml
+  - ./faster-whisper/ks.yaml
   - ./sa.yaml
   # breaks bootstrap
   # - ./minio-serviceentry.yaml

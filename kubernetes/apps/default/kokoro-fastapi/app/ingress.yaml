@@ -1,0 +1,22 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kokoro-fastapi
+  namespace: default
+spec:
+  rules:
+    - host: &host kokoro-fastapi.${SECRET_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kokoro-fastapi
+                port:
+                  number: 8880
+  tls:
+    - hosts:
+        - *host
+      secretName: kokoro-tls

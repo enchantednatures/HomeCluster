@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: faster-whisper
+  namespace: default
+  labels:
+    app: faster-whisper
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      app: faster-whisper
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 200%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: faster-whisper
+    spec:
+      containers:
+        - name: faster-whisper
+          image: ghcr.io/fedirz/faster-whisper-server:latest
+          imagePullPolicy: Always
+          env:
+            - name: WHISPER__MODEL
+              value: "base"
+            - name: WHISPER__INFERENCE_DEVICE
+              value: "cpu"
+            - name: WHISPER__COMPUTE_TYPE
+              value: "int8"
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 2Gi
+            limits:
+              cpu: 4000m
+              memory: 8Gi
+          ports:
+            - containerPort: 8000
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: model-cache
+              mountPath: /root/.cache/huggingface
+      volumes:
+        - name: model-cache
+          emptyDir:
+            sizeLimit: 5Gi
+      restartPolicy: Always
