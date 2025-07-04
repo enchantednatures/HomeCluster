@@ -6,8 +6,6 @@ metadata:
   name: &app keda
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: istio-gateway
   targetNamespace: keda
   commonMetadata:
     labels:
