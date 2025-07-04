@@ -3,14 +3,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cilium-values
-  namespace: kube-system
 data:
-  values.yaml: |-
+  values.yaml: |
     autoDirectNodeRoutes: true
-    bpf-lb-sock-hostns: true
-    socketLB:
-      hostNamespaceOnly: true
-      enabled: true
     bpf:
       masquerade: true
     bgp:
@@ -20,9 +15,8 @@ data:
       id: 1
     cni:
       exclusive: false
-      chainingMode: "generic-veth"
     containerRuntime:
-      # Removed: integration: containerd
+      integration: containerd
       socketPath: /var/run/k3s/containerd/containerd.sock
     endpointRoutes:
       enabled: true
@@ -52,6 +46,30 @@ data:
       ui:
         enabled: true
         rollOutPods: true
+        ingress:
+          enabled: true
+          className: external
+          annotations:
+            kubernetes.io/tls-acme: "true"
+            cert-manager.io/cluster-issuer: letsencrypt-production
+            external-dns/is-public: "true"
+            external-dns.alpha.kubernetes.io/target: "external.${SECRET_DOMAIN}"
+            # This should be the in-cluster DNS name for the authentik outpost service
+            # as when the external URL is specified here, nginx will overwrite some crucial headers
+            nginx.ingress.kubernetes.io/auth-url: |-
+              http://ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local:9000/outpost.goauthentik.io/auth/nginx
+            # If you're using domain-level auth, use the authentication URL instead of the application URL
+            nginx.ingress.kubernetes.io/auth-signin: |-
+              https://auth.enchantednatures.com/outpost.goauthentik.io/start?rd=$escaped_request_uri
+            nginx.ingress.kubernetes.io/auth-response-headers: |-
+              Set-Cookie,X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid
+            nginx.ingress.kubernetes.io/auth-snippet: |
+              proxy_set_header X-Forwarded-Host $http_host;
+          hosts:
+            - "hubble.${SECRET_DOMAIN}"
+          tls:
+            - hosts:
+                - "hubble.${SECRET_DOMAIN}"
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: "${CLUSTER_CIDR}"
@@ -92,4 +110,4 @@ data:
     rollOutCiliumPods: true
     securityContext:
       privileged: true
-    tunnelProtocol: disabled
+    tunnel: disabled
