@@ -8,7 +8,7 @@ resources:
   - ./dbman/ks.yaml
   - ./searxng/ks.yaml
   - ./kokoro-fastapi/ks.yaml
-  - ./faster-whisper/ks.yaml
+  - ./whisper/ks.yaml
   - ./sa.yaml
   # breaks bootstrap
   # - ./minio-serviceentry.yaml
