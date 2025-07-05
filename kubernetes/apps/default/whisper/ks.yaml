@@ -3,14 +3,14 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app faster-whisper
+  name: &app whisper
   namespace: flux-system
 spec:
   targetNamespace: default
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/default/faster-whisper/app
+  path: ./kubernetes/apps/default/whisper/app
   prune: true
   sourceRef:
     kind: GitRepository
