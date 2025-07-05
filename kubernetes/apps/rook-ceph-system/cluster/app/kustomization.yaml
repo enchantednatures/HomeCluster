@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/v1beta1/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: rook-ceph-system
+resources:
+  - ./cephcluster.yaml
+  - ./mon-endpoints-secret.yaml
+  - ./external-cluster-secret.sops.yaml
+  - ./storageclasses.yaml
+  - ./test-pvcs.yaml
