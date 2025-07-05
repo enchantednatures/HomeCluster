@@ -6,4 +6,3 @@ metadata:
   name: rook-ceph-system
   labels:
     name: rook-ceph-system
-    istio-injection: disabled

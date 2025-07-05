@@ -4,7 +4,6 @@ kind: Ingress
 metadata:
   name: tekton-opentofu-webhook
   namespace: tekton-pipelines
-
   annotations:
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: letsencrypt-production
