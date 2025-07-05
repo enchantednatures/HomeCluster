@@ -20,7 +20,6 @@ spec:
     ssl: false
   monitoring:
     enabled: true
-    createPrometheusRules: true
   network:
     connections:
       encryption:

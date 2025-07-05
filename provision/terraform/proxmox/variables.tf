@@ -30,3 +30,9 @@ variable "age_private_key" {
   type        = string
   sensitive   = true
 }
+
+variable "tailscale_auth_key" {
+  description = "Tailscale authentication key for node registration"
+  type        = string
+  sensitive   = true
+}

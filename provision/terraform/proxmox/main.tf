@@ -16,6 +16,8 @@ module "talos" {
     values  = file("${path.module}/templates/cilium/values.yaml")
   }
 
+  tailscale_auth_key = var.tailscale_auth_key
+
   cluster = {
     name            = "talos"
     endpoint        = "192.168.1.201"

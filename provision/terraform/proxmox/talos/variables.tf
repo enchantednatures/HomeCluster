@@ -48,3 +48,9 @@ variable "cilium" {
     install = string
   })
 }
+
+variable "tailscale_auth_key" {
+  description = "Tailscale authentication key for node registration"
+  type        = string
+  sensitive   = true
+}
