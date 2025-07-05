@@ -67,7 +67,8 @@ resource "proxmox_virtual_environment_vm" "this" {
       servers = [
         "100.100.100.100",
         "1.1.1.1",
-        "8.8.8.8"
+        "8.8.8.8",
+        "192.168.1.1"
       ]
     }
   }
