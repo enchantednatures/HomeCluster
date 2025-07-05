@@ -7,8 +7,6 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: csi-driver-nfs
-    - name: openebs
     - name: prometheus-operator-crds
   targetNamespace: postgres
   commonMetadata:
