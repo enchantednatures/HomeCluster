@@ -10,5 +10,3 @@ resources:
   - ./kokoro-fastapi/ks.yaml
   - ./whisper/ks.yaml
   - ./sa.yaml
-  # breaks bootstrap
-  # - ./minio-serviceentry.yaml

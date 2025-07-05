@@ -6,4 +6,3 @@ resources:
   - ./helmrelease.yaml
   - ./config-map.yaml
   - ./secret.sops.yaml
-  - ./minio-serviceentry.yaml

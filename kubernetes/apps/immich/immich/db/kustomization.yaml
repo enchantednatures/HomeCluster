@@ -10,4 +10,3 @@ resources:
   - scheduled-backup.yaml
   - secret.sops.yaml
   - superusersecret.sops.yaml
-  - minio-serviceentry.yaml

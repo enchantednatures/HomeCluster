@@ -10,8 +10,6 @@ spec:
   path: ./kubernetes/apps
   prune: true
   wait: false
-  dependsOn:
-    - name: cluster-crds
   sourceRef:
     kind: GitRepository
     name: home-kubernetes

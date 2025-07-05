@@ -5,3 +5,4 @@ resources:
   - ./cluster.yaml
   - ./ingress.yaml
   - ./service.yaml
+  - ./openid-secret.sops.yaml
