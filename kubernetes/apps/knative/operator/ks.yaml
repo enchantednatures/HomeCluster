@@ -6,8 +6,6 @@ metadata:
   name: &app knative-operator
   namespace: flux-system
 spec:
-  dependsOn:
-    - name: istiod
   targetNamespace: knative
   commonMetadata:
     labels:
