@@ -8,6 +8,7 @@ metadata:
 spec:
   dependsOn:
     - name: csi-driver-nfs
+    - name: harbor-db
   targetNamespace: harbor
   commonMetadata:
     labels:
