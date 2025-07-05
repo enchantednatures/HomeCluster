@@ -6,6 +6,5 @@ resources:
   - ./minio-ui.service.yaml
   - ./minio-service.ingress.yaml
   - ./minio-service.service.yaml
-  - ./minio-service.endpoints.yaml
   - ./pve.ingress.yaml
   - ./pve.service.yaml

@@ -4,4 +4,3 @@ kind: Kustomization
 resources:
   - ./elastic.yaml
   - ./ingress.yaml
-  # - ./virtualservice.yaml
