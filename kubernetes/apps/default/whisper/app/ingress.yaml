@@ -1,0 +1,22 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whisper-server
+  namespace: default
+spec:
+  rules:
+    - host: &host whisper.${SECRET_DOMAIN}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: whisper-server
+                port:
+                  number: 8000
+  tls:
+    - hosts:
+        - *host
+      secretName: whisper-tls

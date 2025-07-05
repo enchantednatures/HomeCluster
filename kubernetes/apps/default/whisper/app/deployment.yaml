@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: faster-whisper
+  name: whisper
   namespace: default
   labels:
-    app: faster-whisper
+    app: whisper
   annotations:
     reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
-      app: faster-whisper
+      app: whisper
   replicas: 1
   strategy:
     rollingUpdate:
@@ -21,19 +21,12 @@ spec:
   template:
     metadata:
       labels:
-        app: faster-whisper
+        app: whisper
     spec:
       containers:
-        - name: faster-whisper
-          image: ghcr.io/fedirz/faster-whisper-server:latest
+        - name: whisper
+          image: didmar/whisper-api-server:latest
           imagePullPolicy: Always
-          env:
-            - name: WHISPER__MODEL
-              value: "base"
-            - name: WHISPER__INFERENCE_DEVICE
-              value: "cpu"
-            - name: WHISPER__COMPUTE_TYPE
-              value: "int8"
           resources:
             requests:
               cpu: 1000m

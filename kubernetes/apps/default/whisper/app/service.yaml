@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: faster-whisper
+  name: whisper
   namespace: default
   labels:
-    app: faster-whisper
+    app: whisper
 spec:
   type: ClusterIP
   ports:
@@ -14,4 +14,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app: faster-whisper
+    app: whisper
