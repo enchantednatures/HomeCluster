@@ -27,24 +27,30 @@ Loki
 - `task kubernetes:resources` - List common cluster resources
 - `task flux:apply path=<app-path>` - Apply specific Flux resources
 - `task flux:reconcile` - Force update Flux to pull changes from git
+- `task flux:bootstrap` - Bootstrap Flux into Kubernetes cluster
 - `task sops:encrypt` - Encrypt all SOPS secrets
 - `task sops:decrypt` - Decrypt all SOPS files
+- `task sops:age-keygen` - Initialize Age key for SOPS encryption
+- `task cluster:bootstrap` - Full cluster bootstrap (infrastructure + GitOps)
+- `task cluster:rebuild` - Destroy and rebuild entire cluster
 
 ## Code Style Guidelines
 
-- **YAML**: 2-space indentation, LF line endings, UTF-8 encoding
+- **YAML**: 2-space indentation, LF line endings, UTF-8 encoding (per .editorconfig)
 - **File Structure**: Follow GitOps patterns -
   `/kubernetes/apps/<namespace>/<app>/` structure
 - **Kubernetes Manifests**: Include yaml-language-server schema comments for
-  validation
+  validation (e.g., `# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/...`)
 - **Secrets**: Always encrypt with SOPS/Age - never commit unencrypted sensitive
   data
 - **Naming**: Use kebab-case for files, resources follow Kubernetes conventions
 - **Comments**: Use `#` for YAML comments, include schema validation headers
 - **App Structure**: Each app needs: `namespace.yaml`, `kustomization.yaml`,
   `ks.yaml`, and `app/` directory
-- **HelmReleases**: Include proper versioning, remediation settings, and cleanup
-  policies
+- **HelmReleases**: Include proper versioning, remediation settings (retries: 3), and cleanup
+  policies (cleanupOnFail: true, keepHistory: false)
+- **Flux Kustomizations**: Set interval: 30m, retryInterval: 1m, timeout: 5m
+- **Shell Scripts**: 4-space indentation (bash/sh files)
 
 ## Istio Service Communication
 

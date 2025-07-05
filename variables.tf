@@ -1,3 +1,4 @@
+
 # tofu/variables.tf
 variable "proxmox" {
   type = object({

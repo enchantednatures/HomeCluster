@@ -13,9 +13,9 @@ terraform {
     skip_metadata_api_check     = true
     skip_region_validation      = true
     use_path_style              = true
+
   }
 
-  # backend "pg" { }
 
   required_providers {
     talos = {
@@ -46,49 +46,15 @@ terraform {
       source  = "hashicorp/tls"
       version = ">= 4.0"
     }
-  }
-}
 
-provider "proxmox" {
-  endpoint = var.proxmox.endpoint
-  insecure = var.proxmox.insecure
+    authentik = {
+      source  = "goauthentik/authentik"
+      version = "~> 2025.6.0"
+    }
 
-  api_token = var.proxmox.api_token
-  ssh {
-    username    = var.proxmox.username
-    agent       = false
-    private_key = file("~/.ssh/id_rsa")
-  }
-}
-
-provider "restapi" {
-  uri                  = var.proxmox.endpoint
-  insecure             = var.proxmox.insecure
-  write_returns_object = true
-
-  headers = {
-    "Content-Type"  = "application/json"
-    "Authorization" = "PVEAPIToken=${var.proxmox.api_token}"
-  }
-}
-
-provider "kubernetes" {
-  config_path = local_file.kube_config.filename
-}
-
-provider "github" {
-  owner = var.github_owner
-}
-
-provider "flux" {
-  kubernetes = {
-    config_path = local_file.kube_config.filename
-  }
-  git = {
-    url = "ssh://git@github.com/${var.github_owner}/${var.github_repository}.git"
-    ssh = {
-      username    = "git"
-      private_key = tls_private_key.flux.private_key_pem
+    harbor = {
+      source  = "goharbor/harbor"
+      version = "3.10.21"
     }
   }
 }

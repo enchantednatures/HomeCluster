@@ -1,3 +1,4 @@
+---
 cluster:
   name: talos
   id: 1
@@ -74,6 +75,7 @@ ingressController:
   service:
     annotations:
       io.cilium/lb-ipam-ips: 192.168.1.223
+    # Random values so Argo CD doesn't complain about the service being out of sync
     insecureNodePort: 32434
     secureNodePort: 31247
 # mTLS
@@ -82,3 +84,13 @@ authentication:
   mutual:
     spire:
       enabled: false
+      install:
+        server:
+          dataStorage:
+            storageClass: cilium-spire-sc
+cni:
+  exclusive: false
+bpf-lb-sock-hostns: true
+tunnel: disabled
+socketLB:
+  hostNamespaceOnly: true

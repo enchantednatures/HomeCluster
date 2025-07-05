@@ -7,7 +7,7 @@ module "talos" {
   }
 
   image = {
-    version   = "v1.10.4"
+    version   = "v1.9.1"
     schematic = file("${path.module}/talos/image/schematic.yaml")
   }
 
@@ -20,7 +20,7 @@ module "talos" {
     name            = "talos"
     endpoint        = "192.168.1.201"
     gateway         = "192.168.1.1"
-    talos_version   = "v1.10.4"
+    talos_version   = "v1.9.1"
     proxmox_cluster = "homelab"
   }
 
@@ -36,6 +36,25 @@ module "talos" {
       datastore_id  = "local-lvm"
       disk_size     = 32
     }
+    # "ctrl-02" = {
+    #   host_node     = "pve"
+    #   machine_type  = "controlplane"
+    #   ip            = "192.168.1.202"
+    #   mac_address   = "BC:24:11:2E:C8:02"
+    #   vm_id         = 801
+    #   cpu           = 4
+    #   ram_dedicated = 4096
+    #   igpu          = true
+    # }
+    # "ctrl-03" = {
+    #   host_node     = "pve"
+    #   machine_type  = "controlplane"
+    #   ip            = "192.168.1.203"
+    #   mac_address   = "BC:24:11:2E:C8:03"
+    #   vm_id         = 802
+    #   cpu           = 4
+    #   ram_dedicated = 4096
+    # }
     "work-00" = {
       host_node     = "pve"
       machine_type  = "worker"
@@ -55,8 +74,8 @@ module "talos" {
       ip            = "192.168.1.212"
       mac_address   = "BC:24:11:2E:08:01"
       vm_id         = 811
-      cpu           = 8
-      ram_dedicated = 16384
+      cpu           = 16
+      ram_dedicated = 32768
       disk_size     = 256
       datastore_id  = "local-lvm"
       igpu          = true
@@ -88,17 +107,30 @@ module "talos" {
       igpu          = true
     }
 
-    "work-04" = {
-      host_node     = "pve"
-      machine_type  = "worker"
-      ip            = "192.168.1.215"
-      mac_address   = "BC:24:11:2E:08:04"
-      vm_id         = 814
-      cpu           = 8
-      ram_dedicated = 16384
-      disk_size     = 128
-      datastore_id  = "local-lvm"
-      igpu          = true
-    }
+    # "work-04" = {
+    #   host_node     = "pve"
+    #   machine_type  = "worker"
+    #   ip            = "192.168.1.215"
+    #   mac_address   = "BC:24:11:2E:08:04"
+    #   vm_id         = 814
+    #   cpu           = 4
+    #   ram_dedicated = 4096
+    #   disk_size     = 64
+    #   datastore_id  = "local-lvm"
+    #   igpu          = true
+    # }
+
+    # "work-05" = {
+    #   host_node     = "pve"
+    #   machine_type  = "worker"
+    #   ip            = "192.168.1.216"
+    #   mac_address   = "BC:24:11:2E:08:05"
+    #   vm_id         = 815
+    #   cpu           = 4
+    #   ram_dedicated = 4096
+    #   disk_size     = 64
+    #   datastore_id  = "local-lvm"
+    #   igpu          = true
+    # }
   }
 }
