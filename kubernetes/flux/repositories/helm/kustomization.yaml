@@ -47,6 +47,7 @@ resources:
   - ./redpanda-charts.yaml
   - ./rook-ceph.yaml
   - ./sealed-secrets.yaml
+  - ./siderolabs.yaml
   - ./stakater.yaml
   - ./strimzi.yaml
   - ./tailscale-charts.yaml
