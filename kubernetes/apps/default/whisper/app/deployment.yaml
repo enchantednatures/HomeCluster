@@ -37,20 +37,6 @@ spec:
           ports:
             - containerPort: 8000
               name: http
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 60
-            periodSeconds: 30
-            timeoutSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8000
-            initialDelaySeconds: 30
-            periodSeconds: 10
-            timeoutSeconds: 5
           volumeMounts:
             - name: model-cache
               mountPath: /root/.cache/huggingface
