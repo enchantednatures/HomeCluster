@@ -4,7 +4,13 @@ kind: Ingress
 metadata:
   name: whisper-server
   namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: external.enchantednatures.com
+    external-dns/is-public: "true"
+    kubernetes.io/tls-acme: "true"
 spec:
+  ingressClassName: external
   rules:
     - host: &host whisper.${SECRET_DOMAIN}
       http:
