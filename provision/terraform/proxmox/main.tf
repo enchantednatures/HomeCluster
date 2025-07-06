@@ -7,7 +7,7 @@ module "talos" {
   }
 
   image = {
-    version   = "v1.9.1"
+    version   = "v1.10.5"
     schematic = file("${path.module}/talos/image/schematic.yaml")
   }
 
@@ -22,7 +22,7 @@ module "talos" {
     name            = "talos"
     endpoint        = "192.168.1.201"
     gateway         = "192.168.1.1"
-    talos_version   = "v1.9.1"
+    talos_version   = "v1.10.5"
     proxmox_cluster = "homelab"
   }
 

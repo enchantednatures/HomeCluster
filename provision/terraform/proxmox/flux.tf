@@ -26,15 +26,14 @@ resource "kubernetes_secret" "sops_age" {
 }
 
 # Bootstrap Flux
-resource "flux_bootstrap_git" "this" {
-  embedded_manifests = true
-  path               = "kubernetes/flux"
-
-  depends_on = [
-    kubernetes_namespace.flux_system,
-    kubernetes_secret.sops_age
-  ]
-}
+# resource "flux_bootstrap_git" "this" {
+#   embedded_manifests = true
+#   path               = "kubernetes/flux"
+#   depends_on = [
+#     kubernetes_namespace.flux_system,
+#     kubernetes_secret.sops_age
+#   ]
+# }
 
 # Use existing repository (comment out if you want Terraform to create it)
 data "github_repository" "this" {
