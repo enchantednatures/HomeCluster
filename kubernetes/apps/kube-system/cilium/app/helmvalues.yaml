@@ -15,6 +15,20 @@ data:
       id: 1
     cni:
       exclusive: false
+    dnsProxy:
+      enabled: true
+      dnsRejectResponseCode: refused
+      enableDnsCompression: true
+      endpointMaxIpPerHostname: 50
+      idleConnectionGracePeriod: 0s
+      maxDeferredConnectionDeletes: 10000
+      minTtl: 0
+      proxyPort: 53
+      proxyResponseMaxDelay: 100ms
+      upstreamDns:
+        - 1.1.1.1:53
+        - 8.8.8.8:53
+        - 192.168.1.1:53
     endpointRoutes:
       enabled: true
     hubble:
