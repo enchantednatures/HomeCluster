@@ -32,6 +32,7 @@ spec:
   targetNamespace: authentik
   dependsOn:
     - name: cloudnative-pg
+    - name: nginx-misc-ingresses
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app-db
