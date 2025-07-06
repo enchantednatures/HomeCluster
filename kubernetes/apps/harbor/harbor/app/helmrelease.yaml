@@ -88,7 +88,7 @@ spec:
           existingSecret: harbor-minio-credentials
           region: us-east-1
           bucket: harbor-registry
-          regionendpoint: http://minio-external.local:9768
+          regionendpoint: http://minio-service.networking.svc.cluster.local:9768
           forcepathstyle: true
           v4auth: true
     harborAdminPassword: Harbor12345
