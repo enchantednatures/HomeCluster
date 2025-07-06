@@ -8,6 +8,7 @@ metadata:
 spec:
   dependsOn:
     - name: elasticsearch
+    - name: external-dns
   targetNamespace: elastic
   commonMetadata:
     labels:

@@ -9,6 +9,7 @@ spec:
   dependsOn:
     - name: arangodb-operator
     - name: openebs
+    - name: external-dns
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

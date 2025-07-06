@@ -6,6 +6,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: redpanda
+  dependsOn:
+    - name: external-dns
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

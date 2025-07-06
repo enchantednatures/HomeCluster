@@ -55,6 +55,7 @@ metadata:
 spec:
   targetNamespace: authentik
   dependsOn:
+    - name: external-dns
     - name: authentik-dragonfly
     - name: authentik-db
   commonMetadata:

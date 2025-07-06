@@ -10,6 +10,7 @@ spec:
   dependsOn:
     - name: dragonflydb-operator
     - name: cloudnative-pg
+    - name: external-dns
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

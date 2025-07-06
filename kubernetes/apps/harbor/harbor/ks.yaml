@@ -9,6 +9,7 @@ spec:
   dependsOn:
     - name: csi-driver-nfs
     - name: harbor-db
+    - name: external-dns
   targetNamespace: harbor
   commonMetadata:
     labels:
