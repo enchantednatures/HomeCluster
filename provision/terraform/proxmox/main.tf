@@ -31,6 +31,7 @@ module "talos" {
       host_node     = "pve"
       machine_type  = "controlplane"
       ip            = "192.168.1.201"
+      cluster_ip    = "172.16.0.1"
       mac_address   = "BC:24:11:2E:C8:01"
       vm_id         = 800
       cpu           = 8
@@ -61,6 +62,7 @@ module "talos" {
       host_node     = "pve"
       machine_type  = "worker"
       ip            = "192.168.1.211"
+      cluster_ip    = "172.16.0.11"
       mac_address   = "BC:24:11:2E:08:00"
       vm_id         = 810
       cpu           = 8
@@ -74,6 +76,7 @@ module "talos" {
       host_node     = "pve"
       machine_type  = "worker"
       ip            = "192.168.1.212"
+      cluster_ip    = "172.16.0.12"
       mac_address   = "BC:24:11:2E:08:01"
       vm_id         = 811
       cpu           = 16
@@ -87,6 +90,7 @@ module "talos" {
       host_node     = "pve"
       machine_type  = "worker"
       ip            = "192.168.1.213"
+      cluster_ip    = "172.16.0.13"
       mac_address   = "BC:24:11:2E:08:02"
       vm_id         = 812
       cpu           = 8
@@ -100,6 +104,7 @@ module "talos" {
       host_node     = "pve"
       machine_type  = "worker"
       ip            = "192.168.1.214"
+      cluster_ip    = "172.16.0.14"
       mac_address   = "BC:24:11:2E:08:03"
       vm_id         = 813
       cpu           = 8

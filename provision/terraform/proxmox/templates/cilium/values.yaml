@@ -4,7 +4,7 @@ cluster:
   id: 1
 kubeProxyReplacement: true
 
-# Talos specific
+# Talos specific - use KubePrism proxy
 k8sServiceHost: localhost
 k8sServicePort: 7445
 securityContext:
@@ -91,6 +91,7 @@ authentication:
 cni:
   exclusive: false
 bpf-lb-sock-hostns: true
-tunnel: disabled
+routingMode: native
+ipv4NativeRoutingCIDR: 10.244.0.0/16
 socketLB:
   hostNamespaceOnly: true

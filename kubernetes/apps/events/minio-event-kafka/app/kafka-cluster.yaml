@@ -1,0 +1,75 @@
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: snail
+  namespace: kafka
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
+spec:
+  kafka:
+    version: 3.9.0
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+      - name: external
+        port: 9094
+        type: nodeport
+        tls: false
+        configuration:
+          bootstrap:
+            nodePort: 31094
+    config:
+      auto.create.topics.enable: "true"
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      default.replication.factor: 3
+      min.insync.replicas: 2
+      group.min.session.timeout.ms: 250
+      # Add listener configuration
+      listener.name.external.plain.sasl.enabled: false
+    metricsConfig:
+      type: jmxPrometheusExporter
+      valueFrom:
+        configMapKeyRef:
+          name: kafka-metrics
+          key: kafka-metrics-config.yml
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+  cruiseControl:
+    config:
+      goals: >
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.RackAwareGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.MinTopicLeadersPerBrokerGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.ReplicaCapacityGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.DiskCapacityGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkInboundCapacityGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkOutboundCapacityGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.CpuCapacityGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.ReplicaDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.PotentialNwOutGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.DiskUsageDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkInboundUsageDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.NetworkOutboundUsageDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.CpuUsageDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.TopicReplicaDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.LeaderReplicaDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.LeaderBytesInDistributionGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.PreferredLeaderElectionGoal
+      default.goals: >
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.RackAwareGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.ReplicaCapacityGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.DiskCapacityGoal
+      hard.goals: >-
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.RackAwareGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.ReplicaCapacityGoal,
+        com.linkedin.kafka.cruisecontrol.analyzer.goals.DiskCapacityGoal

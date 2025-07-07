@@ -1,0 +1,15 @@
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: kafka
+  namespace: events
+  labels:
+    strimzi.io/cluster: minio
+spec:
+  replicas: 3
+  roles: [broker, controller]
+  storage:
+    type: persistent-claim
+    size: 10Gi
+    class: openebs-hostpath
