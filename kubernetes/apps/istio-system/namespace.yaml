@@ -5,4 +5,3 @@ metadata:
   name: istio-system
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
-    istio-injection: enabled
