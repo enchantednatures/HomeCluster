@@ -32,6 +32,7 @@ variable "nodes" {
     datastore_id  = optional(string, "local")
     disk_size     = number
     ip            = string
+    cluster_ip    = string
     mac_address   = string
     vm_id         = number
     cpu           = number
@@ -47,4 +48,10 @@ variable "cilium" {
     values  = string
     install = string
   })
+}
+
+variable "tailscale_auth_key" {
+  description = "Tailscale authentication key for node registration"
+  type        = string
+  sensitive   = true
 }

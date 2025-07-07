@@ -17,25 +17,39 @@ data "talos_machine_configuration" "this" {
   talos_version    = var.cluster.talos_version
   machine_type     = each.value.machine_type
   machine_secrets  = talos_machine_secrets.this.machine_secrets
-  config_patches   = each.value.machine_type == "controlplane" ? [
+  config_patches = each.value.machine_type == "controlplane" ? [
     templatefile("${path.module}/machine-config/control-plane.yaml.tftpl", {
       hostname       = each.key
       node_name      = each.value.host_node
       cluster_name   = var.cluster.proxmox_cluster
+      external_ip    = each.value.ip
+      cluster_ip     = each.value.cluster_ip
+      gateway        = var.cluster.gateway
       cilium_values  = var.cilium.values
       cilium_install = var.cilium.install
     })
-  ] : [
+    # templatefile("${path.module}/machine-config/tailscale-extension-patch.yaml.tftpl", {
+    #   hostname           = each.key
+    #   tailscale_auth_key = var.tailscale_auth_key
+    # })
+    ] : [
     templatefile("${path.module}/machine-config/worker.yaml.tftpl", {
       hostname     = each.key
       node_name    = each.value.host_node
       cluster_name = var.cluster.proxmox_cluster
+      external_ip  = each.value.ip
+      cluster_ip   = each.value.cluster_ip
+      gateway      = var.cluster.gateway
     })
+    # templatefile("${path.module}/machine-config/tailscale-extension-patch.yaml.tftpl", {
+    #   hostname           = each.key
+    #   tailscale_auth_key = var.tailscale_auth_key
+    # })
   ]
 }
 
 resource "talos_machine_configuration_apply" "this" {
-  depends_on = [proxmox_virtual_environment_vm.this]
+  depends_on                  = [proxmox_virtual_environment_vm.this]
   for_each                    = var.nodes
   node                        = each.value.ip
   client_configuration        = talos_machine_secrets.this.client_configuration
@@ -58,15 +72,15 @@ data "talos_cluster_health" "this" {
     talos_machine_bootstrap.this
   ]
   client_configuration = data.talos_client_configuration.this.client_configuration
-  control_plane_nodes  = [for k, v in var.nodes : v.ip if v.machine_type == "controlplane"]
-  worker_nodes         = [for k, v in var.nodes : v.ip if v.machine_type == "worker"]
+  control_plane_nodes  = [for k, v in var.nodes : v.cluster_ip if v.machine_type == "controlplane"]
+  worker_nodes         = [for k, v in var.nodes : v.cluster_ip if v.machine_type == "worker"]
   endpoints            = data.talos_client_configuration.this.endpoints
   timeouts = {
     read = "10m"
   }
 }
 
-data "talos_cluster_kubeconfig" "this" {
+resource "talos_cluster_kubeconfig" "this" {
   depends_on = [
     talos_machine_bootstrap.this,
     data.talos_cluster_health.this

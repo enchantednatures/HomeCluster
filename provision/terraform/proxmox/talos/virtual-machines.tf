@@ -33,8 +33,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
 
   network_device {
-    bridge      = "vmbr8"
-    mac_address = each.value.mac_address
+    bridge = "vmbr8"
   }
 
   disk {
@@ -57,17 +56,27 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   initialization {
     datastore_id = each.value.datastore_id
+    
+    # External network (vmbr0) - home network access
     ip_config {
       ipv4 {
         address = "${each.value.ip}/24"
         gateway = var.cluster.gateway
       }
     }
+    
+    # Internal cluster network (vmbr8) - cluster communication
+    ip_config {
+      ipv4 {
+        address = "${each.value.cluster_ip}/24"
+      }
+    }
+    
     dns {
       servers = [
-        "100.100.100.100",
         "1.1.1.1",
-        "8.8.8.8"
+        "8.8.8.8",
+        "192.168.1.1"
       ]
     }
   }
