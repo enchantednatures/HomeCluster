@@ -11,7 +11,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: csi-driver-nfs
+  storageClassName: csi-nfs
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -25,4 +25,4 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: csi-driver-nfs
+  storageClassName: csi-nfs
