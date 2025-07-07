@@ -6,7 +6,6 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: istio-gateway
     - name: csi-driver-nfs
   targetNamespace: elastic
   commonMetadata:

@@ -7,7 +7,6 @@ metadata:
 spec:
   targetNamespace: immich
   dependsOn:
-    - name: istio-gateway
     - name: dragonflydb-operator
   commonMetadata:
     labels:
@@ -30,7 +29,6 @@ metadata:
 spec:
   targetNamespace: immich
   dependsOn:
-    - name: istio-gateway
     - name: cloudnative-pg
   commonMetadata:
     labels:
@@ -53,7 +51,6 @@ metadata:
 spec:
   targetNamespace: immich
   dependsOn:
-    - name: istio-gateway
     - name: immich-dragonfly
     - name: immich-db
   commonMetadata:

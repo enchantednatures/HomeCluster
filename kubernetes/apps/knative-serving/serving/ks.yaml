@@ -7,7 +7,6 @@ metadata:
 spec:
   targetNamespace: knative-serving
   dependsOn:
-    - name: istio-gateway
     - name: knative-operator
   commonMetadata:
     labels:
