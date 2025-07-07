@@ -18,7 +18,7 @@ tasks:
         sh: find "{{.KUBERNETES_DIR}}" -type f -name "*.sops.*" -exec grep -L "ENC\[AES256_GCM"
           {} \;
   decrypt:
-    desc: Encrypt all sops
+    desc: Decrypt All Sops Files
     dir: kubernetes
     cmds:
       - |

@@ -28,6 +28,8 @@ spec:
     replicas: 1
     deploymentStrategy:
       type: Recreate
+    podAnnotations:
+      sidecar.istio.io/inject: "true"
     admin:
       existingSecret: grafana-admin-secret
     env:

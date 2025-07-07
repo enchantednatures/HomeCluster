@@ -6,6 +6,7 @@ metadata:
   name: harbor
 spec:
   interval: 30m
+  timeout: 15m
   chart:
     spec:
       chart: harbor
@@ -87,7 +88,7 @@ spec:
           existingSecret: harbor-minio-credentials
           region: us-east-1
           bucket: harbor-registry
-          regionendpoint: http://192.168.1.241:9768
+          regionendpoint: http://minio-service.networking.svc.cluster.local:9768
           forcepathstyle: true
           v4auth: true
     harborAdminPassword: Harbor12345

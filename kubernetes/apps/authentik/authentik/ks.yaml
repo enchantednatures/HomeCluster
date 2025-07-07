@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -21,6 +22,7 @@ spec:
   retryInterval: 1m
   timeout: 5m
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -30,6 +32,7 @@ spec:
   targetNamespace: authentik
   dependsOn:
     - name: cloudnative-pg
+    - name: nginx-misc-ingresses
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app-db
@@ -43,6 +46,7 @@ spec:
   retryInterval: 1m
   timeout: 5m
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
@@ -51,6 +55,7 @@ metadata:
 spec:
   targetNamespace: authentik
   dependsOn:
+    - name: external-dns
     - name: authentik-dragonfly
     - name: authentik-db
   commonMetadata:

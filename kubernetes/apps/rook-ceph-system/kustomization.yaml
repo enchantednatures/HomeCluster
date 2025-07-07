@@ -1,0 +1,8 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/v1beta1/kustomization.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./namespace.yaml
+  - ./operator/ks.yaml
+  - ./cluster/ks.yaml

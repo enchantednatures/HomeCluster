@@ -1,0 +1,51 @@
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: opentofu-apply-pipeline
+  namespace: tekton-pipelines
+spec:
+  description: |
+    This pipeline clones a Git repo and runs 'tofu apply' on push to main.
+  params:
+    - name: repo-url
+      description: The git repository URL.
+    - name: revision
+      description: The git revision (commit sha).
+    - name: tofu-dir
+      description: Directory containing OpenTofu files
+      default: "."
+  workspaces:
+    - name: shared-data
+    - name: ssh-credentials
+    - name: tofu-backend-config
+  tasks:
+    - name: fetch-repo
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+      workspaces:
+        - name: output
+          workspace: shared-data
+        - name: ssh-directory
+          workspace: ssh-credentials
+    - name: tofu-apply
+      taskRef:
+        name: opentofu-cli
+      runAfter: [fetch-repo]
+      params:
+        - name: COMMANDS
+          value:
+            - "init"
+            - "apply"
+        - name: TOFU_DIR
+          value: $(params.tofu-dir)
+      workspaces:
+        - name: source
+          workspace: shared-data
+        - name: config
+          workspace: tofu-backend-config

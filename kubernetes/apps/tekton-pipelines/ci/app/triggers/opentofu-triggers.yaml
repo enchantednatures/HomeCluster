@@ -1,0 +1,180 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: opentofu-plan-triggertemplate
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: gitrevision
+    - name: gitrepositoryurl
+    - name: prnumber
+    - name: repofullname
+    - name: tofudir
+      default: "."
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        generateName: opentofu-plan-run-
+        namespace: tekton-pipelines
+      spec:
+        pipelineRef:
+          name: opentofu-plan-pipeline
+        params:
+          - name: revision
+            value: $(tt.params.gitrevision)
+          - name: repo-url
+            value: $(tt.params.gitrepositoryurl)
+          - name: pr-number
+            value: $(tt.params.prnumber)
+          - name: repo-full-name
+            value: $(tt.params.repofullname)
+          - name: tofu-dir
+            value: $(tt.params.tofudir)
+        workspaces:
+          - name: shared-data
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+          - name: ssh-credentials
+            secret:
+              secretName: git-credentials
+          - name: tofu-backend-config
+            configMap:
+              name: opentofu-backend-config
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: opentofu-apply-triggertemplate
+  namespace: tekton-pipelines
+spec:
+  params:
+    - name: gitrevision
+    - name: gitrepositoryurl
+    - name: tofudir
+      default: "."
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        generateName: opentofu-apply-run-
+        namespace: tekton-pipelines
+      spec:
+        pipelineRef:
+          name: opentofu-apply-pipeline
+        params:
+          - name: revision
+            value: $(tt.params.gitrevision)
+          - name: repo-url
+            value: $(tt.params.gitrepositoryurl)
+          - name: tofu-dir
+            value: $(tt.params.tofudir)
+        workspaces:
+          - name: shared-data
+            volumeClaimTemplate:
+              spec:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
+          - name: ssh-credentials
+            secret:
+              secretName: git-credentials
+          - name: tofu-backend-config
+            configMap:
+              name: opentofu-backend-config
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: github-pr-trigger
+  namespace: tekton-pipelines
+spec:
+  interceptors:
+    - ref:
+        name: "cel"
+      params:
+        - name: "filter"
+          value: "header.match('X-Github-Event', 'pull_request') && (body.action == 'opened' || body.action == 'synchronize')"
+        - name: "overlays"
+          value:
+            - key: truncated_sha
+              expression: "body.pull_request.head.sha.truncate(7)"
+  bindings:
+    - name: gitrevision
+      value: $(body.pull_request.head.sha)
+    - name: gitrepositoryurl
+      value: $(body.repository.ssh_url)
+    - name: prnumber
+      value: $(body.number)
+    - name: repofullname
+      value: $(body.repository.full_name)
+    - name: tofudir
+      value: "provision" # Adjust this to your OpenTofu directory
+  template:
+    ref: opentofu-plan-triggertemplate
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: github-push-trigger
+  namespace: tekton-pipelines
+spec:
+  interceptors:
+    - ref:
+        name: "cel"
+      params:
+        - name: "filter"
+          value: "header.match('X-Github-Event', 'push') && body.ref == 'refs/heads/main'"
+        - name: "overlays"
+          value:
+            - key: truncated_sha
+              expression: "body.head_commit.id.truncate(7)"
+  bindings:
+    - name: gitrevision
+      value: $(body.head_commit.id)
+    - name: gitrepositoryurl
+      value: $(body.repository.ssh_url)
+    - name: tofudir
+      value: "provision" # Adjust this to your OpenTofu directory
+  template:
+    ref: opentofu-apply-triggertemplate
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: opentofu-listener
+  namespace: tekton-pipelines
+spec:
+  serviceAccountName: tekton-triggers-eventlistener-serviceaccount
+  triggers:
+    - triggerRef: github-pr-trigger
+    - triggerRef: github-push-trigger
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: el-opentofu-listener
+  namespace: tekton-pipelines
+  labels:
+    app.kubernetes.io/managed-by: EventListener
+    app.kubernetes.io/part-of: Triggers
+    eventlistener: opentofu-listener
+spec:
+  ports:
+    - name: http-listener
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/managed-by: EventListener
+    app.kubernetes.io/part-of: Triggers
+    eventlistener: opentofu-listener
+  type: ClusterIP

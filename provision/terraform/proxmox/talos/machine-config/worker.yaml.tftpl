@@ -1,6 +1,9 @@
 # tofu/talos/machine-config/worker.yaml.tftpl
 machine:
   kubelet:
+    nodeIP:
+      validSubnets:
+        - 172.16.0.0/24
     extraMounts:
       - destination: /var/openebs/local
         type: bind
@@ -11,6 +14,18 @@ machine:
           - rshared
   network:
     hostname: ${hostname}
+    interfaces:
+      - interface: eth0
+        dhcp: false
+        addresses:
+          - ${external_ip}/24
+        routes:
+          - network: 0.0.0.0/0
+            gateway: ${gateway}
+      - interface: eth1
+        dhcp: false
+        addresses:
+          - ${cluster_ip}/24
   nodeLabels:
     topology.kubernetes.io/region: ${cluster_name}
     topology.kubernetes.io/zone: ${node_name}

@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kokoro-fastapi
+  namespace: default
+  labels:
+    app: kokoro-fastapi
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  selector:
+    matchLabels:
+      app: kokoro-fastapi
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 200%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: kokoro-fastapi
+    spec:
+      containers:
+        - name: kokoro-fastapi
+          image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+          ports:
+            - containerPort: 8880
+              name: http
+          livenessProbe:
+            httpGet:
+              path: /docs
+              port: 8880
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /docs
+              port: 8880
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      restartPolicy: Always

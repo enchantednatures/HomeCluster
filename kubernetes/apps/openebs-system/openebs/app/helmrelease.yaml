@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: openebs
-      version: 4.3.1
+      version: 4.3.2
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -38,6 +38,12 @@ spec:
     lvm-localpv:
       enabled: false
     mayastor:
+      enabled: false
+    loki:
+      enabled: false
+    minio:
+      enabled: false
+    alloy:
       enabled: false
     engines:
       local:

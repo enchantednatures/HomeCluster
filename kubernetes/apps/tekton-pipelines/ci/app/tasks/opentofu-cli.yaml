@@ -1,0 +1,73 @@
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: opentofu-cli
+  namespace: tekton-pipelines
+spec:
+  description: >-
+    This task runs OpenTofu commands (init, plan, apply) in a specified directory.
+  params:
+    - name: COMMANDS
+      description: The OpenTofu commands to run (e.g., ["init", "plan"])
+      type: array
+    - name: TOFU_DIR
+      description: The directory containing the OpenTofu configuration files.
+      default: "."
+    - name: TOFU_VERSION
+      description: The OpenTofu version to use
+      default: "latest"
+  workspaces:
+    - name: source
+      description: A workspace containing the OpenTofu configuration files.
+    - name: config
+      description: A workspace containing the backend.hcl configuration.
+  steps:
+    - name: tofu-commands
+      image: ghcr.io/opentofu/opentofu:$(params.TOFU_VERSION)
+      workingDir: $(workspaces.source.path)/$(params.TOFU_DIR)
+      envFrom:
+        - secretRef:
+            name: minio-credentials
+      script: |
+        #!/usr/bin/env sh
+        set -e
+
+        echo "OpenTofu version:"
+        tofu version
+
+        # Copy the backend config into the source directory
+        if [ -f "$(workspaces.config.path)/backend.hcl" ]; then
+          cp $(workspaces.config.path)/backend.hcl .
+          echo "Backend config copied"
+        fi
+
+        # Run each command passed in the params
+        for command in $(params.COMMANDS[*]); do
+          echo "Running: tofu $command"
+          case "$command" in
+            "init")
+              if [ -f "./backend.hcl" ]; then
+                tofu init -backend-config=./backend.hcl -input=false
+              else
+                tofu init -input=false
+              fi
+              ;;
+            "plan")
+              tofu plan -no-color -out=tf.plan
+              ;;
+            "plan-output")
+              tofu show -no-color tf.plan > plan.txt
+              echo "Plan output saved to plan.txt"
+              ;;
+            "apply")
+              tofu apply -auto-approve -no-color
+              ;;
+            "destroy")
+              tofu destroy -auto-approve -no-color
+              ;;
+            *)
+              tofu $command
+              ;;
+          esac
+        done

@@ -4,9 +4,8 @@ kind: ConfigMap
 metadata:
   name: cilium-values
 data:
-  values.yaml: |-
+  values.yaml: |
     autoDirectNodeRoutes: true
-    bpf-lb-sock-hostns
     bpf:
       masquerade: true
     bgp:
@@ -15,12 +14,17 @@ data:
       name: home-cluster
       id: 1
     cni:
-      exclusive: true
-    socketLb:
-      hostNamespaceOnly: true
-    containerRuntime:
-      integration: containerd
-      socketPath: /var/run/k3s/containerd/containerd.sock
+      exclusive: false
+    dnsProxy:
+      enabled: true
+      dnsRejectResponseCode: refused
+      enableDnsCompression: true
+      endpointMaxIpPerHostname: 50
+      idleConnectionGracePeriod: 0s
+      maxDeferredConnectionDeletes: 10000
+      minTtl: 0
+      proxyPort: 53
+      proxyResponseMaxDelay: 100ms
     endpointRoutes:
       enabled: true
     hubble:
@@ -80,7 +84,6 @@ data:
     k8sServicePort: 6443
     kubeProxyReplacement: true
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
-    # Removed Istio integration since we're using init containers
     l2announcements:
       enabled: true
       # https://github.com/cilium/cilium/issues/26586

@@ -6,6 +6,7 @@ metadata:
   namespace: default
 resources:
   - ./deployment.yaml
+  - ./ingress.yaml
   - ./service.yaml
   - ./pvc.yaml
   - ./secret.sops.yaml
@@ -17,4 +18,3 @@ resources:
   - ./scheduled-backup.yaml
   - ./superusersecret.sops.yaml
   - ./config-map.yaml
-  - ./virtualservice.yaml

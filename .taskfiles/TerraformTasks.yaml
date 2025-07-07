@@ -16,7 +16,7 @@ tasks:
   proxmox:apply:
     desc: Create Proxmox VMs
     dir: provision/terraform/proxmox
-    cmds: [tofu apply]
+    cmds: [tofu apply --auto-approve]
   proxmox:destroy:
     desc: Destroy all the k8s nodes
     dir: provision/terraform/proxmox

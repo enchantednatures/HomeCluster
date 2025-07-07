@@ -8,8 +8,9 @@ metadata:
     app.kubernetes.io/name: *app
     app.kubernetes.io/instance: *app
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: redpanda.${SECRET_DOMAIN}
     lbipam.cilium.io/ips: 192.168.1.244
+    tailscale.com/hostname: redpanda-console
+    tailscale.com/tags: tag:k8s
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
