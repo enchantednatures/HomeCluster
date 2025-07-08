@@ -8,7 +8,7 @@ tasks:
   proxmox:init:
     desc: Initialize proxmox terraform
     dir: provision/terraform/proxmox
-    cmds: [tofu init]
+    cmds: [tofu init -upgrade]
   proxmox:plan:
     desc: Plan Proxmox VM creation
     dir: provision/terraform/proxmox
@@ -16,7 +16,7 @@ tasks:
   proxmox:apply:
     desc: Create Proxmox VMs
     dir: provision/terraform/proxmox
-    cmds: [tofu apply]
+    cmds: [tofu apply -auto-approve]
   proxmox:destroy:
     desc: Destroy all the k8s nodes
     dir: provision/terraform/proxmox
