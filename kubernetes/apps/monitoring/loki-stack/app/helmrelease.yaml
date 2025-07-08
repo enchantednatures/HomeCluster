@@ -8,6 +8,8 @@ spec:
   interval: 5m
   dependsOn:
     - name: prometheus-operator-crds
+    - name: openebs
+      namespace: openebs-system
   chart:
     spec:
       chart: loki
