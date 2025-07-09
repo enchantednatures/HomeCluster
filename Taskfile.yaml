@@ -45,7 +45,8 @@ tasks:
     silent: true
   configure:
     desc: Configure repository from bootstrap vars
-    prompt: Any conflicting config in the kubernetes directory will be overwritten...
+    prompt:
+      Any conflicting config in the kubernetes directory will be overwritten...
       continue?
     deps: [workstation:direnv, workstation:venv, sops:age-keygen, init]
     cmds:
