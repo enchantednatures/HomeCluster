@@ -6,4 +6,4 @@ resources:
   - ./scrape-config.yaml
   - ./rules.yaml
   - ./virtualservice.yaml
-  - ./istio-config.yaml
+  # - ./istio-config.yaml  # Disabled due to IstioOperator CRD issue
