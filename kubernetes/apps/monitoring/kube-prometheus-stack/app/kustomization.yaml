@@ -5,5 +5,5 @@ resources:
   - ./helmrelease.yaml
   - ./scrape-config.yaml
   - ./rules.yaml
-  # - ./virtualservice.yaml
-  # - ./istio-config.yaml
+  - ./virtualservice.yaml
+  - ./istio-config.yaml
