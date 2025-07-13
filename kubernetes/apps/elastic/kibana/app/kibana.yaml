@@ -5,7 +5,7 @@ metadata:
   name: kibana
   namespace: elastic
 spec:
-  version: 8.16.0
+  version: 9.0.0
   count: 1
   elasticsearchRef:
     name: elasticsearch
