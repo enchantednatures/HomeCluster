@@ -10,8 +10,8 @@ metadata:
   annotations:
     # external-dns.alpha.kubernetes.io/hostname: kiali.${SECRET_DOMAIN}
     # lbipam.cilium.io/ips: 192.168.1.244
-    tailscale.com/expose: "kiali"
-    tailscale.com/hostname: ""
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: "kiali"
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
