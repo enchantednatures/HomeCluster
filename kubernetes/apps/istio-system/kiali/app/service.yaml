@@ -8,8 +8,10 @@ metadata:
     app.kubernetes.io/name: *app
     app.kubernetes.io/instance: *app
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: kiali.${SECRET_DOMAIN}
-    lbipam.cilium.io/ips: 192.168.1.244
+    # external-dns.alpha.kubernetes.io/hostname: kiali.${SECRET_DOMAIN}
+    # lbipam.cilium.io/ips: 192.168.1.244
+    tailscale.com/expose: "kiali"
+    tailscale.com/hostname: ""
 spec:
   type: LoadBalancer
   loadBalancerClass: tailscale
@@ -18,6 +20,10 @@ spec:
       port: 20001
       protocol: TCP
       targetPort: 20001
+    - name: otherhttp
+      port: 80
+      targetPort: 20001
+      protocol: TCP
   selector:
     app.kubernetes.io/instance: kiali
     app.kubernetes.io/name: kiali
