@@ -64,11 +64,24 @@ spec:
             address: tempo.monitoring.svc.cluster.local:9411
       enablePrometheusMerge: true
       extensionProviders:
-        - envoyExtAuthzHttp:
-            headersToDownstreamOnAllow: [cookie]
-            headersToUpstreamOnAllow: [set-cookie, x-authentik-*]
-            includeRequestHeadersInCheck: [cookie]
+        - name: authentik
+          envoyExtAuthzHttp:
+            service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
+            port: 9000
             pathPrefix: /outpost.goauthentik.io/auth/envoy
-            port: "9000"
-            service: ak-outpost-authentik-embedded-outpost.authentik.svc.cluster.local
-          name: authentik
+            includeRequestHeadersInCheck:
+              - authorization
+              - cookie
+              - x-forwarded-for
+              - x-forwarded-proto
+              - x-forwarded-host
+            headersToUpstreamOnAllow:
+              - x-authentik-username
+              - x-authentik-groups
+              - x-authentik-email
+              - x-authentik-name
+              - x-authentik-uid
+            headersToDownstreamOnDeny:
+              - content-type
+              - set-cookie
+              - location
