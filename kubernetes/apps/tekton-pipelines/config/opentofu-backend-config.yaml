@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opentofu-backend-config
+  namespace: tekton-pipelines
+data:
+  backend.hcl: |
+    bucket         = "tofu"
+    key            = "homelab/terraform.tfstate"
+    region         = "us-east-1"
+    endpoint       = "http://minio.minio.svc.cluster.local:9000"
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    force_path_style            = true
