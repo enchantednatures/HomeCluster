@@ -27,6 +27,8 @@ spec:
   values:
     adminUser:
       create: false
+    authMethods:
+      - oidc
     ingress:
       enabled: false
     networkPolicy:
