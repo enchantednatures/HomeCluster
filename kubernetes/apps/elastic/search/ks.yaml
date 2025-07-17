@@ -8,6 +8,10 @@ spec:
   dependsOn:
     - name: csi-driver-nfs
   targetNamespace: elastic
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
