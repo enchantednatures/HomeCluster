@@ -11,6 +11,11 @@ spec:
     tls:
       selfSignedCertificate:
         disabled: true
+  auth:
+    oidc:
+      - name: authentik
+        clientSecret:
+          secretName: elastic-authentik-oidc-secret
   nodeSets:
     - name: default
       count: 3
@@ -21,6 +26,23 @@ spec:
             username: chastened
             roles: superuser
             authz_exception: false
+          realms:
+            oidc:
+              authentik:
+                order: 0
+                rp.client_id: "elasticsearch-kibana"
+                rp.response_type: code
+                rp.redirect_uri: "https://kibana.${SECRET_DOMAIN}/api/security/oidc/callback"
+                op.issuer: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/"
+                op.authorization_endpoint: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/authorize/"
+                op.token_endpoint: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/token/"
+                op.userinfo_endpoint: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/userinfo/"
+                op.endsession_endpoint: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/end-session/"
+                op.jwkset_path: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/.well-known/jwks.json"
+                claims.principal: email
+                claims.groups: groups
+                claims.name: name
+                claims.mail: email
       podTemplate:
         spec:
           nodeSelector:

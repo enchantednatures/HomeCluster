@@ -9,6 +9,16 @@ spec:
   count: 1
   elasticsearchRef:
     name: elasticsearch
+  config:
+    server.publicBaseUrl: "https://kibana.${SECRET_DOMAIN}"
+    xpack.security.authc.providers:
+      oidc.authentik:
+        order: 0
+        description: "Login with Authentik"
+        realm: authentik
+        icon: "https://auth.${SECRET_DOMAIN}/static/dist/assets/icons/icon_left_brand.svg"
+      basic.basic1:
+        order: 1
   podTemplate:
     metadata:
       labels:
