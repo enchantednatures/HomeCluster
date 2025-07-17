@@ -5,17 +5,17 @@ metadata:
   name: elasticsearch
   namespace: elastic
 spec:
-  version: 9.0.0
+  version: 9.0.3
   volumeClaimDeletePolicy: DeleteOnScaledownOnly
   http:
     tls:
       selfSignedCertificate:
         disabled: true
-  auth:
-    oidc:
-      - name: authentik
-        clientSecret:
-          secretName: elastic-authentik-oidc-secret
+  secureSettings:
+    - secretName: elastic-authentik-oidc-secret
+      entries:
+        - key: client_secret
+          path: xpack.security.authc.realms.oidc.authentik.rp.client_secret
   nodeSets:
     - name: default
       count: 3
