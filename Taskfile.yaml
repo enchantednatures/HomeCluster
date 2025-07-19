@@ -8,7 +8,7 @@ vars:
   PRIVATE_DIR: "{{.ROOT_DIR}}/.private"
   SCRIPTS_DIR: "{{.ROOT_DIR}}/scripts"
   # Files
-  AGE_FILE: "{{.ROOT_DIR}}/age.key"
+  AGE_FILE: "~/.config/sops/age/keys.txt"
   BOOTSTRAP_CONFIG_FILE: "{{.ROOT_DIR}}/config.yaml"
   KUBECONFIG_FILE: ./provision/terraform/proxmox/output/kube-config.yaml
   MAKEJINJA_CONFIG_FILE: "{{.ROOT_DIR}}/makejinja.toml"
