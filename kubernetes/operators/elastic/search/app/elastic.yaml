@@ -10,12 +10,12 @@ spec:
   http:
     tls:
       selfSignedCertificate:
-        disabled: true
-    secureSettings:
-      - secretName: elastic-authentik-oidc-secret
-        entries:
-          - key: client_secret
-            path: xpack.security.authc.realms.oidc.authentik.rp.client_secret
+        disabled: false
+  secureSettings:
+    - secretName: elastic-authentik-oidc-secret
+      entries:
+        - key: client_secret
+          path: xpack.security.authc.realms.oidc.authentik.rp.client_secret
   nodeSets:
     - name: default
       count: 3
@@ -27,7 +27,7 @@ spec:
             roles: superuser
             authz_exception: false
           token:
-            enabled: true  # Enable token service
+            enabled: true # Enable token service
           realms:
             oidc:
               authentik:
