@@ -1,0 +1,19 @@
+---
+# kubernetes/infra/istio-ingress/gateway/app/auth-policy.yaml
+# This policy is disabled by default - enable per-service by adding labels
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: authentik-forward-auth
+  namespace: istio-ingress
+spec:
+  # Apply to specific services that need authentication
+  # Use labels to target specific workloads
+  action: CUSTOM
+  provider:
+    name: authentik
+  rules:
+    - to:
+        - operation:
+            # This will be overridden by specific service policies
+            hosts: []

@@ -1,0 +1,25 @@
+---
+# kubernetes/core/tekton-pipelines/dashboard/auth-policy.yaml
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: tekton-dashboard-auth
+  namespace: tekton-pipelines
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tekton-dashboard
+  action: CUSTOM
+  provider:
+    name: authentik
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - tekton.${SECRET_DOMAIN}
+            # Exclude health checks and API endpoints that might need unauthenticated access
+            notPaths:
+              - /health
+              - /healthz
+              - /readiness
+              - /api/v1/health

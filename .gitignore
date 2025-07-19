@@ -35,3 +35,4 @@ provision/terraform/proxmox/output/
 provision/terraform/harbor/.terraform
 provision/terraform/harbor/.terraform
 kubernetes/wip/
+.archive
