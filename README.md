@@ -278,7 +278,7 @@ contain necessary information that is **vital** to the bootstrap process._
 
    3c. Click the blue `Use template` button for the `Edit zone DNS` template.
 
-   3d. Name your token something like `home-kubernetes`
+   3d. Name your token something like `flux-system`
 
    3e. Under `Permissions`, click `+ Add More` and add each permission below:
 
@@ -755,7 +755,7 @@ The benefits of a public repository include:
    apiVersion: source.toolkit.fluxcd.io/v1beta2
    kind: GitRepository
    metadata:
-     name: home-kubernetes
+     name: flux-system
      namespace: flux-system
    spec:
      interval: 10m
