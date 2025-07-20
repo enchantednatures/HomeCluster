@@ -1,15 +1,4 @@
 ---
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: harbor-db
-  namespace: harbor
-spec:
-  name: harbor
-  owner: harbor
-  cluster:
-    name: harbor-db
----
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v2.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -63,7 +52,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster harbor-v3
+      serverName: &currentCluster harbor-v0
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -73,14 +62,37 @@ spec:
           key: aws-secret-access-key
 
   bootstrap:
-    recovery:
-      source: &previousCluster harbor-v2
-      database: harbor
-      owner: harbor
-      secret:
-        name: harbor-db-user
+    initdb:
+      import:
+        type: microservice
+        databases:
+          - registry
+          # - notary_server
+          # - notary_signer
+        source:
+          externalCluster: monolith-cluster
+
   externalClusters:
-    - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+    - name: monolith-cluster
+      connectionParameters:
+        host: postgres-db-rw.postgres.svc.cluster.local
+        port: "5432"
+        user: harbor
+        # dbname: harbor
+        sslmode: disable
+      password:
+        name: harbor-db
+        key: password
+
+  # bootstrap:
+  #   recovery:
+  #     source: &previousCluster harbor-v0
+  #     database: harbor
+  #     owner: harbor
+  #     secret:
+  #       name: harbor-db-user
+  # externalClusters:
+  #   - name: *previousCluster
+  #     barmanObjectStore:
+  #       <<: *barmanObjectStore
+  #       serverName: *previousCluster

@@ -6,7 +6,7 @@ metadata:
   name: harbor-db-config
   namespace: harbor
 data:
-  host: postgres-db-rw.postgres.svc.cluster.local
+  host: harbor-db-rw.harbor.svc.cluster.local
   port: "5432"
   coreDatabase: registry
   notaryServerDatabase: notary_server

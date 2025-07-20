@@ -39,6 +39,18 @@ spec:
       targetPath: database.external.coreDatabase
     - kind: ConfigMap
       name: harbor-db-config
+      valuesKey: host
+      targetPath: database.external.host
+    - kind: ConfigMap
+      name: harbor-db-config
+      valuesKey: port
+      targetPath: database.external.port
+    - kind: ConfigMap
+      name: harbor-db-config
+      valuesKey: sslmode
+      targetPath: database.external.sslmode
+    - kind: ConfigMap
+      name: harbor-db-config
       valuesKey: notaryServerDatabase
       targetPath: database.external.notaryServerDatabase
     - kind: ConfigMap
@@ -163,14 +175,14 @@ spec:
     database:
       type: external
       external:
-        host: postgres-db-rw.postgres.svc.cluster.local
-        port: 5432
-        username: harbor # todo
-        password: harbor
-        coreDatabase: registry
-        notaryServerDatabase: notary_server
-        notarySignerDatabase: notary_signer
-        sslmode: disable
+        host: ""
+        port: 0
+        username: ""
+        password: ""
+        coreDatabase: ""
+        notaryServerDatabase: ""
+        notarySignerDatabase: ""
+        sslmode: ""
       maxIdleConns: 100
       maxOpenConns: 900
       podAnnotations: {}
