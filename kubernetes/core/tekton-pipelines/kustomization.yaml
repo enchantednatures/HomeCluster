@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./tekton-pipelines/ks.yaml
-  - ./ci/ks.yaml
-  - ./config/opentofu-backend-config.yaml
-  # - ./dashboard/virtualservice.yaml
-  # - ./dashboard/auth-policy.yaml
+  - ./dashboard/ks.yaml
+  # - ./ci/ks.yaml
+  # - ./config/opentofu-backend-config.yaml

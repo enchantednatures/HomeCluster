@@ -10,7 +10,8 @@ vars:
   # Files
   AGE_FILE: "~/.config/sops/age/keys.txt"
   BOOTSTRAP_CONFIG_FILE: "{{.ROOT_DIR}}/config.yaml"
-  KUBECONFIG_FILE: ./provision/terraform/proxmox/output/kube-config.yaml
+  # KUBECONFIG_FILE: ./provision/terraform/proxmox/output/kube-config.yaml
+  KUBECONFIG_FILE: ~/.kube/config
   MAKEJINJA_CONFIG_FILE: "{{.ROOT_DIR}}/makejinja.toml"
   PIP_REQUIREMENTS_FILE: "{{.ROOT_DIR}}/requirements.txt"
   SOPS_CONFIG_FILE: "{{.ROOT_DIR}}/.sops.yaml"
