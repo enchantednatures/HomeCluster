@@ -4,6 +4,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: redpanda
+  namespace: redpanda
 spec:
   interval: 30m
   chart:
@@ -24,6 +25,3 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values:
-    image:
-      tag: v2.3.5-24.3.2
