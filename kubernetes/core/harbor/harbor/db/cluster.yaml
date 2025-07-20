@@ -64,11 +64,11 @@ spec:
   bootstrap:
     initdb:
       import:
-        type: microservice
+        type: monolith
         databases:
           - registry
-          # - notary_server
-          # - notary_signer
+          - notary_server
+          - notary_signer
         source:
           externalCluster: monolith-cluster
 
@@ -77,11 +77,11 @@ spec:
       connectionParameters:
         host: postgres-db-rw.postgres.svc.cluster.local
         port: "5432"
-        user: harbor
+        user: hunter
         # dbname: harbor
         sslmode: disable
       password:
-        name: harbor-db
+        name: harbor-db-hunter
         key: password
 
   # bootstrap:
