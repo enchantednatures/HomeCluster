@@ -73,16 +73,21 @@ spec:
           key: aws-secret-access-key
 
   bootstrap:
-    recovery:
-      source: monolith-cluster
-      database: atuin
+    initdb:
+      owner: atuin
+      import:
+        type: microservice
+        source:
+          externalCluster: monolith-cluster
+
   externalClusters:
     - name: monolith-cluster
       connectionParameters:
-        host: postgres-db-ro.postgres.svc.cluster.local
-        user: hcasten
+        host: postgres-db-rw.postgres.svc.cluster.local
+        port: "5432"
         dbname: atuin
-        sslmode: require
+        user: hunter
+        sslmode: disable
       password:
         name: atuin-db-hunter
         key: password

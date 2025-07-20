@@ -1,4 +1,37 @@
 ---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: registry-db
+  namespace: harbor
+spec:
+  name: registry
+  owner: harbor
+  cluster:
+    name: harbor-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: notary-server-db
+  namespace: harbor
+spec:
+  name: notary_server
+  owner: harbor
+  cluster:
+    name: harbor-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: notary-signer-db
+  namespace: harbor
+spec:
+  name: notary_signer
+  owner: harbor
+  cluster:
+    name: harbor-db
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v2.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
@@ -63,12 +96,13 @@ spec:
 
   bootstrap:
     initdb:
+      owner: harbor
       import:
         type: monolith
         databases:
           - registry
-          - notary_server
-          - notary_signer
+          # - notary_server
+          # - notary_signer
         source:
           externalCluster: monolith-cluster
 
