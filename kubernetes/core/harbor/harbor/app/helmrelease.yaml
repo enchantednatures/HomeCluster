@@ -174,15 +174,15 @@ spec:
         podAnnotations: {}
     database:
       type: external
-      external:
-        host: ""
-        port: 0
-        username: ""
-        password: ""
-        coreDatabase: ""
-        notaryServerDatabase: ""
-        notarySignerDatabase: ""
-        sslmode: ""
+      external: {}
+        # host: ""
+        # port: 0
+        # username: ""
+        # password: ""
+        # coreDatabase: ""
+        # notaryServerDatabase: ""
+        # notarySignerDatabase: ""
+        # sslmode: ""
       maxIdleConns: 100
       maxOpenConns: 900
       podAnnotations: {}
