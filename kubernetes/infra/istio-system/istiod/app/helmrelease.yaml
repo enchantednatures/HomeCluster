@@ -69,6 +69,7 @@ spec:
             service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
             port: 9000
             pathPrefix: /outpost.goauthentik.io/auth/envoy
+            failOpen: false
             includeRequestHeadersInCheck:
               - authorization
               - cookie
