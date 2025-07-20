@@ -85,7 +85,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster harbor-v0
+      serverName: &currentCluster harbor-v1
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -95,38 +95,14 @@ spec:
           key: aws-secret-access-key
 
   bootstrap:
-    initdb:
+    recovery:
+      source: &previousCluster harbor-v0
+      database: harbor
       owner: harbor
-      import:
-        type: monolith
-        databases:
-          - registry
-          # - notary_server
-          # - notary_signer
-        source:
-          externalCluster: monolith-cluster
-
+      secret:
+        name: harbor-db-user
   externalClusters:
-    - name: monolith-cluster
-      connectionParameters:
-        host: postgres-db-rw.postgres.svc.cluster.local
-        port: "5432"
-        user: hunter
-        # dbname: harbor
-        sslmode: disable
-      password:
-        name: harbor-db-hunter
-        key: password
-
-  # bootstrap:
-  #   recovery:
-  #     source: &previousCluster harbor-v0
-  #     database: harbor
-  #     owner: harbor
-  #     secret:
-  #       name: harbor-db-user
-  # externalClusters:
-  #   - name: *previousCluster
-  #     barmanObjectStore:
-  #       <<: *barmanObjectStore
-  #       serverName: *previousCluster
+    - name: *previousCluster
+      barmanObjectStore:
+        <<: *barmanObjectStore
+        serverName: *previousCluster

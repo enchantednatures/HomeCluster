@@ -63,7 +63,7 @@ spec:
         maxParallel: 8
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster atuin-v0
+      serverName: &currentCluster atuin-v1
       s3Credentials:
         accessKeyId:
           name: pg-backup-secret
@@ -73,34 +73,14 @@ spec:
           key: aws-secret-access-key
 
   bootstrap:
-    initdb:
+    recovery:
+      source: &previousCluster atuin-v0
+      database: atuin
       owner: atuin
-      import:
-        type: microservice
-        source:
-          externalCluster: monolith-cluster
-
+      secret:
+        name: atuin-db-user
   externalClusters:
-    - name: monolith-cluster
-      connectionParameters:
-        host: postgres-db-rw.postgres.svc.cluster.local
-        port: "5432"
-        dbname: atuin
-        user: hunter
-        sslmode: disable
-      password:
-        name: atuin-db-hunter
-        key: password
-
-  # bootstrap:
-  #   recovery:
-  #     source: &previousCluster atuin-v2
-  #     database: atuin
-  #     owner: atuin
-  #     secret:
-  #       name: atuin-db-user
-  # externalClusters:
-  #   - name: *previousCluster
-  #     barmanObjectStore:
-  #       <<: *barmanObjectStore
-  #       serverName: *previousCluster
+    - name: *previousCluster
+      barmanObjectStore:
+        <<: *barmanObjectStore
+        serverName: *previousCluster
