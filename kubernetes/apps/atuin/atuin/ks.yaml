@@ -7,11 +7,33 @@ metadata:
 spec:
   targetNamespace: atuin
   dependsOn:
-    - name: cloudnative-pg
+    - name: atuin-db
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
   path: ./kubernetes/apps/atuin/atuin/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-db atuin-db
+  namespace: flux-system
+spec:
+  targetNamespace: atuin
+  dependsOn:
+    - name: cloudnative-pg
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-db
+  path: ./kubernetes/apps/atuin/atuin/db/
   prune: true
   sourceRef:
     kind: GitRepository
