@@ -25,3 +25,12 @@ metadata:
 spec:
   cluster:
     name: authentik-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  generateName: atuin-backup-
+  namespace: atuin
+spec:
+  cluster:
+    name: atuin-db
