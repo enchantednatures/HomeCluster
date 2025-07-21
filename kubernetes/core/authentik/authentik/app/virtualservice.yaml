@@ -23,3 +23,7 @@ spec:
             host: authentik-server
             port:
               number: 80
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+        retryOn: gateway-error,connect-failure,refused-stream
