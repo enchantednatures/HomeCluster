@@ -9,11 +9,10 @@ spec:
       enabled: true
       knative-ingress-gateway:
         selector:
-          istio: istio-gateway
+          istio: istio-gateway # Matches your Gateway selector
   config:
     network:
-      ingress-class: "istio"
-      external-domain-tls: Enabled
+      ingress-class: "istio" # Matches your IngressClass name
     logging:
       loglevel.controller: "info"
       loglevel.autoscaler: "info"
