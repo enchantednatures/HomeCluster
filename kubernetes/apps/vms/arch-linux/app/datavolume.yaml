@@ -10,6 +10,9 @@ spec:
     http:
       url: "https://mirror.rackspace.com/archlinux/iso/2024.12.01/archlinux-2024.12.01-x86_64.iso"
   storage:
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: Filesystem
     resources:
       requests:
         storage: 1Gi
@@ -25,6 +28,9 @@ spec:
   source:
     blank: {}
   storage:
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: Filesystem
     resources:
       requests:
         storage: 20Gi
