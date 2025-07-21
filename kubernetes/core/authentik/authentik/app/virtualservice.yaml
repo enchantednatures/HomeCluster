@@ -23,12 +23,3 @@ spec:
             host: authentik-server
             port:
               number: 80
-      connectionPool:
-        tcp:
-          maxConnections: 100
-          tcpKeepalive:
-            time: 7200s
-            interval: 75s
-        http:
-          http1MaxPendingRequests: 64
-          maxRequestsPerConnection: 20

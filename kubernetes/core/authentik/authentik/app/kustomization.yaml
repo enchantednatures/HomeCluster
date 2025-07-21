@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
   - ./secrets.sops.yaml
   - ./helmrelease.yaml
-  # - ./virtualservice.yaml
+  - ./virtualservice.yaml
   # - ./ingress-forward-auth.yaml
   # - ./virtual-service.yaml
