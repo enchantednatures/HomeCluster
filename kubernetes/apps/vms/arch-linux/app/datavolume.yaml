@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://kubevirt.io/api-reference/main/definitions.html#_v1beta1_datavolume
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: arch-linux-iso
+  namespace: vms
+spec:
+  source:
+    http:
+      url: "https://mirror.rackspace.com/archlinux/iso/2024.12.01/archlinux-2024.12.01-x86_64.iso"
+  storage:
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: openebs-hostpath
+---
+# yaml-language-server: $schema=https://kubevirt.io/api-reference/main/definitions.html#_v1beta1_datavolume
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: arch-linux-disk
+  namespace: vms
+spec:
+  source:
+    blank: {}
+  storage:
+    resources:
+      requests:
+        storage: 20Gi
+    storageClassName: openebs-hostpath
+

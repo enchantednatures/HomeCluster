@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/service.json
+apiVersion: v1
+kind: Service
+metadata:
+  name: arch-linux-vnc
+  namespace: vms
+  labels:
+    app: arch-linux
+spec:
+  selector:
+    kubevirt.io/vm: arch-linux
+  ports:
+    - name: vnc
+      port: 5900
+      targetPort: 5900
+      protocol: TCP
+  type: ClusterIP

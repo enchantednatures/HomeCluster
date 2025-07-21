@@ -1,0 +1,58 @@
+---
+# yaml-language-server: $schema=https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachine
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: arch-linux
+  namespace: vms
+  labels:
+    app: arch-linux
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: arch-linux
+    spec:
+      domain:
+        cpu:
+          cores: 2
+        memory:
+          guest: 4Gi
+        devices:
+          disks:
+            - name: arch-linux-disk
+              disk:
+                bus: virtio
+            - name: arch-linux-iso
+              cdrom:
+                bus: sata
+          interfaces:
+            - name: default
+              masquerade: {}
+          networkInterfaceMultiqueue: true
+          rng: {}
+        features:
+          acpi: {}
+          smm:
+            enabled: true
+        firmware:
+          bootloader:
+            efi:
+              secureBoot: false
+        machine:
+          type: pc-q35-rhel9.2.0
+        resources:
+          requests:
+            memory: 4Gi
+            cpu: 2
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: arch-linux-disk
+          dataVolume:
+            name: arch-linux-disk
+        - name: arch-linux-iso
+          dataVolume:
+            name: arch-linux-iso
