@@ -182,11 +182,3 @@ spec:
   endpoints:
     - address: "10.96.0.1"
 ---
-apiVersion: security.istio.io/v1
-kind: PeerAuthentication
-metadata:
-  name: "default-mesh-wide-permissive"
-  namespace: istio-system
-spec:
-  mtls:
-    mode: PERMISSIVE

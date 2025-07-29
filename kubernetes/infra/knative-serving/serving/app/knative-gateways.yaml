@@ -1,0 +1,40 @@
+---
+# Knative Ingress Gateway for external traffic
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: knative-ingress-gateway
+  namespace: knative-serving
+spec:
+  selector:
+    istio: gateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts: ["*"]
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      tls:
+        mode: SIMPLE
+        credentialName: ${SECRET_DOMAIN/./-}-production-tls
+      hosts: ["*"]
+---
+# Knative Local Gateway for cluster-internal traffic
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: knative-local-gateway
+  namespace: knative-serving
+spec:
+  selector:
+    istio: gateway
+  servers:
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts: ["*"]
