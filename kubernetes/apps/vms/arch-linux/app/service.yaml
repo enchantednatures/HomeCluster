@@ -9,6 +9,7 @@ metadata:
     app: arch-linux
     app.kubernetes.io/name: *app
     app.kubernetes.io/instance: *app
+  annotations:
     tailscale.com/expose: "true"
     tailscale.com/hostname: arch
 spec:
