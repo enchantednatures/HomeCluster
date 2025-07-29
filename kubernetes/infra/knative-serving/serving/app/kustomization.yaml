@@ -5,4 +5,4 @@ resources:
   - ./serving.yaml
   - ./cluster-role.yaml
   - https://github.com/knative/net-istio/releases/download/knative-v1.18.0/net-istio.yaml
-  - ./gateway-patch.yaml
+  # - ./gateway-patch.yaml
