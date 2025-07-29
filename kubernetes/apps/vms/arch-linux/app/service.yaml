@@ -3,11 +3,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: arch-linux-vnc
+  name: &app arch-linux-vnc
   namespace: vms
   labels:
     app: arch-linux
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+    tailscale.com/expose: "true"
+    tailscale.com/hostname: arch
 spec:
+  type: LoadBalancer
+  loadBalancerClass: tailscale
   selector:
     kubevirt.io/vm: arch-linux
   ports:
@@ -15,4 +21,3 @@ spec:
       port: 5900
       targetPort: 5900
       protocol: TCP
-  type: ClusterIP
