@@ -8,7 +8,7 @@ metadata:
 spec:
   source:
     http:
-      url: "https://mirror.rackspace.com/archlinux/iso/2024.12.01/archlinux-2024.12.01-x86_64.iso"
+      url: "https://mirror.rackspace.com/archlinux/iso/latest/archlinux-x86_64.iso"
   storage:
     accessModes:
       - ReadWriteOnce
