@@ -31,7 +31,7 @@ spec:
         url: "http://grafana.monitoring.svc.cluster.local"
       tracing:
         enabled: true
-        in_cluster_url: "http://tempo.monitoring.svc.cluster.local:16686"
+        in_cluster_url: "http://tempo.monitoring.svc.cluster.local:3100"
     deployment:
       ingress:
         enabled: false
