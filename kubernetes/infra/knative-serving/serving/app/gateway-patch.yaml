@@ -1,5 +1,5 @@
 ---
-# Knative Ingress Gateway for external traffic
+# Override the knative-ingress-gateway to use your custom gateway selector
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
@@ -7,13 +7,14 @@ metadata:
   namespace: knative-serving
 spec:
   selector:
-    istio: gateway
+    istio: gateway  # Match your custom gateway selector
   servers:
     - port:
         number: 80
         name: http
         protocol: HTTP
-      hosts: ["*"]
+      hosts:
+        - "*"
     - port:
         number: 443
         name: https
@@ -21,9 +22,10 @@ spec:
       tls:
         mode: SIMPLE
         credentialName: ${SECRET_DOMAIN/./-}-production-tls
-      hosts: ["*"]
+      hosts:
+        - "*"
 ---
-# Knative Local Gateway for cluster-internal traffic
+# Override the knative-local-gateway to use your custom gateway selector
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
 metadata:
@@ -31,10 +33,11 @@ metadata:
   namespace: knative-serving
 spec:
   selector:
-    istio: gateway
+    istio: gateway  # Match your custom gateway selector
   servers:
     - port:
-        number: 80
+        number: 8081
         name: http
         protocol: HTTP
-      hosts: ["*"]
+      hosts:
+        - "*"
