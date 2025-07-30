@@ -8,11 +8,11 @@ spec:
   dependsOn:
     - name: csi-driver-nfs
     - name: prometheus-operator-crds
-  targetNamespace: postgres
+  targetNamespace: cnpg-system
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/operators/postgres/cloudnative-pg/app
+  path: ./kubernetes/operators/cnpg-system/cloudnative-pg/app
   prune: true
   sourceRef:
     kind: GitRepository
@@ -31,11 +31,11 @@ metadata:
 spec:
   dependsOn:
     - name: cloudnative-pg
-  targetNamespace: postgres
+  targetNamespace: cnpg-system
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/operators/postgres/cloudnative-pg/barman-cloud-plugin
+  path: ./kubernetes/operators/cnpg-system/cloudnative-pg/barman-cloud-plugin
   prune: true
   sourceRef:
     kind: GitRepository
