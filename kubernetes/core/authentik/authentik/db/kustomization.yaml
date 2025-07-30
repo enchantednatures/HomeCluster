@@ -11,3 +11,4 @@ resources:
   - superusersecret.sops.yaml
   - hunter-user.sops.yaml
   - object-store.yaml
+  - minio-serviceentry.yaml

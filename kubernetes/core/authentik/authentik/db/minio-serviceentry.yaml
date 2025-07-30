@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/networking.istio.io/serviceentry_v1beta1.json
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: minio-service-access
+  namespace: authentik
+spec:
+  hosts:
+    - minio-service.networking.svc.cluster.local
+  ports:
+    - number: 9768
+      name: minio-api
+      protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS

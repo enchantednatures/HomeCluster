@@ -59,6 +59,7 @@ spec:
       accessLogEncoding: JSON
       enableTracing: true
       defaultConfig:
+        holdApplicationUntilProxyStarts: true
         tracing:
           zipkin:
             address: tempo.monitoring.svc.cluster.local:9411
