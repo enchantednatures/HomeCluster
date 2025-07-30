@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   # - ./postgis/ks.yaml
   - ./cluster/ks.yaml
+  - ./namespace.yaml
