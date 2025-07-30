@@ -18,7 +18,7 @@ metadata:
 spec:
   cluster:
     name: authentik-v8
-  schedule: '0 0 0 * * *'
+  schedule: "0 0 0 * * *"
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:
@@ -72,10 +72,10 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster authentik-v9
+        serverName: &currentCluster authentik-v8
   bootstrap:
     recovery:
-      source: &previousCluster authentik-v8
+      source: &previousCluster authentik-v7
       database: authentik
       owner: authentik
       secret:
