@@ -46,6 +46,7 @@ resources:
   - ./piraeus.yaml
   - ./redpanda-charts.yaml
   - ./rook-ceph.yaml
+  - ./sail-operator.yaml
   - ./sealed-secrets.yaml
   - ./stakater.yaml
   - ./strimzi.yaml

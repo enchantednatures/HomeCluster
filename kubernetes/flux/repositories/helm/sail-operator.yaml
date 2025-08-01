@@ -1,0 +1,9 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: sail-operator
+  namespace: flux-system
+spec:
+  interval: 5m
+  url: https://istio-ecosystem.github.io/sail-operator
