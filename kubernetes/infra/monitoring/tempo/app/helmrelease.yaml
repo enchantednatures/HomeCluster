@@ -21,6 +21,19 @@ spec:
     replicas: 5
     gateway:
       enabled: true
+    memcached:
+      enabled: false
+    cache:
+      caches:
+        - memcached:
+            host: '{{ include "tempo.fullname" . }}-dragonfly'
+            service: memcached
+            consistent_hash: true
+            timeout: 500ms
+          roles:
+            - parquet-footer
+            - bloom
+            - frontend-search
     storage:
       trace:
         backend: s3
