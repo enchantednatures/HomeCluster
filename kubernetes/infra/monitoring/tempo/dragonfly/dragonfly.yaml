@@ -4,9 +4,10 @@ kind: Dragonfly
 metadata:
   labels:
     app.kubernetes.io/name: tempo-dragonfly
-  name: dragonfly
+  name: tempo-dragonfly
 spec:
   replicas: 1
+  memcachedPort: 11211
   resources:
     requests:
       cpu: 500m
