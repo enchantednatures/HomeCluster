@@ -4,6 +4,11 @@ kind: Kustomization
 resources:
   - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/main/manifests/dragonfly-operator.yaml
   - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/main/monitoring/prometheus-service.yaml
+  - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/main/monitoring/promServiceAccount.yaml
+  - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/main/monitoring/promClusterRole.yaml
+  - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/main/monitoring/promClusterBinding.yaml
+  - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/main/monitoring/prometheus-config.yaml
+  - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/main/monitoring/prometheus-service.yaml
 configMapGenerator:
   - name: dragonflydb-dashboard
     files:

@@ -9,7 +9,7 @@ spec:
       enabled: true
       knative-ingress-gateway:
         selector:
-          istio: ingressgateway # Matches the net-istio.yaml Gateway selector
+          istio: gateway
   config:
     network:
       ingress-class: "istio" # Matches your IngressClass name
@@ -25,8 +25,8 @@ spec:
       metrics.backend-destination: "prometheus"
     istio:
       # Points to your custom Istio gateway service in istio-ingress namespace
-      gateway.knative-serving.knative-ingress-gateway: "istio-gateway.istio-ingress.svc.cluster.local"
-      local-gateway.knative-serving.cluster-local-gateway: "istio-gateway.istio-ingress.svc.cluster.local"
+      gateway.knative-serving.knative-ingress-gateway: "istio-ingressgateway.istio-ingress.svc.cluster.local"
+      local-gateway.knative-serving.cluster-local-gateway: "istio-ingressgateway.istio-ingress.svc.cluster.local"
     autoscaler:
       enable-scale-to-zero: "true"
       scale-to-zero-grace-period: "30s"
