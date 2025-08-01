@@ -58,6 +58,11 @@ spec:
       accessLogFile: /dev/stdout
       accessLogEncoding: JSON
       enableTracing: true
+      defaultConfig:
+        holdApplicationUntilProxyStarts: true
+        tracing:
+          sampling: 10
+      enablePrometheusMerge: true
       extensionProviders:
         - name: otel-tracing
           opentelemetry:
@@ -65,12 +70,6 @@ spec:
             service: tempo.monitoring.svc.cluster.local
             resource_detectors:
               environment: {}
-      defaultConfig:
-        holdApplicationUntilProxyStarts: true
-        tracing:
-          sampling: 10
-      enablePrometheusMerge: true
-      extensionProviders:
         - name: authentik
           envoyExtAuthzHttp:
             service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
