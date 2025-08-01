@@ -22,6 +22,9 @@ spec:
     remediation:
       retries: 3
   values:
+    deployment:
+      pod_annotations:
+        sidecar.istio.io/inject: "true"
     auth:
       strategy: anonymous
     external_services:
@@ -31,7 +34,7 @@ spec:
         url: "http://grafana.monitoring.svc.cluster.local"
       tracing:
         enabled: true
-        in_cluster_url: "http://tempo.monitoring.svc.cluster.local:3100"
+        in_cluster_url: "http://tempo.monitoring.svc.cluster.local:3200"
     deployment:
       ingress:
         enabled: false
