@@ -57,6 +57,6 @@ spec:
       tracing:
         enabled: true
         grpc_port: 9095
-        internal_url: "http://tempo.monitoring.svc.cluster.local:3200"
+        internal_url: "http://tempo-query-frontent.monitoring.svc.cluster.local"
         provider: "tempo"
         use_grpc: true
