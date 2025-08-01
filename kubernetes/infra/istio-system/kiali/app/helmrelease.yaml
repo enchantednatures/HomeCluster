@@ -33,7 +33,27 @@ spec:
       prometheus:
         url: "http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090"
       grafana:
-        url: "http://grafana.monitoring.svc.cluster.local"
+        internal_url: "http://grafana.monitoring.svc.cluster.local"
+        external_url: "https://grafana.${SECRET_DOMAIN}"
+        auth:
+          type: bearer
+          token: secret:grafana-kiali-token:token
+        dashboards:
+        - name: "Istio Service Dashboard"
+          variables:
+            datasource: "var-datasource"
+            namespace: "var-namespace"
+            service: "var-service"
+        - name: "Istio Workload Dashboard"
+          variables:
+            datasource: "var-datasource"
+            namespace: "var-namespace"
+            workload: "var-workload"
+            datasource: "var-datasource"
+        - name: "Istio Mesh Dashboard"
+        - name: "Istio Control Plane Dashboard"
+        - name: "Istio Performance Dashboard"
+        - name: "Istio Wasm Extension Dashboard"
       tracing:
         enabled: true
         grpc_port: 9095
