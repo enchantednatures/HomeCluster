@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: kiali-server
-      version: 2.13.0
+      version: 2.11.0
       sourceRef:
         kind: HelmRepository
         name: kiali
@@ -36,5 +36,7 @@ spec:
         url: "http://grafana.monitoring.svc.cluster.local"
       tracing:
         enabled: true
-        in_cluster_url: "http://tempo.monitoring.svc.cluster.local:16685"
+        grpc_port: 9095
+        internal_url: "http://tempo.monitoring.svc.cluster.local:3200"
+        provider: "tempo"
         use_grpc: true
