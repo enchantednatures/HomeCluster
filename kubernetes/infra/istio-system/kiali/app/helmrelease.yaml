@@ -49,7 +49,6 @@ spec:
             datasource: "var-datasource"
             namespace: "var-namespace"
             workload: "var-workload"
-            datasource: "var-datasource"
         - name: "Istio Mesh Dashboard"
         - name: "Istio Control Plane Dashboard"
         - name: "Istio Performance Dashboard"
