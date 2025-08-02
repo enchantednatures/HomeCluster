@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
-    - name: istiod
+    - name: istio
   targetNamespace: istio-ingress
   commonMetadata:
     labels:
