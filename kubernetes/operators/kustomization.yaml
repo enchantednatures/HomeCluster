@@ -10,4 +10,5 @@ resources:
   - ./kubevirt
   - ./rabbitmq-operator
   - ./redpanda
+  - ./rook-ceph
   - ./sail-operator
