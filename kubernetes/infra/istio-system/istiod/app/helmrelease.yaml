@@ -33,7 +33,7 @@ spec:
           cpu: 100m
           memory: 2048Mi
       env:
-        # Disable CNI and use init containers instead
+        PILOT_ENABLE_AMBIENT: true
         EXTERNAL_ISTIOD: false
         PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
         # Disable automatic DestinationRule creation for kubernetes API

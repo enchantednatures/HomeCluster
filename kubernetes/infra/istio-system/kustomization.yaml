@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./base/ks.yaml
-  # - ./cni/ks.yaml  # Disabled CNI, using init containers instead
+  - ./cni/ks.yaml  # Disabled CNI, using init containers instead
   - ./istiod/ks.yaml
-  # - ./istio/ks.yaml
+  - ./ztunnel/ks.yaml
   - ./kiali/ks.yaml
