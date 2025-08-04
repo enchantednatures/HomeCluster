@@ -26,7 +26,7 @@ spec:
         enabled: true
   dashboard:
     enabled: true
-    ssl: true
+    # ssl: true
   monitoring:
     enabled: true
   network:
