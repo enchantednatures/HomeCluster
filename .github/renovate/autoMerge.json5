@@ -16,6 +16,54 @@
       "automerge": true,
       "automergeType": "branch",
       "matchUpdateTypes": ["minor", "patch"]
+    },
+    {
+      "description": ["Auto-merge Helm charts for patch updates"],
+      "matchDatasources": ["helm"],
+      "automerge": true,
+      "automergeType": "branch",
+      "matchUpdateTypes": ["patch"],
+      "ignoreTests": true
+    },
+    {
+      "description": ["Auto-merge trusted container images for minor and patch updates"],
+      "matchDatasources": ["docker"],
+      "automerge": true,
+      "automergeType": "branch",
+      "matchUpdateTypes": ["minor", "patch"],
+      "matchPackagePatterns": [
+        "ghcr.io/bjw-s",
+        "ghcr.io/onedr0p",
+        "ghcr.io/fluxcd",
+        "quay.io/prometheus",
+        "grafana/grafana",
+        "postgres",
+        "redis",
+        "nginx"
+      ],
+      "ignoreTests": true
+    },
+    {
+      "description": ["Auto-merge stable Kubernetes operators for patch updates"],
+      "matchDatasources": ["docker", "helm"],
+      "automerge": true,
+      "automergeType": "branch",
+      "matchUpdateTypes": ["patch"],
+      "matchPackagePatterns": [
+        "cloudnative-pg",
+        "cert-manager",
+        "external-dns",
+        "ingress-nginx"
+      ],
+      "ignoreTests": true
+    },
+    {
+      "description": ["Auto-merge GitHub releases for patch updates"],
+      "matchDatasources": ["github-releases", "github-tags"],
+      "automerge": true,
+      "automergeType": "branch",
+      "matchUpdateTypes": ["patch"],
+      "ignoreTests": true
     }
   ]
 }
