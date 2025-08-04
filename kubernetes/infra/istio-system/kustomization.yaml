@@ -6,5 +6,4 @@ resources:
   - ./base/ks.yaml
   # - ./cni/ks.yaml  # Disabled CNI, using init containers instead
   - ./istiod/ks.yaml
-  # - ./istio/ks.yaml
   - ./kiali/ks.yaml
