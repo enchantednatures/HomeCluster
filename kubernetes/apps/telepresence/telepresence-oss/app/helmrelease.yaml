@@ -1,0 +1,113 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/fluxcd/helm-controller/main/docs/api/v2/helmrelease.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app my-telepresence-oss
+  namespace: telepresence
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: telepresence-oss
+      version: 2.23.6
+      sourceRef:
+        kind: HelmRepository
+        name: telepresence
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    # Telepresence OSS configuration
+    # The chart provides sensible defaults for most configurations
+
+    # Traffic Manager configuration
+    trafficManager:
+      # Enable the traffic manager
+      enabled: true
+
+      # Resource limits and requests
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+      # Security context
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        capabilities:
+          drop: [ALL]
+
+      # Pod security context
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+    # Agent injector configuration
+    agentInjector:
+      # Enable the agent injector
+      enabled: true
+
+      # Resource limits and requests
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+      # Security context
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        capabilities:
+          drop: [ALL]
+
+      # Pod security context
+      podSecurityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+
+    # Global configuration
+    global:
+      # Image pull policy
+      imagePullPolicy: IfNotPresent
+
+      # Pod annotations for monitoring
+      podAnnotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+
+    # Service monitor for Prometheus (if available)
+    serviceMonitor:
+      enabled: false
+      # Uncomment if you want to enable monitoring
+      # enabled: true
+      # interval: 30s
+      # scrapeTimeout: 10s
