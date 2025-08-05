@@ -3,7 +3,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: &app my-telepresence-oss
+  name: &app telepresence
   namespace: telepresence
 spec:
   interval: 30m
@@ -24,90 +24,91 @@ spec:
       strategy: rollback
       retries: 3
   values:
-    # Telepresence OSS configuration
-    # The chart provides sensible defaults for most configurations
+    {}
+    # # Telepresence OSS configuration
+    # # The chart provides sensible defaults for most configurations
 
-    # Traffic Manager configuration
-    trafficManager:
-      # Enable the traffic manager
-      enabled: true
+    # # Traffic Manager configuration
+    # trafficManager:
+    #   # Enable the traffic manager
+    #   enabled: true
 
-      # Resource limits and requests
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits:
-          cpu: 500m
-          memory: 512Mi
+    #   # Resource limits and requests
+    #   resources:
+    #     requests:
+    #       cpu: 100m
+    #       memory: 128Mi
+    #     limits:
+    #       cpu: 500m
+    #       memory: 512Mi
 
-      # Security context
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        capabilities:
-          drop: [ALL]
+    #   # Security context
+    #   securityContext:
+    #     allowPrivilegeEscalation: false
+    #     readOnlyRootFilesystem: true
+    #     runAsNonRoot: true
+    #     runAsUser: 1000
+    #     runAsGroup: 1000
+    #     capabilities:
+    #       drop: [ALL]
 
-      # Pod security context
-      podSecurityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        seccompProfile:
-          type: RuntimeDefault
+    #   # Pod security context
+    #   podSecurityContext:
+    #     runAsNonRoot: true
+    #     runAsUser: 1000
+    #     runAsGroup: 1000
+    #     fsGroup: 1000
+    #     seccompProfile:
+    #       type: RuntimeDefault
 
-    # Agent injector configuration
-    agentInjector:
-      # Enable the agent injector
-      enabled: true
+    # # Agent injector configuration
+    # agentInjector:
+    #   # Enable the agent injector
+    #   enabled: true
 
-      # Resource limits and requests
-      resources:
-        requests:
-          cpu: 50m
-          memory: 64Mi
-        limits:
-          cpu: 200m
-          memory: 256Mi
+    #   # Resource limits and requests
+    #   resources:
+    #     requests:
+    #       cpu: 50m
+    #       memory: 64Mi
+    #     limits:
+    #       cpu: 200m
+    #       memory: 256Mi
 
-      # Security context
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        capabilities:
-          drop: [ALL]
+    #   # Security context
+    #   securityContext:
+    #     allowPrivilegeEscalation: false
+    #     readOnlyRootFilesystem: true
+    #     runAsNonRoot: true
+    #     runAsUser: 1000
+    #     runAsGroup: 1000
+    #     capabilities:
+    #       drop: [ALL]
 
-      # Pod security context
-      podSecurityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
-        seccompProfile:
-          type: RuntimeDefault
+    #   # Pod security context
+    #   podSecurityContext:
+    #     runAsNonRoot: true
+    #     runAsUser: 1000
+    #     runAsGroup: 1000
+    #     fsGroup: 1000
+    #     seccompProfile:
+    #       type: RuntimeDefault
 
-    # Global configuration
-    global:
-      # Image pull policy
-      imagePullPolicy: IfNotPresent
+    # # Global configuration
+    # global:
+    #   # Image pull policy
+    #   imagePullPolicy: IfNotPresent
 
-      # Pod annotations for monitoring
-      podAnnotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
-        prometheus.io/path: "/metrics"
+    #   # Pod annotations for monitoring
+    #   podAnnotations:
+    #     prometheus.io/scrape: "true"
+    #     prometheus.io/port: "8080"
+    #     prometheus.io/path: "/metrics"
 
-    # Service monitor for Prometheus (if available)
-    serviceMonitor:
-      enabled: false
-      # Uncomment if you want to enable monitoring
-      # enabled: true
-      # interval: 30s
-      # scrapeTimeout: 10s
+    # # Service monitor for Prometheus (if available)
+    # serviceMonitor:
+    #   enabled: false
+    #   # Uncomment if you want to enable monitoring
+    #   # enabled: true
+    #   # interval: 30s
+    #   # scrapeTimeout: 10s
