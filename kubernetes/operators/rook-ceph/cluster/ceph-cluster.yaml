@@ -130,13 +130,13 @@ spec:
     nodes:
       - name: "node1"
         devices:
-          - name: "/dev/sdb"
+          - name: "/dev/sda"
       - name: "node2"
         devices:
-          - name: "/dev/sdb"
+          - name: "/dev/sda"
       - name: "node3"
         devices:
-          - name: "/dev/sdb"
+          - name: "/dev/sda"
   disruptionManagement:
     managePodBudgets: true
     osdMaintenanceTimeout: 30
