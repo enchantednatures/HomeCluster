@@ -7,4 +7,5 @@ resources:
   - ./bjw-s.yaml
   - ./prometheus-community.yaml
   - ./spegel.yaml
+  - ./telepresence.yaml
   - ./weave-gitops.yaml
