@@ -66,7 +66,6 @@ data:
         enabled: true
     externalIPs:
         enabled: true
-    enableCiliumEndpointSlice: true
     gatewayAPI:
         enabled: true
     hubble:
