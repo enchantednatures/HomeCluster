@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - ./ceph-cluster.yaml
   - ./storage-classes.yaml
+  - ./virtual-service.yaml
