@@ -3,10 +3,13 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: authentik-db
+  name: authentik-db-backup
+  namespace: authentik
 spec:
-  schedule: "@hourly"
-  immediate: true
-  backupOwnerReference: self
   cluster:
-    name: authentik-db
+    name: authentik-v9
+  schedule: "@hourly"
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
