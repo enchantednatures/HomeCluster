@@ -29,11 +29,13 @@ tasks:
       file:
         sh: find "{{.KUBERNETES_DIR}}" -type f -name "*.sops.*"
   .decrypt-file:
-    desc: Encrypt all sops
+    desc: Encrypt sops file
     dir: kubernetes
     cmd: sops --decrypt --in-place {{.file}}
     ignore_error: true
+    internal: true
   .encrypt-file:
+    desc: Decrypt sops file
     internal: true
     cmd: sops --encrypt --in-place {{.file}}
     requires:
