@@ -47,10 +47,10 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster authentik-v10
+        serverName: &currentCluster authentik-v9
   bootstrap:
     recovery:
-      source: &previousCluster authentik-v9
+      source: &previousCluster authentik-v8
       database: authentik
       owner: authentik
       secret:
