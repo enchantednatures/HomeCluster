@@ -1,0 +1,33 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: registry-db
+  namespace: harbor
+spec:
+  name: registry
+  owner: harbor
+  cluster:
+    name: harbor-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: notary-server-db
+  namespace: harbor
+spec:
+  name: notary_server
+  owner: harbor
+  cluster:
+    name: harbor-db
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: notary-signer-db
+  namespace: harbor
+spec:
+  name: notary_signer
+  owner: harbor
+  cluster:
+    name: harbor-db

@@ -1,38 +1,5 @@
 ---
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: registry-db
-  namespace: harbor
-spec:
-  name: registry
-  owner: harbor
-  cluster:
-    name: harbor-db
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: notary-server-db
-  namespace: harbor
-spec:
-  name: notary_server
-  owner: harbor
-  cluster:
-    name: harbor-db
----
-apiVersion: postgresql.cnpg.io/v1
-kind: Database
-metadata:
-  name: notary-signer-db
-  namespace: harbor
-spec:
-  name: notary_signer
-  owner: harbor
-  cluster:
-    name: harbor-db
----
-# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -50,7 +17,7 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: openebs-hostpath
+    storageClass: ceph-block
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
@@ -78,34 +45,23 @@ spec:
         passwordSecret:
           name: harbor-db-user
         inRoles: [pg_monitor, pg_signal_backend]
-  backup:
-    retentionPolicy: 30d
-    barmanObjectStore: &barmanObjectStore
-      data:
-        compression: bzip2
-      wal:
-        compression: bzip2
-        maxParallel: 8
-      destinationPath: s3://cloudnative-pg/
-      endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster harbor-v1
-      s3Credentials:
-        accessKeyId:
-          name: pg-backup-secret
-          key: aws-access-key-id
-        secretAccessKey:
-          name: pg-backup-secret
-          key: aws-secret-access-key
-
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: &currentCluster harbor-v2
   bootstrap:
     recovery:
-      source: &previousCluster harbor-v0
+      source: &previousCluster harbor-v1
       database: harbor
       owner: harbor
       secret:
         name: harbor-db-user
   externalClusters:
     - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-store
+          serverName: *previousCluster
