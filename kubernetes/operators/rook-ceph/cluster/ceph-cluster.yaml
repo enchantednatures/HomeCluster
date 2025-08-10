@@ -120,23 +120,13 @@ spec:
     mgr: system-cluster-critical
   storage:
     useAllNodes: true
-    useAllDevices: false
-    deviceFilter: ""
+    useAllDevices: true
+    deviceFilter: "^sd[b-z]|^nvme[0-9]"
     config:
       crushRoot: "default"
       metadataDevice: ""
       databaseSizeMB: "1024"
       osdsPerDevice: "1"
-    nodes:
-      - name: "node1"
-        devices:
-          - name: "/dev/sda"
-      - name: "node2"
-        devices:
-          - name: "/dev/sda"
-      - name: "node3"
-        devices:
-          - name: "/dev/sda"
   disruptionManagement:
     managePodBudgets: true
     osdMaintenanceTimeout: 30
