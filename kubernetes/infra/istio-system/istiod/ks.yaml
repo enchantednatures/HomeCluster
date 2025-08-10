@@ -6,6 +6,8 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: istio-system
+  dependsOn:
+    - name: istio-base
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
