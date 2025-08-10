@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
+# yaml-language-server: $schema=rttps://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v2.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -50,7 +50,7 @@ spec:
         serverName: &currentCluster authentik-v9
   bootstrap:
     recovery:
-      source: &previousCluster authentik-v8
+      source: &previousCluster authentik-v7
       database: authentik
       owner: authentik
       secret:

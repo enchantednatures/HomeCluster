@@ -6,7 +6,7 @@ metadata:
   namespace: atuin
 spec:
   cluster:
-    name: atuin-v2
+    name: atuin-db
   schedule: "@hourly"
   backupOwnerReference: self
   method: plugin
