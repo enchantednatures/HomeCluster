@@ -53,7 +53,7 @@ spec:
         serverName: &currentCluster harbor-v2
   bootstrap:
     recovery:
-      source: &previousCluster harbor-v1
+      source: &previousCluster harbor-v0
       database: harbor
       owner: harbor
       secret:
