@@ -43,6 +43,9 @@ metadata:
 spec:
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
   imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
+  inheritedMetadata:
+    annotations:
+      sidecar.istio.io/inject: "false"
   instances: 3
   primaryUpdateStrategy: unsupervised
   storage:

@@ -9,6 +9,9 @@ metadata:
 spec:
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
   imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.3-v0.2.1
+  inheritedMetadata:
+    annotations:
+      sidecar.istio.io/inject: "false"
   instances: 1
   storage:
     size: 10Gi
