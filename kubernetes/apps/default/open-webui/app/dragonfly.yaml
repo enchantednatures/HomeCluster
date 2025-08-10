@@ -11,6 +11,8 @@ metadata:
   name: open-webui-dragonfly
 spec:
   replicas: 3
+  annotations:
+    sidecar.istio.io/inject: "false"
   resources:
     requests:
       cpu: 256m
