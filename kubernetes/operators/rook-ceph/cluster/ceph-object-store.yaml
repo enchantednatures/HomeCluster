@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephobjectstore_v1.json
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: ceph-objectstore
+  namespace: rook-ceph
+spec:
+  # The metadata pool settings
+  metadataPool:
+    failureDomain: host
+    replicated:
+      size: 3
+      requireSafeReplicaSize: true
+    parameters:
+      compression_mode: aggressive
+      compression_algorithm: snappy
+  # The data pool settings
+  dataPool:
+    failureDomain: host
+    replicated:
+      size: 3
+      requireSafeReplicaSize: true
+    parameters:
+      compression_mode: aggressive
+      compression_algorithm: snappy
+  # Whether to preserve metadata and data pools on object store deletion
+  preservePoolsOnDelete: true
+  # The gateway service configuration
+  gateway:
+    # The number of RGW instances
+    instances: 2
+    # The port the RGW service will be listening on (http)
+    port: 80
+    # The port the RGW service will be listening on (https). An SSL certificate is required.
+    # securePort: 443
+    # The name of the secret that will be created to hold the SSL certificate for the RGW service.
+    # If provided, the operator will look for an existing secret by that name to use for SSL,
+    # otherwise the operator will create the secret and the SSL certificate issued by the operator's self-signed CA.
+    # sslCertificateRef: ""
+    # A list of hostnames to add to the SSL certificate
+    # caBundleRef: ""
+    # The resource requirements for the RGW pods
+    resources:
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+      requests:
+        cpu: 1000m
+        memory: 1Gi
+    # The priority class name to set on the RGW pods
+    priorityClassName: system-cluster-critical
+    # The placement for the RGW pods
+    placement:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+  # Health checks for the RGW pods
+  healthCheck:
+    bucket:
+      disabled: false
+      interval: 60s

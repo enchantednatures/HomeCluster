@@ -5,3 +5,10 @@ resources:
   - ./ceph-cluster.yaml
   - ./storage-classes.yaml
   - ./virtual-service.yaml
+  - ./ceph-object-store.yaml
+  - ./ceph-object-store-user.yaml
+  - ./ceph-bucket-storage-class.yaml
+  - ./ceph-object-store-secret.sops.yaml
+  - ./rgw-virtual-service.yaml
+  # Uncomment the following line to create a sample bucket
+  - ./sample-bucket-claim.yaml
