@@ -1,0 +1,63 @@
+# Recommended enhancements to your CephCluster configuration for better DR
+
+# 1. Add to your ceph-cluster.yaml spec section:
+spec:
+  # Enable network encryption for data in transit
+  network:
+    connections:
+      encryption:
+        enabled: true  # CHANGE: Currently false
+      compression:
+        enabled: true  # Optional: reduce network traffic
+      requireMsgr2: true  # Modern Ceph protocol
+
+  # Enhanced cleanup policy for better safety
+  cleanupPolicy:
+    confirmation: ""
+    sanitizeDisks:
+      method: complete  # CHANGE: More secure than 'quick'
+      dataSource: random  # CHANGE: More secure than 'zero'
+      iteration: 3  # CHANGE: Multiple passes
+    allowUninstallWithVolumes: false  # Keep as-is: prevents accidental data loss
+
+  # Add backup/snapshot capabilities
+  csi:
+    enableSnapshots: true
+    enableVolumeReplication: true
+
+# 2. Create a dedicated backup StorageClass
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-block-backup
+  namespace: rook-ceph
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: ceph-blockpool
+  imageFormat: "2"
+  imageFeatures: layering,deep-flatten,exclusive-lock,object-map,fast-diff
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/fstype: ext4
+allowVolumeExpansion: true
+reclaimPolicy: Retain  # CRITICAL: Prevents accidental deletion
+volumeBindingMode: Immediate
+
+# 3. VolumeSnapshotClass for backup capabilities
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: ceph-block-snapshot
+driver: rook-ceph.rbd.csi.ceph.com
+deletionPolicy: Retain
+parameters:
+  clusterID: rook-ceph
+  csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph

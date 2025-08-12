@@ -1,0 +1,63 @@
+# Specific improvements for your ceph-cluster.yaml
+
+# 1. Enable encryption (add to network section)
+network:
+  connections:
+    encryption:
+      enabled: true  # CRITICAL: Encrypt data in transit
+    compression:
+      enabled: true  # Optional: Reduce network overhead
+    requireMsgr2: true  # Modern protocol
+
+# 2. Enhanced storage configuration
+storage:
+  useAllNodes: true
+  useAllDevices: true
+  deviceFilter: "^sd[b-z]|^nvme[0-9]"
+  config:
+    crushRoot: "default"
+    metadataDevice: ""
+    databaseSizeMB: "1024"
+    osdsPerDevice: "1"
+    # Add these for better performance
+    bluestoreBlockSize: "2G"
+    bluestoreBlockDbSize: "64M"
+    bluestoreBlockWalSize: "576M"
+
+# 3. Add backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: "30d"
+
+# 4. Enhanced cleanup policy for production safety
+cleanupPolicy:
+  confirmation: ""
+  sanitizeDisks:
+    method: complete  # More secure than quick
+    dataSource: random  # More secure than zero
+    iteration: 3  # Multiple passes
+  allowUninstallWithVolumes: false
+
+# 5. Add external backup storage class
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-block-retain
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: ceph-blockpool
+  imageFormat: "2"
+  imageFeatures: layering,deep-flatten,exclusive-lock,object-map,fast-diff
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/fstype: ext4
+allowVolumeExpansion: true
+reclaimPolicy: Retain  # CRITICAL: Prevents accidental deletion
+volumeBindingMode: Immediate

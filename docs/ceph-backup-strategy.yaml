@@ -1,0 +1,102 @@
+# Comprehensive Backup Strategy for Rook-Ceph
+
+# 1. Monitor and OSD metadata backup
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ceph-metadata-backup
+  namespace: rook-ceph
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: rook-ceph-system
+          containers:
+          - name: backup
+            image: quay.io/ceph/ceph:v19.2.3
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Backup monitor maps and keyrings
+              mkdir -p /backup/$(date +%Y%m%d)
+              ceph mon dump > /backup/$(date +%Y%m%d)/mon-dump.txt
+              ceph osd dump > /backup/$(date +%Y%m%d)/osd-dump.txt
+              ceph auth list > /backup/$(date +%Y%m%d)/auth-dump.txt
+              ceph fs dump > /backup/$(date +%Y%m%d)/fs-dump.txt
+              
+              # Copy to external storage (implement based on your backup solution)
+              # rsync, s3 sync, etc.
+            volumeMounts:
+            - name: backup-volume
+              mountPath: /backup
+            env:
+            - name: CEPH_CONF
+              value: /etc/ceph/ceph.conf
+          volumes:
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: ceph-backup-pvc
+          restartPolicy: OnFailure
+
+# 2. Application data snapshot automation
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: volume-snapshot-backup
+  namespace: rook-ceph
+spec:
+  schedule: "0 1 * * *"  # Daily at 1 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: snapshot-controller
+          containers:
+          - name: snapshot-creator
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/bash
+            - -c
+            - |
+              # Create snapshots of all PVCs using ceph-block storage
+              for pvc in $(kubectl get pvc --all-namespaces -o json | jq -r '.items[] | select(.spec.storageClassName=="ceph-block") | "\(.metadata.namespace)/\(.metadata.name)"'); do
+                namespace=$(echo $pvc | cut -d'/' -f1)
+                name=$(echo $pvc | cut -d'/' -f2)
+                snapshot_name="${name}-snapshot-$(date +%Y%m%d-%H%M%S)"
+                
+                cat <<EOF | kubectl apply -f -
+              apiVersion: snapshot.storage.k8s.io/v1
+              kind: VolumeSnapshot
+              metadata:
+                name: $snapshot_name
+                namespace: $namespace
+                labels:
+                  backup-date: "$(date +%Y%m%d)"
+                  source-pvc: $name
+              spec:
+                volumeSnapshotClassName: ceph-block-snapshot
+                source:
+                  persistentVolumeClaimName: $name
+              EOF
+              done
+          restartPolicy: OnFailure
+
+# 3. Cluster state backup PVC
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ceph-backup-pvc
+  namespace: rook-ceph
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ceph-block-backup
+  resources:
+    requests:
+      storage: 10Gi

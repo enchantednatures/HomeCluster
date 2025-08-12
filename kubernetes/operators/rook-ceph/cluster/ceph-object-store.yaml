@@ -40,6 +40,17 @@ spec:
     # sslCertificateRef: ""
     # A list of hostnames to add to the SSL certificate
     # caBundleRef: ""
+    # Additional configuration for Kafka notifications
+    config:
+      # Kafka notification settings
+      rgw_kafka_endpoint: "snail-kafka-bootstrap.kafka.svc.cluster.local:9092"
+      rgw_kafka_ack_level: "broker"
+      rgw_kafka_max_inflight: "1000"
+      rgw_notification_max_retries: "3"
+      rgw_notification_retry_interval: "5"
+      # Enable S3 notifications
+      rgw_enable_usage_log: "true"
+      rgw_enable_api: "s3"
     # The resource requirements for the RGW pods
     resources:
       limits:

@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ceph-rgw-kafka-config
+  namespace: rook-ceph
+data:
+  # RGW configuration for Kafka notifications
+  rgw-kafka-config: |
+    [client.rgw]
+    # Enable RGW notifications
+    rgw_enable_api = s3
+    rgw_enable_usage_log = true
+    
+    # Kafka endpoint configuration
+    rgw_kafka_endpoint = snail-kafka-bootstrap.kafka.svc.cluster.local:9092
+    rgw_kafka_ack_level = broker
+    rgw_kafka_max_inflight = 1000
+    
+    # Notification configuration
+    rgw_notification_max_retries = 3
+    rgw_notification_retry_interval = 5
+    
+    # Enable debug logging for notifications (remove in production)
+    debug_rgw = 20
+    debug_rgw_notify = 20
