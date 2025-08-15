@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephobjectstoreuser_v1.json
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  name: ceph-objectstore-user
+  namespace: rook-ceph
+spec:
+  store: ceph-objectstore
+  displayName: "Default Object Store User"
+  capabilities:
+    user: "*"
+    bucket: "*"
+    buckets: "*"
+    metadata: "read"
+    usage: "read, write"
+    zone: "read"
+  quotas:
+    maxBuckets: 1000
+    maxSize: "1Ti"
+    maxObjects: 1000000
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephobjectstoreuser_v1.json
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  name: ceph-objectstore-admin
+  namespace: rook-ceph
+spec:
+  store: ceph-objectstore
+  displayName: "Admin Object Store User"
+  capabilities:
+    user: "*"
+    bucket: "*"
+    buckets: "*"
+    metadata: "*"
+    usage: "*"
+    zone: "*"
+    roles: "*"
+    oidc-provider: "*"
+  quotas:
+    maxBuckets: -1
+    maxObjects: -1

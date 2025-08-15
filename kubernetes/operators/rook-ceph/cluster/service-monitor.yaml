@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rook-ceph-rgw
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-rgw
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  selector:
+    matchLabels:
+      app: rook-ceph-rgw
+      rook_object_store: ceph-objectstore
+  endpoints:
+    - port: http-rgw
+      interval: 30s
+      path: /metrics
+      honorLabels: true
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_name]
+          targetLabel: instance
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
+      metricRelabelings:
+        - sourceLabels: [__name__]
+          regex: 'ceph_rgw_.*'
+          action: keep
+  namespaceSelector:
+    matchNames:
+      - rook-ceph

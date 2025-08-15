@@ -1,8 +1,13 @@
+---
+# Ceph Dashboard Virtual Service
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: rook
+  name: rook-dashboard
   namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-dashboard
+    app.kubernetes.io/component: dashboard
 spec:
   hosts:
     - rook.${SECRET_DOMAIN}
@@ -14,6 +19,54 @@ spec:
             prefix: /
       route:
         - destination:
-            host: rook-ceph-mgr-dashboard
+            host: rook-ceph-mgr-dashboard.rook-ceph.svc.cluster.local
             port:
-              number: 7000
+              number: 8443
+      fault:
+        delay:
+          percentage:
+            value: 0.1
+          fixedDelay: 5s
+      timeout: 30s
+      retries:
+        attempts: 3
+        perTryTimeout: 10s
+---
+# Ceph Object Store (S3) Virtual Service
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rook-objectstore
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-objectstore
+    app.kubernetes.io/component: object-storage
+spec:
+  hosts:
+    - rgw.${SECRET_DOMAIN}
+    - s3.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+            port:
+              number: 80
+      timeout: 300s  # 5 minutes for large object uploads
+      retries:
+        attempts: 3
+        perTryTimeout: 60s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+        response:
+          add:
+            x-content-type-options: nosniff
+            x-frame-options: DENY
+            x-xss-protection: "1; mode=block"

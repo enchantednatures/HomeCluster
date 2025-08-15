@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-bucket
+  labels:
+    app.kubernetes.io/name: ceph-bucket
+    app.kubernetes.io/component: storage-class
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+# Change "rook-ceph" provisioner prefix to match the operator namespace if needed
+provisioner: rook-ceph.ceph.rook.io/bucket
+reclaimPolicy: Delete
+allowVolumeExpansion: false
+volumeBindingMode: Immediate
+parameters:
+  objectStoreName: ceph-objectstore
+  objectStoreNamespace: rook-ceph
+  region: us-east-1
+  # bucketPolicy: bucket-policy-name # Optional: reference to CephBucketPolicy
+---
+# Alternative storage class for retain policy
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-bucket-retain
+  labels:
+    app.kubernetes.io/name: ceph-bucket-retain
+    app.kubernetes.io/component: storage-class
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: rook-ceph.ceph.rook.io/bucket
+reclaimPolicy: Retain
+allowVolumeExpansion: false
+volumeBindingMode: Immediate
+parameters:
+  objectStoreName: ceph-objectstore
+  objectStoreNamespace: rook-ceph
+  region: us-east-1

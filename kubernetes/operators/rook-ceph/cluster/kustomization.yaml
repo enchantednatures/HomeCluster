@@ -7,8 +7,13 @@ resources:
   - ./virtual-service.yaml
   - ./ceph-object-store.yaml
   - ./ceph-object-store-user.yaml
-  - ./ceph-bucket-storage-class.yaml
   - ./ceph-object-store-secret.sops.yaml
   - ./rgw-virtual-service.yaml
+  - ./ceph-objectstore-admin-user.yaml
+  - ./example-bucket-claim.yaml
+  - ./grafana-dashboard-configmap.yaml
+  - ./networkpolicy.yaml
+  - ./poddisruptionbudget.yaml
+  - ./servicemonitor.yaml
   # Uncomment the following line to create a sample bucket
   - ./sample-bucket-claim.yaml

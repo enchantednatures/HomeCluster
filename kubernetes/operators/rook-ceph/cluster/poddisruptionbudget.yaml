@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policy/poddisruptionbudget_v1.json
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: rook-ceph-rgw
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-rgw
+    app.kubernetes.io/component: object-storage
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: rook-ceph-rgw
+      rook_object_store: ceph-objectstore

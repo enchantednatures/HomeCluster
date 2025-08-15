@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/objectbucket.io/objectbucketclaim_v1alpha1.json
+# Example ObjectBucketClaim for testing the Ceph Object Store
+# This file is included for reference but not in the kustomization
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: ceph-bucket-example
+  namespace: default
+  labels:
+    app.kubernetes.io/name: ceph-bucket-example
+    app.kubernetes.io/component: object-storage
+spec:
+  generateBucketName: ceph-bkt
+  storageClassName: ceph-bucket
+  additionalConfig:
+    # Optional: specify bucket policy
+    bucketclass: standard
+---
+# Example with specific bucket name
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: ceph-bucket-named
+  namespace: default
+  labels:
+    app.kubernetes.io/name: ceph-bucket-named
+    app.kubernetes.io/component: object-storage
+spec:
+  bucketName: my-specific-bucket-name
+  storageClassName: ceph-bucket-retain  # Use retain policy for important data
