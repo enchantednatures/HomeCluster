@@ -41,28 +41,28 @@ spec:
                 op.userinfo_endpoint: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/userinfo/"
                 op.endsession_endpoint: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/end-session/"
                 op.jwkset_path: "https://auth.${SECRET_DOMAIN}/application/o/elasticsearch-kibana/.well-known/jwks.json"
-                claims.principal: email
-                claims.groups: groups
-                claims.name: name
-                claims.mail: email
-      podTemplate:
-        spec:
-          nodeSelector:
-            kubernetes.io/arch: amd64
-          containers:
-            - name: elasticsearch
-              resources:
-                requests:
-                  memory: 4505M
-                limits:
-                  memory: 5446M
-      volumeClaimTemplates:
-        - metadata:
-            name: elasticsearch-data
-          spec:
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: 5Gi
-            storageClassName: openebs-hostpath
+                 claims.principal: email
+                 claims.groups: groups
+                 claims.name: name
+                 claims.mail: email
+       podTemplate:
+         spec:
+           nodeSelector:
+             kubernetes.io/arch: amd64
+           containers:
+             - name: elasticsearch
+               resources:
+                 requests:
+                   memory: 4505M
+                 limits:
+                   memory: 5446M
+       volumeClaimTemplates:
+         - metadata:
+             name: elasticsearch-data
+           spec:
+             accessModes:
+               - ReadWriteOnce
+             resources:
+               requests:
+                 storage: 5Gi
+             storageClassName: openebs-hostpath

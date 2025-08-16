@@ -13,7 +13,6 @@ resources:
   - ./ceph-objectstore-admin-user.yaml
   - ./grafana-dashboard-configmap.yaml
   - ./ceph-dashboard-grafana.yaml
-  - ./networkpolicy.yaml
   - ./network-policies-enhanced.yaml
   - ./poddisruptionbudget.yaml
   - ./service-monitor.yaml

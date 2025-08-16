@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/security.istio.io/requestauthentication_v1beta1.json
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: authentik-request-auth
+  namespace: tekton-pipelines
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dashboard
+  jwtRules:
+  - issuer: "https://auth.${SECRET_DOMAIN}/application/o/tekton-dashboard/"
+    audiences:
+    - "tekton-dashboard"
+    jwksUri: "https://auth.${SECRET_DOMAIN}/application/o/tekton-dashboard/.well-known/jwks.json"
+    forwardOriginalToken: true

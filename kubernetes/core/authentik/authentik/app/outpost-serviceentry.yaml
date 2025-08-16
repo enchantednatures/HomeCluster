@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/networking.istio.io/serviceentry_v1beta1.json
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: authentik-outpost
+  namespace: authentik
+spec:
+  hosts:
+    - outpost.${SECRET_DOMAIN}
+  ports:
+    - number: 9000
+      name: http
+      protocol: HTTP
+  resolution: DNS
+  location: MESH_EXTERNAL
