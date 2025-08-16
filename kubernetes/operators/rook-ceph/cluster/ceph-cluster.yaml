@@ -76,9 +76,9 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-    # Specific placement for components
-     mon:
-       nodeAffinity:
+     # Specific placement for components
+    mon:
+      nodeAffinity:
          requiredDuringSchedulingIgnoredDuringExecution:
            nodeSelectorTerms:
              - matchExpressions:
