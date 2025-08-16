@@ -137,83 +137,83 @@ spec:
             summary: "Ceph OSD slow operations"
             description: "OSD {{ $labels.ceph_daemon }} has high apply latency: {{ $value }}ms."
 
-         - alert: CephHighPGStates
-           expr: ceph_pg_activating + ceph_pg_backfill_wait + ceph_pg_backfilling + ceph_pg_creating + ceph_pg_degraded + ceph_pg_down + ceph_pg_incomplete + ceph_pg_inconsistent + ceph_pg_peering + ceph_pg_recovering + ceph_pg_recovery_wait + ceph_pg_repair + ceph_pg_scrubbing + ceph_pg_undersized > 0
-           for: 10m
-           labels:
-             severity: warning
-           annotations:
-             summary: "Ceph has unhealthy placement groups"
-             description: "Ceph cluster has {{ $value }} placement groups in non-active+clean state."
+        - alert: CephHighPGStates
+          expr: ceph_pg_activating + ceph_pg_backfill_wait + ceph_pg_backfilling + ceph_pg_creating + ceph_pg_degraded + ceph_pg_down + ceph_pg_incomplete + ceph_pg_inconsistent + ceph_pg_peering + ceph_pg_recovering + ceph_pg_recovery_wait + ceph_pg_repair + ceph_pg_scrubbing + ceph_pg_undersized > 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph has unhealthy placement groups"
+            description: "Ceph cluster has {{ $value }} placement groups in non-active+clean state."
 
-         - alert: CephHighLatency
-           expr: ceph_osd_commit_latency_ms > 50
-           for: 5m
-           labels:
-             severity: warning
-           annotations:
-             summary: "Ceph OSD high commit latency"
-             description: "OSD {{ $labels.ceph_daemon }} commit latency is {{ $value }}ms."
+        - alert: CephHighLatency
+          expr: ceph_osd_commit_latency_ms > 50
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph OSD high commit latency"
+            description: "OSD {{ $labels.ceph_daemon }} commit latency is {{ $value }}ms."
 
-         - alert: CephPGIncomplete
-           expr: ceph_pg_incomplete > 0
-           for: 5m
-           labels:
-             severity: critical
-           annotations:
-             summary: "Ceph has incomplete placement groups"
-             description: "{{ $value }} placement groups are incomplete. Data may be unavailable."
+        - alert: CephPGIncomplete
+          expr: ceph_pg_incomplete > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph has incomplete placement groups"
+            description: "{{ $value }} placement groups are incomplete. Data may be unavailable."
 
-     - name: ceph-network
-       interval: 60s
-       rules:
-         - alert: CephSlowNetworkOps
-           expr: rate(ceph_osd_op_r_latency_sum[5m]) / rate(ceph_osd_op_r_latency_count[5m]) > 0.1
-           for: 10m
-           labels:
-             severity: warning
-           annotations:
-             summary: "Ceph network operations are slow"
-             description: "Average read latency is {{ $value | humanizeDuration }} on OSD {{ $labels.ceph_daemon }}."
+    - name: ceph-network
+      interval: 60s
+      rules:
+        - alert: CephSlowNetworkOps
+          expr: rate(ceph_osd_op_r_latency_sum[5m]) / rate(ceph_osd_op_r_latency_count[5m]) > 0.1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph network operations are slow"
+            description: "Average read latency is {{ $value | humanizeDuration }} on OSD {{ $labels.ceph_daemon }}."
 
-     - name: ceph-backup
-       interval: 300s
-       rules:
-         - alert: CephBackupJobFailed
-           expr: kube_job_status_failed{job_name=~"ceph-.*backup.*"} > 0
-           for: 5m
-           labels:
-             severity: critical
-           annotations:
-             summary: "Ceph backup job failed"
-             description: "Backup job {{ $labels.job_name }} has failed."
+    - name: ceph-backup
+      interval: 300s
+      rules:
+        - alert: CephBackupJobFailed
+          expr: kube_job_status_failed{job_name=~"ceph-.*backup.*"} > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph backup job failed"
+            description: "Backup job {{ $labels.job_name }} has failed."
 
-         - alert: CephBackupJobMissing
-           expr: absent(kube_job_status_succeeded{job_name=~"ceph-.*backup.*"}) == 1
-           for: 26h  # Alert if no backup in 26 hours (daily backup expected)
-           labels:
-             severity: warning
-           annotations:
-             summary: "Ceph backup job not running"
-             description: "No successful backup job detected in the last 26 hours."
+        - alert: CephBackupJobMissing
+          expr: absent(kube_job_status_succeeded{job_name=~"ceph-.*backup.*"}) == 1
+          for: 26h  # Alert if no backup in 26 hours (daily backup expected)
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph backup job not running"
+            description: "No successful backup job detected in the last 26 hours."
 
-     - name: ceph-csi
-       interval: 60s
-       rules:
-         - alert: CephCSIVolumeProvisioningFailed
-           expr: increase(csi_driver_operation_failures_total{driver_name="rook-ceph.rbd.csi.ceph.com"}[5m]) > 0
-           for: 5m
-           labels:
-             severity: warning
-           annotations:
-             summary: "Ceph CSI volume provisioning failures"
-             description: "{{ $value }} volume provisioning operations have failed in the last 5 minutes."
+    - name: ceph-csi
+      interval: 60s
+      rules:
+        - alert: CephCSIVolumeProvisioningFailed
+          expr: increase(csi_driver_operation_failures_total{driver_name="rook-ceph.rbd.csi.ceph.com"}[5m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph CSI volume provisioning failures"
+            description: "{{ $value }} volume provisioning operations have failed in the last 5 minutes."
 
-         - alert: CephCSIVolumeAttachmentSlow
-           expr: histogram_quantile(0.95, rate(csi_driver_operation_duration_seconds_bucket{driver_name="rook-ceph.rbd.csi.ceph.com",operation_name="CreateVolume"}[5m])) > 30
-           for: 10m
-           labels:
-             severity: warning
-           annotations:
-             summary: "Ceph CSI volume attachment is slow"
-             description: "95th percentile volume creation time is {{ $value | humanizeDuration }}."
+        - alert: CephCSIVolumeAttachmentSlow
+          expr: histogram_quantile(0.95, rate(csi_driver_operation_duration_seconds_bucket{driver_name="rook-ceph.rbd.csi.ceph.com",operation_name="CreateVolume"}[5m])) > 30
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph CSI volume attachment is slow"
+            description: "95th percentile volume creation time is {{ $value | humanizeDuration }}."

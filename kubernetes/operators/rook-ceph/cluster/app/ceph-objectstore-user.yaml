@@ -12,14 +12,7 @@ metadata:
 spec:
   store: ceph-objectstore
   displayName: "Ceph Object Store User"
-  caps:
-    bucket: "*"
-    buckets: "*"
-    metadata: "read"
-    usage: "read"
-    user: "read"
-    users: "read"
   quotas:
     maxBuckets: 1000
-    maxSize: 1TiB
+    maxSize: 1Ti
     maxObjects: 1000000

@@ -85,35 +85,6 @@ spec:
           operator: Exists
           effect: NoSchedule
 
-    # Health checks
-    livenessProbe:
-      httpGet:
-        path: /
-        port: http-rgw
-        scheme: HTTP
-      initialDelaySeconds: 30
-      periodSeconds: 30
-      timeoutSeconds: 10
-      failureThreshold: 3
-    readinessProbe:
-      httpGet:
-        path: /
-        port: http-rgw
-        scheme: HTTP
-      initialDelaySeconds: 10
-      periodSeconds: 15
-      timeoutSeconds: 5
-      failureThreshold: 3
-    startupProbe:
-      httpGet:
-        path: /
-        port: http-rgw
-        scheme: HTTP
-      initialDelaySeconds: 10
-      periodSeconds: 10
-      timeoutSeconds: 5
-      failureThreshold: 30  # Allow longer startup time
-
   # Hosting configuration for Istio service mesh
   hosting:
     advertiseEndpoint:

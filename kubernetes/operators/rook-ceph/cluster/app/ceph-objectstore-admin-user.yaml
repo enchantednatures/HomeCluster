@@ -12,15 +12,3 @@ metadata:
 spec:
   store: ceph-objectstore
   displayName: "Ceph Object Store Admin"
-  caps:
-    bucket: "*"
-    buckets: "*"
-    metadata: "*"
-    usage: "*"
-    user: "*"
-    users: "*"
-    zone: "read"
-  quotas:
-    maxBuckets: -1  # Unlimited
-    maxSize: ""     # Unlimited
-    maxObjects: -1  # Unlimited

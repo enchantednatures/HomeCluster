@@ -19,7 +19,7 @@ spec:
     pg_autoscale_mode: "on"
     target_size_ratio: "0.3"  # Reserve 30% of cluster capacity for this pool
   quotas:
-    maxBytes: 500Gi  # Adjust based on your cluster capacity
+    maxBytes: 536870912000  # 500Gi in bytes - Adjust based on your cluster capacity
   statusCheck:
     mirror:
       disabled: false
@@ -81,7 +81,7 @@ spec:
     pg_autoscale_mode: "on"
     target_size_ratio: "0.2"
   quotas:
-    maxBytes: 1Ti
+    maxBytes: 1099511627776  # 1Ti in bytes
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
 apiVersion: storage.k8s.io/v1
