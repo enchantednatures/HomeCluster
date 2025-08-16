@@ -1,0 +1,25 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: influxdb
+  namespace: monitoring
+spec:
+  hosts:
+    - influxdb.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: influxdb-influxdb2.monitoring.svc.cluster.local
+            port:
+              number: 8086
+      timeout: 300s
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https

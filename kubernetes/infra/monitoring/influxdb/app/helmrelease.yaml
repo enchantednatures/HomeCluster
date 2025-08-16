@@ -1,0 +1,227 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: influxdb
+  namespace: monitoring
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: influxdb2
+      version: 2.1.2
+      sourceRef:
+        kind: HelmRepository
+        name: influx-data
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  dependsOn:
+    - name: openebs
+      namespace: openebs-system
+  values:
+    image:
+      repository: influxdb
+      tag: 2.7.10-alpine
+      pullPolicy: IfNotPresent
+
+    adminUser:
+      organization: "homelab"
+      bucket: "proxmox"
+      user: "admin"
+      retention_policy: "30d"
+      ## Leave empty to generate a random password and token.
+      ## Or fill any of these values to use fixed values.
+      password: ""
+      token: ""
+      ## The password and token are obtained from an existing secret. The expected
+      ## keys are `admin-password` and `admin-token`.
+      ## If set, the password and token values above are ignored.
+      existingSecret: influxdb-auth
+
+    ## Persist data to a persistent volume
+    persistence:
+      enabled: true
+      ## If true will use an existing PVC instead of creating one
+      # useExisting: false
+      ## Name of existing PVC to be used in the influx deployment
+      # name:
+      ## influxdb data Persistent Volume Storage Class
+      ## If defined, storageClassName: <storageClass>
+      ## If set to "-", storageClassName: "", which disables dynamic provisioning
+      ## If undefined (the default) or set to null, no storageClassName spec is
+      ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      ##   GKE, AWS & OpenStack)
+      storageClass: "openebs-hostpath"
+      accessMode: ReadWriteOnce
+      size: 50Gi
+      mountPath: /var/lib/influxdb2
+      subPath: ""
+
+    ## Allow executing custom init scripts
+    ##
+    ## If the container finds any files with the .sh extension inside of the
+    ## /docker-entrypoint-initdb.d folder, it will execute them.
+    ## When multiple files are present, they will be executed in lexical sort order by name.
+    initScripts:
+      enabled: true
+      scripts:
+        init.sh: |+
+          #!/bin/bash
+          set -e
+
+          # Wait for InfluxDB to be ready
+          echo "Waiting for InfluxDB to be ready..."
+          until influx ping > /dev/null 2>&1; do
+            echo "InfluxDB not ready, waiting..."
+            sleep 2
+          done
+
+          echo "InfluxDB is ready!"
+
+          # Create additional buckets for monitoring
+          influx bucket create -n system-metrics -o homelab -r 7d || echo "Bucket system-metrics already exists"
+          influx bucket create -n application-metrics -o homelab -r 14d || echo "Bucket application-metrics already exists"
+          influx bucket create -n network-metrics -o homelab -r 7d || echo "Bucket network-metrics already exists"
+
+          echo "Initialization complete!"
+
+    ## Configure resource requests and limits
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "250m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+
+    ## Node labels for pod assignment
+    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+    nodeSelector: {}
+
+    ## Tolerations for pod assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    tolerations: []
+
+    ## Affinity for pod assignment
+    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    affinity: {}
+
+    ## Use an alternate scheduler, e.g. "stork".
+    ## ref: https://kubernetes.io/docs/tasks/administer-cluster/configure-multiple-schedulers/
+    schedulerName: ""
+
+    ## Security context
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+    securityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      runAsNonRoot: true
+
+    ## Pod security context
+    podSecurityContext:
+      fsGroup: 1000
+
+    ## Configure the service
+    service:
+      type: ClusterIP
+      port: 8086
+      targetPort: 8086
+      annotations: {}
+      labels: {}
+      portName: http
+
+    ## Configure the ingress
+    ingress:
+      enabled: false
+
+    ## Pod annotations
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
+
+    ## Pod labels
+    podLabels: {}
+
+    ## Configure liveness probe
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+    livenessProbe:
+      enabled: true
+      scheme: HTTP
+      path: /health
+      port: http
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+      successThreshold: 1
+
+    ## Configure readiness probe
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+    readinessProbe:
+      enabled: true
+      scheme: HTTP
+      path: /health
+      port: http
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+      successThreshold: 1
+
+    ## Configure startup probe
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+    startupProbe:
+      enabled: true
+      scheme: HTTP
+      path: /health
+      port: http
+      initialDelaySeconds: 30
+      periodSeconds: 5
+      timeoutSeconds: 1
+      failureThreshold: 30
+      successThreshold: 1
+
+    ## Configure extra environment variables
+    env:
+      - name: INFLUXD_LOG_LEVEL
+        value: info
+      - name: INFLUXD_METRICS_DISABLED
+        value: "false"
+
+    ## Additional volumes
+    extraVolumes: []
+
+    ## Additional volume mounts
+    extraVolumeMounts: []
+
+    ## Configure backup
+    ## Backup will be enabled when `backup.enabled` is set to `true`
+    backup:
+      enabled: false
+
+    ## Specify a service account
+    serviceAccount:
+      # Specifies whether a service account should be created
+      create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true, a name is generated using the fullname template
+      name: ""
+
+    ## Configure pdb
+    pdb:
+      enabled: false
+      minAvailable: 1

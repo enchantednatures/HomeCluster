@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: influxdb-config
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/component: database
+data:
+  influxdb.conf: |
+    # InfluxDB configuration for Proxmox metrics collection
+
+    # Global settings
+    reporting-disabled = true
+
+    # HTTP endpoint configuration
+    [http]
+    enabled = true
+    bind-address = ":8086"
+    auth-enabled = true
+    log-enabled = true
+    write-tracing = false
+    pprof-enabled = true
+    pprof-auth-enabled = true
+    debug-pprof-enabled = false
+    ping-auth-enabled = false
+
+    # Logging configuration
+    [logging]
+    format = "auto"
+    level = "info"
+    suppress-logo = false
+
+    # Storage engine configuration
+    [storage-engine]
+    # Cache settings optimized for metrics workload
+    cache-max-memory-size = "1gb"
+    cache-snapshot-memory-size = "25mb"
+    cache-snapshot-write-cold-duration = "10m"
+
+    # Retention policy settings
+    [retention]
+    enabled = true
+    check-interval = "30m"
+
+  telegraf.conf: |
+    # Telegraf configuration for InfluxDB
+    [agent]
+      interval = "10s"
+      round_interval = true
+      metric_batch_size = 1000
+      metric_buffer_limit = 10000
+      collection_jitter = "0s"
+      flush_interval = "10s"
+      flush_jitter = "0s"
+      precision = ""
+      hostname = ""
+      omit_hostname = false
+
+    # Output to InfluxDB
+    [[outputs.influxdb_v2]]
+      urls = ["http://influxdb-influxdb2.monitoring.svc.cluster.local:8086"]
+      token = "$INFLUX_TOKEN"
+      organization = "homelab"
+      bucket = "proxmox"
