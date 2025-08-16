@@ -1,17 +1,34 @@
-# Rook-Ceph Object Store Configuration
+# Rook-Ceph Configuration for HomeCluster
 
-This directory contains the configuration for the Rook-Ceph Object Store (S3-compatible) within the HomeCluster.
+This directory contains the complete Rook-Ceph cluster configuration optimized for the HomeCluster Talos Kubernetes environment.
 
 ## Overview
 
-The Ceph Object Store provides S3-compatible object storage backed by the Rook-Ceph cluster. It includes:
+This Rook-Ceph implementation provides enterprise-grade storage for your Talos Kubernetes homelab:
 
-- **Redundant storage**: 3-replica metadata pool and 2+1 erasure coded data pool
-- **High availability**: 2 RGW gateway instances with anti-affinity
-- **Istio integration**: Virtual services for external access via service mesh
-- **Monitoring**: ServiceMonitor for Prometheus integration
-- **Security**: NetworkPolicy for traffic control
-- **User management**: Admin and regular users with appropriate permissions
+- **Block Storage**: Primary storage using RBD with 3-way replication (default storage class)
+- **Object Storage**: S3-compatible storage with erasure coding for efficiency
+- **High Availability**: Multi-node deployment with proper anti-affinity
+- **Talos Optimized**: Configured specifically for Talos Linux nodes
+- **Istio Integration**: Service mesh routing for external access
+- **GitOps Ready**: Full Flux CD integration with health checks
+- **Security**: RBAC, network policies, and SOPS-encrypted secrets
+
+## ⚠️ IMPORTANT: Pre-Deployment Configuration Required
+
+Before deploying, you MUST update the following in `ceph-cluster.yaml`:
+
+1. **Node Names**: Replace `talos-worker-1`, `talos-worker-2`, `talos-worker-3` with your actual node names
+2. **Device Paths**: Replace `/dev/sdb` with your actual storage device paths
+3. **Device Filter**: Adjust `deviceFilter` pattern to match your VM disk setup
+
+```bash
+# Check your node names
+kubectl get nodes --show-labels | grep worker
+
+# Check available storage devices on each node  
+kubectl debug node/YOUR_NODE_NAME -it --image=busybox -- lsblk
+```
 
 ## Components
 

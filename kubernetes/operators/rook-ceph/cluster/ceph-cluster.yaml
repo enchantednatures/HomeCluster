@@ -53,7 +53,7 @@ spec:
   labels: {}
   placement:
     all:
-       nodeAffinity:
+      nodeAffinity:
          requiredDuringSchedulingIgnoredDuringExecution:
            nodeSelectorTerms:
              - matchExpressions:

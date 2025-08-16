@@ -5,12 +5,14 @@ kind: HelmRelease
 metadata:
   name: rook-ceph-operator
   namespace: rook-ceph
+  annotations:
+    fluxcd.io/reconcileAt: "2024-01-01T00:00:00Z"
 spec:
   interval: 30m
   chart:
     spec:
       chart: rook-ceph
-      version: v1.17.7
+      version: v1.15.3  # Using stable version for Talos compatibility
       sourceRef:
         kind: HelmRepository
         name: rook-charts
@@ -18,36 +20,100 @@ spec:
   install:
     remediation:
       retries: 3
+    timeout: 10m
   upgrade:
     cleanupOnFail: true
     remediation:
       strategy: rollback
       retries: 3
+    timeout: 10m
   values:
+    image:
+      repository: rook/ceph
+      tag: v1.15.3
     monitoring:
       enabled: true
     pspEnable: false
+    rbacEnable: true
+    logLevel: INFO
+    
+    # Talos-specific configurations
+    hostNetwork: false  # Required for Talos
+    
+    # Resource management
     resources:
       limits:
-        memory: 512Mi
+        memory: 1Gi
+        cpu: 1000m
       requests:
-        cpu: 100m
-        memory: 128Mi
+        cpu: 200m
+        memory: 256Mi
+    
+    # Node selection for Talos
     nodeSelector:
       kubernetes.io/arch: amd64
+      node-role.kubernetes.io/worker: ""
+      
+    # Talos tolerations
     tolerations:
       - effect: NoSchedule
         operator: Exists
       - effect: NoExecute
         operator: Exists
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+    
+    # CSI configuration for Talos
     csi:
-      enableCSIHostNetwork: true
+      enableCSIHostNetwork: false  # Talos doesn't support hostNetwork for CSI
+      kubeletDirPath: /var/lib/kubelet
+      logLevel: 1
+      
+      # CSI plugin tolerations
       pluginTolerations:
         - effect: NoSchedule
           operator: Exists
         - effect: NoExecute
           operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+          
+      # CSI provisioner tolerations  
       provisionerTolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+    
+    # Discover daemon configuration for device discovery
+    discover:
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      nodeAffinity: |
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/arch
+              operator: In
+              values:
+              - amd64
+            - key: node-role.kubernetes.io/worker
+              operator: Exists
+    
+    # Admission controller settings
+    admissionController:
+      tolerations:
         - effect: NoSchedule
           operator: Exists
         - effect: NoExecute

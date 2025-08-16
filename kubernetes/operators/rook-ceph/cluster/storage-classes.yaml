@@ -5,25 +5,38 @@ kind: CephBlockPool
 metadata:
   name: ceph-blockpool
   namespace: rook-ceph
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
 spec:
   failureDomain: host
   replicated:
     size: 3
     requireSafeReplicaSize: true
   parameters:
-    compression_mode: none
+    compression_mode: aggressive  # Enable compression to save space
+    pg_autoscale_mode: "on"
+  erasureCoded:
+    dataChunks: 0  # Use replication, not erasure coding for block storage
+    codingChunks: 0
+  mirroring:
+    enabled: false
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: ceph-block
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+  annotations:
+    # Set as default storage class - remove OpenEBS default annotation
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: rook-ceph.rbd.csi.ceph.com
 parameters:
   clusterID: rook-ceph
   pool: ceph-blockpool
   imageFormat: "2"
-  imageFeatures: layering
+  imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
   csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
@@ -34,57 +47,99 @@ parameters:
 allowVolumeExpansion: true
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephfilesystem_v1.json
-apiVersion: ceph.rook.io/v1
-kind: CephFilesystem
-metadata:
-  name: ceph-filesystem
-  namespace: rook-ceph
-spec:
-  metadataPool:
-    replicated:
-      size: 3
-      requireSafeReplicaSize: true
-    parameters:
-      compression_mode: none
-  dataPools:
-    - name: replicated
-      failureDomain: host
-      replicated:
-        size: 3
-        requireSafeReplicaSize: true
-      parameters:
-        compression_mode: none
-  preserveFilesystemOnDelete: true
-  metadataServer:
-    activeCount: 1
-    activeStandby: true
-    resources:
-      limits:
-        memory: "4Gi"
-      requests:
-        cpu: "1000m"
-        memory: "2Gi"
-    priorityClassName: system-cluster-critical
+mountOptions:
+  - discard  # Enable TRIM support
+# CephFS disabled by default - uncomment below if shared filesystem storage is needed
+# Requires additional MDS resources and is not needed for most workloads
+# ---
+# # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephfilesystem_v1.json
+# apiVersion: ceph.rook.io/v1
+# kind: CephFilesystem
+# metadata:
+#   name: ceph-filesystem
+#   namespace: rook-ceph
+#   labels:
+#     app.kubernetes.io/part-of: rook-ceph
+# spec:
+#   metadataPool:
+#     replicated:
+#       size: 3
+#       requireSafeReplicaSize: true
+#     parameters:
+#       compression_mode: aggressive
+#       pg_autoscale_mode: "on"
+#   dataPools:
+#     - name: replicated
+#       failureDomain: host
+#       replicated:
+#         size: 3
+#         requireSafeReplicaSize: true
+#       parameters:
+#         compression_mode: aggressive
+#         pg_autoscale_mode: "on"
+#   preserveFilesystemOnDelete: true
+#   metadataServer:
+#     activeCount: 1
+#     activeStandby: true
+#     resources:
+#       limits:
+#         memory: "2Gi"
+#         cpu: "1000m"
+#       requests:
+#         cpu: "500m"
+#         memory: "1Gi"
+#     priorityClassName: system-cluster-critical
+#     placement:
+#       nodeAffinity:
+#         requiredDuringSchedulingIgnoredDuringExecution:
+#           nodeSelectorTerms:
+#             - matchExpressions:
+#                 - key: node-role.kubernetes.io/worker
+#                   operator: Exists
+#       tolerations:
+#         - effect: NoSchedule
+#           operator: Exists
+#         - effect: NoExecute
+#           operator: Exists
+# ---
+# # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: ceph-filesystem
+#   labels:
+#     app.kubernetes.io/part-of: rook-ceph
+#   annotations:
+#     storageclass.kubernetes.io/is-default-class: "false"
+# provisioner: rook-ceph.cephfs.csi.ceph.com
+# parameters:
+#   clusterID: rook-ceph
+#   fsName: ceph-filesystem
+#   pool: ceph-filesystem-replicated
+#   csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+#   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+#   csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+#   csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+#   csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+#   csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+# allowVolumeExpansion: true
+# reclaimPolicy: Delete
+# volumeBindingMode: Immediate
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: ceph-filesystem
-provisioner: rook-ceph.cephfs.csi.ceph.com
+  name: ceph-bucket
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: rook-ceph.ceph.rook.io/bucket
 parameters:
-  clusterID: rook-ceph
-  fsName: ceph-filesystem
-  pool: ceph-filesystem-replicated
-  csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
-  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
-  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
-  csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
-  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-allowVolumeExpansion: true
+  objectStoreName: ceph-objectstore
+  objectStoreNamespace: rook-ceph
+  region: us-east-1
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 ---
@@ -95,25 +150,12 @@ metadata:
   name: ceph-bucket-retain
   labels:
     app.kubernetes.io/part-of: rook-ceph
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
 provisioner: rook-ceph.ceph.rook.io/bucket
 parameters:
   objectStoreName: ceph-objectstore
   objectStoreNamespace: rook-ceph
   region: us-east-1
 reclaimPolicy: Retain
-volumeBindingMode: Immediate
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: ceph-bucket-delete
-  labels:
-    app.kubernetes.io/part-of: rook-ceph
-provisioner: rook-ceph.ceph.rook.io/bucket
-parameters:
-  objectStoreName: ceph-objectstore
-  objectStoreNamespace: rook-ceph
-  region: us-east-1
-reclaimPolicy: Delete
 volumeBindingMode: Immediate

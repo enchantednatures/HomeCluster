@@ -18,7 +18,16 @@ spec:
   wait: true
   interval: 30m
   retryInterval: 1m
-  timeout: 5m
+  timeout: 10m
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: rook-ceph-operator
+      namespace: rook-ceph
+    - apiVersion: apps/v1
+      kind: DaemonSet
+      name: rook-ceph-crashcollector
+      namespace: rook-ceph
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -34,11 +43,20 @@ spec:
   dependsOn:
     - name: rook-ceph-operator
   path: ./kubernetes/operators/rook-ceph/cluster
-  prune: true
+  prune: false  # Never prune Ceph cluster resources
   sourceRef:
     kind: GitRepository
     name: flux-system
   wait: true
   interval: 30m
-  retryInterval: 1m
-  timeout: 15m
+  retryInterval: 2m
+  timeout: 30m  # Extended timeout for cluster creation
+  healthChecks:
+    - apiVersion: ceph.rook.io/v1
+      kind: CephCluster
+      name: rook-ceph
+      namespace: rook-ceph
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: rook-ceph-mgr-a
+      namespace: rook-ceph

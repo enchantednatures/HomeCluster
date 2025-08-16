@@ -5,8 +5,12 @@ kind: CephObjectStore
 metadata:
   name: ceph-objectstore
   namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-objectstore
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: object-storage
 spec:
-  # The metadata pool settings
+  # Metadata pool settings
   metadataPool:
     failureDomain: host
     replicated:
@@ -15,43 +19,42 @@ spec:
     parameters:
       compression_mode: aggressive
       compression_algorithm: snappy
-  # The data pool settings
+      pg_autoscale_mode: "on"
+    application: rgw
+  # Data pool settings - using erasure coding for better space efficiency
   dataPool:
     failureDomain: host
-    replicated:
-      size: 3
-      requireSafeReplicaSize: true
+    erasureCoded:
+      dataChunks: 2
+      codingChunks: 1
     parameters:
       compression_mode: aggressive
       compression_algorithm: snappy
-  # Whether to preserve metadata and data pools on object store deletion
+      pg_autoscale_mode: "on"
+    application: rgw
+  # Preserve pools on deletion for data safety
   preservePoolsOnDelete: true
-  # The gateway service configuration
+  # Gateway configuration
   gateway:
-    # The number of RGW instances
     instances: 2
-    # The port the RGW service will be listening on (http)
     port: 80
-    # The port the RGW service will be listening on (https). An SSL certificate is required.
+    # SSL configuration - commented for internal access
     # securePort: 443
-    # The name of the secret that will be created to hold the SSL certificate for the RGW service.
-    # If provided, the operator will look for an existing secret by that name to use for SSL,
-    # otherwise the operator will create the secret and the SSL certificate issued by the operator's self-signed CA.
-    # sslCertificateRef: ""
-    # A list of hostnames to add to the SSL certificate
-    # caBundleRef: ""
-
-    # The resource requirements for the RGW pods
+    # sslCertificateRef: rook-ceph-rgw-cert
+    
+    # Resource configuration
     resources:
       limits:
-        cpu: 2000m
-        memory: 2Gi
+        cpu: "1000m"
+        memory: "2Gi"
       requests:
-        cpu: 1000m
-        memory: 1Gi
-    # The priority class name to set on the RGW pods
+        cpu: "500m"
+        memory: "1Gi"
+    
+    # High priority for critical storage service
     priorityClassName: system-cluster-critical
-    # The placement for the RGW pods
+    
+    # Placement configuration for Talos
     placement:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
@@ -61,9 +64,63 @@ spec:
                   operator: In
                   values:
                     - amd64
+                - key: node-role.kubernetes.io/worker
+                  operator: Exists
+      # Pod anti-affinity for HA
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: rook-ceph-rgw
+                  rook_object_store: ceph-objectstore
+              topologyKey: kubernetes.io/hostname
       tolerations:
         - effect: NoSchedule
           operator: Exists
         - effect: NoExecute
           operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+    
+    # Health checks
+    livenessProbe:
+      httpGet:
+        path: /
+        port: http-rgw
+        scheme: HTTP
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 10
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /
+        port: http-rgw
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 15
+      timeoutSeconds: 5
+      failureThreshold: 3
+    startupProbe:
+      httpGet:
+        path: /
+        port: http-rgw
+        scheme: HTTP
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 30  # Allow longer startup time
+  
+  # Hosting configuration for Istio service mesh
+  hosting:
+    advertiseEndpoint:
+      dnsName: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+      port: 80
+      useTls: false
+    dnsNames:
+      - rgw.${SECRET_DOMAIN}
+      - s3.${SECRET_DOMAIN}
 

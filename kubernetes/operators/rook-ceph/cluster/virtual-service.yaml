@@ -8,6 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: rook-dashboard
     app.kubernetes.io/component: dashboard
+    app.kubernetes.io/part-of: rook-ceph
 spec:
   hosts:
     - rook.${SECRET_DOMAIN}
@@ -22,15 +23,21 @@ spec:
             host: rook-ceph-mgr-dashboard.rook-ceph.svc.cluster.local
             port:
               number: 8443
-      fault:
-        delay:
-          percentage:
-            value: 0.1
-          fixedDelay: 5s
-      timeout: 30s
+      timeout: 60s
       retries:
         attempts: 3
-        perTryTimeout: 10s
+        perTryTimeout: 20s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+            x-forwarded-port: "443"
+        response:
+          add:
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: "1; mode=block"
 ---
 # Ceph Object Store (S3) Virtual Service
 apiVersion: networking.istio.io/v1beta1
@@ -41,6 +48,7 @@ metadata:
   labels:
     app.kubernetes.io/name: rook-objectstore
     app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
 spec:
   hosts:
     - rgw.${SECRET_DOMAIN}
@@ -65,8 +73,15 @@ spec:
         request:
           add:
             x-forwarded-proto: https
+            x-forwarded-port: "443"
+            # Required for S3 API compatibility
+            x-real-ip: "%{DOWNSTREAM_REMOTE_ADDRESS}"
         response:
           add:
             x-content-type-options: nosniff
             x-frame-options: DENY
             x-xss-protection: "1; mode=block"
+            # CORS headers for S3 API
+            access-control-allow-origin: "*"
+            access-control-allow-methods: "GET, POST, PUT, DELETE, HEAD"
+            access-control-allow-headers: "Content-Type, Authorization, x-amz-date, x-amz-content-sha256"

@@ -3,11 +3,44 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  name: rook-ceph-mon
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-mon
+    app.kubernetes.io/component: mon
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  minAvailable: 2  # Ensure quorum for 3 MONs
+  selector:
+    matchLabels:
+      app: rook-ceph-mon
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policy/poddisruptionbudget_v1.json
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: rook-ceph-mgr
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-mgr
+    app.kubernetes.io/component: mgr
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: rook-ceph-mgr
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policy/poddisruptionbudget_v1.json
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
   name: rook-ceph-rgw
   namespace: rook-ceph
   labels:
     app.kubernetes.io/name: rook-ceph-rgw
     app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
 spec:
   minAvailable: 1
   selector:
