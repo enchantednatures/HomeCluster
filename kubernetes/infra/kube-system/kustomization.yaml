@@ -6,7 +6,9 @@ resources:
   - ./cilium/ks.yaml
   # - ./coredns/ks.yaml
   - ./metrics-server/ks.yaml
+  - ./nvme-labeler/ks.yaml
   - ./reloader/ks.yaml
   - ./snapshot-controller/ks.yaml
   - ./csi-driver-nfs/ks.yaml
   - ./spegel/ks.yaml
+---

@@ -1,0 +1,72 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/main/src/schemas/json/k8s-job-batch-v1.json
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nvme-labeler
+  namespace: kube-system
+spec:
+  backoffLimit: 3
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: nvme-labeler
+    spec:
+      serviceAccountName: nvme-labeler
+      restartPolicy: Never
+      containers:
+        - name: kubectl
+          image: registry.k8s.io/kubectl:v1.33.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              echo "Starting NVMe node labeling process..."
+
+              # List of worker nodes with NVMe storage
+              NVME_NODES="work-00 work-01 work-02 work-03"
+
+              for node in $NVME_NODES; do
+                echo "Checking if node $node exists..."
+                if kubectl get node "$node" > /dev/null 2>&1; then
+                  echo "Labeling node $node with has-nvme-storage=true"
+                  kubectl label node "$node" has-nvme-storage=true --overwrite
+                  echo "Successfully labeled node $node"
+                else
+                  echo "Warning: Node $node not found in cluster, skipping..."
+                fi
+              done
+
+              echo "NVMe labeling process completed successfully!"
+              echo "Nodes with NVMe storage label:"
+              kubectl get nodes -l has-nvme-storage=true --no-headers | awk '{print $1}' || echo "No nodes found with has-nvme-storage=true label"
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              cpu: 100m
+              memory: 32Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+---
+
