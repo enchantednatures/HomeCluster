@@ -52,7 +52,6 @@ spec:
     # Node selection for Talos
     nodeSelector:
       kubernetes.io/arch: amd64
-      node-role.kubernetes.io/worker: ""
       
     # Talos tolerations
     tolerations:
@@ -108,8 +107,13 @@ spec:
               operator: In
               values:
               - amd64
-            - key: node-role.kubernetes.io/worker
-              operator: Exists
+             - key: kubernetes.io/hostname
+               operator: In
+               values:
+               - work-00
+               - work-01
+               - work-02
+               - work-03
     
     # Admission controller settings
     admissionController:
