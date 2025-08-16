@@ -8,7 +8,7 @@ resources:
   - ./storage-classes-enhanced.yaml
   - ./ceph-object-store.yaml
   - ./virtual-service.yaml
-  - ./istio-config-enhanced.yaml
+  # - ./istio-config-enhanced.yaml  # Temporarily disabled due to schema issues
   - ./ceph-object-store-secret.sops.yaml
   - ./ceph-objectstore-admin-user.yaml
   - ./grafana-dashboard-configmap.yaml
