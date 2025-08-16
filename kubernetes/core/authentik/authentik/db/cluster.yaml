@@ -17,7 +17,7 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: ceph-block
+    storageClass: openebs-hostpath
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
@@ -50,7 +50,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster authentik-v9
+        serverName: &currentCluster authentik-v10
   bootstrap:
     recovery:
       source: &previousCluster authentik-v6
