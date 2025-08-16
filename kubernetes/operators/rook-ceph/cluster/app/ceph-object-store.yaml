@@ -41,7 +41,7 @@ spec:
     # SSL configuration - commented for internal access
     # securePort: 443
     # sslCertificateRef: rook-ceph-rgw-cert
-    
+
     # Resource configuration
     resources:
       limits:
@@ -50,10 +50,10 @@ spec:
       requests:
         cpu: "500m"
         memory: "1Gi"
-    
+
     # High priority for critical storage service
     priorityClassName: system-cluster-critical
-    
+
     # Placement configuration for Talos
     placement:
       nodeAffinity:
@@ -84,7 +84,7 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-    
+
     # Health checks
     livenessProbe:
       httpGet:
@@ -113,7 +113,7 @@ spec:
       periodSeconds: 10
       timeoutSeconds: 5
       failureThreshold: 30  # Allow longer startup time
-  
+
   # Hosting configuration for Istio service mesh
   hosting:
     advertiseEndpoint:
@@ -123,4 +123,3 @@ spec:
     dnsNames:
       - rgw.${SECRET_DOMAIN}
       - s3.${SECRET_DOMAIN}
-

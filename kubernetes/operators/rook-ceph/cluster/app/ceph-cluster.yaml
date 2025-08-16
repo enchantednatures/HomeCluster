@@ -32,10 +32,10 @@ spec:
   network:
     connections:
       encryption:
-        enabled: false
+        enabled: true  # Enable encryption in transit for security
       compression:
-        enabled: false
-      requireMsgr2: false
+        enabled: true  # Enable compression to reduce network overhead
+      requireMsgr2: true  # Use modern Ceph messaging protocol
   crashCollector:
     disable: false
   logCollector:
@@ -54,20 +54,19 @@ spec:
   placement:
     all:
       nodeAffinity:
-         requiredDuringSchedulingIgnoredDuringExecution:
-           nodeSelectorTerms:
-             - matchExpressions:
-                 - key: kubernetes.io/arch
-                   operator: In
-                   values:
-                     - amd64
-                 - key: kubernetes.io/hostname
-                   operator: In
-                   values:
-                     - work-00
-                     - work-01
-                     - work-02
-                     - work-03
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - work-00
+                    - work-01
+                    - work-02
       tolerations:
         - effect: NoSchedule
           operator: Exists
@@ -76,53 +75,50 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-     # Specific placement for components
+    # Specific placement for components
     mon:
       nodeAffinity:
-         requiredDuringSchedulingIgnoredDuringExecution:
-           nodeSelectorTerms:
-             - matchExpressions:
-                 - key: kubernetes.io/hostname
-                   operator: In
-                   values:
-                     - work-00
-                     - work-01
-                     - work-02
-                     - work-03
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - work-00
+                    - work-01
+                    - work-02
       tolerations:
         - effect: NoSchedule
           operator: Exists
         - effect: NoExecute
           operator: Exists
-     mgr:
-       nodeAffinity:
-         requiredDuringSchedulingIgnoredDuringExecution:
-           nodeSelectorTerms:
-             - matchExpressions:
-                 - key: kubernetes.io/hostname
-                   operator: In
-                   values:
-                     - work-00
-                     - work-01
-                     - work-02
-                     - work-03
+    mgr:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - work-00
+                    - work-01
+                    - work-02
       tolerations:
         - effect: NoSchedule
           operator: Exists
         - effect: NoExecute
           operator: Exists
-     osd:
-       nodeAffinity:
-         requiredDuringSchedulingIgnoredDuringExecution:
-           nodeSelectorTerms:
-             - matchExpressions:
-                 - key: kubernetes.io/hostname
-                   operator: In
-                   values:
-                     - work-00
-                     - work-01
-                     - work-02
-                     - work-03
+    osd:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - work-00
+                    - work-01
+                    - work-02
       tolerations:
         - effect: NoSchedule
           operator: Exists
@@ -188,9 +184,16 @@ spec:
     config:
       crushRoot: "default"
       metadataDevice: ""
-      databaseSizeMB: "1024"
+      databaseSizeMB: "2048"  # Increased for better performance
       osdsPerDevice: "1"
       encryptedDevice: "false"  # Disable encryption for initial setup
+      # Performance tuning parameters
+      bluestoreBlockDbSize: "67108864"  # 64MB block DB
+      bluestoreBlockWalSize: "134217728"  # 128MB WAL
+      bluestoreCompressionMode: "none"  # Disable compression for performance
+      bluestoreCompressionAlgorithm: "snappy"
+      bluestoreCacheSizeHdd: "1073741824"  # 1GB cache for HDD
+      bluestoreCacheSizeSsd: "3221225472"  # 3GB cache for SSD
     # Define specific nodes and devices (recommended for production)
     nodes:
       - name: "work-00"  # Actual node names from cluster
@@ -212,12 +215,7 @@ spec:
         config:
           storeType: bluestore
           databaseSizeMB: "1024"
-      - name: "work-03"
-        devices:
-          - name: "/dev/sdb"
-        config:
-          storeType: bluestore
-          databaseSizeMB: "1024"
+
   disruptionManagement:
     managePodBudgets: true
     osdMaintenanceTimeout: 30
@@ -242,29 +240,29 @@ spec:
         disabled: false
 
   cephBlockPools:
-      - name: ceph-blockpool
-        spec:
-          failureDomain: host
-          replicated:
-            size: 3
-        storageClass:
-          enabled: true
-          name: ceph-block
-          isDefault: true
-          reclaimPolicy: Delete
-          allowVolumeExpansion: true
-          volumeBindingMode: Immediate
-          mountOptions: ["discard"]
-          parameters:
-            imageFormat: "2"
-            imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
-            csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-            csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
-            csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
-            csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
-            csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
-            csi.storage.k8s.io/fstype: ext4
+    - name: ceph-blockpool
+      spec:
+        failureDomain: host
+        replicated:
+          size: 3
+      storageClass:
+        enabled: true
+        name: ceph-block
+        isDefault: true
+        reclaimPolicy: Delete
+        allowVolumeExpansion: true
+        volumeBindingMode: Immediate
+        mountOptions: ["discard"]
+        parameters:
+          imageFormat: "2"
+          imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
+          csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+          csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+          csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+          csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+          csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+          csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+          csi.storage.k8s.io/fstype: ext4
 
   # NOTE: CephFS disabled for performance and resource optimization
   # Enable only if shared filesystem storage is required

@@ -1,0 +1,270 @@
+---
+# Enhanced backup strategy with external storage integration
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/cronjob_v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ceph-metadata-backup-enhanced
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-metadata-backup
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 3600
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ceph-metadata-backup
+            app.kubernetes.io/component: backup
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: rook-ceph-cmd-reporter
+          containers:
+            - name: backup-metadata
+              image: rook/ceph:v1.15.3
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -euo pipefail
+
+                  BACKUP_DATE=$(date +%Y%m%d-%H%M%S)
+                  BACKUP_DIR="/backup/metadata/$BACKUP_DATE"
+
+                  echo "Starting comprehensive Ceph metadata backup at $(date)"
+                  mkdir -p "$BACKUP_DIR"
+
+                  # Export cluster maps
+                  echo "Exporting monitor map..."
+                  ceph mon getmap -o "$BACKUP_DIR/monmap.bin"
+
+                  echo "Exporting OSD map..."
+                  ceph osd getmap -o "$BACKUP_DIR/osdmap.bin"
+
+                  echo "Exporting CRUSH map..."
+                  ceph osd getcrushmap -o "$BACKUP_DIR/crushmap.bin"
+                  ceph osd crush dump > "$BACKUP_DIR/crushmap.json"
+
+                  echo "Exporting PG map..."
+                  ceph pg dump > "$BACKUP_DIR/pgmap.json"
+
+                  # Export authentication keys
+                  echo "Exporting authentication keys..."
+                  ceph auth export > "$BACKUP_DIR/auth-export.txt"
+
+                  # Export pool information
+                  echo "Exporting pool information..."
+                  ceph osd lspools > "$BACKUP_DIR/pools.txt"
+                  ceph df detail > "$BACKUP_DIR/pool-usage.txt"
+
+                  # Export cluster configuration
+                  echo "Exporting cluster configuration..."
+                  ceph config dump > "$BACKUP_DIR/config-dump.json"
+
+                  # Get cluster status and health
+                  echo "Capturing cluster status..."
+                  ceph status > "$BACKUP_DIR/ceph-status.txt"
+                  ceph health detail > "$BACKUP_DIR/ceph-health-detail.txt"
+                  ceph osd tree > "$BACKUP_DIR/osd-tree.txt"
+                  ceph osd df > "$BACKUP_DIR/osd-usage.txt"
+
+                  # Export MDS info if CephFS is used
+                  if ceph fs ls 2>/dev/null | grep -q .; then
+                    echo "Exporting filesystem information..."
+                    ceph fs dump > "$BACKUP_DIR/fs-dump.json"
+                    ceph mds stat > "$BACKUP_DIR/mds-status.txt"
+                  fi
+
+                  # Create backup summary
+                  echo "Creating backup summary..."
+                  cat > "$BACKUP_DIR/backup-summary.txt" <<EOF
+                  Ceph Metadata Backup Summary
+                  ===========================
+                  Backup Date: $BACKUP_DATE
+                  Backup Location: $BACKUP_DIR
+
+                  Files Created:
+                  $(ls -la "$BACKUP_DIR")
+
+                  Cluster Health at Backup Time:
+                  $(ceph health)
+
+                  Total Storage:
+                  $(ceph df)
+                  EOF
+
+                  # List all created files
+                  echo "Backup files created:"
+                  ls -la "$BACKUP_DIR"
+
+                  echo "Metadata backup completed successfully at $(date)"
+              env:
+                - name: ROOK_CEPH_MON_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: rook-ceph-mon
+                      key: mon-host
+                - name: ROOK_CEPH_MON_INITIAL_MEMBERS
+                  valueFrom:
+                    secretKeyRef:
+                      name: rook-ceph-mon
+                      key: mon-initial-members
+              volumeMounts:
+                - name: ceph-config
+                  mountPath: /etc/ceph
+                  readOnly: true
+                - name: backup-storage
+                  mountPath: /backup
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 500m
+                  memory: 1Gi
+          volumes:
+            - name: ceph-config
+              secret:
+                secretName: rook-ceph-mon
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: ceph-metadata-backup-pvc
+          tolerations:
+            - effect: NoSchedule
+              operator: Exists
+            - effect: NoExecute
+              operator: Exists
+          nodeSelector:
+            kubernetes.io/arch: amd64
+---
+# PVC for backup storage
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ceph-metadata-backup-pvc
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-backup-storage
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ceph-block-retain  # Use retain policy for backups
+  resources:
+    requests:
+      storage: 20Gi
+---
+# Automated volume snapshot creation job
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/cronjob_v1.json
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: volume-snapshot-automation
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: volume-snapshot-automation
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "0 1 * * *"  # Daily at 1 AM
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: volume-snapshot-controller
+          containers:
+            - name: snapshot-creator
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -euo pipefail
+
+                  SNAPSHOT_DATE=$(date +%Y%m%d-%H%M%S)
+
+                  echo "Starting automated volume snapshot creation at $(date)"
+
+                  # Find all PVCs using Ceph storage classes
+                  for storage_class in ceph-block ceph-block-ssd ceph-block-retain; do
+                    echo "Processing PVCs with storage class: $storage_class"
+
+                    kubectl get pvc --all-namespaces -o json | \
+                    jq -r ".items[] | select(.spec.storageClassName==\"$storage_class\") | \"\(.metadata.namespace)/\(.metadata.name)\"" | \
+                    while IFS='/' read -r namespace pvc_name; do
+
+                      if [ -n "$namespace" ] && [ -n "$pvc_name" ]; then
+                        snapshot_name="${pvc_name}-snapshot-${SNAPSHOT_DATE}"
+
+                        echo "Creating snapshot: $snapshot_name for PVC: $namespace/$pvc_name"
+
+                        cat <<EOF | kubectl apply -f -
+                  apiVersion: snapshot.storage.k8s.io/v1
+                  kind: VolumeSnapshot
+                  metadata:
+                    name: $snapshot_name
+                    namespace: $namespace
+                    labels:
+                      backup-date: "$(date +%Y%m%d)"
+                      source-pvc: $pvc_name
+                      backup-type: "automated"
+                      storage-class: $storage_class
+                    annotations:
+                      backup.rook.io/created-by: "volume-snapshot-automation"
+                      backup.rook.io/created-at: "$(date -Iseconds)"
+                  spec:
+                    volumeSnapshotClassName: ceph-block-snapshot
+                    source:
+                      persistentVolumeClaimName: $pvc_name
+                  EOF
+
+                        # Wait a moment between snapshots to avoid overwhelming the system
+                        sleep 5
+                      fi
+                    done
+                  done
+
+                  echo "Automated snapshot creation completed at $(date)"
+
+                  # Clean up old snapshots (older than 30 days)
+                  echo "Cleaning up old snapshots..."
+                  CUTOFF_DATE=$(date -d '30 days ago' +%Y%m%d)
+
+                  kubectl get volumesnapshot --all-namespaces -o json | \
+                  jq -r ".items[] | select(.metadata.labels.\"backup-type\"==\"automated\" and .metadata.labels.\"backup-date\" < \"$CUTOFF_DATE\") | \"\(.metadata.namespace)/\(.metadata.name)\"" | \
+                  while IFS='/' read -r namespace snapshot_name; do
+                    if [ -n "$namespace" ] && [ -n "$snapshot_name" ]; then
+                      echo "Deleting old snapshot: $namespace/$snapshot_name"
+                      kubectl delete volumesnapshot "$snapshot_name" -n "$namespace"
+                    fi
+                  done
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+          restartPolicy: OnFailure
+          tolerations:
+            - effect: NoSchedule
+              operator: Exists
+            - effect: NoExecute
+              operator: Exists

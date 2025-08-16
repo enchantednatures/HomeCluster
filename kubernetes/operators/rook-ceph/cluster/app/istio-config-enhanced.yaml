@@ -1,0 +1,209 @@
+---
+# Istio ServiceEntry for Ceph dashboard internal communication
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: ceph-dashboard-internal
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-dashboard-serviceentry
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: istio
+spec:
+  hosts:
+    - rook-ceph-mgr-dashboard.rook-ceph.svc.cluster.local
+  ports:
+    - number: 8443
+      name: https-dashboard
+      protocol: HTTPS
+    - number: 7000
+      name: http-dashboard
+      protocol: HTTP
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# Istio ServiceEntry for Ceph RGW S3 API
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: ceph-rgw-s3
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-rgw-serviceentry
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: istio
+spec:
+  hosts:
+    - rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+  ports:
+    - number: 80
+      name: http-s3
+      protocol: HTTP
+    - number: 443
+      name: https-s3
+      protocol: HTTPS
+  location: MESH_EXTERNAL
+  resolution: DNS
+---
+# Enhanced VirtualService for Ceph Dashboard with security headers
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rook-dashboard-enhanced
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-dashboard-vs
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  hosts:
+    - rook.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: rook-ceph-mgr-dashboard.rook-ceph.svc.cluster.local
+            port:
+              number: 8443
+      timeout: 60s
+      retries:
+        attempts: 3
+        perTryTimeout: 20s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+            x-forwarded-port: "443"
+            x-real-ip: "%{DOWNSTREAM_REMOTE_ADDRESS}"
+        response:
+          add:
+            # Security headers
+            strict-transport-security: "max-age=31536000; includeSubDomains"
+            x-content-type-options: nosniff
+            x-frame-options: SAMEORIGIN
+            x-xss-protection: "1; mode=block"
+            referrer-policy: "strict-origin-when-cross-origin"
+            content-security-policy: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'"
+      fault:
+        delay:
+          percentage:
+            value: 0.1
+          fixedDelay: 5s
+---
+# Enhanced VirtualService for Ceph Object Store S3 API
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rook-objectstore-enhanced
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-objectstore-vs
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  hosts:
+    - rgw.${SECRET_DOMAIN}
+    - s3.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+            port:
+              number: 80
+      timeout: 300s  # 5 minutes for large object uploads
+      retries:
+        attempts: 3
+        perTryTimeout: 60s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+            x-forwarded-port: "443"
+            x-real-ip: "%{DOWNSTREAM_REMOTE_ADDRESS}"
+        response:
+          add:
+            # Security headers
+            strict-transport-security: "max-age=31536000; includeSubDomains"
+            x-content-type-options: nosniff
+            x-frame-options: DENY
+            x-xss-protection: "1; mode=block"
+            # S3 API CORS headers
+            access-control-allow-origin: "*"
+            access-control-allow-methods: "GET, POST, PUT, DELETE, HEAD, OPTIONS"
+            access-control-allow-headers: "Content-Type, Authorization, x-amz-date, x-amz-content-sha256, x-amz-security-token"
+            access-control-expose-headers: "ETag, x-amz-request-id"
+            access-control-max-age: "3600"
+      corsPolicy:
+        allowOrigins:
+          - exact: "*"
+        allowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - HEAD
+          - OPTIONS
+        allowHeaders:
+          - content-type
+          - authorization
+          - x-amz-date
+          - x-amz-content-sha256
+          - x-amz-security-token
+        exposeHeaders:
+          - etag
+          - x-amz-request-id
+        maxAge: 3600s
+---
+# DestinationRule for Ceph services with TLS settings
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: ceph-services
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-destination-rule
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: istio
+spec:
+  host: "*.rook-ceph.svc.cluster.local"
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+        connectTimeout: 30s
+        tcpKeepalive:
+          time: 7200s
+          interval: 75s
+      http:
+        http1MaxPendingRequests: 10
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 10
+        maxRetries: 3
+        consecutiveGatewayErrors: 5
+        interval: 30s
+        baseEjectionTime: 30s
+    loadBalancer:
+      simple: LEAST_CONN
+    outlierDetection:
+      consecutive5xxErrors: 5
+      consecutiveGatewayErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+  portLevelSettings:
+    - port:
+        number: 8443
+      tls:
+        mode: SIMPLE
+        sni: rook-ceph-mgr-dashboard.rook-ceph.svc.cluster.local

@@ -1,0 +1,114 @@
+---
+# High-performance block pool optimized for SSDs
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephblockpool_v1.json
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: ceph-blockpool-ssd
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+    pool-type: ssd
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+    requireSafeReplicaSize: true
+  parameters:
+    compression_mode: "none"  # Disable compression for maximum performance
+    pg_autoscale_mode: "on"
+    target_size_ratio: "0.3"  # Reserve 30% of cluster capacity for this pool
+  quotas:
+    maxBytes: 500Gi  # Adjust based on your cluster capacity
+  statusCheck:
+    mirror:
+      disabled: false
+      interval: 60s
+---
+# High-performance storage class for latency-sensitive workloads
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-block-ssd
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+    performance-tier: high
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "High-performance SSD storage for latency-sensitive workloads"
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: ceph-blockpool-ssd
+  imageFormat: "2"
+  imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/fstype: ext4
+  # Performance tuning parameters
+  mapOptions: "krbd:rxbounce"
+  unmapOptions: "krbd:rxbounce"
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - discard
+  - noatime  # Improve performance by not updating access times
+---
+# Economy storage class for bulk data
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephblockpool_v1.json
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: ceph-blockpool-economy
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+    pool-type: economy
+spec:
+  failureDomain: host
+  replicated:
+    size: 2  # Lower replication for cost savings
+    requireSafeReplicaSize: false
+  parameters:
+    compression_mode: aggressive  # Aggressive compression for space savings
+    compression_algorithm: lz4    # Fast compression algorithm
+    pg_autoscale_mode: "on"
+    target_size_ratio: "0.2"
+  quotas:
+    maxBytes: 1Ti
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-block-economy
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+    performance-tier: economy
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "Economy storage with compression for bulk data"
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: ceph-blockpool-economy
+  imageFormat: "2"
+  imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/fstype: ext4
+allowVolumeExpansion: true
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer  # Better scheduling
+mountOptions:
+  - discard

@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/snapshot.storage.k8s.io/volumesnapshotclass_v1.json
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: ceph-block-snapshot
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true"
+driver: rook-ceph.rbd.csi.ceph.com
+deletionPolicy: Retain  # Keep snapshots even if VolumeSnapshotClass is deleted
+parameters:
+  clusterID: rook-ceph
+  csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/snapshot.storage.k8s.io/volumesnapshotclass_v1.json
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: ceph-block-snapshot-delete
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "false"
+driver: rook-ceph.rbd.csi.ceph.com
+deletionPolicy: Delete  # Delete snapshots when VolumeSnapshotClass is deleted
+parameters:
+  clusterID: rook-ceph
+  csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/snapshotter-secret-namespace: rook-ceph

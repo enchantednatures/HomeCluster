@@ -1,18 +1,19 @@
-# Rook-Ceph Configuration for HomeCluster
+# Rook-Ceph Enhanced Configuration for HomeCluster
 
-This directory contains the complete Rook-Ceph cluster configuration optimized for the HomeCluster Talos Kubernetes environment.
+This directory contains the enhanced Rook-Ceph cluster configuration optimized for production use in the HomeCluster Talos Kubernetes environment.
 
 ## Overview
 
-This Rook-Ceph implementation provides enterprise-grade storage for your Talos Kubernetes homelab:
+This comprehensive Rook-Ceph implementation provides enterprise-grade storage with advanced features:
 
-- **Block Storage**: Primary storage using RBD with 3-way replication (default storage class)
-- **Object Storage**: S3-compatible storage with erasure coding for efficiency
-- **High Availability**: Multi-node deployment with proper anti-affinity
-- **Talos Optimized**: Configured specifically for Talos Linux nodes
-- **Istio Integration**: Service mesh routing for external access
-- **GitOps Ready**: Full Flux CD integration with health checks
-- **Security**: RBAC, network policies, and SOPS-encrypted secrets
+- **Block Storage**: High-performance RBD with multiple storage tiers and optimization
+- **Object Storage**: S3-compatible storage with advanced features and security
+- **Performance Optimization**: Tuned for maximum throughput and low latency
+- **Enhanced Security**: Comprehensive network policies, RBAC, and encryption
+- **Advanced Monitoring**: Detailed metrics, alerts, and Grafana dashboards
+- **Automated Backup**: Intelligent snapshot management and disaster recovery
+- **Istio Integration**: Full service mesh integration with security headers
+- **GitOps Ready**: Complete Flux CD integration with health checks
 
 ## ⚠️ IMPORTANT: Pre-Deployment Configuration Required
 
@@ -26,7 +27,7 @@ Before deploying, you MUST update the following in `ceph-cluster.yaml`:
 # Check your node names
 kubectl get nodes --show-labels | grep worker
 
-# Check available storage devices on each node  
+# Check available storage devices on each node
 kubectl debug node/YOUR_NODE_NAME -it --image=busybox -- lsblk
 ```
 

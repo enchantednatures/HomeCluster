@@ -1,0 +1,172 @@
+---
+# ServiceAccount for volume snapshot operations
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/serviceaccount.json
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: volume-snapshot-controller
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: volume-snapshot-controller
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+---
+# ClusterRole for volume snapshot operations
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/clusterrole_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: volume-snapshot-controller
+  labels:
+    app.kubernetes.io/name: volume-snapshot-controller
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+rules:
+  # Volume snapshot permissions
+  - apiGroups: ["snapshot.storage.k8s.io"]
+    resources: ["volumesnapshots", "volumesnapshotcontents", "volumesnapshotclasses"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # PVC permissions for discovering volumes to snapshot
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims", "persistentvolumes"]
+    verbs: ["get", "list", "watch"]
+  # Events for logging
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "update", "patch"]
+  # Storage class permissions
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+---
+# ClusterRoleBinding for volume snapshot operations
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/clusterrolebinding_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: volume-snapshot-controller
+  labels:
+    app.kubernetes.io/name: volume-snapshot-controller
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+subjects:
+  - kind: ServiceAccount
+    name: volume-snapshot-controller
+    namespace: rook-ceph
+roleRef:
+  kind: ClusterRole
+  name: volume-snapshot-controller
+  apiGroup: rbac.authorization.k8s.io
+---
+# Role for Ceph operations within rook-ceph namespace
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/role_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ceph-backup-operator
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-backup-operator
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+rules:
+  # Pod execution for running Ceph commands
+  - apiGroups: [""]
+    resources: ["pods", "pods/exec"]
+    verbs: ["get", "list", "create", "delete"]
+  # ConfigMap and Secret access for Ceph configuration
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+  # PVC access for backup storage
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+  # Job management for backup operations
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Events for logging
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "update", "patch"]
+---
+# RoleBinding for Ceph backup operations
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/rolebinding_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ceph-backup-operator
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-backup-operator
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: backup
+subjects:
+  - kind: ServiceAccount
+    name: rook-ceph-cmd-reporter
+    namespace: rook-ceph
+  - kind: ServiceAccount
+    name: volume-snapshot-controller
+    namespace: rook-ceph
+roleRef:
+  kind: Role
+  name: ceph-backup-operator
+  apiGroup: rbac.authorization.k8s.io
+---
+# ServiceAccount for Ceph monitoring operations
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/serviceaccount.json
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ceph-monitoring
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-monitoring
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: monitoring
+---
+# Role for monitoring operations
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/role_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ceph-monitoring
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-monitoring
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: monitoring
+rules:
+  # Pod access for metrics collection
+  - apiGroups: [""]
+    resources: ["pods", "pods/exec"]
+    verbs: ["get", "list", "watch"]
+  # Service access for endpoint discovery
+  - apiGroups: [""]
+    resources: ["services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+  # ConfigMap access for monitoring configuration
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+# RoleBinding for monitoring operations
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/rolebinding_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ceph-monitoring
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-monitoring
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: monitoring
+subjects:
+  - kind: ServiceAccount
+    name: ceph-monitoring
+    namespace: rook-ceph
+roleRef:
+  kind: Role
+  name: ceph-monitoring
+  apiGroup: rbac.authorization.k8s.io

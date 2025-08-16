@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephtoolbox_v1.json
+apiVersion: ceph.rook.io/v1
+kind: CephToolbox
+metadata:
+  name: rook-ceph-tools
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-toolbox
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: toolbox
+spec:
+  image: quay.io/ceph/ceph:v19.2.3
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+    - effect: NoExecute
+      operator: Exists
+    - key: node-role.kubernetes.io/control-plane
+      operator: Exists
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                  - amd64
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - work-00
+                  - work-01
+                  - work-02
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  priorityClassName: system-cluster-critical

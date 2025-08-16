@@ -1,0 +1,163 @@
+---
+# Grafana Dashboard for Ceph Cluster Monitoring
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ceph-cluster-dashboard
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: grafana-dashboard
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: monitoring
+    grafana_dashboard: "1"
+data:
+  ceph-cluster.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Ceph Cluster Overview",
+        "tags": ["ceph", "storage", "rook"],
+        "style": "dark",
+        "timezone": "browser",
+        "refresh": "30s",
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "panels": [
+          {
+            "id": 1,
+            "title": "Cluster Health Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "ceph_health_status",
+                "legendFormat": "Health Status"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "mappings": [
+                  {"options": {"0": {"text": "OK", "color": "green"}}},
+                  {"options": {"1": {"text": "WARN", "color": "yellow"}}},
+                  {"options": {"2": {"text": "ERR", "color": "red"}}}
+                ]
+              }
+            },
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "id": 2,
+            "title": "Total Storage Capacity",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "ceph_cluster_total_bytes",
+                "legendFormat": "Total Capacity"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "bytes"
+              }
+            },
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "id": 3,
+            "title": "Storage Utilization",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "ceph_cluster_total_used_raw_bytes",
+                "legendFormat": "Used"
+              },
+              {
+                "expr": "ceph_cluster_total_avail_bytes",
+                "legendFormat": "Available"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "bytes"
+              }
+            },
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8}
+          },
+          {
+            "id": 4,
+            "title": "OSD Status",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "sum(ceph_osd_up)",
+                "legendFormat": "OSDs Up"
+              },
+              {
+                "expr": "sum(ceph_osd_in)",
+                "legendFormat": "OSDs In"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+          },
+          {
+            "id": 5,
+            "title": "MON Quorum Status",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "sum(ceph_mon_quorum_status)",
+                "legendFormat": "MONs in Quorum"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+          },
+          {
+            "id": 6,
+            "title": "Performance - OSD Latency",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "ceph_osd_apply_latency_ms",
+                "legendFormat": "Apply Latency - {{ $labels.ceph_daemon }}"
+              },
+              {
+                "expr": "ceph_osd_commit_latency_ms",
+                "legendFormat": "Commit Latency - {{ $labels.ceph_daemon }}"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "ms"
+              }
+            },
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 24}
+          },
+          {
+            "id": 7,
+            "title": "Placement Group States",
+            "type": "timeseries",
+            "targets": [
+              {
+                "expr": "ceph_pg_active_clean",
+                "legendFormat": "Active+Clean"
+              },
+              {
+                "expr": "ceph_pg_degraded",
+                "legendFormat": "Degraded"
+              },
+              {
+                "expr": "ceph_pg_inconsistent",
+                "legendFormat": "Inconsistent"
+              },
+              {
+                "expr": "ceph_pg_incomplete",
+                "legendFormat": "Incomplete"
+              }
+            ],
+            "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+          }
+        ]
+      }
+    }

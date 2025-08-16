@@ -1,0 +1,219 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: rook-ceph-alerts
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: monitoring
+spec:
+  groups:
+    - name: ceph-health
+      interval: 60s
+      rules:
+        - alert: CephHealthCritical
+          expr: ceph_health_status == 2
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph cluster is in HEALTH_ERR state"
+            description: "Ceph cluster {{ $labels.cluster }} health is HEALTH_ERR. Check cluster status immediately."
+
+        - alert: CephHealthWarning
+          expr: ceph_health_status == 1
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph cluster is in HEALTH_WARN state"
+            description: "Ceph cluster {{ $labels.cluster }} health is HEALTH_WARN for over 15 minutes."
+
+        - alert: CephOSDDown
+          expr: ceph_osd_up == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph OSD is down"
+            description: "OSD {{ $labels.ceph_daemon }} on {{ $labels.hostname }} has been down for more than 5 minutes."
+
+        - alert: CephOSDNearFull
+          expr: ceph_osd_stat_bytes_used / ceph_osd_stat_bytes > 0.85
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph OSD is near full"
+            description: "OSD {{ $labels.ceph_daemon }} is {{ $value | humanizePercentage }} full."
+
+        - alert: CephOSDFull
+          expr: ceph_osd_stat_bytes_used / ceph_osd_stat_bytes > 0.95
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph OSD is critically full"
+            description: "OSD {{ $labels.ceph_daemon }} is {{ $value | humanizePercentage }} full. Immediate action required."
+
+    - name: ceph-capacity
+      interval: 300s
+      rules:
+        - alert: CephClusterNearFull
+          expr: ceph_cluster_total_used_raw_bytes / ceph_cluster_total_bytes > 0.80
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph cluster is near full"
+            description: "Ceph cluster is {{ $value | humanizePercentage }} full. Consider adding storage capacity."
+
+        - alert: CephClusterCriticallyFull
+          expr: ceph_cluster_total_used_raw_bytes / ceph_cluster_total_bytes > 0.90
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph cluster is critically full"
+            description: "Ceph cluster is {{ $value | humanizePercentage }} full. Add storage capacity immediately."
+
+    - name: ceph-mon
+      interval: 60s
+      rules:
+        - alert: CephMonitorDown
+          expr: ceph_mon_quorum_status == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph monitor is down"
+            description: "Monitor {{ $labels.ceph_daemon }} is not in quorum."
+
+        - alert: CephMonitorClockSkew
+          expr: abs(ceph_monitor_clock_skew_seconds) > 0.2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph monitor clock skew detected"
+            description: "Monitor {{ $labels.ceph_daemon }} has clock skew of {{ $value }}s."
+
+    - name: ceph-mgr
+      interval: 60s
+      rules:
+        - alert: CephManagerDown
+          expr: up{job="rook-ceph-mgr"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Ceph manager is down"
+            description: "Ceph manager is not responding to queries."
+
+    - name: ceph-pool
+      interval: 300s
+      rules:
+        - alert: CephPoolQuotaNearFull
+          expr: ceph_pool_stored / ceph_pool_quota_bytes > 0.85
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph pool quota near full"
+            description: "Pool {{ $labels.name }} is {{ $value | humanizePercentage }} of quota."
+
+    - name: ceph-performance
+      interval: 60s
+      rules:
+        - alert: CephSlowOPS
+          expr: ceph_osd_apply_latency_ms > 100
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Ceph OSD slow operations"
+            description: "OSD {{ $labels.ceph_daemon }} has high apply latency: {{ $value }}ms."
+
+         - alert: CephHighPGStates
+           expr: ceph_pg_activating + ceph_pg_backfill_wait + ceph_pg_backfilling + ceph_pg_creating + ceph_pg_degraded + ceph_pg_down + ceph_pg_incomplete + ceph_pg_inconsistent + ceph_pg_peering + ceph_pg_recovering + ceph_pg_recovery_wait + ceph_pg_repair + ceph_pg_scrubbing + ceph_pg_undersized > 0
+           for: 10m
+           labels:
+             severity: warning
+           annotations:
+             summary: "Ceph has unhealthy placement groups"
+             description: "Ceph cluster has {{ $value }} placement groups in non-active+clean state."
+
+         - alert: CephHighLatency
+           expr: ceph_osd_commit_latency_ms > 50
+           for: 5m
+           labels:
+             severity: warning
+           annotations:
+             summary: "Ceph OSD high commit latency"
+             description: "OSD {{ $labels.ceph_daemon }} commit latency is {{ $value }}ms."
+
+         - alert: CephPGIncomplete
+           expr: ceph_pg_incomplete > 0
+           for: 5m
+           labels:
+             severity: critical
+           annotations:
+             summary: "Ceph has incomplete placement groups"
+             description: "{{ $value }} placement groups are incomplete. Data may be unavailable."
+
+     - name: ceph-network
+       interval: 60s
+       rules:
+         - alert: CephSlowNetworkOps
+           expr: rate(ceph_osd_op_r_latency_sum[5m]) / rate(ceph_osd_op_r_latency_count[5m]) > 0.1
+           for: 10m
+           labels:
+             severity: warning
+           annotations:
+             summary: "Ceph network operations are slow"
+             description: "Average read latency is {{ $value | humanizeDuration }} on OSD {{ $labels.ceph_daemon }}."
+
+     - name: ceph-backup
+       interval: 300s
+       rules:
+         - alert: CephBackupJobFailed
+           expr: kube_job_status_failed{job_name=~"ceph-.*backup.*"} > 0
+           for: 5m
+           labels:
+             severity: critical
+           annotations:
+             summary: "Ceph backup job failed"
+             description: "Backup job {{ $labels.job_name }} has failed."
+
+         - alert: CephBackupJobMissing
+           expr: absent(kube_job_status_succeeded{job_name=~"ceph-.*backup.*"}) == 1
+           for: 26h  # Alert if no backup in 26 hours (daily backup expected)
+           labels:
+             severity: warning
+           annotations:
+             summary: "Ceph backup job not running"
+             description: "No successful backup job detected in the last 26 hours."
+
+     - name: ceph-csi
+       interval: 60s
+       rules:
+         - alert: CephCSIVolumeProvisioningFailed
+           expr: increase(csi_driver_operation_failures_total{driver_name="rook-ceph.rbd.csi.ceph.com"}[5m]) > 0
+           for: 5m
+           labels:
+             severity: warning
+           annotations:
+             summary: "Ceph CSI volume provisioning failures"
+             description: "{{ $value }} volume provisioning operations have failed in the last 5 minutes."
+
+         - alert: CephCSIVolumeAttachmentSlow
+           expr: histogram_quantile(0.95, rate(csi_driver_operation_duration_seconds_bucket{driver_name="rook-ceph.rbd.csi.ceph.com",operation_name="CreateVolume"}[5m])) > 30
+           for: 10m
+           labels:
+             severity: warning
+           annotations:
+             summary: "Ceph CSI volume attachment is slow"
+             description: "95th percentile volume creation time is {{ $value | humanizeDuration }}."

@@ -8,7 +8,7 @@ metadata:
   annotations:
     fluxcd.io/reconcileAt: "2024-01-01T00:00:00Z"
 spec:
-  interval: 30m
+  interval: 15m
   chart:
     spec:
       chart: rook-ceph
@@ -17,7 +17,10 @@ spec:
         kind: HelmRepository
         name: rook-charts
         namespace: flux-system
+      interval: 15m
+  maxHistory: 2
   install:
+    createNamespace: false  # Namespace already exists
     remediation:
       retries: 3
     timeout: 10m
@@ -27,6 +30,8 @@ spec:
       strategy: rollback
       retries: 3
     timeout: 10m
+  uninstall:
+    keepHistory: false
   values:
     image:
       repository: rook/ceph
@@ -36,10 +41,10 @@ spec:
     pspEnable: false
     rbacEnable: true
     logLevel: INFO
-    
+
     # Talos-specific configurations
     hostNetwork: false  # Required for Talos
-    
+
     # Resource management
     resources:
       limits:
@@ -48,11 +53,11 @@ spec:
       requests:
         cpu: 200m
         memory: 256Mi
-    
+
     # Node selection for Talos
     nodeSelector:
       kubernetes.io/arch: amd64
-      
+
     # Talos tolerations
     tolerations:
       - effect: NoSchedule
@@ -62,13 +67,13 @@ spec:
       - key: node-role.kubernetes.io/control-plane
         operator: Exists
         effect: NoSchedule
-    
+
     # CSI configuration for Talos
     csi:
       enableCSIHostNetwork: false  # Talos doesn't support hostNetwork for CSI
       kubeletDirPath: /var/lib/kubelet
       logLevel: 1
-      
+
       # CSI plugin tolerations
       pluginTolerations:
         - effect: NoSchedule
@@ -78,8 +83,8 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-          
-      # CSI provisioner tolerations  
+
+      # CSI provisioner tolerations
       provisionerTolerations:
         - effect: NoSchedule
           operator: Exists
@@ -88,7 +93,7 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-    
+
     # Discover daemon configuration for device discovery
     discover:
       tolerations:
@@ -107,14 +112,13 @@ spec:
               operator: In
               values:
               - amd64
-             - key: kubernetes.io/hostname
-               operator: In
-               values:
-               - work-00
-               - work-01
-               - work-02
-               - work-03
-    
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - work-00
+                - work-01
+                - work-02
+
     # Admission controller settings
     admissionController:
       tolerations:

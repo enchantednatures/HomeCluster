@@ -1,0 +1,297 @@
+---
+# Comprehensive network policies for Ceph cluster security
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/networkpolicy_v1.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rook-ceph-mon
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-mon-netpol
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app: rook-ceph-mon
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow communication from OSDs
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - protocol: TCP
+          port: 6789
+        - protocol: TCP
+          port: 3300
+    # Allow communication from MGRs
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - protocol: TCP
+          port: 6789
+    # Allow communication from other MONs
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - protocol: TCP
+          port: 6789
+        - protocol: TCP
+          port: 3300
+    # Allow communication from toolbox
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-tools
+      ports:
+        - protocol: TCP
+          port: 6789
+  egress:
+    # Allow communication to other MONs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - protocol: TCP
+          port: 6789
+        - protocol: TCP
+          port: 3300
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/networkpolicy_v1.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rook-ceph-osd
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-osd-netpol
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app: rook-ceph-osd
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow communication from MONs
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - protocol: TCP
+          port: 6800-7300
+    # Allow communication from other OSDs
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - protocol: TCP
+          port: 6800-7300
+    # Allow communication from MGRs
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mgr
+      ports:
+        - protocol: TCP
+          port: 6800-7300
+    # Allow communication from CSI pods
+    - from:
+        - podSelector:
+            matchLabels:
+              app: csi-rbdplugin
+      ports:
+        - protocol: TCP
+          port: 6800-7300
+    # Allow monitoring from Prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9283
+  egress:
+    # Allow communication to MONs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - protocol: TCP
+          port: 6789
+    # Allow communication to other OSDs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - protocol: TCP
+          port: 6800-7300
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/networkpolicy_v1.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rook-ceph-mgr
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-mgr-netpol
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app: rook-ceph-mgr
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow dashboard access from Istio gateway
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: istio-ingress
+      ports:
+        - protocol: TCP
+          port: 8443
+        - protocol: TCP
+          port: 7000
+    # Allow monitoring from Prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9283
+    # Allow communication from toolbox
+    - from:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-tools
+      ports:
+        - protocol: TCP
+          port: 8443
+        - protocol: TCP
+          port: 7000
+  egress:
+    # Allow communication to MONs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - protocol: TCP
+          port: 6789
+    # Allow communication to OSDs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - protocol: TCP
+          port: 6800-7300
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/networkpolicy_v1.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: rook-ceph-rgw
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-rgw-netpol
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app: rook-ceph-rgw
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow S3 API access from Istio gateway
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: istio-ingress
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+    # Allow monitoring from Prometheus
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: monitoring
+      ports:
+        - protocol: TCP
+          port: 9283
+    # Allow access from application namespaces
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              rook-ceph-access: "enabled"
+      ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    # Allow communication to MONs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-mon
+      ports:
+        - protocol: TCP
+          port: 6789
+    # Allow communication to OSDs
+    - to:
+        - podSelector:
+            matchLabels:
+              app: rook-ceph-osd
+      ports:
+        - protocol: TCP
+          port: 6800-7300
+    # Allow DNS resolution
+    - to: []
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53

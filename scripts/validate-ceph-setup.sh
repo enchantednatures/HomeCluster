@@ -100,9 +100,9 @@ echo "======================"
 if kubectl get cephcluster -n rook-ceph rook-ceph &>/dev/null; then
     ceph_phase=$(kubectl get cephcluster -n rook-ceph rook-ceph -o jsonpath='{.status.phase}')
     ceph_state=$(kubectl get cephcluster -n rook-ceph rook-ceph -o jsonpath='{.status.state}')
-    
+
     print_status "INFO" "CephCluster exists with phase: $ceph_phase, state: $ceph_state"
-    
+
     if [ "$ceph_phase" = "Ready" ] && [ "$ceph_state" = "Created" ]; then
         print_status "OK" "CephCluster is healthy and ready"
     else
@@ -152,7 +152,7 @@ kubectl get nodes -l node-role.kubernetes.io/worker -o custom-columns=NAME:.meta
 if kubectl get deployment -n rook-ceph | grep -q rook-ceph-osd; then
     osd_count=$(kubectl get deployment -n rook-ceph | grep rook-ceph-osd | wc -l)
     print_status "INFO" "Found $osd_count OSD deployments"
-    
+
     # Check OSD pod status
     osd_ready=0
     for osd in $(kubectl get pods -n rook-ceph -l app=rook-ceph-osd --no-headers | awk '{print $1}'); do
@@ -160,7 +160,7 @@ if kubectl get deployment -n rook-ceph | grep -q rook-ceph-osd; then
             ((osd_ready++))
         fi
     done
-    
+
     if [ "$osd_ready" -eq "$osd_count" ]; then
         print_status "OK" "All $osd_ready OSD pods are running"
     else
@@ -226,5 +226,41 @@ else
     print_status "OK" "Device paths appear to be customized in ceph-cluster.yaml"
 fi
 
-echo -e "\n${GREEN}Validation complete!${NC}"
-echo "Check the warnings above and refer to the README.md for detailed instructions."
+# Check for recent improvements
+echo -e "\n${BLUE}🔧 Recent Enhancements Check${NC}"
+echo "============================="
+
+if kubectl get prometheusrule -n rook-ceph rook-ceph-alerts &>/dev/null; then
+    print_status "OK" "Prometheus alerts configured"
+else
+    print_status "WARN" "Prometheus alerts not found - consider adding monitoring rules"
+fi
+
+if kubectl get volumesnapshotclass ceph-block-snapshot &>/dev/null; then
+    print_status "OK" "Volume snapshot support configured"
+else
+    print_status "WARN" "Volume snapshot support not configured"
+fi
+
+if kubectl get storageclass ceph-block-retain &>/dev/null; then
+    print_status "OK" "Retain storage class available"
+else
+    print_status "WARN" "Consider adding ceph-block-retain storage class for critical data"
+fi
+
+# Check encryption status
+echo -e "\n${BLUE}🔒 Security Configuration${NC}"
+echo "=========================="
+
+if kubectl get cephcluster -n rook-ceph rook-ceph -o jsonpath='{.spec.network.connections.encryption.enabled}' | grep -q "true"; then
+    print_status "OK" "Cluster encryption enabled"
+else
+    print_status "WARN" "Cluster encryption disabled - consider enabling for security"
+fi
+
+echo -e "\n${GREEN}✅ Validation complete!${NC}"
+echo "======================================"
+echo "For detailed troubleshooting, check:"
+echo "  - kubectl logs -n rook-ceph deployment/rook-ceph-operator"
+echo "  - kubectl -n rook-ceph get cephcluster rook-ceph -o yaml"
+echo "  - kubectl get events -n rook-ceph --sort-by='.lastTimestamp'"

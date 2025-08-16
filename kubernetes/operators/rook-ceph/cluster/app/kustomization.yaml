@@ -1,0 +1,25 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./ceph-cluster.yaml
+  - ./ceph-toolbox.yaml
+  - ./storage-classes.yaml
+  - ./storage-classes-enhanced.yaml
+  - ./ceph-object-store.yaml
+  - ./virtual-service.yaml
+  - ./istio-config-enhanced.yaml
+  - ./ceph-object-store-secret.sops.yaml
+  - ./ceph-objectstore-admin-user.yaml
+  - ./grafana-dashboard-configmap.yaml
+  - ./ceph-dashboard-grafana.yaml
+  - ./networkpolicy.yaml
+  - ./network-policies-enhanced.yaml
+  - ./poddisruptionbudget.yaml
+  - ./service-monitor.yaml
+  - ./prometheus-rules.yaml
+  - ./volume-snapshot-class.yaml
+  - ./rbac-enhanced.yaml
+  - ./backup-strategy-enhanced.yaml
+  # Sample bucket claim for testing - comment out in production
+  # - ./sample-bucket-claim.yaml
