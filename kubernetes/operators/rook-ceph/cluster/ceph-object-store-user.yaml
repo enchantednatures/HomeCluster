@@ -16,4 +16,4 @@ spec:
     zone: "*"
   quotas:
     maxBuckets: 1000
-    maxSize: "1TiB"
+    maxSize: "1Ti"
