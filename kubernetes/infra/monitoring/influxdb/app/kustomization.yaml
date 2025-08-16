@@ -10,6 +10,7 @@ resources:
   - ./destinationrule.yaml
   - ./pvc.yaml
   - ./service.yaml
+  - ./service-external.yaml
   - ./configmap.yaml
   - ./networkpolicy.yaml
   - ./grafana-dashboard.yaml
