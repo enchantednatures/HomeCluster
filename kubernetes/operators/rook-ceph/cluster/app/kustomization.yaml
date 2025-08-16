@@ -7,7 +7,7 @@ resources:
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
   - ./ceph-object-store.yaml
-  - ./virtual-service.yaml
+  # - ./virtual-service.yaml  # Temporarily disabled due to Istio validation issues
   # - ./istio-config-enhanced.yaml  # Temporarily disabled due to schema issues
   - ./ceph-object-store-secret.sops.yaml
   - ./ceph-objectstore-admin-user.yaml
