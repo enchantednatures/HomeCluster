@@ -14,7 +14,7 @@ spec:
   continueUpgradeAfterChecksEvenIfNotHealthy: false
   waitTimeoutForHealthyOSDInMinutes: 10
   mon:
-    count: 3
+    count: 2  # Reduced for resource-constrained cluster
     allowMultiplePerNode: false
   mgr:
     count: 2
