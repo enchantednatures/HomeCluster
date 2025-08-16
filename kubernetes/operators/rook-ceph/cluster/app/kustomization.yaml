@@ -13,7 +13,7 @@ resources:
   - ./ceph-objectstore-admin-user.yaml
   - ./grafana-dashboard-configmap.yaml
   - ./ceph-dashboard-grafana.yaml
-  - ./network-policies-enhanced.yaml
+  # - ./network-policies-enhanced.yaml  # Temporarily disabled due to port range validation
   - ./poddisruptionbudget.yaml
   - ./service-monitor.yaml
   - ./prometheus-rules.yaml
