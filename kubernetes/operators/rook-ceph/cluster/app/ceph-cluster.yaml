@@ -43,12 +43,12 @@ spec:
     periodicity: daily
     maxLogSize: 500M
   cleanupPolicy:
-    confirmation: "yes-really-destroy-data"
+    confirmation: ""  # Empty to allow normal operation
     sanitizeDisks:
       method: quick
       dataSource: zero
       iteration: 1
-    allowUninstallWithVolumes: true
+    allowUninstallWithVolumes: false  # Prevent accidental deletion
   annotations: {}
   labels: {}
   placement:
