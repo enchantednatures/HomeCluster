@@ -9,7 +9,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  path: ./kubernetes/apps/monitoring/influxdb/app
+  path: ./kubernetes/apps/infra/influxdb/app
   prune: true
   sourceRef:
     kind: GitRepository
