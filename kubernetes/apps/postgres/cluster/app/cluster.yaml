@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/postgresql.cnpg.io/cluster_v2.json
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -44,43 +44,23 @@ spec:
         passwordSecret:
           name: spanner-db-user
         inRoles: [pg_monitor, pg_signal_backend]
-  backup:
-    retentionPolicy: 30d
-    barmanObjectStore: &barmanObjectStore
-      data:
-        compression: bzip2
-      wal:
-        compression: bzip2
-        maxParallel: 8
-      destinationPath: s3://cloudnative-pg/
-      endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      # Note: serverName version needs to be incremented
-      # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgres-v9
-      s3Credentials:
-        accessKeyId:
-          name: cloudnative-pg-secret
-          key: aws-access-key-id
-        secretAccessKey:
-          name: cloudnative-pg-secret
-          key: aws-secret-access-key
-  # Note: previousCluster needs to be set to the name of the previous
-  # cluster when recovering from an existing cnpg cluster
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: &currentCluster postgres-v10
   bootstrap:
-    # initdb:
-    #   database: app
-    #   owner: app
-    #   secret:
-    #     name: postgres-app-user
-    #   postInitTemplatsSQL: []
     recovery:
-      source: &previousCluster postgres-v8
-      database: app
-      owner: app
+      source: &previousCluster postgres-v9
+      database: postgres
+      owner: postgres
       secret:
-        name: postgres-app-user
+        name: postgres-db-user
   externalClusters:
     - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-store
+          serverName: *previousCluster
