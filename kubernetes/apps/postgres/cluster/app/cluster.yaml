@@ -4,6 +4,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: postgres-db
+  namespace: postgres
   labels:
     app.kubernetes.io/name: postgres-db
 spec:
@@ -56,7 +57,7 @@ spec:
       database: postgres
       owner: postgres
       secret:
-        name: postgres-db-user
+        name: pg-backup-secret
   externalClusters:
     - name: *previousCluster
       plugin:
