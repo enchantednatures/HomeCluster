@@ -1,20 +1,36 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
   name: &app kiali
   namespace: flux-system
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: kiali
 spec:
   targetNamespace: istio-system
+  dependsOn:
+    - name: istio-base
+    - name: istio-cni
+    - name: ztunnel
+    - name: istiod
+    - name: istio-ambient-config
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+      app.kubernetes.io/component: kiali
   path: ./kubernetes/infra/istio-system/kiali/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
-  wait: false
+  wait: true
   interval: 30m
   retryInterval: 1m
   timeout: 5m
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: kiali
+      namespace: istio-system

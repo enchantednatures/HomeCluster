@@ -1,13 +1,12 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: istio-cni
+  namespace: istio-system
 spec:
   interval: 30m
-  dependsOn:
-    - name: istio-base
   chart:
     spec:
       chart: cni
@@ -27,14 +26,55 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    # Configure CNI for ambient mode compatibility
     cni:
+      # Enable ambient mode support
+      ambient:
+        enabled: true
+      # Chain with existing CNI (Cilium)
       chained: true
       cniBinDir: /opt/cni/bin
       cniConfDir: /etc/cni/net.d
       cniConfFileName: "05-cilium.conflist"
       reconcileInterval: "60s"
-      logLevel: warn # Reduce log noise
+      logLevel: warn
       repair:
         enabled: true
-        # hub: docker.io/istio
-        # tag: 1.25.1
+      # Configure ambient-specific settings
+      ambientMesh:
+        enabled: true
+        # Configure ambient CNI settings
+        settings:
+          # Enable ambient mesh networking
+          enabled: true
+          # Configure ambient mesh ports
+          ports:
+            - name: ambient-mesh
+              port: 15008
+              protocol: TCP
+            - name: ambient-mesh-tls
+              port: 15006
+              protocol: TCP
+    # Global settings for ambient mode
+    global:
+      # Enable ambient mode globally
+      ambient:
+        enabled: true
+      # Configure mesh ID
+      meshID: enchantednatures
+      # Configure network settings
+      network:
+        # Enable ambient networking
+        enabled: true
+        # Configure ambient network settings
+        settings:
+          # Enable ambient mesh networking
+          enabled: true
+          # Configure ambient mesh ports
+          ports:
+            - name: ambient-mesh
+              port: 15008
+              protocol: TCP
+            - name: ambient-mesh-tls
+              port: 15006
+              protocol: TCP
