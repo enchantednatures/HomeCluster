@@ -7,14 +7,14 @@ metadata:
   namespace: rook-ceph
 spec:
   cephVersion:
-    image: quay.io/ceph/ceph:v19.2.3
+    image: quay.io/ceph/ceph:v19.2.0
     allowUnsupported: false
   dataDirHostPath: /var/lib/rook
   skipUpgradeChecks: false
   continueUpgradeAfterChecksEvenIfNotHealthy: false
-  waitTimeoutForHealthyOSDInMinutes: 10
+  waitTimeoutForHealthyOSDInMinutes: 15
   mon:
-    count: 2  # Reduced for resource-constrained cluster
+    count: 3  # Optimal for 3-node cluster (quorum)
     allowMultiplePerNode: false
   mgr:
     count: 2
@@ -26,16 +26,17 @@ spec:
         enabled: true
   dashboard:
     enabled: true
-    # ssl: true
+    ssl: true
+    port: 8443
   monitoring:
     enabled: true
   network:
     connections:
       encryption:
-        enabled: true  # Enable encryption in transit for security
+        enabled: false  # Disable for better performance on fresh setup
       compression:
-        enabled: true  # Enable compression to reduce network overhead
-      requireMsgr2: true  # Use modern Ceph messaging protocol
+        enabled: false  # Disable compression for better performance
+      requireMsgr2: false  # Allow msgr1 for compatibility
   crashCollector:
     disable: false
   logCollector:
@@ -75,7 +76,7 @@ spec:
         - key: node-role.kubernetes.io/control-plane
           operator: Exists
           effect: NoSchedule
-    # Specific placement for components
+    # Distribute monitors evenly
     mon:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
@@ -92,6 +93,14 @@ spec:
           operator: Exists
         - effect: NoExecute
           operator: Exists
+      # Ensure each monitor is on a different node
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: rook-ceph-mon
     mgr:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
@@ -127,10 +136,10 @@ spec:
   resources:
     mgr:
       limits:
-        memory: "1Gi"
+        memory: "2Gi"
       requests:
         cpu: "500m"
-        memory: "512Mi"
+        memory: "1Gi"
     mon:
       limits:
         memory: "2Gi"
@@ -139,14 +148,16 @@ spec:
         memory: "1Gi"
     osd:
       limits:
-        memory: "4Gi"
+        memory: "6Gi"  # Increased for better performance
       requests:
         cpu: "1000m"
-        memory: "2Gi"
+        memory: "3Gi"  # Increased for better performance
     prepareosd:
+      limits:
+        memory: "1Gi"
       requests:
         cpu: "500m"
-        memory: "50Mi"
+        memory: "512Mi"
     mgr-sidecar:
       limits:
         memory: "100Mi"
@@ -179,26 +190,23 @@ spec:
   storage:
     useAllNodes: false  # Explicit node selection for better control
     useAllDevices: false  # Explicit device selection for safety
-    # Talos-specific device patterns - adjust based on your Proxmox VM disk setup
-    deviceFilter: "^sd[b-z]|^nvme[1-9]|^vd[b-z]"  # Added vd for Proxmox VirtIO disks
     config:
       crushRoot: "default"
       metadataDevice: ""
-      databaseSizeMB: "2048"  # Increased for better performance
+      databaseSizeMB: "1024"  # Conservative for stability
       osdsPerDevice: "1"
-      encryptedDevice: "false"  # Disable encryption for initial setup
-      # Performance tuning parameters
-      bluestoreBlockDbSize: "67108864"  # 64MB block DB
+      encryptedDevice: "false"  # Disable encryption for performance
+      # BlueStore configuration optimized for performance
+      bluestoreBlockDbSize: "134217728"  # 128MB block DB
       bluestoreBlockWalSize: "134217728"  # 128MB WAL
-      bluestoreCompressionMode: "none"  # Disable compression for performance
-      bluestoreCompressionAlgorithm: "snappy"
+      bluestoreCompressionMode: "none"  # Disable compression
       bluestoreCacheSizeHdd: "1073741824"  # 1GB cache for HDD
-      bluestoreCacheSizeSsd: "3221225472"  # 3GB cache for SSD
-    # Define specific nodes and devices (recommended for production)
+      bluestoreCacheSizeSsd: "2147483648"  # 2GB cache for SSD
+    # Define specific nodes and devices for clean deployment
     nodes:
-      - name: "work-00"  # Actual node names from cluster
+      - name: "work-00"
         devices:
-          - name: "/dev/sdb"  # Confirmed device path from logs
+          - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
@@ -208,12 +216,14 @@ spec:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
+          metadataDevice: ""
           databaseSizeMB: "1024"
       - name: "work-02"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
+          metadataDevice: ""
           databaseSizeMB: "1024"
 
   disruptionManagement:
@@ -238,5 +248,3 @@ spec:
         disabled: false
       osd:
         disabled: false
-
-
