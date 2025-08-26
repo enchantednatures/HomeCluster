@@ -1,0 +1,12 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/v1beta1.json
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./ambient-mesh.yaml
+  - ./ambient-profile.yaml
+labels:
+  - pairs:
+      app.kubernetes.io/component: ambient-config
+      app.kubernetes.io/managed-by: flux
+    includeSelectors: true

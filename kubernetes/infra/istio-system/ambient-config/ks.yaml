@@ -1,0 +1,59 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app istio-ambient-config
+  namespace: flux-system
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/component: ambient-config
+spec:
+  targetNamespace: istio-system
+  dependsOn:
+    - name: istio-base
+    - name: istio-cni
+    - name: ztunnel
+    - name: istiod
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+      app.kubernetes.io/component: ambient-config
+  path: ./kubernetes/infra/istio-system/ambient-config/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  healthChecks:
+    - apiVersion: istio.io/v1beta1
+      kind: AmbientMesh
+      name: default
+      namespace: istio-system
+    - apiVersion: istio.io/v1beta1
+      kind: AmbientProfile
+      name: default
+      namespace: istio-system
+  patches:
+    - patch: |-
+        apiVersion: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        metadata:
+          name: not-used
+        spec:
+          healthChecks:
+            - apiVersion: istio.io/v1beta1
+              kind: AmbientMesh
+              name: default
+              namespace: istio-system
+            - apiVersion: istio.io/v1beta1
+              kind: AmbientProfile
+              name: default
+              namespace: istio-system
+      target:
+        group: kustomize.toolkit.fluxcd.io
+        kind: Kustomization
+        name: istio-ambient-config

@@ -1,0 +1,75 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/istio.io/v1beta1.json
+apiVersion: istio.io/v1beta1
+kind: AmbientMesh
+metadata:
+  name: default
+  namespace: istio-system
+spec:
+  # Enable ambient mesh mode
+  enabled: true
+  # Configure mesh-wide settings
+  meshConfig:
+    accessLogFile: /dev/stdout
+    accessLogEncoding: JSON
+    enableTracing: true
+    defaultConfig:
+      holdApplicationUntilProxyStarts: true
+      tracing:
+        sampling: 10
+    enablePrometheusMerge: true
+    extensionProviders:
+      - name: otel-tracing
+        opentelemetry:
+          port: 4317
+          service: tempo.monitoring.svc.cluster.local
+      - name: authentik
+        envoyExtAuthzHttp:
+          service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
+          port: 9000
+          pathPrefix: /outpost.goauthentik.io/auth/envoy
+          failOpen: false
+          includeRequestHeadersInCheck:
+            - authorization
+            - cookie
+            - x-forwarded-for
+            - x-forwarded-proto
+            - x-forwarded-host
+          headersToUpstreamOnAllow:
+            - x-authentik-username
+            - x-authentik-groups
+            - x-authentik-email
+            - x-authentik-name
+            - x-authentik-uid
+          headersToDownstreamOnDeny:
+            - content-type
+            - set-cookie
+            - location
+  # Configure ambient-specific settings
+  ambient:
+    # Enable waypoint proxies for L7 processing
+    waypointProxies:
+      enabled: true
+    # Configure ztunnel settings
+    ztunnel:
+      enabled: true
+      # Resource configuration for ztunnel
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+    # Configure ambient networking
+    networking:
+      # Enable ambient mesh networking
+      enabled: true
+      # Configure ambient mesh ports
+      ports:
+        - name: http
+          port: 80
+          protocol: TCP
+        - name: https
+          port: 443
+          protocol: TCP
