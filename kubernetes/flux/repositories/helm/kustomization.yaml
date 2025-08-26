@@ -39,6 +39,7 @@ resources:
   - ./kestra-charts.yaml
   - ./kiali.yaml
   - ./kubernetes-dashboard.yaml
+  - ./kyverno.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml

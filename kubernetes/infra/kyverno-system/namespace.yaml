@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kyverno-system
+  labels:
+    app.kubernetes.io/name: kyverno
+    app.kubernetes.io/instance: kyverno-system
+    istio-injection: disabled
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged

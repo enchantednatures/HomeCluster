@@ -1,0 +1,54 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/main/schemas/kyverno/v1/policy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-default-network-policy
+  annotations:
+    policies.kyverno.io/title: Add Default Network Policy
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: NetworkPolicy
+    policies.kyverno.io/description: >-
+      By default, Kubernetes allows communications across all Pods within a cluster.
+      Network policies and, a CNI that supports them, must be used to restrict
+      communications. This policy will create a new NetworkPolicy resource whenever
+      a new Namespace is created which denies all traffic.
+spec:
+  background: false
+  rules:
+    - name: default-deny
+      match:
+        any:
+        - resources:
+            kinds:
+            - Namespace
+      exclude:
+        any:
+        - resources:
+            names:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - kyverno-system
+            - flux-system
+            - istio-system
+            - rook-ceph
+            - openebs-system
+            - knative-*
+            - monitoring
+      generate:
+        synchronize: true
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        name: default-deny
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          spec:
+            podSelector: {}
+            policyTypes:
+            - Ingress
+            - Egress

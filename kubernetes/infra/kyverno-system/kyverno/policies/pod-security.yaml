@@ -1,0 +1,123 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/main/schemas/kyverno/v1/policy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-privileged-containers
+  annotations:
+    policies.kyverno.io/title: Disallow Privileged Containers
+    policies.kyverno.io/category: Pod Security Standards (Baseline)
+    policies.kyverno.io/severity: high
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Privileged containers share namespaces with the host system, eschew cgroup
+      restrictions, and do not offer any security. They should be used exclusively for
+      system containers. This policy ensures privileged containers are not allowed.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: check-privileged
+      match:
+        any:
+        - resources:
+            kinds:
+            - Pod
+      exclude:
+        any:
+        - resources:
+            namespaces:
+            - kube-system
+            - kyverno-system
+            - rook-ceph
+            - openebs-system
+      validate:
+        message: "Privileged containers are not allowed"
+        pattern:
+          spec:
+            =(securityContext):
+              =(privileged): "false"
+            containers:
+            - name: "*"
+              =(securityContext):
+                =(privileged): "false"
+            =(initContainers):
+            - name: "*"
+              =(securityContext):
+                =(privileged): "false"
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/main/schemas/kyverno/v1/policy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-run-as-non-root
+  annotations:
+    policies.kyverno.io/title: Require Run As Non-Root User
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.22"
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Containers must be required to run as a non-root user. This policy ensures
+      the `runAsNonRoot` field is set to `true`.
+spec:
+  validationFailureAction: enforce
+  background: true
+  rules:
+    - name: check-containers
+      match:
+        any:
+        - resources:
+            kinds:
+            - Pod
+      exclude:
+        any:
+        - resources:
+            namespaces:
+            - kube-system
+            - kyverno-system
+            - rook-ceph
+            - openebs-system
+            - istio-system
+      validate:
+        message: "Containers must run as non-root user"
+        pattern:
+          spec:
+            =(securityContext):
+              =(runAsNonRoot): "true"
+            containers:
+            - name: "*"
+              =(securityContext):
+                =(runAsNonRoot): "true"
+    - name: check-init-containers
+      match:
+        any:
+        - resources:
+            kinds:
+            - Pod
+      exclude:
+        any:
+        - resources:
+            namespaces:
+            - kube-system
+            - kyverno-system
+            - rook-ceph
+            - openebs-system
+            - istio-system
+      preconditions:
+        all:
+        - key: "{{ request.object.spec.initContainers[] || '' }}"
+          operator: AnyNotIn
+          value: [""]
+      validate:
+        message: "Init containers must run as non-root user"
+        foreach:
+        - list: "request.object.spec.initContainers"
+          pattern:
+            =(securityContext):
+              =(runAsNonRoot): "true"
