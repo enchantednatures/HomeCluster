@@ -34,9 +34,10 @@ spec:
       chained: true
       cniBinDir: /opt/cni/bin
       cniConfDir: /etc/cni/net.d
-      cniConfFileName: "05-cilium.conflist"
-      logLevel: warn
-      repair:
-        enabled: true
+       cniConfFileName: "05-cilium.conflist"
+       reconcileInterval: "300s"
+       logLevel: warn
+       repair:
+         enabled: false
     global:
       meshID: enchantednatures
