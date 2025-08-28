@@ -25,18 +25,18 @@ spec:
       retries: 3
    uninstall:
      keepHistory: false
-   values:
-     cni:
-       ambient:
-         enabled: true
-         dnsCapture: true
-         ipv6: true
-       chained: true
-       cniBinDir: /opt/cni/bin
-       cniConfDir: /etc/cni/net.d
-       cniConfFileName: "05-cilium.conflist"
-       logLevel: warn
-       repair:
-         enabled: true
-     global:
-       meshID: enchantednatures
+  values:
+    cni:
+      ambient:
+        enabled: true
+        dnsCapture: true
+        ipv6: true
+      chained: true
+      cniBinDir: /opt/cni/bin
+      cniConfDir: /etc/cni/net.d
+      cniConfFileName: "05-cilium.conflist"
+      logLevel: warn
+      repair:
+        enabled: true
+    global:
+      meshID: enchantednatures

@@ -29,45 +29,45 @@ spec:
       retries: 3
    uninstall:
      keepHistory: false
-   values:
-     env: {}  # Remove PILOT_ENABLE_AMBIENT* vars; ambient is enabled by charts
-     meshConfig:
-       accessLogFile: /dev/stdout
-       accessLogEncoding: JSON
-       enableTracing: true
-       defaultConfig:
-         holdApplicationUntilProxyStarts: true
-         tracing:
-           sampling: 10
-       enablePrometheusMerge: true
-       extensionProviders:
-         - name: otel-tracing
-           opentelemetry:
-             port: 4317
-             service: tempo.monitoring.svc.cluster.local
-         - name: authentik
-           envoyExtAuthzHttp:
-             service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
-             port: 9000
-             pathPrefix: /outpost.goauthentik.io/auth/envoy
-             failOpen: false
-             includeRequestHeadersInCheck:
-               - authorization
-               - cookie
-               - x-forwarded-for
-               - x-forwarded-proto
-               - x-forwarded-host
-             headersToUpstreamOnAllow:
-               - x-authentik-username
-               - x-authentik-groups
-               - x-authentik-email
-               - x-authentik-name
-               - x-authentik-uid
-             headersToDownstreamOnDeny:
-               - content-type
-               - set-cookie
-               - location
-     global:
-       logAsJson: true
-       meshID: enchantednatures
-       istioNamespace: istio-system
+  values:
+    env: {}  # Remove PILOT_ENABLE_AMBIENT* vars; ambient is enabled by charts
+    meshConfig:
+      accessLogFile: /dev/stdout
+      accessLogEncoding: JSON
+      enableTracing: true
+      defaultConfig:
+        holdApplicationUntilProxyStarts: true
+        tracing:
+          sampling: 10
+      enablePrometheusMerge: true
+      extensionProviders:
+        - name: otel-tracing
+          opentelemetry:
+            port: 4317
+            service: tempo.monitoring.svc.cluster.local
+        - name: authentik
+          envoyExtAuthzHttp:
+            service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
+            port: 9000
+            pathPrefix: /outpost.goauthentik.io/auth/envoy
+            failOpen: false
+            includeRequestHeadersInCheck:
+              - authorization
+              - cookie
+              - x-forwarded-for
+              - x-forwarded-proto
+              - x-forwarded-host
+            headersToUpstreamOnAllow:
+              - x-authentik-username
+              - x-authentik-groups
+              - x-authentik-email
+              - x-authentik-name
+              - x-authentik-uid
+            headersToDownstreamOnDeny:
+              - content-type
+              - set-cookie
+              - location
+    global:
+      logAsJson: true
+      meshID: enchantednatures
+      istioNamespace: istio-system

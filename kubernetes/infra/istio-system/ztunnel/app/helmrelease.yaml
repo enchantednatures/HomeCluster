@@ -28,12 +28,12 @@ spec:
       retries: 3
    uninstall:
      keepHistory: false
-   values:
-     logLevel: info
-     resources:
-       requests:
-         cpu: 100m
-         memory: 128Mi
-       limits:
-         cpu: 500m
-         memory: 512Mi
+  values:
+    logLevel: info
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
