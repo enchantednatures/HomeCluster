@@ -27,8 +27,8 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-   uninstall:
-     keepHistory: false
+  uninstall:
+    keepHistory: false
   values:
     env: {}  # Remove PILOT_ENABLE_AMBIENT* vars; ambient is enabled by charts
     meshConfig:
