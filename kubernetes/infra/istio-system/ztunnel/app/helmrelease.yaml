@@ -26,8 +26,8 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  uninstall:
-    keepHistory: false
+   uninstall:
+     keepHistory: false
    values:
      logLevel: info
      resources:

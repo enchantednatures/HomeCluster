@@ -23,8 +23,8 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
-  uninstall:
-    keepHistory: false
+   uninstall:
+     keepHistory: false
    values:
      cni:
        ambient:
@@ -34,7 +34,7 @@ spec:
        chained: true
        cniBinDir: /opt/cni/bin
        cniConfDir: /etc/cni/net.d
-       cniConfFileName: "05-cilium.conf"
+       cniConfFileName: "05-cilium.conflist"
        logLevel: warn
        repair:
          enabled: true
