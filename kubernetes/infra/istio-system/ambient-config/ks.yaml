@@ -28,32 +28,5 @@ spec:
   interval: 30m
   retryInterval: 1m
   timeout: 10m
-  healthChecks:
-    - apiVersion: istio.io/v1beta1
-      kind: AmbientMesh
-      name: default
-      namespace: istio-system
-    - apiVersion: istio.io/v1beta1
-      kind: AmbientProfile
-      name: default
-      namespace: istio-system
-  patches:
-    - patch: |-
-        apiVersion: kustomize.toolkit.fluxcd.io/v1
-        kind: Kustomization
-        metadata:
-          name: not-used
-        spec:
-          healthChecks:
-            - apiVersion: istio.io/v1beta1
-              kind: AmbientMesh
-              name: default
-              namespace: istio-system
-            - apiVersion: istio.io/v1beta1
-              kind: AmbientProfile
-              name: default
-              namespace: istio-system
-      target:
-        group: kustomize.toolkit.fluxcd.io
-        kind: Kustomization
-        name: istio-ambient-config
+   # healthChecks: []  # Removed invalid health checks for non-existent resources
+   # patches: []  # Removed redundant patches

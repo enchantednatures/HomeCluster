@@ -28,83 +28,12 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values:
-    # Enable ambient mesh mode
-    ambient:
-      enabled: true
-    # Configure ztunnel for ambient mesh
-    ztunnel:
-      # Enable debug logging if needed
-      logLevel: info
-      # Resource limits
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits:
-          cpu: 500m
-          memory: 512Mi
-      # Configure ambient-specific settings
-      ambient:
-        enabled: true
-        # Configure ztunnel ambient settings
-        settings:
-          # Enable ambient mesh
-          enabled: true
-          # Configure ambient mesh networking
-          networking:
-            enabled: true
-            # Configure ambient mesh ports
-            ports:
-              - name: ztunnel-inbound
-                port: 15008
-                protocol: TCP
-              - name: ztunnel-outbound
-                port: 15006
-                protocol: TCP
-              - name: ztunnel-tls
-                port: 15001
-                protocol: TCP
-          # Configure ambient mesh security
-          security:
-            enabled: true
-            # Configure mTLS settings
-            mtls:
-              enabled: true
-              mode: STRICT
-          # Configure ambient mesh telemetry
-          telemetry:
-            enabled: true
-            # Configure telemetry settings
-            metrics:
-              enabled: true
-              port: 15020
-            tracing:
-              enabled: true
-              port: 15031
-            logging:
-              enabled: true
-              level: info
-    # Global settings for ambient mode
-    global:
-      # Enable ambient mode globally
-      ambient:
-        enabled: true
-      # Configure mesh ID
-      meshID: enchantednatures
-      # Configure network settings
-      network:
-        # Enable ambient networking
-        enabled: true
-        # Configure ambient network settings
-        settings:
-          # Enable ambient mesh networking
-          enabled: true
-          # Configure ambient mesh ports
-          ports:
-            - name: ambient-mesh
-              port: 15008
-              protocol: TCP
-            - name: ambient-mesh-tls
-              port: 15006
-              protocol: TCP
+   values:
+     logLevel: info
+     resources:
+       requests:
+         cpu: 100m
+         memory: 128Mi
+       limits:
+         cpu: 500m
+         memory: 512Mi

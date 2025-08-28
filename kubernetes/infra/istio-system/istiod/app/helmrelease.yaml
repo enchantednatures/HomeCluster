@@ -29,132 +29,45 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values:
-    pilot:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 2048Mi
-      env:
-        # Enable ambient mode
-        PILOT_ENABLE_AMBIENT: true
-        # Enable ambient mesh features
-        PILOT_ENABLE_AMBIENT_MESH: true
-        # Enable waypoint proxies
-        PILOT_ENABLE_WAYPOINT: true
-        # Enable ambient workload handling
-        PILOT_ENABLE_AMBIENT_WORKLOAD_HANDLING: true
-        # Enable ambient service discovery
-        PILOT_ENABLE_AMBIENT_SERVICE_DISCOVERY: true
-        # External istiod settings
-        EXTERNAL_ISTIOD: false
-        # Workload entry autoregistration
-        PILOT_ENABLE_WORKLOAD_ENTRY_AUTOREGISTRATION: true
-        # Disable automatic DestinationRule creation for kubernetes API
-        PILOT_ENABLE_KUBERNETES_GATEWAY_API: false
-        # Enable ambient mesh telemetry
-        PILOT_ENABLE_AMBIENT_TELEMETRY: true
-        # Enable ambient mesh security
-        PILOT_ENABLE_AMBIENT_SECURITY: true
-    global:
-      logAsJson: true
-      meshID: enchantednatures
-      istioNamespace: istio-system
-      # Enable ambient mode globally
-      ambient:
-        enabled: true
-      # Configure CNI for ambient mode
-      cni:
-        enabled: true
-        ambient:
-          enabled: true
-      # Configure tracer
-      tracer:
-        zipkin:
-          address: tempo.monitoring.svc.cluster.local:9411
-    meshConfig:
-      accessLogFile: /dev/stdout
-      accessLogEncoding: JSON
-      enableTracing: true
-      defaultConfig:
-        holdApplicationUntilProxyStarts: true
-        tracing:
-          sampling: 10
-        # Enable ambient mesh settings
-        ambientMesh:
-          enabled: true
-      enablePrometheusMerge: true
-      extensionProviders:
-        - name: otel-tracing
-          opentelemetry:
-            port: 4317
-            service: tempo.monitoring.svc.cluster.local
-            resource_detectors:
-              environment: {}
-        - name: authentik
-          envoyExtAuthzHttp:
-            service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
-            port: 9000
-            pathPrefix: /outpost.goauthentik.io/auth/envoy
-            failOpen: false
-            includeRequestHeadersInCheck:
-              - authorization
-              - cookie
-              - x-forwarded-for
-              - x-forwarded-proto
-              - x-forwarded-host
-            headersToUpstreamOnAllow:
-              - x-authentik-username
-              - x-authentik-groups
-              - x-authentik-email
-              - x-authentik-name
-              - x-authentik-uid
-            headersToDownstreamOnDeny:
-              - content-type
-              - set-cookie
-              - location
-    # Configure ambient mesh settings
-    ambient:
-      enabled: true
-      # Configure waypoint proxies
-      waypoint:
-        enabled: true
-        # Configure waypoint proxy settings
-        resources:
-          requests:
-            cpu: 200m
-            memory: 256Mi
-          limits:
-            cpu: 1000m
-            memory: 1Gi
-      # Configure ambient mesh networking
-      networking:
-        enabled: true
-        # Configure ambient mesh ports
-        ports:
-          - name: ambient-mesh
-            port: 15008
-            protocol: TCP
-          - name: ambient-mesh-tls
-            port: 15006
-            protocol: TCP
-      # Configure ambient mesh security
-      security:
-        enabled: true
-        # Configure mTLS settings
-        mtls:
-          enabled: true
-          mode: STRICT
-      # Configure ambient mesh telemetry
-      telemetry:
-        enabled: true
-        # Configure telemetry settings
-        metrics:
-          enabled: true
-          port: 15020
-        tracing:
-          enabled: true
-          port: 15031
-        logging:
-          enabled: true
-          level: info
+   values:
+     env: {}  # Remove PILOT_ENABLE_AMBIENT* vars; ambient is enabled by charts
+     meshConfig:
+       accessLogFile: /dev/stdout
+       accessLogEncoding: JSON
+       enableTracing: true
+       defaultConfig:
+         holdApplicationUntilProxyStarts: true
+         tracing:
+           sampling: 10
+       enablePrometheusMerge: true
+       extensionProviders:
+         - name: otel-tracing
+           opentelemetry:
+             port: 4317
+             service: tempo.monitoring.svc.cluster.local
+         - name: authentik
+           envoyExtAuthzHttp:
+             service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
+             port: 9000
+             pathPrefix: /outpost.goauthentik.io/auth/envoy
+             failOpen: false
+             includeRequestHeadersInCheck:
+               - authorization
+               - cookie
+               - x-forwarded-for
+               - x-forwarded-proto
+               - x-forwarded-host
+             headersToUpstreamOnAllow:
+               - x-authentik-username
+               - x-authentik-groups
+               - x-authentik-email
+               - x-authentik-name
+               - x-authentik-uid
+             headersToDownstreamOnDeny:
+               - content-type
+               - set-cookie
+               - location
+     global:
+       logAsJson: true
+       meshID: enchantednatures
+       istioNamespace: istio-system

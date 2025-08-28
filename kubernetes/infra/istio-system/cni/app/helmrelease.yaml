@@ -25,56 +25,18 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
-  values:
-    # Configure CNI for ambient mode compatibility
-    cni:
-      # Enable ambient mode support
-      ambient:
-        enabled: true
-      # Chain with existing CNI (Cilium)
-      chained: true
-      cniBinDir: /opt/cni/bin
-      cniConfDir: /etc/cni/net.d
-      cniConfFileName: "05-cilium.conflist"
-      reconcileInterval: "60s"
-      logLevel: warn
-      repair:
-        enabled: true
-      # Configure ambient-specific settings
-      ambientMesh:
-        enabled: true
-        # Configure ambient CNI settings
-        settings:
-          # Enable ambient mesh networking
-          enabled: true
-          # Configure ambient mesh ports
-          ports:
-            - name: ambient-mesh
-              port: 15008
-              protocol: TCP
-            - name: ambient-mesh-tls
-              port: 15006
-              protocol: TCP
-    # Global settings for ambient mode
-    global:
-      # Enable ambient mode globally
-      ambient:
-        enabled: true
-      # Configure mesh ID
-      meshID: enchantednatures
-      # Configure network settings
-      network:
-        # Enable ambient networking
-        enabled: true
-        # Configure ambient network settings
-        settings:
-          # Enable ambient mesh networking
-          enabled: true
-          # Configure ambient mesh ports
-          ports:
-            - name: ambient-mesh
-              port: 15008
-              protocol: TCP
-            - name: ambient-mesh-tls
-              port: 15006
-              protocol: TCP
+   values:
+     cni:
+       ambient:
+         enabled: true
+         dnsCapture: true
+         ipv6: true
+       chained: true
+       cniBinDir: /opt/cni/bin
+       cniConfDir: /etc/cni/net.d
+       cniConfFileName: "05-cilium.conf"
+       logLevel: warn
+       repair:
+         enabled: true
+     global:
+       meshID: enchantednatures
