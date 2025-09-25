@@ -50,7 +50,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster authentik-v10
+        serverName: &currentCluster authentik-v11
   bootstrap:
     recovery:
       source: &previousCluster authentik-v6

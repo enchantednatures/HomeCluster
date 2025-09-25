@@ -50,7 +50,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster atuin-v2
+        serverName: &currentCluster atuin-v3
   bootstrap:
     recovery:
       source: &previousCluster atuin-v1
