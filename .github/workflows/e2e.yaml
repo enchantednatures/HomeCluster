@@ -24,7 +24,7 @@ jobs:
         id: setup-homebrew
         uses: Homebrew/actions/setup-homebrew@master
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         id: setup-python
         with:
           python-version: "3.13" # minimum supported version
