@@ -6,3 +6,4 @@ resources:
   - ./pod-security.yaml
   - ./network-policies.yaml
   - ./resource-limits.yaml
+  - ./git-push-token-replication.yaml
