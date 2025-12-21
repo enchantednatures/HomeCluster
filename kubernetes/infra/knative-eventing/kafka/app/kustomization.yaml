@@ -9,6 +9,6 @@ resources:
   # - https://github.com/knative-extensions/eventing-kafka-broker/releases/download/knative-v1.18.0/eventing-kafka-source.yaml
   # - https://github.com/knative-extensions/eventing-kafka-broker/releases/download/knative-v1.18.0/eventing-kafka-broker-prometheus-operator.yaml
   # - https://github.com/knative-extensions/eventing-kafka-broker/releases/download/knative-v1.18.0/eventing-kafka-channel-prometheus-operator.yaml
-  - https://raw.githubusercontent.com/knative-extensions/monitoring/main/config/eventing-kafka-monitors.yaml
+  # - https://raw.githubusercontent.com/knative-extensions/monitoring/main/config/eventing-kafka-monitors.yaml
   # - https://github.com/knative/eventing/releases/download/knative-v1.16.1/eventing-core.yaml
   # - https://github.com/knative-extensions/eventing-istio/releases/download/knative-v1.16.0/eventing-istio.yaml
