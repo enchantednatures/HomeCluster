@@ -6,16 +6,18 @@ metadata:
   name: &app kubevirt-cdi
   namespace: flux-system
 spec:
-  targetNamespace: kubevirt
+  targetNamespace: cdi
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  dependsOn:
+    - name: kubevirt-operator
   path: ./kubernetes/operators/kubevirt/cdi/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
-  wait: false
+  wait: true
   interval: 30m
   retryInterval: 1m
-  timeout: 5m
+  timeout: 10m
