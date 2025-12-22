@@ -27,6 +27,9 @@ spec:
             - name: arch-linux-iso
               cdrom:
                 bus: sata
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
           interfaces:
             - name: default
               masquerade: {}
@@ -59,3 +62,7 @@ spec:
         - name: arch-linux-iso
           dataVolume:
             name: arch-linux-iso
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            secretRef:
+              name: arch-linux-cloud-init
