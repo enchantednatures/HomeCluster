@@ -41,6 +41,7 @@ spec:
             - cert-manager
             - monitoring
             - kubevirt
+            - cdi
       validate:
         message: "Resource requests and limits are required"
         pattern:
@@ -94,6 +95,7 @@ spec:
             - cert-manager
             - monitoring
             - kubevirt
+            - cdi
       validate:
         message: "An image tag is required and it cannot be 'latest'"
         pattern:
