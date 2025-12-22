@@ -36,6 +36,11 @@ spec:
             - kube-system
             - kyverno-system
             - flux-system
+            - istio-system
+            - openebs-system
+            - cert-manager
+            - monitoring
+            - kubevirt
       validate:
         message: "Resource requests and limits are required"
         pattern:
@@ -84,6 +89,11 @@ spec:
             - kube-system
             - kyverno-system
             - flux-system
+            - istio-system
+            - openebs-system
+            - cert-manager
+            - monitoring
+            - kubevirt
       validate:
         message: "An image tag is required and it cannot be 'latest'"
         pattern:
