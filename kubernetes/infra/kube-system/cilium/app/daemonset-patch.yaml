@@ -10,4 +10,5 @@ spec:
       containers:
       - name: cilium-agent
         args:
+        - --config-dir=/tmp/cilium/config-map
         - --cni-exclusive=false
