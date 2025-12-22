@@ -34,6 +34,8 @@ spec:
             - kyverno-system
             - rook-ceph
             - openebs-system
+            - kubevirt
+            - cdi
       validate:
         message: "Privileged containers are not allowed"
         pattern:
