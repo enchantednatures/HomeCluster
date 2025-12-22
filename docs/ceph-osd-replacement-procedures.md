@@ -246,7 +246,17 @@ kubectl delete configmaps -n rook-ceph $(kubectl get configmaps -n rook-ceph | g
 # From the earlier ceph osd find command, identify which node the OSD was on
 # For your cluster, it will be one of: work-00, work-01, work-02
 NODE_NAME="work-XX"  # Replace with actual node
-DEVICE_PATH="/dev/sdb"  # Based on your configuration
+
+# Device path - could be SSD (/dev/sdb) or NVMe (/dev/nvme0n1)
+DEVICE_PATH="/dev/sdb"  # Default SSD path
+
+# For NVMe devices, identify the correct path:
+# Check NVMe devices on the node
+kubectl debug node/$NODE_NAME -it --image=alpine:latest -- chroot /host sh -c "nvme list"
+
+# Common NVMe device paths:
+# /dev/nvme0n1, /dev/nvme1n1, /dev/nvme2n1, etc.
+DEVICE_PATH="/dev/nvme0n1"  # Update for NVMe devices
 ```
 
 ### 5.2 Clean Device Signatures
@@ -292,13 +302,32 @@ sed "s/NODE_NAME_PLACEHOLDER/$NODE_NAME/g" /tmp/device-cleanup-pod.yaml | kubect
 kubectl wait --for=condition=ready pod/device-cleanup -n rook-ceph --timeout=300s
 
 # Execute cleanup commands
+# For SSD devices:
 kubectl exec -n rook-ceph device-cleanup -- sgdisk --zap-all $DEVICE_PATH
 kubectl exec -n rook-ceph device-cleanup -- dd if=/dev/zero of=$DEVICE_PATH bs=1M count=100
 kubectl exec -n rook-ceph device-cleanup -- wipefs --all $DEVICE_PATH
 
+# For NVMe devices, use NVMe-specific commands:
+if [[ $DEVICE_PATH =~ ^/dev/nvme ]]; then
+    # NVMe secure erase (preferred method)
+    kubectl exec -n rook-ceph device-cleanup -- nvme format -s 1 $DEVICE_PATH  # User data erase
+    # OR for cryptographic erase (if supported):
+    # kubectl exec -n rook-ceph device-cleanup -- nvme format -s 2 $DEVICE_PATH
+else
+    # Standard SSD cleanup
+    kubectl exec -n rook-ceph device-cleanup -- sgdisk --zap-all $DEVICE_PATH
+    kubectl exec -n rook-ceph device-cleanup -- dd if=/dev/zero of=$DEVICE_PATH bs=1M count=100
+    kubectl exec -n rook-ceph device-cleanup -- wipefs --all $DEVICE_PATH
+fi
+
 # Verify device is clean
 kubectl exec -n rook-ceph device-cleanup -- lsblk $DEVICE_PATH
-kubectl exec -n rook-ceph device-cleanup -- fdisk -l $DEVICE_PATH
+kubectl exec -n rook-ceph device-cleanup -- fdisk -l $DEVICE_PATH 2>/dev/null || echo "fdisk may not work with NVMe partitions"
+
+# For NVMe, also check:
+if [[ $DEVICE_PATH =~ ^/dev/nvme ]]; then
+    kubectl exec -n rook-ceph device-cleanup -- nvme list-ns $DEVICE_PATH
+fi
 
 # Clean up the pod
 kubectl delete pod device-cleanup -n rook-ceph
@@ -341,7 +370,18 @@ kubectl wait --for=condition=ready pod/device-verify -n rook-ceph --timeout=300s
 
 # Verify device is available and clean
 kubectl exec -n rook-ceph device-verify -- lsblk $DEVICE_PATH
-kubectl exec -n rook-ceph device-verify -- fdisk -l $DEVICE_PATH
+
+# Device-specific verification
+if [[ $DEVICE_PATH =~ ^/dev/nvme ]]; then
+    # NVMe-specific checks
+    kubectl exec -n rook-ceph device-verify -- nvme list
+    kubectl exec -n rook-ceph device-verify -- nvme id-ctrl $DEVICE_PATH
+    kubectl exec -n rook-ceph device-verify -- nvme smart-log $DEVICE_PATH | grep -E "(temperature|available_spare|percentage_used)"
+    kubectl exec -n rook-ceph device-verify -- nvme list-ns $DEVICE_PATH
+else
+    # SSD-specific checks
+    kubectl exec -n rook-ceph device-verify -- fdisk -l $DEVICE_PATH 2>/dev/null || echo "Device appears clean"
+fi
 
 # Clean up
 kubectl delete pod device-verify -n rook-ceph

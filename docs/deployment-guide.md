@@ -34,6 +34,30 @@ This guide provides step-by-step instructions for deploying the HomeCluster from
 | **Storage** | 120GB SSD per node | 500GB+ NVMe per node |
 | **Network** | 1Gbps | 10Gbps |
 
+#### NVMe Storage Configuration
+
+For optimal Ceph performance, NVMe drives are highly recommended:
+
+**NVMe Hardware Requirements:**
+- **Interface**: PCIe 3.0/4.0/5.0 with 4x lanes minimum
+- **Capacity**: 500GB minimum, 1TB+ recommended per drive
+- **Endurance**: Enterprise-grade with high write endurance
+- **Features**: Power Loss Protection (PLP), end-to-end data protection
+
+**NVMe Setup Checklist:**
+- [ ] Verify PCIe slot compatibility and speed
+- [ ] Update NVMe firmware to latest version
+- [ ] Check thermal management (NVMe can run hot)
+- [ ] Ensure proper power delivery
+- [ ] Test drive health with `nvme smart-log`
+
+**Performance Expectations:**
+- IOPS: 100K+ read, 50K+ write
+- Throughput: 3GB/s+ read, 1GB/s+ write
+- Latency: <50μs read, <20μs write
+
+For detailed NVMe setup instructions, see [Ceph NVMe Setup Guide](ceph-nvme-setup.md).
+
 ### Software Requirements
 
 #### Local Workstation Tools
