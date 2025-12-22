@@ -2,5 +2,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources: [./cilium-l2.yaml, ./helmvalues.yaml, ./helmrelease.yaml]
-patchesStrategicMerge:
-  - daemonset-patch.yaml
+patchesJson6902:
+  - target:
+      version: v1
+      kind: DaemonSet
+      name: cilium
+      namespace: kube-system
+    path: daemonset-patch.json
