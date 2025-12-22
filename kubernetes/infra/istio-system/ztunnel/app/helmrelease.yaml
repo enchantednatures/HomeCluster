@@ -10,6 +10,7 @@ spec:
   dependsOn:
     - name: istio-base
     - name: istio-cni
+    - name: istiod
   chart:
     spec:
       chart: ztunnel
