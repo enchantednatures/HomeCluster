@@ -22,3 +22,7 @@ spec:
       port: 5900
       targetPort: 5900
       protocol: TCP
+    - name: ssh
+      port: 22
+      targetPort: 22
+      protocol: TCP
