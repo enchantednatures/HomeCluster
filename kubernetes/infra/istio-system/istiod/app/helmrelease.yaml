@@ -29,7 +29,8 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    env: {}  # Remove PILOT_ENABLE_AMBIENT* vars; ambient is enabled by charts
+    env:
+      PILOT_ENABLE_AMBIENT: "true"
     meshConfig:
       accessLogFile: /dev/stdout
       accessLogEncoding: JSON
