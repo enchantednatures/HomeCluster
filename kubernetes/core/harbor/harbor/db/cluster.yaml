@@ -17,7 +17,14 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: openebs-hostpath
+    storageClass: csi-nfs
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
@@ -50,18 +57,3 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster harbor-v3
-  bootstrap:
-    recovery:
-      source: &previousCluster harbor-v0
-      database: harbor
-      owner: harbor
-      secret:
-        name: harbor-db-user
-  externalClusters:
-    - name: *previousCluster
-      plugin:
-        name: barman-cloud.cloudnative-pg.io
-        parameters:
-          barmanObjectName: minio-store
-          serverName: *previousCluster

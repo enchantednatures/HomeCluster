@@ -3,10 +3,14 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: harbor-db
+  name: harbor-db-v2
+  namespace: harbor
 spec:
-  schedule: "@hourly"
+  schedule: "0 * * * *"  # Hourly
   immediate: true
   backupOwnerReference: self
   cluster:
-    name: harbor-db
+    name: harbor-db-v2
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
