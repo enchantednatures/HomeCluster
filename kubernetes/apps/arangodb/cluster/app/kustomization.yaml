@@ -5,4 +5,5 @@ resources:
   - ./cluster.yaml
   - ./service.yaml
   - ./virtualservice.yaml
+  - ./destinationrule.yaml
   - ./openid-secret.sops.yaml

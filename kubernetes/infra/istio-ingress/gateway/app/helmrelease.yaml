@@ -28,35 +28,22 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    gateways:
-      istio-ingressgateway:
-        annotations:
-          external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
-        service:
-          externalTrafficPolicy: Cluster
-        resources:
-          requests:
-            cpu: 10m
-            memory: 250Mi
-          limits:
-            memory: 500Mi
-        topologySpreadConstraints:
-          - maxSkew: 1
-            topologyKey: kubernetes.io/hostname
-            whenUnsatisfiable: DoNotSchedule
-            labelSelector:
-              matchLabels:
-                app: istio-ingressgateway
-                istio: ingressgateway
-    replicaCount: 1
-    autoscaling:
-      enabled: false
     service:
-      externalTrafficPolicy: Local
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 200m
-        memory: 256Mi
+      type: LoadBalancer
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
+        io.cilium/lb-ipam-ips: 192.168.1.226
+      externalTrafficPolicy: Cluster
+      ports:
+        - name: status-port
+          port: 15021
+          protocol: TCP
+          targetPort: 15021
+        - name: http2
+          port: 80
+          protocol: TCP
+          targetPort: 80
+        - name: https
+          port: 443
+          protocol: TCP
+          targetPort: 443
