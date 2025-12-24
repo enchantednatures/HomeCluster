@@ -25,8 +25,6 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    labels:
-      istio: gateway
     service:
       annotations:
         external-dns.alpha.kubernetes.io/hostname: external.${SECRET_DOMAIN}
