@@ -131,3 +131,12 @@ spec:
           limits:
             cpu: 2000m
             memory: 1024Mi
+        volumeMounts:
+        - name: istio-ca-root
+          mountPath: /var/run/secrets/istio
+          readOnly: true
+      volumes:
+      - name: istio-ca-root
+        secret:
+          secretName: istio-ca-secret
+          optional: true
