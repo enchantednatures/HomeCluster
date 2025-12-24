@@ -10,11 +10,11 @@ spec:
     - name: prometheus-operator-crds
       namespace: monitoring
   interval: 30m
-  timeout: 15m
+  timeout: 60m
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 75.18.1
+      version: 75.10.0
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
