@@ -4,6 +4,8 @@ kind: ServiceAccount
 metadata:
   name: istio-ingressgateway-service-account
   namespace: istio-ingress
+  annotations:
+    sidecar.istio.io/inject: "false"
 ---
 apiVersion: v1
 kind: Service
@@ -55,8 +57,6 @@ spec:
         prometheus.io/port: "15020"
         prometheus.io/scrape: "true"
         prometheus.io/path: "/stats/prometheus"
-        inject.istio.io/templates: "gateway"
-        sidecar.istio.io/inject: "true"
       labels:
         istio: gateway
         app: istio-ingressgateway
@@ -129,12 +129,3 @@ spec:
           limits:
             cpu: 2000m
             memory: 1024Mi
-        volumeMounts:
-        - name: istio-ca-root
-          mountPath: /var/run/secrets/istio
-          readOnly: true
-      volumes:
-      - name: istio-ca-root
-        secret:
-          secretName: istio-ca-secret
-          optional: true
