@@ -3,8 +3,9 @@ kind: HelmRelease
 metadata:
   name: &app console
   namespace: redpanda
-spec:
+  spec:
   interval: 30m
+  timeout: 20m
   chart:
     spec:
       chart: console

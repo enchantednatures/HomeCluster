@@ -4,6 +4,5 @@ kind: Kustomization
 resources:
   - ./auth-policy.yaml
   - ./certificate.yaml
-  - ./ingress-class.yaml
   - ./request-authentication.yaml
   - ./gateway.yaml
