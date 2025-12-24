@@ -21,7 +21,7 @@ spec:
   loadBalancerIP: 192.168.1.226
   externalTrafficPolicy: Cluster
   selector:
-    istio: ingressgateway
+    istio: gateway
   ports:
     - name: status-port
       port: 15021
@@ -43,12 +43,12 @@ metadata:
   namespace: istio-ingress
   labels:
     app: istio-ingressgateway
-    istio: ingressgateway
+    istio: gateway
 spec:
   replicas: 1
   selector:
     matchLabels:
-      istio: ingressgateway
+      istio: gateway
   template:
     metadata:
       annotations:
@@ -58,7 +58,7 @@ spec:
         inject.istio.io/templates: "gateway"
         sidecar.istio.io/inject: "true"
       labels:
-        istio: ingressgateway
+        istio: gateway
         app: istio-ingressgateway
     spec:
       serviceAccountName: istio-ingressgateway-service-account
