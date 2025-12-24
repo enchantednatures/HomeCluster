@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
   - ./auth-policy.yaml
   - ./certificate.yaml
-  - ./helmrelease.yaml
+  - ./deployment.yaml
   - ./ingress-class.yaml
   - ./request-authentication.yaml
   - ./gateway.yaml
