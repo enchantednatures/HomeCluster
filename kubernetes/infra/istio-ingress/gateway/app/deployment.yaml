@@ -85,8 +85,6 @@ spec:
         - "15021"
         - --trust-domain
         - cluster.local
-        - --controlPlaneAuthPolicy
-        - NONE
         - --discoveryAddress
         - istiod.istio-system.svc:15012
         - --dnsRefreshRate
