@@ -4,8 +4,9 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: schema-registry
-spec:
+  spec:
   interval: 30m
+  timeout: 20m
   chart:
     spec:
       chart: schema-registry
