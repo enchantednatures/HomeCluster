@@ -6,7 +6,7 @@ metadata:
   name: harbor
   spec:
   interval: 30m
-  timeout: 40m
+  timeout: 60m
   chart:
     spec:
       chart: harbor
