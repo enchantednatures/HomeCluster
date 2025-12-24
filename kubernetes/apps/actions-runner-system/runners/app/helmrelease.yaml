@@ -39,14 +39,6 @@ spec:
     githubConfigSecret: github-auth-secret
     minRunners: 0
     maxRunners: 5
-    labels:
-      - self-hosted
-      - linux
-      - docker
-      - kubernetes
-      - flux
-      - cargo
-      - kind
     containerMode:
       type: kubernetes
       kubernetesModeWorkVolumeClaim:
