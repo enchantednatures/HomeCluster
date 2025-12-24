@@ -8,4 +8,3 @@ resources:
   - ./ingress-class.yaml
   - ./request-authentication.yaml
   - ./gateway.yaml
-  - ./gateway.yaml
