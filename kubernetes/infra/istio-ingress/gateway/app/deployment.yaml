@@ -64,7 +64,7 @@ spec:
       serviceAccountName: istio-ingressgateway-service-account
       containers:
       - name: istio-proxy
-        image: gcr.io/istio-testing/proxyv2:1.26.3
+        image: docker.io/istio/proxyv2:1.26.3
         args:
         - proxy
         - router
