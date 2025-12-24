@@ -23,6 +23,8 @@ metadata:
     cleanupOnFail: true
     remediation:
       retries: 3
+  # Disable remediation to avoid continuous retries during timeout
+  disableWait: false
   uninstall:
     keepHistory: false
   valuesFrom:
