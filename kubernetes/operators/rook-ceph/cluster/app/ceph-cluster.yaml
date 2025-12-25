@@ -7,7 +7,7 @@ metadata:
   namespace: rook-ceph
 spec:
   cephVersion:
-    image: quay.io/ceph/ceph:v19.2.0
+    image: quay.io/ceph/ceph:v20.2.0
     allowUnsupported: false
   dataDirHostPath: /var/lib/rook
   skipUpgradeChecks: false
@@ -190,6 +190,7 @@ spec:
   storage:
     useAllNodes: false  # Explicit node selection for better control
     useAllDevices: false  # Explicit device selection for safety
+    deviceFilter: "^sd[b-z]|^nvme[0-9]n[0-9]$"  # Support both SSD and NVMe
     config:
       crushRoot: "default"
       metadataDevice: ""
@@ -198,8 +199,17 @@ spec:
       encryptedDevice: "false"  # Disable encryption for performance
       # BlueStore configuration optimized for performance
       bluestoreBlockDbSize: "134217728"  # 128MB block DB
-      bluestoreBlockWalSize: "134217728"  # 128MB WAL
-      bluestoreCompressionMode: "none"  # Disable compression
+      # NVMe-specific optimizations (applied when NVMe devices detected)
+      bluestoreBlockSize: "4294967296"  # 4GB for NVMe
+      bluestoreBlockWalSize: "1073741824"  # 1GB WAL for NVMe
+      bluestoreCacheSize: "3221225472"  # 3GB cache for NVMe
+      bluestoreCacheMetaRatio: "0.8"  # More cache for metadata
+      bluestoreMaxBlobSize: "2147483648"  # 2GB blobs for NVMe
+      bluestoreMinAllocSize: "4096"  # 4KB alignment for NVMe
+      bluestoreMaxAllocSize: "16777216"  # 16MB allocations
+      bluestoreCacheAutotune: "true"  # Auto-tune cache
+      bluestoreCacheAutotuneInterval: "3600"  # Hourly tuning
+      bluestoreCompressionMode: "none"  # Disable compression for max performance
       bluestoreCacheSizeHdd: "1073741824"  # 1GB cache for HDD
       bluestoreCacheSizeSsd: "2147483648"  # 2GB cache for SSD
     # Define specific nodes and devices for clean deployment

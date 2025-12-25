@@ -13,6 +13,7 @@ spec:
   dependsOn:
     - name: istio-base
     - name: istio-cni
+    - name: istiod
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

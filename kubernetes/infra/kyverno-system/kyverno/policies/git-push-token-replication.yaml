@@ -22,23 +22,23 @@ spec:
     - name: generate-git-push-token
       match:
         any:
-        - resources:
-            kinds:
-            - Namespace
+          - resources:
+              kinds:
+                - Namespace
       exclude:
         any:
-        - resources:
-            names:
-            - kube-system
-            - kube-public
-            - kube-node-lease
-            - kyverno-system
-            - flux-system
-            - istio-system
-            - rook-ceph
-            - openebs-system
-            - monitoring
-            - knative-*
+          - resources:
+              names:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - kyverno-system
+                - flux-system
+                - istio-system
+                - rook-ceph
+                - openebs-system
+                - monitoring
+                - knative-*
       generate:
         synchronize: true
         apiVersion: v1

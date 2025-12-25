@@ -1,0 +1,4 @@
+---
+resources:
+  - ./github-auth-secret.sops.yaml
+  - ./helmrelease.yaml

@@ -4,8 +4,10 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: schema-registry
+  namespace: kafka
 spec:
   interval: 30m
+  timeout: 60m
   chart:
     spec:
       chart: schema-registry

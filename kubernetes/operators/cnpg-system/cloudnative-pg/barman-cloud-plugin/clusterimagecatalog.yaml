@@ -1,0 +1,11 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/clusterimagecatalog_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: ClusterImageCatalog
+metadata:
+  name: barman-cloud-catalog
+  namespace: cnpg-system
+spec:
+  images:
+    - image: ghcr.io/cloudnative-pg/barman-cloud:0.5.0
+      major: 16

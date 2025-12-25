@@ -7,10 +7,11 @@ metadata:
   namespace: istio-system
 spec:
   interval: 30m
+  timeout: 15m
   chart:
     spec:
       chart: cni
-      version: 1.26.3
+      version: 1.28.2
       sourceRef:
         kind: HelmRepository
         name: istio
@@ -34,10 +35,10 @@ spec:
       chained: true
       cniBinDir: /opt/cni/bin
       cniConfDir: /etc/cni/net.d
-       cniConfFileName: "05-cilium.conflist"
-       reconcileInterval: "300s"
-       logLevel: warn
-       repair:
-         enabled: false
+      cniConfFileName: "05-cilium.conflist"
+      reconcileInterval: "300s"
+      logLevel: warn
+      repair:
+        enabled: false
     global:
       meshID: enchantednatures

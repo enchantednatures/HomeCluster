@@ -40,6 +40,9 @@ spec:
             - openebs-system
             - knative-*
             - monitoring
+            - kubevirt
+            - cdi
+            - vms
       generate:
         synchronize: true
         apiVersion: networking.k8s.io/v1
