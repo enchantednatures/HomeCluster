@@ -5,7 +5,7 @@ kind: HelmRelease
 metadata:
   name: redpanda
   namespace: redpanda
-  spec:
+spec:
   interval: 30m
   timeout: 60m
   chart:
