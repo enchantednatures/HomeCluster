@@ -1,0 +1,119 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: gha-runner-scale-set
+  namespace: flux-system
+spec:
+  interval: 15m
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 0.13.1
+  url: oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name gha-runner-scale-set
+  namespace: actions-runner-system
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: gha-runner-scale-set
+    namespace: flux-system
+  interval: 15m
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    nameOverride: *name
+    runnerScaleSetName: *name
+    githubConfigUrl: https://github.com/enchantednatures/rust-knative-flux-template
+    githubConfigSecret: github-auth-secret
+    minRunners: 0
+    maxRunners: 5
+    listenerTemplate:
+      spec:
+        containers:
+          - name: listener
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+    containerMode:
+      type: kubernetes
+      kubernetesModeWorkVolumeClaim:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: openebs-hostpath
+        resources:
+          requests:
+            storage: 20Gi
+    controllerServiceAccount:
+      name: actions-runner-controller
+      namespace: actions-runner-system
+    template:
+      spec:
+        serviceAccountName: *name
+        containers:
+          - name: runner
+            image: ghcr.io/actions/actions-runner:latest
+            command:
+              - /home/runner/run.sh
+            resources:
+              requests:
+                cpu: 500m
+                memory: 2Gi
+              limits:
+                cpu: 2000m
+                memory: 4Gi
+            env:
+              - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
+                value: "false"
+              - name: DOCKER_TLS_CERTDIR
+                value: /certs
+              - name: DOCKER_HOST
+                value: tcp://localhost:2376
+              - name: DOCKER_TLS_VERIFY
+                value: "1"
+              - name: DOCKER_CERT_PATH
+                value: /certs/client
+              - name: DOCKER_CLI_EXPERIMENTAL
+                value: enabled
+          - name: dind
+            image: docker:dind
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+            env:
+              - name: DOCKER_TLS_CERTDIR
+                value: /certs
+              - name: DOCKER_DRIVER
+                value: overlay2
+            volumeMounts:
+              - name: work
+                mountPath: /__w
+              - name: certs
+                mountPath: /certs
+              - name: docker-graph-storage
+                mountPath: /var/lib/docker
+        volumes:
+          - name: certs
+            emptyDir: {}
+          - name: docker-graph-storage
+            emptyDir: {}

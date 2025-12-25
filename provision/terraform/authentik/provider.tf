@@ -22,23 +22,23 @@ terraform {
   required_providers {
     authentik = {
       source  = "goauthentik/authentik"
-      version = "2025.6.0"
+      version = "2025.10.1"
     }
     local = {
       source  = "hashicorp/local"
-      version = "2.5.3"
+      version = "2.6.1"
     }
     minio = {
       source  = "aminueza/minio"
-      version = "3.6.3"
+      version = "3.12.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "2.38.0"
+      version = "3.0.1"
     }
     bitwarden = {
       source  = "maxlaverse/bitwarden"
-      version = "0.15.0"
+      version = "0.16.0"
     }
   }
 }

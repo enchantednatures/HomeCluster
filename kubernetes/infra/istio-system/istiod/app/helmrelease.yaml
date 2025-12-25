@@ -10,11 +10,10 @@ spec:
   dependsOn:
     - name: istio-base
     - name: istio-cni
-    - name: ztunnel
   chart:
     spec:
       chart: istiod
-      version: 1.26.3
+      version: 1.28.2
       sourceRef:
         kind: HelmRepository
         name: istio
@@ -30,7 +29,8 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    env: {}  # Remove PILOT_ENABLE_AMBIENT* vars; ambient is enabled by charts
+    env:
+      PILOT_ENABLE_AMBIENT: "true"
     meshConfig:
       accessLogFile: /dev/stdout
       accessLogEncoding: JSON

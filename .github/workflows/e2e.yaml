@@ -30,7 +30,7 @@ jobs:
           python-version: "3.13" # minimum supported version
       - name: Cache homebrew packages
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         id: cache-homebrew-packages
         with:
           key: homebrew-${{ runner.os }}-${{ steps.setup-homebrew.outputs.gems-hash
@@ -38,7 +38,7 @@ jobs:
           path: /home/linuxbrew/.linuxbrew
       - name: Cache venv
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version
             }}-${{ hashFiles('requirements.txt', 'requirements.yaml') }}

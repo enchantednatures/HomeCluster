@@ -5,5 +5,5 @@ resources:
   - ./secrets.sops.yaml
   - ./helmrelease.yaml
   - ./virtualservice.yaml
-  - ./ingress-forward-auth.yaml
+  - ./virtualservice-outpost.yaml
   - ./outpost-serviceentry.yaml

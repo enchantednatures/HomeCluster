@@ -5,4 +5,4 @@ resources:
   # - ./istio-config.yaml
   - ./monitoring/ks.yaml
   - ./notifications/github
-  - ./webhooks
+  # Webhooks moved to separate Kustomization with Istio dependency

@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://kubevirt.io/api-reference/main/definitions.html#_v1_kubevirt
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  certificateRotateStrategy: {}
+  configuration:
+    developerConfiguration:
+      featureGates:
+        - Snapshot
+        - VMExport
+        - HotplugVolumes
+  customizeComponents: {}
+  imagePullPolicy: IfNotPresent
