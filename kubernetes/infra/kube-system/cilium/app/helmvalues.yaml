@@ -11,7 +11,8 @@ data:
         id: 1
     kubeProxyReplacement: true
     bpf-lb-sock-hostns-only: "true"
-    cni-exclusive: "false"
+    cni:
+      exclusive: false
 
     # Talos specific
     k8sServiceHost: localhost
