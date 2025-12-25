@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/part-of: rook-ceph
     app.kubernetes.io/component: toolbox
 spec:
-  image: quay.io/ceph/ceph:v19.2.3
+  image: quay.io/ceph/ceph:v20.2.0
   tolerations:
     - effect: NoSchedule
       operator: Exists

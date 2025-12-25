@@ -89,6 +89,7 @@ graph TB
 | [Flux GitOps](flux-gitops.md) | GitOps workflow and Flux configuration |
 | [Terraform Provisioning](terraform.md) | Infrastructure provisioning with Terraform |
 | [Deployment Guide](deployment-guide.md) | Complete deployment and configuration instructions |
+| [Ceph NVMe Setup](ceph-nvme-setup.md) | NVMe drive setup and optimization guide |
 | [Networking](networking.md) | Network configuration and service mesh setup |
 | [Security](security.md) | Security policies and secret management |
 | [Monitoring](monitoring.md) | Observability and monitoring setup |

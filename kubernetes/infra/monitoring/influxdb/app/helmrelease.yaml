@@ -32,7 +32,7 @@ spec:
   values:
     image:
       repository: influxdb
-      tag: 2.7.10-alpine
+      tag: 2.8.0-alpine
       pullPolicy: IfNotPresent
 
     adminUser:

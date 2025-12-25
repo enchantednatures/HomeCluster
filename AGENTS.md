@@ -2,69 +2,46 @@
 
 ## Architecture Overview
 
-**Infrastructure**: Talos Kubernetes cluster on Proxmox VMs, managed via
-Terraform/Tofu **Service Mesh**: Istio (migrating from Nginx Ingress, currently
-has Cilium compatibility issues) **CNI**: Cilium for networking and security
-policies **DNS**: external-dns with Cloudflare integration **Ingress**:
-Cloudflare Tunnels for external access **Serverless**: KNative for serverless
-workloads **Storage**: External MinIO for object storage, OpenEBS for persistent
-volumes **Observability**: Grafana, Prometheus (kube-prometheus-stack), Tempo,
-Loki
-
-## Data Systems Operators
-
-- **CloudNative-PG**: PostgreSQL operator for database workloads
-- **Strimzi**: Apache Kafka operator for event streaming
-- **ArangoDB Operator**: Multi-model database deployments
-- **DragonflyDB Operator**: Redis-compatible in-memory datastore
-- **Elastic Operator**: Elasticsearch and Kibana deployments
+**Infrastructure**: Talos Kubernetes cluster on Proxmox VMs, managed via Terraform/Tofu
+**Service Mesh**: Istio ambient mode with Cilium CNI
+**DNS**: external-dns with Cloudflare, Ingress via Cloudflare Tunnels
+**Serverless**: KNative for serverless workloads
+**Storage**: Rook-Ceph for block/object, OpenEBS for volumes, external MinIO
+**Observability**: kube-prometheus-stack (Grafana, Prometheus, AlertManager), Tempo, Loki
+**Operators**: CloudNative-PG (PostgreSQL), Strimzi (Kafka), ArangoDB, DragonflyDB, Elastic
 
 ## Build/Test/Lint Commands
 
-- `task default` - List all available tasks
-- `task configure` - Configure repository from bootstrap vars and validate
-- `task kubernetes:kubeconform` - Validate all Kubernetes manifests
-- `task kubernetes:resources` - List common cluster resources
-- `task flux:apply path=<app-path>` - Apply specific Flux resources
-- `task flux:reconcile` - Force update Flux to pull changes from git
-- `task sops:encrypt` - Encrypt all SOPS secrets
-- `task sops:decrypt` - Decrypt all SOPS files
+- `task` or `task default` - List all available tasks
+- `task configure` - Template, encrypt secrets, and validate all manifests
+- `task kubernetes:kubeconform` - Validate Kubernetes manifests with kubeconform
+- `task flux:reconcile` - Force Flux to pull latest changes from git
+- `task flux:apply path=<namespace>/<app>` - Apply specific app (e.g., `path=default/open-webui`)
+- `task sops:encrypt` - Encrypt all `*.sops.yaml` files with Age
+- `task kubernetes:resources` - List cluster resources (pods, helmreleases, kustomizations, etc.)
+- `task kubernetes:ceph:health` - Check Ceph cluster status via toolbox pod
 
 ## Code Style Guidelines
 
-- **YAML**: 2-space indentation, LF line endings, UTF-8 encoding
-- **File Structure**: Follow GitOps patterns -
-  `/kubernetes/apps/<namespace>/<app>/` structure
-- **Kubernetes Manifests**: Include yaml-language-server schema comments for
-  validation
-- **Secrets**: Always encrypt with SOPS/Age - never commit unencrypted sensitive
-  data
-- **Naming**: Use kebab-case for files, resources follow Kubernetes conventions
-- **Comments**: Use `#` for YAML comments, include schema validation headers
-- **App Structure**: Each app needs: `namespace.yaml`, `kustomization.yaml`,
-  `ks.yaml`, and `app/` directory
-- **HelmReleases**: Include proper versioning, remediation settings, and cleanup
-  policies
-
-## Istio Service Communication
-
-- **Cross-namespace communication**: Services may need ServiceEntry
-  configurations
-- **Service discovery**: Use full FQDN format:
-  `service-name.namespace.svc.cluster.local:port`
-- **Port specifications**: Always specify explicit ports in service URLs and
-  ServiceEntry configurations
-- **Common service ports**: Prometheus: 9090, Grafana: 80/3000, Tempo:
-  3200/16686, AlertManager: 9093
+**YAML Formatting**: 2-space indent, LF endings, UTF-8, trim trailing whitespace, final newline
+**File Naming**: kebab-case (`helmrelease.yaml`, `db-user.sops.yaml`, `kustomization.yaml`)
+**Schema Validation**: Always include `# yaml-language-server: $schema=<url>` comment at top
+**App Directory Structure**: `/kubernetes/{apps,core,infra,operators}/<namespace>/<app>/`
+  - Each app has: `namespace.yaml`, `kustomization.yaml`, `ks.yaml`, `app/` subdirectory
+  - Multi-component apps use subdirs: `app/`, `db/`, `dragonfly/` (each with own kustomization)
+**Secrets**: Files named `*.sops.yaml`, encrypted with SOPS/Age before commit, never plain text
+  - SOPS encrypts only `^(data|stringData)$` fields in Secrets
+**HelmReleases**: Pin versions, include `maxHistory: 2`, remediation `retries: 3`, `cleanupOnFail: true`
+**Resource Names**: Use anchor pattern (`name: &app myapp`), reference in labels (`app.kubernetes.io/name: *app`)
+**Kustomizations (Flux)**: Place in `flux-system` namespace, set `targetNamespace`, `prune: true`, `interval: 30m`
+**Dependencies**: Use `dependsOn` in Kustomizations to enforce ordering
+**Istio Service Discovery**: Use FQDNs (`service.namespace.svc.cluster.local:port`), explicit ports required
 
 ## Critical Operational Requirements
 
-- **GitOps Only**: ALL changes must be committed and pushed to git - no direct
-  cluster access
-- **Flux Sync**: Changes only take effect after Flux reconciles from git
-  repository
-- **SOPS Encryption**: All secrets must be encrypted before committing
-- **Validation**: All manifests must pass kubeconform validation before
-  deployment
-- **Istio Migration**: Consider service mesh implications when adding new
-  services
+**GitOps Workflow**: ALL changes via git commit/push, NO direct `kubectl apply` to cluster
+**Flux Reconciliation**: Changes apply only after Flux syncs (use `task flux:reconcile` to force)
+**Secret Handling**: Encrypt with `task sops:encrypt` before committing, verify with pre-commit hooks
+**Validation**: Run `task kubernetes:kubeconform` before committing to catch schema errors
+**Istio Compatibility**: New services may need VirtualService, ServiceEntry, or AuthorizationPolicy configs
+**Substitution Vars**: `${SECRET_DOMAIN}` and other vars injected via Flux `postBuild.substituteFrom`

@@ -9,7 +9,7 @@ resources:
   - ./tempo/ks.yaml
   - ./kube-prometheus-stack/ks.yaml
   # - ./kube-state-metrics/ks.yaml
-  - ./prometheus-operator-crds//ks.yaml
+  - ./prometheus-operator-crds/ks.yaml
   - ./promtail/ks.yaml
   - ./influxdb/ks.yaml
   # - ./node-exporter/ks.yaml

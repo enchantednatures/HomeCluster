@@ -112,3 +112,89 @@ reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer  # Better scheduling
 mountOptions:
   - discard
+---
+# Ultra-high-performance block pool optimized for NVMe drives
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephblockpool_v1.json
+apiVersion: ceph.rook.io/v1
+kind: CephBlockPool
+metadata:
+  name: ceph-blockpool-nvme
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+    pool-type: nvme
+spec:
+  failureDomain: host
+  replicated:
+    size: 3
+    requireSafeReplicaSize: true
+  deviceClass: nvme  # Use NVMe device class
+  parameters:
+    compression_mode: "none"  # Disable compression for maximum performance
+    pg_autoscale_mode: "on"
+    target_size_ratio: "0.4"  # Reserve 40% of NVMe capacity for this pool
+  statusCheck:
+    mirror:
+      disabled: false
+      interval: 60s
+---
+# Ultra-high-performance storage class for NVMe drives
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-nvme-block
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+    performance-tier: ultra-high
+    device-type: nvme
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "Ultra-high-performance NVMe storage for latency-critical workloads"
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: ceph-blockpool-nvme
+  imageFormat: "2"
+  imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/fstype: ext4
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate  # Faster binding for NVMe performance
+---
+# NVMe storage class with compression disabled for maximum speed
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-nvme-ssd
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+    performance-tier: ultra-high
+    device-type: nvme
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+    description: "NVMe storage with compression disabled for maximum throughput"
+provisioner: rook-ceph.rbd.csi.ceph.com
+parameters:
+  clusterID: rook-ceph
+  pool: ceph-blockpool-nvme
+  imageFormat: "2"
+  imageFeatures: layering,fast-diff,object-map,deep-flatten,exclusive-lock
+  csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+  csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  csi.storage.k8s.io/fstype: ext4
+  compression: none  # Explicitly disable compression
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: Immediate

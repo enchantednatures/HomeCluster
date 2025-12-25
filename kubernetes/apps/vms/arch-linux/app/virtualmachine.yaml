@@ -18,7 +18,7 @@ spec:
         cpu:
           cores: 2
         memory:
-          guest: 4Gi
+          guest: 2Gi
         devices:
           disks:
             - name: arch-linux-disk
@@ -27,6 +27,9 @@ spec:
             - name: arch-linux-iso
               cdrom:
                 bus: sata
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
           interfaces:
             - name: default
               masquerade: {}
@@ -44,7 +47,10 @@ spec:
           type: pc-q35-rhel9.2.0
         resources:
           requests:
-            memory: 4Gi
+            memory: 2Gi
+            cpu: 1
+          limits:
+            memory: 2Gi
             cpu: 2
       networks:
         - name: default
@@ -56,3 +62,7 @@ spec:
         - name: arch-linux-iso
           dataVolume:
             name: arch-linux-iso
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            secretRef:
+              name: arch-linux-cloud-init

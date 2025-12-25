@@ -13,7 +13,6 @@ spec:
   dependsOn:
     - name: istio-base
     - name: istio-cni
-    - name: ztunnel
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

@@ -31,6 +31,8 @@ This document summarizes the comprehensive remediation and optimization improvem
 - `ceph-block-economy` - Cost-optimized with compression
 - `ceph-block-retain` - Critical data with retain policy
 - `ceph-block-snapshot-retain` - Long-term snapshot retention
+- `ceph-nvme-block` - Ultra-high-performance NVMe storage
+- `ceph-nvme-ssd` - NVMe with compression disabled for maximum speed
 
 **Files Created:**
 - `kubernetes/operators/rook-ceph/cluster/app/storage-classes-enhanced.yaml`
@@ -133,15 +135,21 @@ This document summarizes the comprehensive remediation and optimization improvem
 - Troubleshooting guides and operational procedures
 - Performance tuning documentation
 - Security configuration guidelines
+- NVMe drive setup and optimization guide
 
 **Files Updated/Created:**
 - `kubernetes/operators/rook-ceph/cluster/app/README.md` (enhanced)
 - `docs/ceph-cluster-improvements-implementation.md` (this document)
+- `docs/ceph-nvme-setup.md` (NVMe setup guide)
 
 ## Key Features Implemented
 
 ### 1. Multi-Tier Storage Strategy
 ```yaml
+# Ultra-high-performance tier for NVMe drives
+ceph-nvme-block:     # Maximum performance, no compression
+ceph-nvme-ssd:       # NVMe optimized, compression disabled
+
 # High-performance tier for latency-sensitive workloads
 ceph-block-ssd:      # No compression, optimized for speed
 ceph-block:          # Default tier with balanced performance/capacity
@@ -181,6 +189,15 @@ ceph-block-retain:   # Critical data with retain policy
 - BlueStore cache auto-tuning enabled
 - Optimized block database and WAL sizes
 - Performance-oriented threading configuration
+
+### NVMe-Specific Optimizations
+- **BlueStore Block Size**: Increased to 4G for NVMe drives to maximize throughput
+- **Database Size**: 1G allocation for NVMe metadata performance
+- **WAL Size**: 1G dedicated WAL space for NVMe speed
+- **Cache Configuration**: 3G cache with 80% metadata ratio for NVMe
+- **Compression**: Disabled for maximum NVMe performance
+- **Allocation Sizes**: 4K minimum, 16M maximum for NVMe sector alignment
+- **Device Class**: Dedicated NVMe device class with optimized CRUSH rules
 
 ### Network Optimizations
 - Message compression enabled

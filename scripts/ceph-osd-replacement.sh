@@ -20,8 +20,68 @@ NC='\033[0m' # No Color
 NAMESPACE="rook-ceph"
 TOOLBOX_DEPLOYMENT="deployment/rook-ceph-tools"
 CEPH_CLUSTER_NAME="rook-ceph"
-DEVICE_PATH="/dev/sdb"  # Default from your config
+DEVICE_PATH="/dev/sdb"  # Default from your config (can be overridden)
 NODES=("work-00" "work-01" "work-02")  # Your cluster nodes
+
+# Function to detect device type
+detect_device_type() {
+    local device_path=$1
+    if [[ $device_path =~ ^/dev/nvme ]]; then
+        echo "nvme"
+    else
+        echo "ssd"
+    fi
+}
+
+# Function to get NVMe device info
+get_nvme_info() {
+    local device_path=$1
+    local node_name=$2
+
+    echo "NVMe Device Information for $device_path on $node_name:"
+    ceph_exec nvme list | grep "$device_path" || echo "Device not found in nvme list"
+
+    # Create temporary pod to check device
+    local check_pod="nvme-check-$node_name"
+    cat > /tmp/$check_pod.yaml << EOF
+apiVersion: v1
+kind: Pod
+metadata:
+  name: $check_pod
+  namespace: $NAMESPACE
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: $node_name
+  hostNetwork: true
+  containers:
+  - name: nvme-check
+    image: alpine:latest
+    command: ["/bin/sh"]
+    args: ["-c", "sleep 60"]
+    securityContext:
+      privileged: true
+    volumeMounts:
+    - name: dev
+      mountPath: /dev
+  volumes:
+  - name: dev
+    hostPath:
+      path: /dev
+  restartPolicy: Never
+EOF
+
+    kubectl apply -f /tmp/$check_pod.yaml
+    kubectl wait --for=condition=ready pod/$check_pod -n $NAMESPACE --timeout=30s
+
+    echo "Health status:"
+    kubectl exec -n $NAMESPACE $check_pod -- nvme smart-log $device_path 2>/dev/null || echo "Unable to get health status"
+
+    echo "Controller info:"
+    kubectl exec -n $NAMESPACE $check_pod -- nvme id-ctrl $device_path 2>/dev/null || echo "Unable to get controller info"
+
+    kubectl delete pod $check_pod -n $NAMESPACE --ignore-not-found=true
+    rm -f /tmp/$check_pod.yaml
+}
 
 print_status() {
     local status=$1
@@ -359,13 +419,32 @@ EOF
     kubectl wait --for=condition=ready pod/device-cleanup-$node_name -n $NAMESPACE --timeout=300s
     
     print_status "STEP" "Cleaning device signatures..."
-    kubectl exec -n $NAMESPACE device-cleanup-$node_name -- sgdisk --zap-all $device_path || true
-    kubectl exec -n $NAMESPACE device-cleanup-$node_name -- dd if=/dev/zero of=$device_path bs=1M count=100 || true
-    kubectl exec -n $NAMESPACE device-cleanup-$node_name -- wipefs --all $device_path || true
-    
+
+    # Device-type specific cleanup
+    device_type=$(detect_device_type $device_path)
+    if [[ $device_type == "nvme" ]]; then
+        print_status "INFO" "Detected NVMe device, using NVMe-specific cleanup..."
+        # NVMe secure erase (user data erase)
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- nvme format -s 1 $device_path || print_status "WARN" "NVMe format failed, trying alternative methods"
+        # Fallback to standard cleanup if NVMe format fails
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- sgdisk --zap-all $device_path || true
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- wipefs --all $device_path || true
+    else
+        print_status "INFO" "Detected SSD device, using standard cleanup..."
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- sgdisk --zap-all $device_path || true
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- dd if=/dev/zero of=$device_path bs=1M count=100 || true
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- wipefs --all $device_path || true
+    fi
+
     print_status "STEP" "Verifying device is clean..."
     kubectl exec -n $NAMESPACE device-cleanup-$node_name -- lsblk $device_path
-    kubectl exec -n $NAMESPACE device-cleanup-$node_name -- fdisk -l $device_path || true
+
+    if [[ $device_type == "nvme" ]]; then
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- nvme list-ns $device_path || true
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- nvme smart-log $device_path | head -10 || true
+    else
+        kubectl exec -n $NAMESPACE device-cleanup-$node_name -- fdisk -l $device_path || true
+    fi
     
     print_status "STEP" "Cleaning up device cleanup pod..."
     kubectl delete pod device-cleanup-$node_name -n $NAMESPACE
@@ -559,7 +638,27 @@ interactive_osd_replacement() {
     local osd_node
     osd_node=$(ceph_exec ceph osd find "$osd_id" | grep -o '"host":"[^"]*"' | cut -d'"' -f4)
     print_status "INFO" "OSD $osd_id is located on node: $osd_node"
-    
+
+    # Get device information
+    local device_path
+    device_path=$(ceph_exec ceph osd metadata "$osd_id" | grep '"device"' | cut -d'"' -f4)
+    if [[ -z "$device_path" ]]; then
+        print_status "WARN" "Could not determine device path for OSD $osd_id"
+        device_path=$DEVICE_PATH  # Use default
+    fi
+
+    print_status "INFO" "OSD $osd_id uses device: $device_path"
+
+    # Detect device type and show information
+    local device_type
+    device_type=$(detect_device_type "$device_path")
+    print_status "INFO" "Device type detected: $device_type"
+
+    if [[ $device_type == "nvme" ]]; then
+        print_status "INFO" "NVMe device detected - will use NVMe-specific cleanup procedures"
+        get_nvme_info "$device_path" "$osd_node"
+    fi
+
     # Validate removal safety
     if ! validate_removal_safety "$osd_id"; then
         exit 1
