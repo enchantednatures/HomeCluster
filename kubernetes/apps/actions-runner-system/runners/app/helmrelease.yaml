@@ -35,7 +35,7 @@ spec:
   values:
     nameOverride: *name
     runnerScaleSetName: *name
-    githubConfigUrl: https://github.com/enchantednatures
+    githubConfigUrl: https://github.com/enchantednatures/rust-knative-flux-template
     githubConfigSecret: github-auth-secret
     minRunners: 0
     maxRunners: 5
