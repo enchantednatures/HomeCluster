@@ -39,6 +39,16 @@ spec:
     githubConfigSecret: github-auth-secret
     minRunners: 0
     maxRunners: 5
+    listenerTemplate:
+      spec:
+        containers:
+          - name: listener
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
     containerMode:
       type: kubernetes
       kubernetesModeWorkVolumeClaim:
@@ -59,6 +69,13 @@ spec:
             image: ghcr.io/actions/actions-runner:latest
             command:
               - /home/runner/run.sh
+            resources:
+              requests:
+                cpu: 500m
+                memory: 2Gi
+              limits:
+                cpu: 2000m
+                memory: 4Gi
             env:
               - name: ACTIONS_RUNNER_REQUIRE_JOB_CONTAINER
                 value: "false"
@@ -76,6 +93,13 @@ spec:
             image: docker:dind
             securityContext:
               privileged: true
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
             env:
               - name: DOCKER_TLS_CERTDIR
                 value: /certs

@@ -43,6 +43,7 @@ spec:
             - kubevirt
             - cdi
             - vms
+            - actions-runner-system
       validate:
         message: "Resource requests and limits are required"
         pattern:
