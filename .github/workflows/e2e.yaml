@@ -19,7 +19,7 @@ jobs:
         config-files: [talos]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Homebrew
         id: setup-homebrew
         uses: Homebrew/actions/setup-homebrew@master
