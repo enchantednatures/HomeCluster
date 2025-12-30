@@ -116,18 +116,18 @@ spec:
 
     # Global configuration
     config:
-      webhooks:
-        - namespaceSelector:
-            matchExpressions:
-            - key: name
-              operator: NotIn
-              values: [kyverno-system, kube-system, kube-public, kube-node-lease, flux-system]
       excludeGroups:
         - system:nodes
         - system:serviceaccounts:kube-system
         - system:serviceaccounts:kyverno-system
         - system:serviceaccounts:flux-system
       generateSuccessEvents: false
+      webhooks:
+        namespaceSelector:
+          matchExpressions:
+          - key: name
+            operator: NotIn
+            values: [kyverno-system, kube-system, kube-public, kube-node-lease, flux-system]
 
     # Network policies
     networkPolicies:
