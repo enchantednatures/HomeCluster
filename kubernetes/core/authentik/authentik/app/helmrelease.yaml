@@ -75,16 +75,21 @@ spec:
     server:
       ingress:
         enabled: false
-
       resources:
         server:
           requests:
             cpu: 15m
             memory: 476M
+          limits:
+            cpu: 500m
+            memory: 1024M
         worker:
           requests:
             cpu: 15m
             memory: 512M
+          limits:
+            cpu: 500m
+            memory: 1024M
     geoip:
       enabled: false
     authentik:
