@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/main/src/schemas/json/k8s-job-batch-v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/job_v1.json
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -18,7 +18,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: kubectl
-          image: registry.k8s.io/kubectl:v1.35.0
+          image: alpine/kubectl:1.35.0
           imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
