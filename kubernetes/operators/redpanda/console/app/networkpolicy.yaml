@@ -33,7 +33,7 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: kube-system
-        - podSelector:
+          podSelector:
             matchLabels:
               k8s-app: kube-dns
       ports:
@@ -46,7 +46,7 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: kafka
-        - podSelector:
+          podSelector:
             matchLabels:
               app.kubernetes.io/name: kafka
       ports:
