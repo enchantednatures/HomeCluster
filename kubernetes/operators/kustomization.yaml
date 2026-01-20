@@ -7,8 +7,8 @@ resources:
   - ./cnpg-system
   - ./dragonflydb
   - ./elastic
-  - ./flink
+  # - ./flink
   - ./kubevirt
   - ./rabbitmq-operator
   - ./redpanda
-  - ./rook-ceph
+  # - ./rook-ceph
