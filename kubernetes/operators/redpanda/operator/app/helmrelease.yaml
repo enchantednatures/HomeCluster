@@ -37,6 +37,7 @@ spec:
               - --configurator-base-image=docker.redpanda.com/redpandadata/redpanda-operator
               - --configurator-tag=v25.3.1
               - --enable-console=false
+              - --enable-shadowlinks=false
               - --enable-vectorized-controllers=false
               - --health-probe-bind-address=:8081
               - --leader-elect
