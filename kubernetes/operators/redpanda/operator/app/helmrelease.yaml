@@ -29,18 +29,6 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    podTemplate:
-      spec:
-        containers:
-          - name: manager
-            args:
-              - --configurator-base-image=docker.redpanda.com/redpandadata/redpanda-operator
-              - --configurator-tag=v25.3.1
-              - --enable-console=false
-              - --enable-shadowlinks=false
-              - --enable-vectorized-controllers=false
-              - --health-probe-bind-address=:8081
-              - --leader-elect
-              - --log-level=info
-              - --metrics-bind-address=:8443
-              - --webhook-enabled=false
+    crds:
+      enabled: true
+      experimental: true
