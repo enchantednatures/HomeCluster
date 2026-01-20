@@ -28,3 +28,6 @@ spec:
     disableWait: false
   uninstall:
     keepHistory: false
+  values:
+    additionalCmdFlags:
+      - --enable-console=false
