@@ -21,9 +21,13 @@ spec:
         namespace: flux-system
   maxHistory: 2
   install:
+    disableWait: true
+    disableWaitForJobs: true
     remediation:
       retries: 3
   upgrade:
+    disableWait: true
+    disableWaitForJobs: true
     cleanupOnFail: true
     remediation:
       retries: 3
@@ -38,3 +42,13 @@ spec:
       limits:
         cpu: 500m
         memory: 512Mi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: NotIn
+              values:
+              - work-00
+              - work-03
