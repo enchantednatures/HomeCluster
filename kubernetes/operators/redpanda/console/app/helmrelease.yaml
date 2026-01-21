@@ -28,7 +28,7 @@ spec:
         brokers:
           - snail-kafka-bootstrap.kafka.svc.cluster.local:9092
     ingress:
-      enabled: true
+      enabled: false
       className: tailscale
       annotations:
         kubernetes.io/tls-acme: "true"
