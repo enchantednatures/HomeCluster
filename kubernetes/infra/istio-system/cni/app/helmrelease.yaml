@@ -44,5 +44,15 @@ spec:
       logLevel: warn
       repair:
         enabled: false
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                - work-00
+                - work-03
     global:
       meshID: enchantednatures
