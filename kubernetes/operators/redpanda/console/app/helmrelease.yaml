@@ -32,7 +32,7 @@ spec:
     config:
       kafka:
         brokers:
-          - redpanda.redpanda.svc.cluster.local:9092
+          - redpanda-cluster.redpanda.svc.cluster.local:9092
     ingress:
       enabled: false
       className: tailscale
