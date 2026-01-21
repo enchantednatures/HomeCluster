@@ -36,6 +36,7 @@ spec:
             - openebs-system
             - kubevirt
             - cdi
+            - networking
       validate:
         message: "Privileged containers are not allowed"
         pattern:

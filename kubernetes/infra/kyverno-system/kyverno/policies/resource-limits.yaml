@@ -45,6 +45,7 @@ spec:
             - vms
             - actions-runner-system
             - kafka
+            - networking
       validate:
         message: "Resource requests and limits are required"
         pattern:
