@@ -6,3 +6,4 @@ resources:
   - ./addons
   - ./addons/ks.yaml
   - ./weave-gitops/ks.yaml
+  - ./image-automation/ks.yaml
