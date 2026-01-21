@@ -20,3 +20,18 @@ spec:
     limits:
       memory: 4Gi
       cpu: 2000m
+  template:
+    pod:
+      metadata:
+        labels:
+          app: kafka
+      spec:
+        containers:
+          - name: kafka
+            resources:
+              requests:
+                memory: 2Gi
+                cpu: 500m
+              limits:
+                memory: 4Gi
+                cpu: 2000m
