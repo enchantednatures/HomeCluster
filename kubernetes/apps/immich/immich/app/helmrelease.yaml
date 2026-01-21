@@ -38,7 +38,7 @@ spec:
       IMMICH_MACHINE_LEARNING_URL: '{{ printf "http://%s-machine-learning:3003" .Release.Name }}'
 
     image:
-      tag: v1.119.0
+      tag: v1.119.0 # {"$imagepolicy": "flux-system:immich-server:tag"}
 
     immich:
       metrics:
@@ -58,7 +58,7 @@ spec:
     server:
       enabled: true
       image:
-        repository: ghcr.io/immich-app/immich-server
+        repository: ghcr.io/immich-app/immich-server # {"$imagepolicy": "flux-system:immich-server:name"}
         pullPolicy: IfNotPresent
       ingress:
         main:
@@ -75,7 +75,7 @@ spec:
     machine-learning:
       enabled: true
       image:
-        repository: ghcr.io/immich-app/immich-machine-learning
+        repository: ghcr.io/immich-app/immich-machine-learning # {"$imagepolicy": "flux-system:immich-machine-learning:name"}
         pullPolicy: IfNotPresent
       env:
         TRANSFORMERS_CACHE: /cache

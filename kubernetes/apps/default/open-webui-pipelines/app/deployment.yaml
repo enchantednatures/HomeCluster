@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: pipelines
-          image: ghcr.io/open-webui/pipelines:main
+          image: ghcr.io/open-webui/pipelines:main # {"$imagepolicy": "flux-system:open-webui-pipelines-main"}
           ports:
             - containerPort: 9099
           volumeMounts:
