@@ -48,7 +48,7 @@ spec:
       persistentVolume:
         enabled: true
         size: 20Gi
-        storageClass: csi-nfs
+        storageClass: openebs-hostpath
 
     resources:
       cpu:

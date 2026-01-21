@@ -1,0 +1,237 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/OAI/OpenAPI-Specification/main/schemas/v3.0/schema.json
+openapi: 3.0.3
+info:
+  title: Kokoro Text-to-Speech API
+  description: |
+    Text-to-speech synthesis service using Kokoro-FastAPI container.
+    Converts written text into natural-sounding speech audio with customizable voice options.
+  version: 1.0.0
+  contact:
+    name: HomeCluster
+    url: https://github.com/remsky/Kokoro-FastAPI
+
+servers:
+  - url: http://kokoro-api.ai-services.svc.cluster.local:8000
+    description: Internal cluster service (Istio mesh)
+
+paths:
+  /synthesize:
+    post:
+      summary: Convert text to speech
+      description: |
+        Generates synthesized speech audio from input text with optional voice customization.
+        Supports multiple output formats (MP3, WAV, OGG) and voice characteristics.
+      operationId: synthesizeSpeech
+      tags:
+        - Text-to-Speech
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextToSpeechRequest'
+            examples:
+              basic:
+                summary: Basic text-to-speech request
+                value:
+                  text: "Hello, this is a test of the Kokoro text-to-speech system."
+                  output_format: "mp3"
+              customized:
+                summary: Customized voice and speed
+                value:
+                  text: "The quick brown fox jumps over the lazy dog."
+                  voice_id: "af_bella"
+                  language: "en"
+                  speaking_rate: 1.2
+                  output_format: "wav"
+      responses:
+        '200':
+          description: Successfully generated audio
+          headers:
+            Content-Type:
+              description: Audio MIME type
+              schema:
+                type: string
+                enum:
+                  - audio/mpeg
+                  - audio/wav
+                  - audio/ogg
+            Content-Length:
+              description: Audio file size in bytes
+              schema:
+                type: integer
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+            audio/wav:
+              schema:
+                type: string
+                format: binary
+            audio/ogg:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Invalid request (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emptyText:
+                  summary: Empty text input
+                  value:
+                    error: "ValidationError"
+                    message: "Text input cannot be empty or whitespace-only"
+                    details:
+                      field: "text"
+                      received: "   "
+                invalidVoice:
+                  summary: Unsupported voice ID
+                  value:
+                    error: "UnsupportedVoice"
+                    message: "Voice ID 'invalid_voice' is not supported"
+                    details:
+                      field: "voice_id"
+                      received: "invalid_voice"
+                      supported_voices: ["af_bella", "af_sarah", "am_adam", "am_michael"]
+        '500':
+          description: Internal server error (audio generation failure)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "InternalError"
+                message: "Audio generation failed due to unexpected error"
+                details:
+                  trace_id: "abc123"
+        '503':
+          description: Service unavailable (after retry exhaustion)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "ServiceUnavailable"
+                message: "Kokoro service temporarily unavailable after 3 retry attempts"
+                details:
+                  retry_attempts: 3
+                  last_error: "Connection refused"
+
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns service health status for readiness/liveness probes
+      operationId: healthCheck
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy]
+                  timestamp:
+                    type: string
+                    format: date-time
+              example:
+                status: "healthy"
+                timestamp: "2026-01-20T12:00:00Z"
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [unhealthy]
+                  error:
+                    type: string
+              example:
+                status: "unhealthy"
+                error: "Model not loaded"
+
+components:
+  schemas:
+    TextToSpeechRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          description: Input text to synthesize (non-empty, typically <1000 words)
+          minLength: 1
+          maxLength: 10000
+          example: "Hello, this is a test of the Kokoro text-to-speech system."
+        voice_id:
+          type: string
+          description: Voice identifier from Kokoro's voice library
+          default: "af_bella"
+          example: "af_bella"
+        language:
+          type: string
+          description: ISO 639-1 language code
+          default: "en"
+          pattern: '^[a-z]{2}$'
+          example: "en"
+        speaking_rate:
+          type: number
+          format: float
+          description: Speech speed multiplier (0.5 = slow, 2.0 = fast)
+          minimum: 0.5
+          maximum: 2.0
+          default: 1.0
+          example: 1.0
+        output_format:
+          type: string
+          description: Desired audio output format
+          enum:
+            - mp3
+            - wav
+            - ogg
+          default: "mp3"
+          example: "mp3"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error type identifier
+          enum:
+            - ValidationError
+            - UnsupportedVoice
+            - InternalError
+            - ServiceUnavailable
+          example: "ValidationError"
+        message:
+          type: string
+          description: Human-readable error description
+          example: "Text input cannot be empty or whitespace-only"
+        details:
+          type: object
+          description: Additional error context (optional)
+          additionalProperties: true
+          example:
+            field: "text"
+            received: "   "
+
+tags:
+  - name: Text-to-Speech
+    description: Speech synthesis operations
+  - name: Health
+    description: Service health monitoring
