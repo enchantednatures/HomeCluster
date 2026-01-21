@@ -29,7 +29,7 @@ spec:
           - snail-kafka-bootstrap.kafka.svc.cluster.local:9092
     ingress:
       enabled: true
-      className: external
+      className: tailscale
       annotations:
         kubernetes.io/tls-acme: "true"
         cert-manager.io/cluster-issuer: letsencrypt-production
