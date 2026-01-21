@@ -10,6 +10,11 @@ metadata:
 spec:
   kafka:
     version: 4.1.1
+    template:
+      pod:
+        metadata:
+          labels:
+            app: kafka
     listeners:
       - name: plain
         port: 9092

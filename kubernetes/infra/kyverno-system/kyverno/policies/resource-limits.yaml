@@ -44,6 +44,7 @@ spec:
             - cdi
             - vms
             - actions-runner-system
+            - kafka
       validate:
         message: "Resource requests and limits are required"
         pattern:
