@@ -2,6 +2,8 @@
 originRequest:
   http2Origin: true
 ingress:
+  - hostname: console.${SECRET_DOMAIN}
+    service: http://console.redpanda.svc.cluster.local:8080
   - hostname: ${SECRET_DOMAIN}
     service: http://istio-gateway.istio-ingress.svc.cluster.local:80
   - hostname: "*.${SECRET_DOMAIN}"
