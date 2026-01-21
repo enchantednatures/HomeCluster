@@ -3,4 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./namespace.yaml
-  - ./strimzi/ks.yaml
+  # Strimzi operator - commented out in favor of Redpanda
+  # - ./strimzi/ks.yaml
+  # Schema Registry - commented out, using Redpanda's built-in schema registry
+  # - ./schema-registry/ks.yaml

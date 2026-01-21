@@ -1,0 +1,87 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app redpanda
+  namespace: redpanda
+spec:
+  interval: 30m
+  timeout: 60m
+  chart:
+    spec:
+      chart: redpanda
+      version: 25.3.1
+      sourceRef:
+        kind: HelmRepository
+        name: redpanda-charts
+        namespace: flux-system
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    nameOverride: *app
+    fullnameOverride: *app
+
+    image:
+      repository: docker.redpanda.com/redpandadata/redpanda
+      tag: v25.3.1
+
+    auth:
+      sasl:
+        enabled: false
+
+    tls:
+      enabled: false
+
+    statefulset:
+      replicas: 3
+
+    storage:
+      persistentVolume:
+        enabled: true
+        size: 20Gi
+        storageClass: ceph-block
+
+    resources:
+      cpu:
+        cores: 1
+      memory:
+        container:
+          max: 2.5Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+      limits:
+        cpu: 2000m
+        memory: 2.5Gi
+
+    console:
+      enabled: false
+
+    listeners:
+      kafka:
+        port: 9092
+      admin:
+        port: 9644
+      http:
+        enabled: true
+        port: 8082
+      schemaRegistry:
+        enabled: true
+        port: 8081
+
+    config:
+      cluster:
+        auto_create_topics_enabled: true
+
+    monitoring:
+      enabled: true
+      scrapeInterval: 30s
