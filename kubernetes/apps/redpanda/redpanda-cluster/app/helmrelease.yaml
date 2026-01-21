@@ -48,7 +48,7 @@ spec:
       persistentVolume:
         enabled: true
         size: 20Gi
-        storageClass: ceph-block
+        storageClass: csi-nfs
 
     resources:
       cpu:
