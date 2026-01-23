@@ -1,6 +1,6 @@
 ---
 # Automated backup job for critical Ceph data
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/cronjob_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/cronjob.json
 apiVersion: batch/v1
 kind: CronJob
 metadata:

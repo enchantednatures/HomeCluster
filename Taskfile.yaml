@@ -30,6 +30,8 @@ includes:
   terraform: .taskfiles/TerraformTasks.yaml
   sops: .taskfiles/Sops/Taskfile.yaml
   workstation: .taskfiles/Workstation/Taskfile.yaml
+  scripts:
+    taskfile: .taskfiles/Scripts/Taskfile.yaml
   user:
     taskfile: .taskfiles/User
     optional: true

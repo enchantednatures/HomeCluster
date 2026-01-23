@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/gateway_v1.json
 ---
 # kubernetes/infra/istio-ingress/gateway/app/gateway.yaml
 apiVersion: networking.istio.io/v1beta1

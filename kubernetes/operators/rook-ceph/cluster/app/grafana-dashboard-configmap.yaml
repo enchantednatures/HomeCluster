@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
 ---
 # Grafana Dashboard for Ceph Object Store (RGW) Monitoring
 # This creates a ConfigMap that can be auto-discovered by Grafana

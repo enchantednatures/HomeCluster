@@ -1,6 +1,6 @@
 ---
 # ServiceAccount for volume snapshot operations
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/serviceaccount.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -12,7 +12,7 @@ metadata:
     app.kubernetes.io/component: backup
 ---
 # ClusterRole for volume snapshot operations
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/clusterrole_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -40,7 +40,7 @@ rules:
     verbs: ["get", "list", "watch"]
 ---
 # ClusterRoleBinding for volume snapshot operations
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/clusterrolebinding_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -59,7 +59,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 # Role for Ceph operations within rook-ceph namespace
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/role_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -92,7 +92,7 @@ rules:
     verbs: ["create", "update", "patch"]
 ---
 # RoleBinding for Ceph backup operations
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/rolebinding_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -115,7 +115,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ---
 # ServiceAccount for Ceph monitoring operations
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/serviceaccount.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -127,7 +127,7 @@ metadata:
     app.kubernetes.io/component: monitoring
 ---
 # Role for monitoring operations
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/role_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -152,7 +152,7 @@ rules:
     verbs: ["get", "list", "watch"]
 ---
 # RoleBinding for monitoring operations
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/rolebinding_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:

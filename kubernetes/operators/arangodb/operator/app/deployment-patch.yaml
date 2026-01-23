@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/apps/v1/deployment.json
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/serviceentry_v1.json
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry

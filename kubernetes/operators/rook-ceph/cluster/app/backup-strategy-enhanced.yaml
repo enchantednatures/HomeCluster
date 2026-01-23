@@ -1,6 +1,6 @@
 ---
 # Enhanced backup strategy with external storage integration
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/cronjob_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -149,7 +149,7 @@ spec:
             kubernetes.io/arch: amd64
 ---
 # PVC for backup storage
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -168,7 +168,7 @@ spec:
       storage: 20Gi
 ---
 # Automated volume snapshot creation job
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/cronjob_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: batch/v1
 kind: CronJob
 metadata:

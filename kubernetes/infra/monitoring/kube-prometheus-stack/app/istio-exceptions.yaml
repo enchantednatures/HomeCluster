@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/sidecar_v1.json
 ---
 # Sidecar configuration to exclude admission webhook jobs from Istio injection
 apiVersion: networking.istio.io/v1beta1

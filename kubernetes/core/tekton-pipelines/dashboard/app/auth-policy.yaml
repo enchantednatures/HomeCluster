@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/security.istio.io/authorizationpolicy_v1beta1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/security.istio.io/authorizationpolicy_v1.json
 # Gateway-level authorization for tekton domain
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy
@@ -19,7 +19,7 @@ spec:
     matchLabels:
       app: istio-ingressgateway
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/security.istio.io/authorizationpolicy_v1beta1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/security.istio.io/authorizationpolicy_v1.json
 # Service-level authorization requiring authentication
 apiVersion: security.istio.io/v1beta1
 kind: AuthorizationPolicy

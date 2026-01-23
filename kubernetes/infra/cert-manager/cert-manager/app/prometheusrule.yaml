@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/prometheusrule.json
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule

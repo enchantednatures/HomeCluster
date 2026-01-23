@@ -1,6 +1,6 @@
 ---
 # High-performance block pool optimized for SSDs
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephblockpool_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
@@ -26,7 +26,7 @@ spec:
       interval: 60s
 ---
 # High-performance storage class for latency-sensitive workloads
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -61,7 +61,7 @@ mountOptions:
   - noatime  # Improve performance by not updating access times
 ---
 # Economy storage class for bulk data
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephblockpool_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
@@ -83,7 +83,7 @@ spec:
   quotas:
     maxBytes: 1099511627776  # 1Ti in bytes
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -114,7 +114,7 @@ mountOptions:
   - discard
 ---
 # Ultra-high-performance block pool optimized for NVMe drives
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephblockpool_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
@@ -139,7 +139,7 @@ spec:
       interval: 60s
 ---
 # Ultra-high-performance storage class for NVMe drives
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -169,7 +169,7 @@ allowVolumeExpansion: true
 volumeBindingMode: Immediate  # Faster binding for NVMe performance
 ---
 # NVMe storage class with compression disabled for maximum speed
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:

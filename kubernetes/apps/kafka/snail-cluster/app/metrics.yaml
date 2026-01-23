@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
 ---
 kind: ConfigMap
 apiVersion: v1

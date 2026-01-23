@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/gateway_v1.json
 ---
 # Override the knative-ingress-gateway to use your custom gateway selector
 apiVersion: networking.istio.io/v1beta1

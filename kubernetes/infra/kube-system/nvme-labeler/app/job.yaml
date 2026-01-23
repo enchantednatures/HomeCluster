@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/job_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
 apiVersion: batch/v1
 kind: Job
 metadata:

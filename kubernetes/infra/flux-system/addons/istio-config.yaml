@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 ---
 # ServiceEntry to allow access to GitHub
 apiVersion: networking.istio.io/v1beta1

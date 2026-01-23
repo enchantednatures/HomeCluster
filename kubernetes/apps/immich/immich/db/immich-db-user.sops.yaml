@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
 apiVersion: v1
 stringData:
     password: ENC[AES256_GCM,data:SqUBTKh1JcDRHkNte6wHPgypr5IhQwfoxlz1DXc4t3EfGhtG,iv:dAVFnI3dWHUKPGIgdCDEsIv/NnVOkfTKdRfSx9xhJzQ=,tag:5dMknft9eavMzrrOZA/1sA==,type:str]

@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/v1/storageclass.json
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass

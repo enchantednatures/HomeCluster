@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/cephblockpool_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
@@ -24,7 +24,7 @@ spec:
   compressionMode: none # Disable compression for performance
   enableRBDStats: true
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -56,7 +56,7 @@ volumeBindingMode: Immediate
 mountOptions:
   - discard # Enable TRIM support
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -73,7 +73,7 @@ parameters:
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -91,7 +91,7 @@ reclaimPolicy: Retain
 volumeBindingMode: Immediate
 ---
 # Retain policy storage class for critical data
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/storage.k8s.io/storageclass_v1.json
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:

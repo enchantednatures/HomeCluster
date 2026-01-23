@@ -1,5 +1,5 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.zinn.ca/security.istio.io/requestauthentication_v1beta1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/security.istio.io/requestauthentication_v1.json
 apiVersion: security.istio.io/v1beta1
 kind: RequestAuthentication
 metadata:

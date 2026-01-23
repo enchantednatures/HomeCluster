@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

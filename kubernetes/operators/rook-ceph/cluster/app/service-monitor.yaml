@@ -1,6 +1,6 @@
 ---
 # Comprehensive Ceph cluster monitoring
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/servicemonitor.json
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -29,7 +29,7 @@ spec:
     matchNames:
       - rook-ceph
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/servicemonitor.json
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
