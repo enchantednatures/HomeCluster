@@ -6,6 +6,7 @@ metadata:
   name: promtail
   namespace: monitoring
 spec:
+  maxHistory: 2
   interval: 5m
   chart:
     spec:
@@ -24,6 +25,8 @@ spec:
       retries: 3
       remediateLastFailure: true
     cleanupOnFail: true
+  uninstall:
+    keepHistory: false
   values:
     config:
       logLevel: info

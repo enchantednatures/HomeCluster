@@ -5,6 +5,7 @@ kind: HelmRelease
 metadata:
   name: &app dbman
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
@@ -22,6 +23,8 @@ spec:
     remediation:
       retries: 5
   timeout: 15m
+  uninstall:
+    keepHistory: false
   values:
     env:
       - name: RUST_LOG

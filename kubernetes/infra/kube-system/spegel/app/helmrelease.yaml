@@ -5,6 +5,7 @@ kind: HelmRelease
 metadata:
   name: spegel
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
@@ -23,5 +24,7 @@ spec:
       strategy: rollback
       retries: 3
   valuesFrom:
+  uninstall:
+    keepHistory: false
     - kind: ConfigMap
       name: spegel-helm-values

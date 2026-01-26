@@ -5,6 +5,7 @@ kind: HelmRelease
 metadata:
   name: tailscale
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
@@ -22,6 +23,8 @@ spec:
     remediation:
       strategy: rollback
       retries: 3
+  uninstall:
+    keepHistory: false
   values:
     oauth:
       clientId:

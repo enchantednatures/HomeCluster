@@ -5,6 +5,7 @@ kind: HelmRelease
 metadata:
   name: &app node-red
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
@@ -27,6 +28,8 @@ spec:
       namespace: home-automation
     - name: volsync
       namespace: storage
+  uninstall:
+    keepHistory: false
   values:
     controllers:
       node-red:

@@ -17,6 +17,8 @@ spec:
         kind: HelmRepository
         name: grafana
         namespace: flux-system
+  uninstall:
+    keepHistory: false
   values:
     replicas: 5
     gateway:

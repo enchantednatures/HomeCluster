@@ -6,6 +6,7 @@ metadata:
   name: kiali
   namespace: istio-system
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
@@ -22,6 +23,8 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  uninstall:
+    keepHistory: false
   values:
     deployment:
       ingress:

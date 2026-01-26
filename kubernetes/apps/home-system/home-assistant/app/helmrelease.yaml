@@ -6,6 +6,7 @@ metadata:
   name: home-assistant
   namespace: home-system
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
@@ -19,6 +20,8 @@ spec:
   # dependsOn:
   #   - name: rook-ceph-cluster
   #     namespace: rook-ceph
+  uninstall:
+    keepHistory: false
   values:
     controllers:
       home-assistant:

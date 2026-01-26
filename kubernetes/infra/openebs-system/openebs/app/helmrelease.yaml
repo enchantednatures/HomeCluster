@@ -5,6 +5,7 @@ kind: HelmRelease
 metadata:
   name: openebs
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
@@ -15,6 +16,8 @@ spec:
         kind: HelmRepository
         name: openebs-charts
         namespace: flux-system
+  uninstall:
+    keepHistory: false
   values:
     localpv-provisioner:
       rbac:

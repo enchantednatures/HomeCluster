@@ -6,6 +6,7 @@ metadata:
   name: eck-operator
   namespace: elastic
 spec:
+  maxHistory: 2
   interval: 5m
   chart:
     spec:
@@ -16,6 +17,8 @@ spec:
         name: elastic
         namespace: flux-system
       interval: 5m
+  uninstall:
+    keepHistory: false
   values:
     image:
       repository: docker.elastic.co/eck/eck-operator

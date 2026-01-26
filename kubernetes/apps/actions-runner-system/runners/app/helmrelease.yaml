@@ -33,6 +33,8 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  uninstall:
+    keepHistory: false
   values:
     nameOverride: *name
     runnerScaleSetName: *name

@@ -105,8 +105,8 @@ is_istio_enabled_namespace() {
 extract_namespace_name() {
     local file="$1"
     
-    # Extract namespace name from metadata.name
-    grep "^  name:" "$file" 2>/dev/null | head -1 | awk '{print $2}'
+    # Extract namespace name from metadata.name (handle variable indentation)
+    grep "^ *name:" "$file" 2>/dev/null | head -1 | awk '{print $2}'
 }
 
 analyze_namespace() {

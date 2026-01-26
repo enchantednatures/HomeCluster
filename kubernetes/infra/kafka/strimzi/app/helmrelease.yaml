@@ -6,6 +6,7 @@ metadata:
   name: strimzi-kafka-operator
   namespace: kafka
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
