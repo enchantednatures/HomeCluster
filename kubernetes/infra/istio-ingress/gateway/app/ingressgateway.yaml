@@ -1,0 +1,199 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/apps_v1_deployment.json
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-ingress
+  labels:
+    app: istio-ingressgateway
+    istio: ingressgateway
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+      istio: ingressgateway
+  replicas: 2
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "15020"
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/stats/prometheus"
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: istio-ingressgateway
+        istio: ingressgateway
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: istio-ingressgateway
+      securityContext:
+        sysctls:
+          - name: net.ipv4.ip_unprivileged_port_start
+            value: "0"
+      containers:
+        - name: istio-proxy
+          image: docker.io/istio/proxyv2:1.24.2
+          args:
+            - proxy
+            - router
+            - --domain
+            - $(POD_NAMESPACE).svc.cluster.local
+            - --proxyLogLevel=warning
+            - --proxyComponentLogLevel=misc:error
+            - --log_output_level=default:info
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1337
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 50m
+              memory: 128Mi
+          env:
+            - name: JWT_POLICY
+              value: third-party-jwt
+            - name: PILOT_CERT_PROVIDER
+              value: istiod
+            - name: CA_ADDR
+              value: istiod.istio-system.svc:15012
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: INSTANCE_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+            - name: ISTIO_META_UNPRIVILEGED_POD
+              value: "true"
+            - name: ISTIO_META_ROUTER_MODE
+              value: sni-dnat
+            - name: ISTIO_META_CLUSTER_ID
+              value: Kubernetes
+            - name: ISTIO_META_NETWORK
+              value: ""
+            - name: ISTIO_META_WORKLOAD_NAME
+              value: istio-ingressgateway
+            - name: ISTIO_META_OWNER
+              value: kubernetes://apis/apps/v1/namespaces/istio-ingress/deployments/istio-ingressgateway
+          volumeMounts:
+            - name: istio-envoy
+              mountPath: /etc/istio/proxy
+            - name: istio-certs
+              mountPath: /etc/certs
+              readOnly: true
+            - name: istio-ca-root-cert
+              mountPath: /var/run/secrets/istio
+              readOnly: true
+          ports:
+            - containerPort: 15090
+              name: http-envoy-prom
+              protocol: TCP
+            - containerPort: 15021
+              name: status-port
+              protocol: TCP
+            - containerPort: 80
+              name: http2
+              protocol: TCP
+            - containerPort: 443
+              name: https
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz/ready
+              port: 15021
+              scheme: HTTP
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 30
+            httpGet:
+              path: /healthz/ready
+              port: 15021
+              scheme: HTTP
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            successThreshold: 1
+            timeoutSeconds: 1
+      volumes:
+        - name: istio-envoy
+          emptyDir:
+            medium: Memory
+        - name: istio-certs
+          secret:
+            optional: true
+            secretName: istio-ingressgateway-certs
+        - name: istio-ca-root-cert
+          configMap:
+            defaultMode: 420
+            name: istio-ca-root-cert
+            optional: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-ingress
+  labels:
+    app: istio-ingressgateway
+    istio: ingressgateway
+  annotations:
+    prometheus.io/port: "15020"
+    prometheus.io/scrape: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: status-port
+      port: 15021
+      targetPort: 15021
+      protocol: TCP
+    - name: http2
+      port: 80
+      targetPort: 80
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 443
+      protocol: TCP
+  selector:
+    app: istio-ingressgateway
+    istio: ingressgateway
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-ingress
+  labels:
+    app: istio-ingressgateway
+    istio: ingressgateway
