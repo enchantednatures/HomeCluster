@@ -59,16 +59,8 @@ spec:
         barmanObjectName: minio-store
         serverName: atuin-v3
   bootstrap:
-    recovery:
-      source: atuin-v3
+    initdb:
       database: atuin
       owner: atuin
       secret:
         name: atuin-db-user
-  externalClusters:
-    - name: atuin-v3
-      plugin:
-        name: barman-cloud.cloudnative-pg.io
-        parameters:
-          barmanObjectName: minio-store
-          serverName: atuin-v3
