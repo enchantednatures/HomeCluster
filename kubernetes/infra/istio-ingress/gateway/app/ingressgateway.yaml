@@ -25,7 +25,6 @@ spec:
         app: istio-ingressgateway
         istio: ingressgateway
         sidecar.istio.io/inject: "false"
-        istio.io/dataplane-mode: ambient
     spec:
       serviceAccountName: istio-ingressgateway
       securityContext:
