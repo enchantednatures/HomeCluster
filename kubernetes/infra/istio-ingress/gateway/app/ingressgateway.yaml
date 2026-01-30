@@ -114,6 +114,8 @@ spec:
             - name: istio-token
               mountPath: /var/run/secrets/tokens
               readOnly: true
+            - name: workload-socket
+              mountPath: /var/run/secrets/workload-spiffe-uds
           ports:
             - containerPort: 15090
               name: http-envoy-prom
@@ -167,6 +169,8 @@ spec:
                   path: istio-token
                   expirationSeconds: 43200
                   audience: istio-ca
+        - name: workload-socket
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
