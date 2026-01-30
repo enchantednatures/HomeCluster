@@ -80,6 +80,8 @@ spec:
                 cpu: 20m
                 memory: 256M
     defaultPodOptions:
+      labels:
+        istio.io/dataplane-mode: ambient
       securityContext:
         runAsNonRoot: true
         runAsUser: 568
