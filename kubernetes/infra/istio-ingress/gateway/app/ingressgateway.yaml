@@ -44,7 +44,6 @@ spec:
             - --log_output_level=default:info
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
@@ -112,6 +111,9 @@ spec:
             - name: istio-ca-root-cert
               mountPath: /var/run/secrets/istio
               readOnly: true
+            - name: istio-token
+              mountPath: /var/run/secrets/tokens
+              readOnly: true
           ports:
             - containerPort: 15090
               name: http-envoy-prom
@@ -158,6 +160,13 @@ spec:
             defaultMode: 420
             name: istio-ca-root-cert
             optional: true
+        - name: istio-token
+          projected:
+            sources:
+              - serviceAccountToken:
+                  path: istio-token
+                  expirationSeconds: 43200
+                  audience: istio-ca
 ---
 apiVersion: v1
 kind: Service
