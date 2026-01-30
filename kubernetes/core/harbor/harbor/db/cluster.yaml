@@ -57,3 +57,18 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
+        serverName: &currentCluster harbor-v3
+  bootstrap:
+    recovery:
+      source: &previousCluster harbor-v2
+      database: registry
+      owner: harbor
+      secret:
+        name: harbor-db-user
+  externalClusters:
+    - name: *previousCluster
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-store
+          serverName: *previousCluster
