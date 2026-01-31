@@ -57,10 +57,4 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: atuin-v3
-  bootstrap:
-    initdb:
-      database: atuin
-      owner: atuin
-      secret:
-        name: atuin-db-user
+        serverName: atuin-v4

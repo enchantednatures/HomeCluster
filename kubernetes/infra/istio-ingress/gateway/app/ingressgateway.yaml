@@ -93,7 +93,7 @@ spec:
                   apiVersion: v1
                   fieldPath: status.hostIP
             - name: ISTIO_META_UNPRIVILEGED_POD
-              value: "true"
+              value: "false"
             - name: ISTIO_META_ROUTER_MODE
               value: sni-dnat
             - name: ISTIO_META_CLUSTER_ID

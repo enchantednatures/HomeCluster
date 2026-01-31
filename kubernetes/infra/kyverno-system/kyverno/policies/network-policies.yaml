@@ -36,6 +36,7 @@ spec:
             - kyverno-system
             - flux-system
             - istio-system
+            - istio-ingress
             - rook-ceph
             - openebs-system
             - knative-*
