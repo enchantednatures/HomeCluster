@@ -7,12 +7,12 @@ metadata:
   namespace: istio-ingress
   labels:
     app: istio-ingressgateway
-    istio: ingressgateway
+    istio: gateway
 spec:
   selector:
     matchLabels:
       app: istio-ingressgateway
-      istio: ingressgateway
+      istio: gateway
   replicas: 2
   template:
     metadata:
@@ -23,7 +23,7 @@ spec:
         sidecar.istio.io/inject: "false"
       labels:
         app: istio-ingressgateway
-        istio: ingressgateway
+        istio: gateway
         sidecar.istio.io/inject: "false"
     spec:
       serviceAccountName: istio-ingressgateway
@@ -179,7 +179,7 @@ metadata:
   namespace: istio-ingress
   labels:
     app: istio-ingressgateway
-    istio: ingressgateway
+    istio: gateway
   annotations:
     prometheus.io/port: "15020"
     prometheus.io/scrape: "true"
@@ -200,7 +200,7 @@ spec:
       protocol: TCP
   selector:
     app: istio-ingressgateway
-    istio: ingressgateway
+    istio: gateway
 ---
 apiVersion: v1
 kind: ServiceAccount
