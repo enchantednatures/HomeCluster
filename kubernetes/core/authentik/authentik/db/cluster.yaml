@@ -60,8 +60,15 @@ spec:
         name: authentik-db-user
   externalClusters:
     - name: *previousCluster
-      plugin:
-        name: barman-cloud.cloudnative-pg.io
-        parameters:
-          barmanObjectName: minio-store
-          serverName: *previousCluster
+      barmanObjectStore:
+        destinationPath: s3://cloudnative-pg/
+        endpointURL: http://minio-service.networking.svc.cluster.local:9768
+        s3Credentials:
+          accessKeyId:
+            name: pg-backup-secret
+            key: aws-access-key-id
+          secretAccessKey:
+            name: pg-backup-secret
+            key: aws-secret-access-key
+        wal:
+          compression: bzip2
