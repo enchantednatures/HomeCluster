@@ -13,6 +13,7 @@ spec:
     pattern: '^main$'
   policy:
     alphabetical: {}
+  interval: 5m
   digestReflectionPolicy: Always
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/image.toolkit.fluxcd.io/imagepolicy_v1beta2.json
@@ -29,6 +30,7 @@ spec:
     pattern: '^main$'
   policy:
     alphabetical: {}
+  interval: 5m
   digestReflectionPolicy: Always
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/image.toolkit.fluxcd.io/imagepolicy_v1beta2.json
