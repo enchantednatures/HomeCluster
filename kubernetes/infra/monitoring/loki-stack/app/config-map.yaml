@@ -8,5 +8,5 @@ metadata:
 data:
   chunks_bucket_name: loki-chunks
   BUCKET_ENDPOINT: s3://loki
-  BUCKET_HOST: s3.${SECRET_DOMAIN}
+  BUCKET_HOST: http://minio-service.networking.svc.cluster.local:9768
   REGION: us-east-1
