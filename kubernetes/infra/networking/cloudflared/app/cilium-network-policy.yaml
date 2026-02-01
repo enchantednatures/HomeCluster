@@ -56,3 +56,16 @@ spec:
               protocol: UDP
             - port: "53"
               protocol: TCP
+    # Allow egress to Cloudflare edge servers
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
+            - port: "7844"
+              protocol: TCP
+            - port: "8844"
+              protocol: TCP
