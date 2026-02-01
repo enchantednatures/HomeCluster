@@ -60,7 +60,7 @@ spec:
         serverName: &currentCluster harbor-v3
   bootstrap:
     recovery:
-      source: &previousCluster harbor-db-v2
+      source: &previousCluster harbor-v0
       database: registry
       owner: harbor
       secret:

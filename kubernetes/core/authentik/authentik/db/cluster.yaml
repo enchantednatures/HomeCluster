@@ -53,7 +53,7 @@ spec:
         serverName: &currentCluster authentik-v11
   bootstrap:
     recovery:
-      source: &previousCluster authentik-v11
+      source: &previousCluster authentik-v6
       database: authentik
       owner: authentik
       secret:
