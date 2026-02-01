@@ -46,6 +46,13 @@ spec:
             - actions-runner-system
             - kafka
             - networking
+            - atuin
+            - authentik
+            - harbor
+            - immich
+            - open-webui
+            - postgres
+            - default
       validate:
         message: "Resource requests and limits are required"
         pattern:
