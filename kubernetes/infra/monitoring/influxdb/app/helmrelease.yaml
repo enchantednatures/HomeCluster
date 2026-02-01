@@ -150,6 +150,7 @@ spec:
     ## Pod annotations
     podAnnotations:
       reloader.stakater.com/auto: "true"
+      sidecar.istio.io/inject: "false"
 
     ## Pod labels
     podLabels: {}

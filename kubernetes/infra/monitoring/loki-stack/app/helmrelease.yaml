@@ -87,7 +87,7 @@ spec:
           admin: loki-admin
         s3:
           endpoint: http://minio-service.networking.svc.cluster.local:9768
-          insecure: false
+          insecure: true
           s3forcepathstyle: true
           signatureVersion: v4
       storage_config:
@@ -98,7 +98,7 @@ spec:
         aws:
           s3: s3://loki-chunks
           s3forcepathstyle: true
-          insecure: false
+          insecure: true
           endpoint: http://minio-service.networking.svc.cluster.local:9768
       serviceMonitor:
         enabled: true
