@@ -90,6 +90,7 @@ spec:
           insecure: true
           s3forcepathstyle: true
           signatureVersion: v4
+          bucketnames: loki-chunks
       storage_config:
         tsdb_shipper:
           active_index_directory: /var/loki/tsdb-index
