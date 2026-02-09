@@ -31,7 +31,7 @@ spec:
           serviceAccountName: rook-ceph-cmd-reporter
           containers:
             - name: backup-metadata
-              image: rook/ceph:v1.19.0
+              image: rook/ceph:v1.19.1
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/bash
