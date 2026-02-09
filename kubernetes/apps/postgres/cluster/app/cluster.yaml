@@ -50,18 +50,4 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster postgres-v10
-  bootstrap:
-    recovery:
-      source: &previousCluster postgres-v9
-      database: postgres
-      owner: postgres
-      secret:
-        name: pg-backup-secret
-  externalClusters:
-    - name: *previousCluster
-      plugin:
-        name: barman-cloud.cloudnative-pg.io
-        parameters:
-          barmanObjectName: minio-store
-          serverName: *previousCluster
+        serverName: postgres-v11
