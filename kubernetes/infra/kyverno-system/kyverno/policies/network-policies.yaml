@@ -16,9 +16,7 @@ metadata:
       By default, Kubernetes allows communications across all Pods within a cluster.
       Network policies and, a CNI that supports them, must be used to restrict
       communications. This policy will create a new NetworkPolicy resource whenever
-      a new Namespace is created which denies all traffic. It also generates a
-      companion policy that allows CloudNativePG pods to communicate with the
-      Kubernetes API server, DNS, and the CNPG operator.
+      a new Namespace is created which denies all traffic.
 spec:
   background: false
   rules:
@@ -59,69 +57,3 @@ spec:
             policyTypes:
             - Ingress
             - Egress
-    - name: allow-cnpg
-      match:
-        any:
-        - resources:
-            kinds:
-            - Namespace
-      exclude:
-        any:
-        - resources:
-            names:
-            - kube-system
-            - kube-public
-            - kube-node-lease
-            - kyverno-system
-            - flux-system
-            - istio-system
-            - istio-ingress
-            - rook-ceph
-            - openebs-system
-            - knative-*
-            - monitoring
-            - kubevirt
-            - cdi
-            - vms
-            - cnpg-system
-      generate:
-        synchronize: true
-        apiVersion: networking.k8s.io/v1
-        kind: NetworkPolicy
-        name: allow-cnpg
-        namespace: "{{request.object.metadata.name}}"
-        data:
-          spec:
-            podSelector:
-              matchExpressions:
-              - key: cnpg.io/cluster
-                operator: Exists
-            policyTypes:
-            - Ingress
-            - Egress
-            ingress:
-            # Allow CNPG operator (from cnpg-system) to reach instance manager
-            - from:
-              - namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: cnpg-system
-              ports:
-              - protocol: TCP
-                port: 8000
-            # Allow PostgreSQL replication and client connections within namespace
-            - from:
-              - podSelector: {}
-              ports:
-              - protocol: TCP
-                port: 5432
-            # Allow Prometheus scraping of metrics
-            - from:
-              - namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: monitoring
-              ports:
-              - protocol: TCP
-                port: 9187
-            egress:
-            # Allow all egress (API server, DNS, MinIO backups, replication, etc.)
-            - {}

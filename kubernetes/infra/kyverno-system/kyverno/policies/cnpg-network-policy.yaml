@@ -1,0 +1,88 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-cnpg-network-policy
+  annotations:
+    policies.kyverno.io/title: Add CloudNativePG Network Policy
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: NetworkPolicy
+    policies.kyverno.io/description: >-
+      CloudNativePG pods require specific network access to function properly.
+      This policy automatically generates a NetworkPolicy in every namespace
+      that allows CNPG pods to communicate with the Kubernetes API server,
+      DNS, the CNPG operator, and other PostgreSQL instances for replication.
+spec:
+  background: false
+  rules:
+    - name: allow-cnpg
+      match:
+        any:
+        - resources:
+            kinds:
+            - Namespace
+      exclude:
+        any:
+        - resources:
+            names:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - kyverno-system
+            - flux-system
+            - istio-system
+            - istio-ingress
+            - rook-ceph
+            - openebs-system
+            - knative-*
+            - monitoring
+            - kubevirt
+            - cdi
+            - vms
+            - cnpg-system
+      generate:
+        synchronize: true
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        name: allow-cnpg
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          spec:
+            podSelector:
+              matchExpressions:
+              - key: cnpg.io/cluster
+                operator: Exists
+            policyTypes:
+            - Ingress
+            - Egress
+            ingress:
+            # Allow CNPG operator (from cnpg-system) to reach instance manager
+            - from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: cnpg-system
+              ports:
+              - protocol: TCP
+                port: 8000
+            # Allow PostgreSQL replication and client connections within namespace
+            - from:
+              - podSelector: {}
+              ports:
+              - protocol: TCP
+                port: 5432
+            # Allow Prometheus scraping of metrics
+            - from:
+              - namespaceSelector:
+                  matchLabels:
+                    kubernetes.io/metadata.name: monitoring
+              ports:
+              - protocol: TCP
+                port: 9187
+            egress:
+            # Allow all egress (API server, DNS, MinIO backups, replication, etc.)
+            - {}
