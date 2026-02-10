@@ -45,6 +45,31 @@ spec:
             - cdi
             - vms
             - cnpg-system
+            - harbor
+            - market-data
+            - postgres
+            - authentik
+            - atuin
+            - kafka
+            - redpanda
+            - elastic
+            - networking
+            - cert-manager
+            - actions-runner-system
+            - arangodb
+            - dragonflydb
+            - home-system
+            - immich
+            - irc
+            - keda
+            - observability
+            - rabbitmq-operator
+            - tekton-pipelines
+            - tekton-pipelines-resolvers
+            - telepresence
+            - local-path-storage
+            - cilium-secrets
+            - default
       generate:
         synchronize: true
         apiVersion: networking.k8s.io/v1

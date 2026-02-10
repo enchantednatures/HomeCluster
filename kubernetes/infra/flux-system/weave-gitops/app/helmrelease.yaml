@@ -28,6 +28,8 @@ spec:
   values:
     adminUser:
       create: false
+    additionalArgs:
+      - "--auth-methods=oidc"
     authMethods:
       - oidc
     ingress:
@@ -38,6 +40,3 @@ spec:
       enabled: true
     rbac:
       create: true
-    #   impersonationResourceNames: [admin]
-    # podAnnotations:
-    #   secret.reloader.stakater.com/reload: cluster-user-auth
