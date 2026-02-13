@@ -8,3 +8,4 @@ resources:
   - ./cnpg-network-policy.yaml
   - ./resource-limits.yaml
   - ./git-push-token-replication.yaml
+  - ./ghcr-pull-secret-replication.yaml
