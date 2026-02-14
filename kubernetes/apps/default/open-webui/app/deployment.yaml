@@ -1,5 +1,3 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/apps/v1/deployment.json
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,7 +24,7 @@ spec:
     spec:
       containers:
         - name: open-webui
-          image: ghcr.io/open-webui/open-webui:main # {"$imagepolicy": "flux-system:open-webui-main"}
+          image: ghcr.io/open-webui/open-webui:main@sha256:ffb0275d5c626c8b0713d1c0f002f359ea36c80b5cd584370b116b0563ed849e # {"$imagepolicy": "flux-system:open-webui-main"}
           imagePullPolicy: Always
           envFrom:
             - secretRef:

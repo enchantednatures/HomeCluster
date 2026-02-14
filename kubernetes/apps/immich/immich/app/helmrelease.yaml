@@ -1,4 +1,3 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -36,17 +35,14 @@ spec:
             name: immich-pg-user
             key: password
       IMMICH_MACHINE_LEARNING_URL: '{{ printf "http://%s-machine-learning:3003" .Release.Name }}'
-
     image:
-      tag: v1.119.0 # {"$imagepolicy": "flux-system:immich-server:tag"}
-
+      tag: v2.5.6 # {"$imagepolicy": "flux-system:immich-server:tag"}
     immich:
       metrics:
         enabled: true
       persistence:
         library:
           existingClaim: immich-media
-
     postgresql:
       enabled: false
       global:
@@ -71,7 +67,6 @@ spec:
               paths:
                 - path: "/"
           tls: []
-
     machine-learning:
       enabled: true
       image:
