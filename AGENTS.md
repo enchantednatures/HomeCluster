@@ -1,302 +1,147 @@
 # AGENTS.md - HomeCluster Repository Guidelines
 
-This document provides comprehensive guidelines for AI coding agents working in this Kubernetes GitOps repository.
+## Architecture
 
-## Architecture Overview
+Talos Kubernetes cluster on Proxmox VMs, provisioned via OpenTofu. GitOps with FluxCD v2. Cilium CNI + Istio ambient mode. Rook-Ceph (block/object) + OpenEBS (local). SOPS/Age for secrets. Renovate for dependency updates.
 
-**Infrastructure**: Talos Kubernetes cluster on Proxmox VMs, managed via Terraform/OpenTofu
-**GitOps**: FluxCD v2 with Kustomize overlays, Git as source of truth
-**Service Mesh**: Istio ambient mode with Cilium CNI for advanced networking
-**DNS**: external-dns with Cloudflare provider, ingress via Cloudflare Tunnels
-**Serverless**: KNative for event-driven and serverless workloads
-**Storage**: Rook-Ceph (block/object), OpenEBS (local volumes), external MinIO
-**Observability**: kube-prometheus-stack (Grafana, Prometheus, AlertManager), Tempo, Loki
-**Databases**: CloudNative-PG (PostgreSQL), Strimzi (Kafka), ArangoDB, DragonflyDB, Elastic
-**Secrets**: SOPS with Age encryption for all sensitive data in Git
+**Key components**: CloudNative-PG, Strimzi, ArangoDB, DragonflyDB, Elastic, KNative, kube-prometheus-stack, Grafana, Loki, Tempo, external-dns + Cloudflare Tunnels, Tailscale.
 
-## Build/Test/Lint Commands
+## Commands
 
-### Essential Task Commands
-- `task` or `task default` - List all available tasks
-- `task configure` - Template, encrypt secrets, and validate all manifests (run before commit)
-- `task kubernetes:kubeconform` - Validate Kubernetes manifests with kubeconform
-- `task sops:encrypt` - Encrypt all `*.sops.yaml` files with Age (REQUIRED before commit)
-- `task sops:decrypt` - Decrypt all SOPS encrypted files for inspection
-
-### Flux Operations
-- `task flux:reconcile` - Force Flux to pull latest changes from git immediately
-- `task flux:apply path=<namespace>/<app>` - Apply specific app (e.g., `path=immich/immich`)
-- `task flux:bootstrap` - Bootstrap Flux into cluster (initial setup only)
-
-### Cluster Inspection
-- `task kubernetes:resources` - List common cluster resources (pods, helmreleases, kustomizations, etc.)
-- `task kubernetes:ceph:health` - Check Ceph cluster health via toolbox pod
-- `task kubernetes:ceph:status` - Get detailed Ceph cluster status
-- `task kubernetes:ceph:validate` - Validate Rook-Ceph configuration
-
-### Terraform/Infrastructure
-- `task terraform:proxmox:plan` - Preview Proxmox VM changes
-- `task terraform:proxmox:apply` - Apply Proxmox VM configuration
-- `task terraform:proxmox:init` - Initialize Terraform providers
-
-### Debugging Commands
 ```bash
-# Check Flux resource status
-flux get sources git -A
-flux get sources oci -A
-flux get kustomizations -A
-flux get helmreleases -A
-
-# Inspect pod logs
-kubectl -n <namespace> logs <pod-name> -f
-stern -n <namespace> <partial-name>  # tail multiple pods
-
-# Check events in namespace
-kubectl -n <namespace> get events --sort-by='.metadata.creationTimestamp'
-
-# Describe resource for troubleshooting
-kubectl -n <namespace> describe <resource-type> <resource-name>
+task configure                 # Template + encrypt + validate (run before every commit)
+task kubernetes:kubeconform    # Schema-validate manifests
+task sops:encrypt              # Encrypt *.sops.yaml files (REQUIRED before commit)
+task sops:decrypt              # Decrypt for inspection
+task flux:reconcile            # Force git sync
+task flux:apply path=ns/app    # Apply specific app
+task kubernetes:resources      # List pods, helmreleases, kustomizations
+task kubernetes:ceph:health    # Ceph cluster health
+task terraform:proxmox:plan    # Preview VM changes
+task terraform:proxmox:apply   # Apply VM config
 ```
 
-## Code Style Guidelines
+**Debugging**: `flux get kustomizations -A`, `flux get helmreleases -A`, `stern -n <ns> <name>`, `kubectl -n <ns> get events --sort-by=.metadata.creationTimestamp`
 
-### YAML Formatting
-- **Indentation**: 2 spaces (never tabs)
-- **Line Endings**: LF (Unix), never CRLF
-- **Encoding**: UTF-8
-- **Whitespace**: Trim trailing whitespace, insert final newline
-- **Separators**: Use `---` document separator at start of each YAML file
+## Flux Deployment Order
 
-### File Naming Conventions
-- **Format**: kebab-case for all files
-- **Standard Names**: `helmrelease.yaml`, `kustomization.yaml`, `namespace.yaml`, `ks.yaml`
-- **Secrets**: Always suffix with `.sops.yaml` (e.g., `db-credentials.sops.yaml`)
-- **Components**: `virtualservice.yaml`, `serviceentry.yaml`, `pvc.yaml`
+```
+cluster-infrastructure  (no deps — deploys first)
+  ├─► cluster-core       (depends on infra)
+  │     ├─► cluster-operators  (depends on core + infra)
+  │     └─► cluster-apps       (depends on core + infra)
+```
 
-### Schema Validation
-- **REQUIRED**: Include `# yaml-language-server: $schema=<url>` comment as first line
-- **Sources**: Use schemas from `https://kubernetes-schemas.pages.dev/` or `https://kubernetes-schemas.zinn.ca/`
-- **Examples**:
-  ```yaml
-  # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
-  # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/virtualservice_v1.json
-  ```
+Operators and apps are independent of each other at the Flux level. Individual apps declare `dependsOn` to specific operators in their `ks.yaml`.
 
-### Directory Structure Pattern
+## Repository Layout
+
 ```
 kubernetes/
-├── apps/              # User-facing applications
-├── core/              # Core platform services (Tekton, Harbor, etc.)
-├── infra/             # Infrastructure components (monitoring, networking)
-├── operators/         # Kubernetes operators (Rook, CloudNative-PG, etc.)
-└── flux/              # Flux system configuration
-    ├── config/        # Flux GitRepository and Kustomization
-    ├── repositories/  # HelmRepository and OCIRepository definitions
-    └── vars/          # Cluster-wide variables and secrets
+├── apps/       # User-facing applications
+├── core/       # Core platform (Tekton, Harbor)
+├── infra/      # Infrastructure (monitoring, networking, cert-manager, kyverno)
+├── operators/  # Operators (rook-ceph, cnpg, dragonfly, strimzi, elastic, kubevirt, flink, etc.)
+└── flux/       # Flux config, repositories, vars
+provision/terraform/  # OpenTofu/Terraform for Proxmox VMs
+scripts/              # Utility scripts (kubeconform, ceph ops, standardization)
+.taskfiles/           # Task runner modules
+```
 
-# Standard app structure:
+### App Structure
+
+```
 kubernetes/apps/<namespace>/<app-name>/
-├── namespace.yaml         # Namespace definition
-├── kustomization.yaml     # Root kustomization (lists subdirs)
-├── ks.yaml               # Flux Kustomization(s) - may define multiple components
-├── app/                  # Main application component
+├── ks.yaml               # Flux Kustomization(s)
+├── kustomization.yaml     # Root kustomization
+├── namespace.yaml
+├── app/
 │   ├── helmrelease.yaml
-│   ├── kustomization.yaml
-│   └── pvc.yaml (optional)
-├── db/                   # Database component (if needed)
-│   ├── cluster.yaml
 │   └── kustomization.yaml
-└── dragonfly/            # Cache/Redis component (if needed)
-    ├── dragonfly.yaml
-    └── kustomization.yaml
+├── db/                    # Optional CloudNative-PG cluster
+└── dragonfly/             # Optional DragonflyDB cache
 ```
 
-### HelmRelease Standards
-```yaml
----
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: &app my-app  # Use anchor for DRY principle
-spec:
-  interval: 30m
-  chart:
-    spec:
-      chart: my-app
-      version: 1.2.3  # ALWAYS pin versions explicitly
-      sourceRef:
-        kind: HelmRepository
-        name: my-repo
-        namespace: flux-system
-  maxHistory: 2  # Limit stored releases
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    cleanupOnFail: true
-    remediation:
-      retries: 3
-  uninstall:
-    keepHistory: false
-  values:
-    # Chart values here
-```
+## Code Style
 
-### Flux Kustomization Standards
-```yaml
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: &app my-app
-  namespace: flux-system  # Always in flux-system
-spec:
-  targetNamespace: my-namespace  # Where resources deploy
-  dependsOn:  # Enforce ordering
-    - name: prerequisite-app
-  commonMetadata:
-    labels:
-      app.kubernetes.io/name: *app  # Use anchor reference
-  path: ./kubernetes/apps/my-namespace/my-app/app
-  prune: true  # Enable automatic cleanup
-  sourceRef:
-    kind: GitRepository
-    name: flux-system
-  wait: true
-  interval: 30m
-  retryInterval: 1m
-  timeout: 5m
-```
+### YAML
 
-### Resource Naming Pattern
-Use YAML anchors for DRY (Don't Repeat Yourself):
-```yaml
-metadata:
-  name: &app immich
-  labels:
-    app.kubernetes.io/name: *app
-    app.kubernetes.io/instance: *app
-```
+- 2-space indent, LF line endings, UTF-8, trim trailing whitespace, final newline
+- Start every file with `---` document separator
+- **Schema comment required** as first line: `# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/...`
+- Kebab-case filenames: `helmrelease.yaml`, `kustomization.yaml`, `ks.yaml`, `namespace.yaml`
+- Secrets: `*.sops.yaml` suffix always
+- Use YAML anchors for DRY: `name: &app my-app` then `*app` in labels
+- Pin chart versions explicitly, set `maxHistory: 2`, `install.remediation.retries: 3`, `upgrade.cleanupOnFail: true`
 
-### Secrets Management
-- **Naming**: Files MUST end with `.sops.yaml` or `.sops.yml`
-- **Encryption**: SOPS encrypts only `^(data|stringData)$` fields per `.sops.yaml` config
-- **Before Commit**: Always run `task sops:encrypt` to encrypt unencrypted secrets
-- **Verification**: Pre-commit hooks check for unencrypted secrets
-- **Example**:
-  ```yaml
-  ---
-  # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: db-credentials
-  type: Opaque
-  stringData:  # This field will be encrypted by SOPS
-    username: myuser
-    password: ENC[AES256_GCM,data:encrypted...]
-  ```
+### yamllint Rules (`.github/yamllint.config.yaml`)
 
-### Istio Service Mesh Patterns
-- **FQDNs Required**: Always use fully qualified domain names: `service.namespace.svc.cluster.local`
-- **Explicit Ports**: Always specify port numbers in destination rules
-- **VirtualService**:
-  ```yaml
-  spec:
-    hosts:
-      - myapp.${SECRET_DOMAIN}  # Use substitution vars
-    gateways:
-      - istio-ingress/external-gateway
-    http:
-      - route:
-          - destination:
-              host: myapp.mynamespace.svc.cluster.local  # Full FQDN
-              port:
-                number: 8080  # Explicit port
-  ```
+- Brackets forbidden (use multi-line lists)
+- Truthy: only `"true"` / `"false"` allowed
+- Comments: min 1 space from content
+- Line length: disabled
+- Braces: 0-1 spaces inside
+- Indentation: 2 spaces, consistent indent-sequences
 
-### Variable Substitution
-Flux performs post-build substitution from ConfigMaps/Secrets:
-- Common vars: `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc.
-- Defined in: `kubernetes/flux/vars/cluster-settings.yaml` and `cluster-secrets.sops.yaml`
+### Shell Scripts
 
-## Error Handling and Validation
+- 4-space indent (per `.editorconfig`)
+- Always `set -o errexit -o pipefail`
 
-### Pre-Commit Checklist
-1. Run `task configure` to template and validate all manifests
-2. Run `task kubernetes:kubeconform` to catch schema errors
-3. Run `task sops:encrypt` to encrypt any new/modified secrets
-4. Verify no plaintext secrets: `git diff` should show encrypted fields
-5. Check pre-commit hooks pass: `pre-commit run --all-files`
+### Istio Patterns
 
-### Common Issues
-- **"oldString not found"**: Ensure exact whitespace matching when editing
-- **Flux reconciliation fails**: Check `flux get kustomizations -A` for errors
-- **Pod CrashLoopBackOff**: Check logs with `kubectl logs` and describe pod
-- **Ceph issues**: Run `task kubernetes:ceph:health` for cluster status
+- Always use FQDNs: `service.namespace.svc.cluster.local`
+- Always specify explicit port numbers
+- Use `${SECRET_DOMAIN}` for external hosts
+- Gateway: `istio-ingress/external-gateway`
 
-## Critical Operational Requirements
+## Secrets Management
 
-### GitOps Workflow (NON-NEGOTIABLE)
-- **ALL changes MUST go through Git**: Never `kubectl apply` directly to cluster
-- **Flux is the source of truth**: Changes only apply after Flux reconciles
-- **Force reconciliation**: Use `task flux:reconcile` to expedite sync (max every 30m by default)
-- **Validation first**: Always run `task configure` before committing
+- Files MUST end with `.sops.yaml`
+- SOPS encrypts only `^(data|stringData)$` per `.sops.yaml` config
+- Run `task sops:encrypt` before every commit
+- Pre-commit hook (`forbid-secrets`) blocks plaintext secrets
+- Age key: `~/.config/sops/age/keys.txt` or `$SOPS_AGE_KEY_FILE`
 
-### Security Requirements
-- **Never commit plaintext secrets**: All secrets MUST be SOPS-encrypted
-- **Encrypt before commit**: Run `task sops:encrypt` as final step
-- **Age key location**: `~/.config/sops/age/keys.txt` or set `SOPS_AGE_KEY_FILE`
-- **Pre-commit hooks**: Automatically verify secrets are encrypted
+## Variable Substitution
 
-### Istio Integration
-- New external services may require `VirtualService`, `Gateway`, or `DestinationRule`
-- Internal cross-namespace communication may need `ServiceEntry` or `AuthorizationPolicy`
-- Always use FQDNs with explicit ports for service mesh compatibility
+Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
+- `kubernetes/flux/vars/cluster-settings.yaml` (ConfigMap)
+- `kubernetes/flux/vars/cluster-secrets.sops.yaml` (Secret)
 
-### Dependencies and Ordering
-- Use `dependsOn` in Flux Kustomizations to enforce deployment order
-- Example: App depends on database, database depends on operator
-- Common dependencies: `cloudnative-pg`, `dragonflydb-operator`, `rook-ceph`
+## CI Pipeline (GitHub Actions on PRs to `main`)
 
-## Repository Layout Reference
+- **Kubeconform**: validates manifests under `kubernetes/` against schemas
+- **Flux Diff**: shows rendered diff of HelmRelease/Kustomization changes as PR comments
+- **Lint**: yamllint review via reviewdog
+- **Flux Image Updates**: auto-creates PRs from `flux-image-updates` branch
 
-```
-/
-├── kubernetes/           # All Kubernetes manifests
-│   ├── apps/            # Application deployments (user-facing)
-│   ├── core/            # Core platform services
-│   ├── infra/           # Infrastructure (monitoring, networking)
-│   ├── operators/       # Kubernetes operators
-│   └── flux/            # Flux CD configuration
-├── provision/           # Infrastructure provisioning
-│   ├── terraform/       # Terraform/OpenTofu configs
-│   └── certs/           # Certificate files
-├── .taskfiles/          # Task definition modules
-├── scripts/             # Utility scripts
-├── .sops.yaml          # SOPS encryption config
-├── Taskfile.yaml       # Main task definitions
-└── .editorconfig       # Editor formatting rules
-```
+## Renovate
 
-## Quick Reference
+- Semantic commits: `feat(container)!:` (major), `feat(helm):` (minor), `fix(container):` (patch)
+- Auto-merges minor/patch GitHub Actions updates
+- Groups Flux and Talos packages together
+- Runs on weekends, ignores `*.sops.*` files
+- Custom regex manager for inline `# datasource=... depName=...` comments
 
-### Most Common Tasks
-```bash
-# Daily development workflow
-task configure              # Validate everything
-task flux:reconcile         # Sync changes immediately
-task kubernetes:resources   # Check cluster state
+## Pre-Commit Checklist
 
-# Troubleshooting
-flux get kustomizations -A  # Check Flux sync status
-kubectl get pods -A         # Check all pods
-task kubernetes:ceph:health # Check storage health
-```
+1. `task configure` — template, encrypt, validate
+2. `task kubernetes:kubeconform` — schema validation
+3. `task sops:encrypt` — encrypt secrets
+4. Verify `git diff` shows encrypted fields only
+5. `pre-commit run --all-files` — trailing whitespace, line endings, tabs, smartquotes, secret check
 
-### File Templates
-See existing apps in `kubernetes/apps/` for working examples:
-- `kubernetes/apps/immich/immich/` - Multi-component app (app + db + cache)
-- `kubernetes/apps/atuin/atuin/` - Simple app with HelmRelease
-- `kubernetes/core/harbor/harbor/` - Complex app with Istio VirtualService
+## Critical Rules
+
+- **ALL changes go through Git** — never `kubectl apply` directly
+- **Never commit plaintext secrets**
+- **Always validate before committing** (`task configure`)
+- Flux Kustomizations live in `flux-system` namespace, deploy to `targetNamespace`
+- Use `dependsOn` to enforce ordering (app → operator → core → infra)
+
+## Reference Examples
+
+- Multi-component app: `kubernetes/apps/immich/immich/` (app + db + cache)
+- Simple app: `kubernetes/apps/atuin/atuin/`
+- Complex with Istio: `kubernetes/core/harbor/harbor/`

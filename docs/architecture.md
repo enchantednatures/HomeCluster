@@ -21,11 +21,11 @@ This repository implements a **home‑lab Kubernetes cluster** using the followi
 - **Talos** as the operating system for the nodes (running on Proxmox VMs)
 - **Kubernetes** (Talos‑managed) with **Flux** for GitOps‑driven configuration
 - **Cilium** for networking and security policies
-- **Istio** as the service mesh (migration from Nginx Ingress in progress)
+- **Istio** as the service mesh (ambient mode -- no sidecars)
 - **External‑DNS** with Cloudflare for DNS management
 - **Cloudflare Tunnels** for external ingress
 - **KNative** for server‑less workloads
-- **MinIO** for object storage and **OpenEBS** for persistent volumes
+- **Rook‑Ceph** for distributed block/object storage and **OpenEBS** for local persistent volumes
 - **Observability stack**: Grafana, Prometheus (kube‑prometheus‑stack), Loki, Tempo
 
 The repository follows a **GitOps** model: all changes are made via Git, and Flux reconciles the state to the cluster. Secrets are encrypted with **SOPS** and **Age**.
@@ -39,16 +39,16 @@ graph TB
         GH[GitHub Repository]
         REG[Container Registry]
     end
-    
+
     subgraph "Home Network"
         subgraph "Kubernetes Cluster"
             subgraph "Infrastructure Layer"
                 K8S[Kubernetes Control Plane]
                 CILIUM[Cilium CNI]
-                STORAGE[OpenEBS Storage]
+                STORAGE[Rook-Ceph + OpenEBS Storage]
                 ISTIO[Istio Service Mesh]
             end
-            
+
             subgraph "Platform Services"
                 FLUX[Flux GitOps]
                 CERT[Cert-Manager]
@@ -56,21 +56,21 @@ graph TB
                 TUNNEL[Cloudflare Tunnel]
                 AUTH[Authentik]
             end
-            
+
             subgraph "Observability Stack"
                 PROM[Prometheus]
                 GRAF[Grafana]
                 TEMPO[Tempo]
                 LOKI[Loki]
             end
-            
+
             subgraph "Data Services"
                 PG[PostgreSQL]
                 KAFKA[Apache Kafka]
                 ARANGO[ArangoDB]
                 REDIS[DragonflyDB]
             end
-            
+
             subgraph "Applications"
                 APPS[User Applications]
                 KNATIVE[Serverless Apps]
@@ -78,24 +78,24 @@ graph TB
             end
         end
     end
-    
+
     CF --> TUNNEL
     GH --> FLUX
     REG --> K8S
-    
+
     FLUX --> K8S
     K8S --> CILIUM
     K8S --> STORAGE
     K8S --> ISTIO
-    
+
     ISTIO --> CERT
     ISTIO --> DNS
     ISTIO --> AUTH
-    
+
     PROM --> GRAF
     GRAF --> TEMPO
     GRAF --> LOKI
-    
+
     APPS --> PG
     APPS --> KAFKA
     APPS --> ARANGO
@@ -105,9 +105,9 @@ graph TB
 ## Infrastructure Layer
 
 ### Kubernetes Distribution
-- **Talos/K3s**: Lightweight Kubernetes distribution optimized for edge and IoT
+- **Talos**: Immutable, minimal operating system purpose-built for Kubernetes
 - **High Availability**: Multi-master setup with etcd clustering
-- **Resource Efficiency**: Minimal overhead for home lab environments
+- **Provisioning**: OpenTofu (Terraform-compatible) on Proxmox VMs
 
 ### Container Network Interface (CNI)
 - **Cilium**: eBPF-based networking and security
@@ -118,19 +118,23 @@ graph TB
   - Cluster mesh capabilities
 
 ### Storage
-- **OpenEBS**: Container-attached storage
+- **Rook-Ceph**: Distributed storage providing block (RBD) and object storage
+  - NVMe-optimized OSDs
+  - CephFS for shared filesystems
+  - Object store for S3-compatible access
+- **OpenEBS**: Container-attached storage for local persistent volumes
 - **Storage Classes**:
+  - Ceph RBD for replicated block storage
   - Local PV for high-performance workloads
-  - Replicated storage for critical data
   - Dynamic provisioning
 
 ### Service Mesh
-- **Istio**: Advanced traffic management and security
+- **Istio (Ambient Mode)**: Advanced traffic management and security without sidecar proxies
 - **Components**:
-  - Envoy proxy sidecars
-  - Pilot for configuration
-  - Citadel for security
-  - Mixer for telemetry (deprecated in newer versions)
+  - Ztunnel for Layer 4 traffic handling
+  - Istiod for configuration and certificate management
+  - Istio CNI for pod network setup
+  - Kiali for service mesh observability
 
 ## Platform Layer
 
@@ -142,7 +146,7 @@ graph LR
         FLUX --> KUST[Kustomization]
         KUST --> HELM[Helm Releases]
         HELM --> K8S[Kubernetes API]
-        
+
         FLUX --> SOPS[SOPS Decryption]
         SOPS --> SECRETS[Kubernetes Secrets]
     end
@@ -173,18 +177,21 @@ graph TB
         STRIMZI[Strimzi<br/>Kafka Operator]
         ARANGO_OP[ArangoDB Operator]
         DRAGONFLY[DragonflyDB Operator]
-        
+        ELASTIC[Elastic Operator]
+
         subgraph "Database Instances"
             PG_CLUSTER[PostgreSQL Clusters]
             KAFKA_CLUSTER[Kafka Clusters]
             ARANGO_CLUSTER[ArangoDB Deployments]
             REDIS_CLUSTER[Redis-Compatible Cache]
+            ELASTIC_CLUSTER[Elasticsearch Deployments]
         end
-        
+
         CNPG --> PG_CLUSTER
         STRIMZI --> KAFKA_CLUSTER
         ARANGO_OP --> ARANGO_CLUSTER
         DRAGONFLY --> REDIS_CLUSTER
+        ELASTIC --> ELASTIC_CLUSTER
     end
 ```
 
@@ -210,7 +217,7 @@ sequenceDiagram
     participant Istio
     participant App
     participant Database
-    
+
     User->>Cloudflare: HTTPS Request
     Cloudflare->>Tunnel: Forward Request
     Tunnel->>Istio: Route to Service
@@ -231,7 +238,7 @@ sequenceDiagram
     participant Flux as Flux Controller
     participant K8s as Kubernetes API
     participant App as Application
-    
+
     Dev->>Git: Push Changes
     Git->>Flux: Webhook/Poll
     Flux->>Git: Fetch Changes
@@ -251,39 +258,39 @@ graph TB
         INTERNET[Internet]
         CF_EDGE[Cloudflare Edge]
     end
-    
+
     subgraph "Home Network"
         ROUTER[Home Router]
         DNS_SERVER[Pi-hole DNS]
-        
+
         subgraph "Kubernetes Network"
             subgraph "Node Network"
                 NODE1[Node 1<br/>192.168.1.10]
                 NODE2[Node 2<br/>192.168.1.11]
                 NODE3[Node 3<br/>192.168.1.12]
             end
-            
+
             subgraph "Pod Network"
                 POD_CIDR[Pod CIDR<br/>10.42.0.0/16]
             end
-            
+
             subgraph "Service Network"
                 SVC_CIDR[Service CIDR<br/>10.43.0.0/16]
             end
         end
     end
-    
+
     INTERNET --> CF_EDGE
     CF_EDGE --> ROUTER
     ROUTER --> DNS_SERVER
     ROUTER --> NODE1
     ROUTER --> NODE2
     ROUTER --> NODE3
-    
+
     NODE1 --> POD_CIDR
     NODE2 --> POD_CIDR
     NODE3 --> POD_CIDR
-    
+
     POD_CIDR --> SVC_CIDR
 ```
 
@@ -304,19 +311,19 @@ graph TB
             NP[Network Policies]
             MTLS[mTLS Encryption]
         end
-        
+
         subgraph "Identity & Access"
             RBAC[Kubernetes RBAC]
             SSO[Single Sign-On]
             JWT[JWT Tokens]
         end
-        
+
         subgraph "Data Security"
             SOPS_ENC[SOPS Encryption]
             AGE_KEY[Age Keys]
             TLS_CERTS[TLS Certificates]
         end
-        
+
         subgraph "Runtime Security"
             PSP[Pod Security Policies]
             ADMISSION[Admission Controllers]
@@ -340,25 +347,25 @@ graph LR
         DEV[Developer]
         IDE[IDE/Editor]
     end
-    
+
     subgraph "Source Control"
         GIT[Git Repository]
         PR[Pull Request]
     end
-    
+
     subgraph "CI Pipeline"
         VALIDATE[Validate YAML]
         LINT[Lint Code]
         TEST[Run Tests]
         BUILD[Build Images]
     end
-    
+
     subgraph "CD Pipeline"
         FLUX[Flux Sync]
         DEPLOY[Deploy to Cluster]
         MONITOR[Monitor Health]
     end
-    
+
     DEV --> IDE
     IDE --> GIT
     GIT --> PR

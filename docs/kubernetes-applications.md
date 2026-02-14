@@ -16,12 +16,16 @@
 The applications layer contains user-facing services and tools deployed on the Kubernetes cluster. Applications are organized by namespace and follow GitOps principles for deployment and management.
 
 **Application Namespaces**:
-- `default`: General-purpose applications
+- `actions-runner-system`: GitHub Actions self-hosted runners
+- `arangodb`: ArangoDB multi-model database
 - `atuin`: Shell history synchronization
-- `home-system`: Home automation and IoT services
+- `default`: General-purpose applications (Open WebUI, SearXNG, dbman)
+- `home-system`: Home automation and IoT services (Home Assistant, ESPHome, Node-RED)
+- `immich`: Photo and video management
 - `irc`: Internet Relay Chat services
 - `kafka`: Event streaming platform
-- `postgres`: Database clusters
+- `postgres`: PostgreSQL database clusters
+- `redpanda`: Kafka-compatible streaming platform
 - `telepresence`: Development tools
 - `vms`: Virtual machine workloads
 
@@ -35,29 +39,47 @@ graph TB
             SEARCH[SearXNG]
             DBMAN[Database Manager]
         end
-        
+
+        subgraph "Media & Photos"
+            IMMICH[Immich]
+        end
+
+        subgraph "Home Automation"
+            HA[Home Assistant]
+            ESPHOME[ESPHome]
+            NODERED[Node-RED]
+            RABBITMQ[RabbitMQ]
+        end
+
         subgraph "Development Tools"
             ATUIN[Atuin Shell History]
             TELEPRESENCE[Telepresence]
+            RUNNERS[GitHub Actions Runners]
         end
-        
+
         subgraph "Data Services"
             POSTGRES[PostgreSQL Clusters]
             KAFKA[Apache Kafka]
+            REDPANDA[Redpanda]
+            ARANGO[ArangoDB]
             REDIS[DragonflyDB Cache]
         end
-        
+
         subgraph "Infrastructure"
             IRC[InspIRCd Server]
             VMS[Virtual Machines]
         end
     end
-    
+
     WEBUI --> POSTGRES
     WEBUI --> REDIS
     ATUIN --> POSTGRES
     SEARCH --> REDIS
     DBMAN --> POSTGRES
+    IMMICH --> POSTGRES
+    IMMICH --> REDIS
+    HA --> RABBITMQ
+    NODERED --> RABBITMQ
 ```
 
 ## Database Applications
@@ -96,24 +118,24 @@ graph TB
             PG_REPLICA[Replica Instance]
             PG_BACKUP[Backup Storage]
         end
-        
+
         subgraph "PostGIS Cluster"
             POSTGIS_PRIMARY[PostGIS Primary]
             POSTGIS_REPLICA[PostGIS Replica]
             POSTGIS_BACKUP[PostGIS Backup]
         end
-        
+
         subgraph "Applications"
             APPS[Applications]
             GIS_APPS[GIS Applications]
         end
     end
-    
+
     PG_PRIMARY --> PG_REPLICA
     PG_PRIMARY --> PG_BACKUP
     POSTGIS_PRIMARY --> POSTGIS_REPLICA
     POSTGIS_PRIMARY --> POSTGIS_BACKUP
-    
+
     APPS --> PG_PRIMARY
     GIS_APPS --> POSTGIS_PRIMARY
 ```
@@ -180,12 +202,12 @@ graph TB
         POSTGRES_DB[PostgreSQL Database]
         DRAGONFLY[DragonflyDB Cache]
     end
-    
+
     subgraph "Storage"
         PVC[Persistent Volume]
         BACKUP[Database Backup]
     end
-    
+
     WEBUI --> PIPELINES
     WEBUI --> POSTGRES_DB
     WEBUI --> DRAGONFLY
@@ -230,6 +252,64 @@ Web-based database administration tool for managing PostgreSQL clusters.
 
 ## Infrastructure Applications
 
+### Immich
+**Location**: `kubernetes/apps/immich/immich/`
+
+Self-hosted photo and video management platform with AI-powered search and organization.
+
+**Components**:
+- **Immich Server**: Core application with web interface and API
+- **PostgreSQL Database**: Metadata and user data storage (via CloudNative-PG)
+- **DragonflyDB Cache**: Redis-compatible caching layer
+- **Machine Learning**: AI-powered face recognition and object detection
+
+**Features**:
+- Mobile app backup and sync
+- AI-powered search and tagging
+- Face recognition and clustering
+- Timeline and map views
+- Sharing and album management
+
+### Home Automation
+
+#### Home Assistant
+**Location**: `kubernetes/apps/home-system/home-assistant/`
+
+Open-source home automation platform for smart home control and automation.
+
+**Features**:
+- Device integration and control
+- Automation rules and scenes
+- Energy monitoring
+- Voice assistant integration
+
+#### ESPHome
+**Location**: `kubernetes/apps/home-system/esphome/`
+
+Configuration and management platform for ESP8266/ESP32 IoT devices.
+
+**Features**:
+- YAML-based device configuration
+- OTA firmware updates
+- Native Home Assistant integration
+- Sensor and actuator management
+
+#### Node-RED
+**Location**: `kubernetes/apps/home-system/node-red/`
+
+Flow-based automation tool for wiring together hardware devices, APIs, and services.
+
+**Features**:
+- Visual flow editor
+- Extensive node library
+- Home Assistant integration
+- MQTT and HTTP support
+
+#### RabbitMQ
+**Location**: `kubernetes/apps/home-system/home-system-rabbitmq/`
+
+Message broker for home automation event routing between services.
+
 ### InspIRCd Server
 **Location**: `kubernetes/apps/irc/inspircd/`
 
@@ -271,19 +351,19 @@ graph TB
             DV[DataVolume]
             VMI[VM Instance]
         end
-        
+
         subgraph "Storage"
             PV[Persistent Volume]
             STORAGE_CLASS[Storage Class]
         end
-        
+
         subgraph "Networking"
             SVC[Service]
             VS[VirtualService]
             ISTIO[Istio Gateway]
         end
     end
-    
+
     VM --> VMI
     VM --> DV
     DV --> PV
@@ -311,17 +391,17 @@ graph TB
             CPU[CPU Requests/Limits]
             MEMORY[Memory Requests/Limits]
         end
-        
+
         subgraph "Storage"
             PVC[Persistent Volume Claims]
             STORAGE_CLASS[Storage Classes]
         end
-        
+
         subgraph "Network"
             SERVICES[Kubernetes Services]
             INGRESS[Istio VirtualServices]
         end
-        
+
         subgraph "Security"
             RBAC[Service Accounts]
             SECRETS[Encrypted Secrets]

@@ -19,7 +19,11 @@ The infrastructure is organized into several key namespaces:
 - `kube-system`: Core Kubernetes services
 - `istio-system`: Service mesh components
 - `monitoring`: Observability stack
-- `openebs-system`: Storage infrastructure
+- `openebs-system`: Local persistent volume storage
+- `rook-ceph` (via operators): Distributed block/object storage
+- `cert-manager`: TLS certificate management
+- `networking`: DNS, tunnels, and connectivity
+- `kyverno-system`: Policy enforcement
 
 ## Infrastructure Components
 
@@ -33,14 +37,14 @@ graph TB
             RELOADER[Reloader]
             SPEGEL[Spegel Registry]
         end
-        
+
         subgraph "istio-system"
             ISTIO_BASE[Istio Base]
             ISTIOD[Istio Control Plane]
             CNI[Istio CNI]
             ZTUNNEL[Ztunnel]
         end
-        
+
         subgraph "monitoring"
             PROMETHEUS[Prometheus Stack]
             GRAFANA[Grafana]
@@ -48,12 +52,12 @@ graph TB
             TEMPO[Tempo]
             PROMTAIL[Promtail]
         end
-        
+
         subgraph "openebs-system"
             OPENEBS[OpenEBS]
         end
     end
-    
+
     CILIUM --> ISTIO_BASE
     COREDNS --> METRICS
     PROMETHEUS --> GRAFANA
@@ -107,33 +111,35 @@ Distributed container image registry that caches images across cluster nodes for
 
 ## Service Mesh
 
-### Istio Architecture
+### Istio Architecture (Ambient Mode)
 ```mermaid
 graph TB
-    subgraph "Istio Service Mesh"
+    subgraph "Istio Ambient Mesh"
         subgraph "Control Plane"
             ISTIOD[Istiod<br/>Configuration & Certificates]
         end
-        
-        subgraph "Data Plane"
-            ENVOY1[Envoy Proxy<br/>Sidecar 1]
-            ENVOY2[Envoy Proxy<br/>Sidecar 2]
-            ENVOY3[Envoy Proxy<br/>Sidecar 3]
+
+        subgraph "Data Plane (Ambient)"
+            ZTUNNEL1[Ztunnel<br/>Node 1]
+            ZTUNNEL2[Ztunnel<br/>Node 2]
+            ZTUNNEL3[Ztunnel<br/>Node 3]
         end
-        
+
         subgraph "Infrastructure"
             CNI[Istio CNI<br/>Pod Network Setup]
-            ZTUNNEL[Ztunnel<br/>Ambient Mesh]
+            KIALI[Kiali<br/>Mesh Observability]
         end
     end
-    
-    ISTIOD --> ENVOY1
-    ISTIOD --> ENVOY2
-    ISTIOD --> ENVOY3
-    CNI --> ENVOY1
-    CNI --> ENVOY2
-    CNI --> ENVOY3
+
+    ISTIOD --> ZTUNNEL1
+    ISTIOD --> ZTUNNEL2
+    ISTIOD --> ZTUNNEL3
+    CNI --> ZTUNNEL1
+    CNI --> ZTUNNEL2
+    CNI --> ZTUNNEL3
 ```
+
+> **Note**: Ambient mode eliminates the need for sidecar proxies. Ztunnel runs as a DaemonSet on each node and handles Layer 4 traffic (mTLS, authorization).
 
 ### Istio Base
 **Location**: `kubernetes/infra/istio-system/base/`
@@ -162,7 +168,7 @@ Replaces the init container approach for setting up pod networking, providing be
 ### Ztunnel (Ambient Mesh)
 **Location**: `kubernetes/infra/istio-system/ztunnel/`
 
-Enables ambient mesh capabilities for applications that don't require sidecar proxies.
+Enables ambient mesh capabilities -- a DaemonSet on each node that handles Layer 4 traffic (mTLS, authorization) without requiring sidecar proxies in application pods.
 
 ## Monitoring Stack
 
@@ -176,23 +182,23 @@ graph TB
             KUBE_STATE[Kube State Metrics]
             SCRAPE[Custom Scrape Configs]
         end
-        
+
         subgraph "Visualization"
             GRAFANA[Grafana]
             DASHBOARDS[Custom Dashboards]
         end
-        
+
         subgraph "Logging"
             LOKI[Loki]
             PROMTAIL[Promtail]
         end
-        
+
         subgraph "Tracing"
             TEMPO[Tempo]
             JAEGER[Jaeger UI]
         end
     end
-    
+
     NODE_EXP --> PROMETHEUS
     KUBE_STATE --> PROMETHEUS
     SCRAPE --> PROMETHEUS
@@ -251,50 +257,81 @@ Log collection agent that ships logs to Loki from all cluster nodes.
 
 ## Storage
 
-### OpenEBS
-**Location**: `kubernetes/infra/openebs-system/openebs/`
+### Rook-Ceph
+**Location**: `kubernetes/operators/rook-ceph/`
 
-Container-attached storage solution providing:
+Distributed storage solution providing block and object storage across the cluster:
 
-**Storage Classes**:
-- **Local PV**: High-performance local storage
-- **Replicated Storage**: Data replication across nodes
-- **Dynamic Provisioning**: Automatic volume creation
+**Storage Types**:
+- **Block Storage (RBD)**: Replicated block devices for stateful workloads
+- **Object Storage**: S3-compatible object store
+- **CephFS**: Shared filesystem for multi-pod access
 
 **Features**:
-- Snapshot support
-- Volume expansion
-- Data protection and backup
-- Integration with Kubernetes CSI
+- NVMe-optimized OSD configuration
+- Automatic self-healing and rebalancing
+- Erasure coding support
+- Prometheus metrics integration
+- Snapshot and backup support
+
+**Key Paths**:
+- `kubernetes/operators/rook-ceph/operator/` -- Rook operator
+- `kubernetes/operators/rook-ceph/cluster/` -- Ceph cluster configuration
 
 ```mermaid
 graph TB
-    subgraph "OpenEBS Storage Architecture"
-        subgraph "Storage Classes"
-            LOCAL[Local PV<br/>High Performance]
-            REPLICATED[Replicated Storage<br/>High Availability]
+    subgraph "Storage Architecture"
+        subgraph "Rook-Ceph (Distributed)"
+            OPERATOR[Rook Operator]
+            OSD1[OSD - NVMe 1]
+            OSD2[OSD - NVMe 2]
+            OSD3[OSD - NVMe 3]
+            MON[Ceph Monitors]
+            MGR[Ceph Manager]
+            RBD[RBD Block Storage]
+            OBJ[Object Storage]
         end
-        
-        subgraph "Components"
-            MAYA[Maya API Server]
-            CSTOR[cStor Storage Engine]
-            JIVA[Jiva Storage Engine]
+
+        subgraph "OpenEBS (Local)"
+            OPENEBS[OpenEBS Controller]
+            LOCAL[Local PV]
         end
-        
-        subgraph "Applications"
+
+        subgraph "Consumers"
             DB[Databases]
             APPS[Applications]
             CACHE[Cache Systems]
         end
     end
-    
-    LOCAL --> DB
-    REPLICATED --> APPS
-    MAYA --> CSTOR
-    MAYA --> JIVA
-    CSTOR --> REPLICATED
-    JIVA --> LOCAL
+
+    OPERATOR --> MON
+    OPERATOR --> MGR
+    MON --> OSD1
+    MON --> OSD2
+    MON --> OSD3
+    OSD1 --> RBD
+    OSD2 --> RBD
+    OSD3 --> OBJ
+    RBD --> DB
+    RBD --> APPS
+    OBJ --> APPS
+    OPENEBS --> LOCAL
+    LOCAL --> CACHE
 ```
+
+### OpenEBS
+**Location**: `kubernetes/infra/openebs-system/openebs/`
+
+Container-attached storage for local persistent volumes:
+
+**Storage Classes**:
+- **Local PV**: High-performance local storage for latency-sensitive workloads
+- **Dynamic Provisioning**: Automatic volume creation
+
+**Features**:
+- Snapshot support via snapshot-controller
+- Volume expansion
+- Integration with Kubernetes CSI
 
 ## Networking
 
@@ -325,19 +362,19 @@ graph TB
             NP[Network Policies]
             CILIUM_SEC[Cilium Security]
         end
-        
+
         subgraph "Service Mesh Level"
             MTLS[mTLS Encryption]
             AUTH_POLICY[Authorization Policies]
             PEER_AUTH[Peer Authentication]
         end
-        
+
         subgraph "Application Level"
             RBAC[Kubernetes RBAC]
             PSP[Pod Security Policies]
         end
     end
-    
+
     NP --> MTLS
     CILIUM_SEC --> AUTH_POLICY
     MTLS --> RBAC

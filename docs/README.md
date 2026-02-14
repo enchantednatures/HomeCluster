@@ -14,15 +14,16 @@
 
 HomeCluster is a production-ready Kubernetes cluster designed for home lab environments, built using GitOps principles with Flux CD. This repository contains the complete infrastructure-as-code setup for deploying and managing a highly available Kubernetes cluster with modern cloud-native technologies.
 
-The cluster is designed to run on bare metal or virtual machines within a home network, providing enterprise-grade features including:
+The cluster runs on Talos (an immutable, minimal Kubernetes OS) provisioned on Proxmox VMs via OpenTofu, providing enterprise-grade features including:
 
 - **GitOps-driven deployments** with Flux CD
 - **Encrypted secrets management** using SOPS and Age
-- **Service mesh capabilities** with Istio
+- **Service mesh capabilities** with Istio (ambient mode)
 - **Advanced networking** with Cilium CNI
-- **Comprehensive observability** with Grafana, Prometheus, and Tempo
+- **Distributed storage** with Rook-Ceph (block/object) and OpenEBS (local PV)
+- **Comprehensive observability** with Grafana, Prometheus, Loki, and Tempo
 - **Serverless workloads** with KNative
-- **Multiple database operators** for PostgreSQL, MongoDB, Redis, and more
+- **Multiple database operators** for PostgreSQL, Kafka, ArangoDB, DragonflyDB, and Elastic
 
 ## Architecture
 
@@ -31,33 +32,33 @@ The cluster follows a layered architecture approach:
 ```mermaid
 graph TB
     subgraph "Infrastructure Layer"
-        A[Talos/K3s Kubernetes]
+        A[Talos Kubernetes]
         B[Cilium CNI]
-        C[OpenEBS Storage]
+        C[Rook-Ceph + OpenEBS Storage]
         D[Istio Service Mesh]
     end
-    
+
     subgraph "Platform Layer"
         E[Flux GitOps]
         F[Cert-Manager]
         G[External-DNS]
         H[Cloudflare Tunnels]
     end
-    
+
     subgraph "Observability Layer"
         I[Prometheus]
         J[Grafana]
         K[Tempo]
         L[Loki]
     end
-    
+
     subgraph "Application Layer"
         M[Database Operators]
         N[Serverless Apps]
         O[Web Applications]
         P[Development Tools]
     end
-    
+
     A --> E
     B --> D
     E --> F
@@ -75,8 +76,8 @@ graph TB
 ## Quick Start
 
 1. **Prerequisites**: Ensure you have the required tools installed (see [Deployment Guide](deployment-guide.md))
-2. **Initialize**: Run `task init` to create configuration files
-3. **Configure**: Update `config.yaml` with your environment settings
+2. **Provision VMs**: Use OpenTofu to create Talos VMs on Proxmox
+3. **Configure**: Update secrets and cluster settings
 4. **Deploy**: Follow the [Deployment Guide](deployment-guide.md) for complete setup instructions
 
 ## Documentation Index
@@ -87,54 +88,58 @@ graph TB
 | [Kubernetes Infrastructure](kubernetes-infrastructure.md) | Infrastructure components and operators |
 | [Kubernetes Applications](kubernetes-applications.md) | Application deployments and configurations |
 | [Flux GitOps](flux-gitops.md) | GitOps workflow and Flux configuration |
-| [Terraform Provisioning](terraform.md) | Infrastructure provisioning with Terraform |
+| [Terraform Provisioning](terraform.md) | Infrastructure provisioning with OpenTofu/Terraform |
 | [Deployment Guide](deployment-guide.md) | Complete deployment and configuration instructions |
-| [Ceph NVMe Setup](ceph-nvme-setup.md) | NVMe drive setup and optimization guide |
 | [Networking](networking.md) | Network configuration and service mesh setup |
-| [Security](security.md) | Security policies and secret management |
-| [Monitoring](monitoring.md) | Observability and monitoring setup |
-| [Troubleshooting](troubleshooting.md) | Common issues and debugging guides |
+| [Ceph NVMe Setup](ceph-nvme-setup.md) | NVMe drive setup and optimization guide |
+| [Ceph OSD Replacement](ceph-osd-replacement-procedures.md) | OSD replacement procedures |
+| [Ceph Disaster Recovery](ceph-disaster-recovery-procedures.md) | Disaster recovery scenarios |
+| [Authentik + Istio Forward Auth](authentik-istio-forward-auth.md) | Authentik forward auth with Istio |
 
 ## Key Features
 
-### 🔄 GitOps Workflow
+### GitOps Workflow
 - **Flux CD** for continuous deployment
 - **Git-based** configuration management
 - **Automated** reconciliation and drift detection
 
-### 🔐 Security First
+### Security
 - **SOPS encryption** for secrets at rest
 - **Age encryption** for secure key management
-- **Istio service mesh** for zero-trust networking
+- **Istio ambient mesh** for zero-trust networking
 - **Cert-manager** for automated TLS certificates
+- **Kyverno** for policy enforcement
 
-### 📊 Comprehensive Observability
+### Comprehensive Observability
 - **Prometheus** for metrics collection
 - **Grafana** for visualization and dashboards
 - **Tempo** for distributed tracing
 - **Loki** for log aggregation
 
-### 🚀 Modern Platform
+### Modern Platform
 - **KNative** for serverless workloads
-- **Multiple database operators** (PostgreSQL, ArangoDB, Redis, etc.)
-- **Event-driven architecture** with Kafka and Strimzi
+- **Multiple database operators** (PostgreSQL, Kafka, ArangoDB, DragonflyDB, Elastic)
+- **Event-driven architecture** with Kafka (Strimzi) and Redpanda
 - **Container registry** with Harbor
+- **CI/CD pipelines** with Tekton
 
-### 🌐 Network & Ingress
+### Network and Ingress
 - **Cilium CNI** with eBPF networking
-- **Istio service mesh** for advanced traffic management
+- **Istio ambient mesh** for traffic management (no sidecars)
 - **Cloudflare Tunnels** for secure external access
 - **External-DNS** for automated DNS management
+- **Tailscale** for private network connectivity
 
 ## Technology Stack
 
 ### Core Infrastructure
-- **Kubernetes**: Talos/K3s distribution
+- **Kubernetes**: Talos distribution on Proxmox VMs
+- **Provisioning**: OpenTofu (Terraform-compatible)
 - **CNI**: Cilium for networking and security
-- **Storage**: OpenEBS for persistent volumes
-- **Service Mesh**: Istio for traffic management
+- **Storage**: Rook-Ceph (block/object) + OpenEBS (local PV)
+- **Service Mesh**: Istio ambient mode
 
-### GitOps & Automation
+### GitOps and Automation
 - **Flux CD**: GitOps continuous delivery
 - **SOPS**: Secrets encryption
 - **Age**: Encryption key management
@@ -145,24 +150,34 @@ graph TB
 - **Grafana**: Dashboards and visualization
 - **Tempo**: Distributed tracing
 - **Loki**: Log aggregation
+- **InfluxDB**: Time-series data
 
-### Data & Messaging
+### Data and Messaging
 - **CloudNative-PG**: PostgreSQL operator
 - **Strimzi**: Apache Kafka operator
+- **Redpanda**: Kafka-compatible streaming
 - **ArangoDB**: Multi-model database
 - **DragonflyDB**: Redis-compatible datastore
+- **Elastic**: Elasticsearch operator
 
-### Development & Tools
+### Development and Tools
 - **Harbor**: Container registry
 - **Authentik**: Identity provider
 - **Tekton**: CI/CD pipelines
 - **KNative**: Serverless platform
+- **KubeVirt**: Virtual machine workloads
+
+### Home Automation
+- **Home Assistant**: Home automation platform
+- **ESPHome**: IoT device management
+- **Node-RED**: Flow-based automation
+- **RabbitMQ**: Message broker
 
 ## Getting Help
 
 - **Issues**: Create an issue in this repository for bugs or feature requests
 - **Discussions**: Use GitHub Discussions for questions and community support
-- **Documentation**: Check the [troubleshooting guide](troubleshooting.md) for common issues
+- **Community**: Join the [Home Operations](https://discord.gg/home-operations) Discord
 
 ## Contributing
 

@@ -31,28 +31,28 @@ graph TB
             GIT[Git Repository]
             WEBHOOK[GitHub Webhook]
         end
-        
+
         subgraph "Flux Controllers"
             SOURCE[Source Controller]
             KUSTOMIZE[Kustomize Controller]
             HELM[Helm Controller]
             NOTIFICATION[Notification Controller]
         end
-        
+
         subgraph "Cluster Resources"
             INFRA[Infrastructure]
             CORE[Core Services]
             APPS[Applications]
             OPERATORS[Operators]
         end
-        
+
         subgraph "External Resources"
             HELM_REPOS[Helm Repositories]
             OCI_REPOS[OCI Repositories]
             SECRETS[Encrypted Secrets]
         end
     end
-    
+
     GIT --> SOURCE
     WEBHOOK --> SOURCE
     SOURCE --> KUSTOMIZE
@@ -121,28 +121,35 @@ kubernetes/flux/
 graph TB
     subgraph "Deployment Layers"
         INFRA[Infrastructure Layer]
-        OPERATORS[Operators Layer]
         CORE[Core Services Layer]
+        OPERATORS[Operators Layer]
         APPS[Applications Layer]
     end
-    
-    INFRA --> OPERATORS
+
     INFRA --> CORE
-    OPERATORS --> CORE
+    INFRA --> OPERATORS
+    CORE --> OPERATORS
+    INFRA --> APPS
     CORE --> APPS
-    
+
     subgraph "Dependencies"
-        INFRA_DEP[CNI, Storage, Service Mesh]
+        INFRA_DEP[CNI, Storage, Service Mesh, Monitoring]
+        CORE_DEP[Authentik, Harbor, Tekton]
         OPERATORS_DEP[Database Operators, CRDs]
-        CORE_DEP[Cert-Manager, DNS, Auth]
         APPS_DEP[User Applications]
     end
-    
+
     INFRA --> INFRA_DEP
-    OPERATORS --> OPERATORS_DEP
     CORE --> CORE_DEP
+    OPERATORS --> OPERATORS_DEP
     APPS --> APPS_DEP
 ```
+
+> **Actual dependency chain** (from Flux Kustomization YAML):
+> - **Infrastructure**: no dependencies
+> - **Core**: depends on Infrastructure
+> - **Operators**: depends on Core + Infrastructure
+> - **Apps**: depends on Core + Infrastructure
 
 ## Deployment Layers
 
@@ -156,18 +163,7 @@ Foundational components that must be deployed first:
 - OpenEBS storage
 - Core monitoring stack
 
-### 2. Operators Layer
-**File**: `kubernetes/flux/operators.yaml`
-**Path**: `./kubernetes/operators`
-
-Custom Resource Definitions and operators:
-- CloudNative-PG (PostgreSQL)
-- Strimzi (Kafka)
-- ArangoDB Operator
-- Rook-Ceph
-- Elastic Operator
-
-### 3. Core Services Layer
+### 2. Core Services Layer
 **File**: `kubernetes/flux/core.yaml`
 **Path**: `./kubernetes/core`
 
@@ -177,6 +173,25 @@ Essential platform services:
 - Tekton (CI/CD Pipelines)
 
 **Dependencies**: Infrastructure layer must be healthy
+
+### 3. Operators Layer
+**File**: `kubernetes/flux/operators.yaml`
+**Path**: `./kubernetes/operators`
+
+Custom Resource Definitions and operators:
+- CloudNative-PG (PostgreSQL)
+- Strimzi (Kafka)
+- ArangoDB Operator
+- Rook-Ceph
+- DragonflyDB Operator
+- Elastic Operator
+- KubeVirt
+- Flink
+- RabbitMQ Operator
+- Redpanda Operator
+- Actions Runner Controller
+
+**Dependencies**: Core and Infrastructure layers must be healthy
 
 ### 4. Applications Layer
 **File**: `kubernetes/flux/apps.yaml`
@@ -298,7 +313,7 @@ sequenceDiagram
     participant ConfigMap as ConfigMap/Secret
     participant Template as Template Manifest
     participant Applied as Applied Resource
-    
+
     Flux->>ConfigMap: Read Variables
     Flux->>Template: Process Template
     ConfigMap->>Template: Substitute Variables
@@ -374,19 +389,19 @@ graph TB
             PROM[Prometheus Metrics]
             GRAFANA[Grafana Dashboards]
         end
-        
+
         subgraph "Alerts"
             ALERT_RULES[Alert Rules]
             NOTIFICATIONS[Notifications]
         end
-        
+
         subgraph "Status Checks"
             READY[Ready Status]
             RECONCILE[Reconciliation Status]
             ERRORS[Error Conditions]
         end
     end
-    
+
     PROM --> GRAFANA
     PROM --> ALERT_RULES
     ALERT_RULES --> NOTIFICATIONS
