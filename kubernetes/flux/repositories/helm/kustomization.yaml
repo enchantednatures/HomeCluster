@@ -6,6 +6,7 @@ resources:
   - ./agones-charts.yaml
   - ./apicurio.yaml
   - ./actions-runner-controller-charts.yaml
+  - ./flagger.yaml
   - ./airflow-charts.yaml
   - ./ananace-charts.yaml
   - ./arroyo-charts.yaml

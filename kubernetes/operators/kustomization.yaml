@@ -9,6 +9,7 @@ resources:
   - ./dragonflydb
   - ./elastic
   # - ./flink
+  - ./flagger
   - ./kubevirt
   - ./rabbitmq-operator
   - ./redpanda
