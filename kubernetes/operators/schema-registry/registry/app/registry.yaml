@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/registry.apicur.io/apicurioregistry_v1.json
+apiVersion: registry.apicur.io/v1
+kind: ApicurioRegistry
+metadata:
+  name: apicurio-registry
+  namespace: schema-registry
+spec:
+  configuration:
+    persistence: kafkasql
+    kafkasql:
+      bootstrapServers: redpanda-cluster.redpanda.svc.cluster.local:9092
+  deployment:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+  ui:
+    enabled: true
