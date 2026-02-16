@@ -21,12 +21,9 @@ spec:
           guest: 2Gi
         devices:
           disks:
-            - name: arch-linux-disk
+            - name: arch-linux-root
               disk:
                 bus: virtio
-            - name: arch-linux-iso
-              cdrom:
-                bus: sata
             - name: cloudinitdisk
               disk:
                 bus: virtio
@@ -56,12 +53,9 @@ spec:
         - name: default
           pod: {}
       volumes:
-        - name: arch-linux-disk
+        - name: arch-linux-root
           dataVolume:
-            name: arch-linux-disk
-        - name: arch-linux-iso
-          dataVolume:
-            name: arch-linux-iso
+            name: arch-linux-root
         - name: cloudinitdisk
           cloudInitNoCloud:
             secretRef:

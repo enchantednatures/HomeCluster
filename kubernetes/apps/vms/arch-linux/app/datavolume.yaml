@@ -3,30 +3,12 @@
 apiVersion: cdi.kubevirt.io/v1beta1
 kind: DataVolume
 metadata:
-  name: arch-linux-iso
+  name: arch-linux-root
   namespace: vms
 spec:
   source:
-    http:
-      url: "https://mirror.rackspace.com/archlinux/iso/latest/archlinux-x86_64.iso"
-  storage:
-    accessModes:
-      - ReadWriteOnce
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: 2Gi
-    storageClassName: openebs-hostpath
----
-# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
-apiVersion: cdi.kubevirt.io/v1beta1
-kind: DataVolume
-metadata:
-  name: arch-linux-disk
-  namespace: vms
-spec:
-  source:
-    blank: {}
+    registry:
+      url: "docker://containercraft/archlinux:latest"
   storage:
     accessModes:
       - ReadWriteOnce
@@ -35,4 +17,5 @@ spec:
       requests:
         storage: 20Gi
     storageClassName: openebs-hostpath
+
 
