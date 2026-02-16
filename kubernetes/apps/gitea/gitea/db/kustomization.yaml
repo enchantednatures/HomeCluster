@@ -4,6 +4,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ./cluster.yaml
+  - ./object-store.yaml
   - ./gitea-db-user.sops.yaml
   - ./gitea-db-hunter.sops.yaml
+  - ./pg-backup-secret.sops.yaml
   - ./postgres-superuser.sops.yaml
