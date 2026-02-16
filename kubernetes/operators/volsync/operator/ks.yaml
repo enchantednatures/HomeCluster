@@ -1,25 +1,21 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: &app arch-linux-vm
+  name: &app volsync
   namespace: flux-system
 spec:
-  targetNamespace: vms
+  targetNamespace: volsync-system
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
-  dependsOn:
-    - name: kubevirt-operator
-    - name: kubevirt-cdi
-    - name: volsync
-  path: ./kubernetes/apps/vms/arch-linux/app
+  path: ./kubernetes/operators/volsync/operator/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
-  wait: false
+  wait: true
   interval: 30m
   retryInterval: 1m
   timeout: 5m

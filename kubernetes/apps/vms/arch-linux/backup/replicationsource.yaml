@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: arch-linux-backup
+  namespace: vms
+spec:
+  sourcePVC: arch-linux-root
+  trigger:
+    # Run backup daily at 2 AM
+    schedule: "0 2 * * *"
+  restic:
+    # The secret containing S3/restic credentials
+    repository: arch-linux-backup-secret
+    # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    # Prune removes unreferenced data from the repository
+    pruneIntervalDays: 7
+    # Storage for the mover pod (temporary, during backup)
+    storageClassName: openebs-hostpath
+    # Cache for faster incremental backups
+    cacheStorageClassName: openebs-hostpath
+    cacheCapacity: 10Gi
+    # Mover pod resources
+    moverPodLabels:
+      app: volsync-arch-linux-backup
+    # Ensure VM is paused during backup for data consistency (optional)
+    # Uncomment if you need application-consistent backups
+    # pause: true
+    # cleanupTempPVC: true
