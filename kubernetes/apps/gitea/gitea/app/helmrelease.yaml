@@ -15,6 +15,7 @@ spec:
         kind: HelmRepository
         name: gitea-charts
         namespace: flux-system
+  timeout: 15m
   install:
     remediation:
       retries: 3
