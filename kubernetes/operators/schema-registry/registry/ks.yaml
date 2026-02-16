@@ -10,6 +10,7 @@ spec:
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
+  suspend: true
   path: ./kubernetes/operators/schema-registry/registry/app
   prune: true
   sourceRef:

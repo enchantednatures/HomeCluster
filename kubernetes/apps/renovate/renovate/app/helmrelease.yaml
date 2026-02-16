@@ -50,12 +50,7 @@ spec:
             "fileMatch": ["kubernetes/.+\\.ya?ml$"]
           }
         }
-    secrets:
-      RENOVATE_TOKEN:
-        valueFrom:
-          secretKeyRef:
-            name: renovate-github-token
-            key: token
+    existingSecret: renovate-github-token
     resources:
       requests:
         cpu: 100m

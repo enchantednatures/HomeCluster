@@ -1,5 +1,4 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
-# PLACEHOLDER - Run 'task sops:encrypt' to encrypt this file
 apiVersion: v1
 kind: Secret
 metadata:
@@ -7,19 +6,19 @@ metadata:
     namespace: renovate
 type: Opaque
 stringData:
-    token: ENC[AES256_GCM,data:171vvnAnrN7oyI0YruIsuPxooSeF6v+z,iv:iD/hN8OkQPMOrxwuRF1aFBPpbQlAo2pgOFcQplkhVdg=,tag:lZh8hHPt+2nfLeCOc6PE6Q==,type:str]
+    RENOVATE_TOKEN: ENC[AES256_GCM,data:cU6gex8j2NuTA5junJNPvMC7mQ280XTI,iv:x9awInnJc1ccE9m9bkp+wZfeutlOBLz+6tfCTHJJOGU=,tag:IB3yvdo27YxbGnHY6RNcFw==,type:str]
 sops:
     age:
         - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2Rm1SMXpSU2xvb0tJSm43
-            cGlOUWU3MDdpblNNT2hBMXVubjZJOThubEI0ClV5QWN6RUZMWGhYbXk5YnJ2NHdY
-            VXExQTJWd0NDam9Td0NqSWdXb0hINWMKLS0tIG9rdWUra0tWcVVsbUNOL0pEanV1
-            Q3RGMEFGQU4wNEVhRmRPRGtrOUJtN00KBPR0quJaTwH429wmwYYi8hFo4GizW2pF
-            t4SBnyouQMv2G64Wt/IGF20nTf34PrHPTRtk3SeUfzzhbDlK6vHmVg==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTb2t4aHFEbmhSOEo1RWxZ
+            bVZTS3NBNnRpcERYUWhCODhnc3l0SlQ3NUYwCkZtN2UrMm4wWG00NGZ2Qm5ORVho
+            OWVVaWJwQVI5UStDT2NzRm01SEZhZDQKLS0tIDlTamMxSlVLbUk0VmpERTlBalRz
+            b0ExVlNtNDgxdzdaQTJ0WHljcldzeEEKRY9I+6Het8az0OCRck1pA1Cf3m6lPJaQ
+            X5Loi9TRa3SffnikTGiwscXjWtu2QRuIvEQqeqKVaQhLGTmmKHHuaA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-02-16T02:48:20Z"
-    mac: ENC[AES256_GCM,data:55op5uCc+x7Ei3eqChSBAjgD3xNneMnzSCAroF7Jr+zDxE5dA+JUJIAsm9bdY7MpsrS92mK7TVWHevbG4Fmgy78nQy2dFY7fc578bc6HeivEGOllYNLxOlB/6XOKY0atajc2jjT05oBBw8178uPnpzrPm4QnnOw+6sry0PejxIs=,iv:cpuvbV9oW3YLFEshIzZ/jc7lrR7MFOUqXGZU91If9ic=,tag:4BvWqEr3RR0IYtD8ZqWTog==,type:str]
+    lastmodified: "2026-02-16T06:43:52Z"
+    mac: ENC[AES256_GCM,data:65Uskm8p7iKiOaa0ys3WYhgmvYeSTT+AwgGz2d6gZEzPbXQ/35cXIoZrWUMZ8Lqizu9VaCNYQtI5ICO2MbJOTrTUEA2t7vIt+B1u9kd8dEQ/rboHHGozWqQWM6ju9eJMv+iLH37p9LWKfAx/LoFJU9NOqHQ9SRynIgp4ATMFK2k=,iv:xs4lO8HlG4qcbUsZ+SkLuv6lrOw3FAUH5wkGL50q234=,tag:q4N7cQidltCB0YvUP8lntA==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.11.0

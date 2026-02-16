@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: kellnr
-      version: 2.4.0
+      version: 5.0.0
       sourceRef:
         kind: HelmRepository
         name: kellnr
@@ -26,26 +26,27 @@ spec:
   uninstall:
     keepHistory: false
   values:
-    kellnr:
-      apiAddress: crates.${SECRET_DOMAIN}
-      adminPwd:
-        valueFrom:
-          secretKeyRef:
-            name: kellnr-admin-secret
-            key: adminPassword
-      adminToken:
-        valueFrom:
-          secretKeyRef:
-            name: kellnr-admin-secret
-            key: adminToken
-      cratesIoProxy: true
-      gitIndex: false  # Use sparse index (modern cargo)
-      maxDocsSize: 100
-      maxCrateSize: 50
-    persistence:
+    secret:
       enabled: true
-      storageClass: csi-nfs
-      size: 50Gi
+      useExisting: true
+      name: kellnr-admin-secret
+    kellnr:
+      origin:
+        hostname: crates.${SECRET_DOMAIN}
+        port: 443
+        protocol: https
+      registry:
+        maxCrateSize: 50
+      docs:
+        enabled: true
+        maxSize: 100
+      proxy:
+        enabled: true
+    pvc:
+      enabled: true
+      name: kellnr
+      storageClassName: csi-nfs
+      storage: 50Gi
     resources:
       requests:
         cpu: 100m
@@ -60,11 +61,5 @@ spec:
         cert-manager.io/cluster-issuer: letsencrypt-production
         external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
         external-dns/is-public: "true"
-      hosts:
-        - host: &host crates.${SECRET_DOMAIN}
-          paths:
-            - path: /
-              pathType: Prefix
       tls:
-        - hosts: [*host]
-          secretName: kellnr-tls
+        secretName: kellnr-tls
