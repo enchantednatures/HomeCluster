@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app renovate
+spec:
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: renovate
+      version: 39.86.0
+      sourceRef:
+        kind: HelmRepository
+        name: renovate
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    cronjob:
+      schedule: "0 4 * * *"  # Run at 4 AM daily
+      successfulJobsHistoryLimit: 1
+      failedJobsHistoryLimit: 1
+    renovate:
+      config: |
+        {
+          "platform": "github",
+          "autodiscover": false,
+          "repositories": ["hcasten/HomeCluster"],
+          "extends": [
+            "config:recommended",
+            ":dependencyDashboard"
+          ],
+          "flux": {
+            "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+          },
+          "kubernetes": {
+            "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+          },
+          "helm-values": {
+            "fileMatch": ["kubernetes/.+\\.ya?ml$"]
+          }
+        }
+    secrets:
+      RENOVATE_TOKEN:
+        valueFrom:
+          secretKeyRef:
+            name: renovate-github-token
+            key: token
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        memory: 1Gi

@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: gitea-db
+  namespace: gitea
+  labels:
+    app.kubernetes.io/name: gitea-db
+spec:
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
+  inheritedMetadata:
+    annotations:
+      sidecar.istio.io/inject: "false"
+  instances: 3
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 20Gi
+    storageClass: csi-nfs
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1000m"
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: postgres-superuser
+  postgresql:
+    parameters:
+      max_connections: "300"
+      shared_buffers: 512MB
+  monitoring:
+    enablePodMonitor: true
+  managed:
+    roles:
+      - name: hunter
+        ensure: present
+        comment: Hunter
+        login: true
+        superuser: true
+        passwordSecret:
+          name: gitea-db-hunter
+        inRoles: [pg_monitor, pg_signal_backend]
+      - name: gitea
+        ensure: present
+        comment: Gitea
+        login: true
+        superuser: false
+        passwordSecret:
+          name: gitea-db-user
+        inRoles: [pg_monitor, pg_signal_backend]
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: gitea-v4

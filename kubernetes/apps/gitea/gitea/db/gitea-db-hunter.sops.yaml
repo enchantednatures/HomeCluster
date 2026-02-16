@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+# PLACEHOLDER - Run 'task sops:encrypt' to encrypt this file
+apiVersion: v1
+kind: Secret
+metadata:
+    name: gitea-db-hunter
+    namespace: gitea
+type: Opaque
+stringData:
+    password: ENC[AES256_GCM,data:0tA3JVfty2qv0rc85HTGSLnBJhzj1G0G,iv:t29HEeZJgTL9UmPc0KiPYAvSCnIqiDnhhRFZX6Qq/gc=,tag:E0hjaY4QhqGiL1Odv8KuCQ==,type:str]
+sops:
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBTRm1xQlAxV29lOGhtSDdZ
+            VEJUT29YUW9GNk1oaWppc0ROV1NyeXhqK0dRCnQxUjlpUHZEZzBEUml2YlNlVFBF
+            a2EwUG5YKytBR3h6VjJ4Q3JpL25kS2MKLS0tIDJQYldOL2MwR0h3ZmRYdHFobnlX
+            RnIwUjIrZjFYTFIrUEFORGNlV016alUK4bYo++rpJbhAtOvwYWvhU5LA+ky3jEml
+            k13P0oHxVpKeOJ/9z2K+cWeeeX0bO3m5wLdbUL07P4eTW3RF3SEXnw==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-16T02:48:21Z"
+    mac: ENC[AES256_GCM,data:d32jiVrSG/BkrgQlURqtSKPCn0yXGHfZULxoYYcPTteyhqNNvicMMshXrS0jsOQj7Swk61JkjhfaSow8fgGWKtg2tkS3/sk6WuKVBL9CRRJ+0z9ChuAEe3JfdYCA1VXFVFRR2dJaO+4bBK9QEjkqcVpxsEJgzbe+/XrVkfRLOMQ=,iv:D9KhFlkUjMNRETECVx4zTgxz2kfFVOfNfZ5i0Q6r3W0=,tag:SJYD4QXjr8O4FO6wLOcNsQ==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0

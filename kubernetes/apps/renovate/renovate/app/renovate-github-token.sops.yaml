@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+# PLACEHOLDER - Run 'task sops:encrypt' to encrypt this file
+apiVersion: v1
+kind: Secret
+metadata:
+    name: renovate-github-token
+    namespace: renovate
+type: Opaque
+stringData:
+    token: ENC[AES256_GCM,data:171vvnAnrN7oyI0YruIsuPxooSeF6v+z,iv:iD/hN8OkQPMOrxwuRF1aFBPpbQlAo2pgOFcQplkhVdg=,tag:lZh8hHPt+2nfLeCOc6PE6Q==,type:str]
+sops:
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2Rm1SMXpSU2xvb0tJSm43
+            cGlOUWU3MDdpblNNT2hBMXVubjZJOThubEI0ClV5QWN6RUZMWGhYbXk5YnJ2NHdY
+            VXExQTJWd0NDam9Td0NqSWdXb0hINWMKLS0tIG9rdWUra0tWcVVsbUNOL0pEanV1
+            Q3RGMEFGQU4wNEVhRmRPRGtrOUJtN00KBPR0quJaTwH429wmwYYi8hFo4GizW2pF
+            t4SBnyouQMv2G64Wt/IGF20nTf34PrHPTRtk3SeUfzzhbDlK6vHmVg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-16T02:48:20Z"
+    mac: ENC[AES256_GCM,data:55op5uCc+x7Ei3eqChSBAjgD3xNneMnzSCAroF7Jr+zDxE5dA+JUJIAsm9bdY7MpsrS92mK7TVWHevbG4Fmgy78nQy2dFY7fc578bc6HeivEGOllYNLxOlB/6XOKY0atajc2jjT05oBBw8178uPnpzrPm4QnnOw+6sry0PejxIs=,iv:cpuvbV9oW3YLFEshIzZ/jc7lrR7MFOUqXGZU91If9ic=,tag:4BvWqEr3RR0IYtD8ZqWTog==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0
