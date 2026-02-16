@@ -61,9 +61,6 @@ spec:
           REQUIRE_SIGNIN_VIEW: false
         security:
           INSTALL_LOCK: true
-      additionalConfigSources:
-        - secret:
-            secretName: gitea-admin-secret
       additionalConfigFromEnvs:
         - name: GITEA__database__PASSWD
           valueFrom:
