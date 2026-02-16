@@ -7,8 +7,8 @@ metadata:
   namespace: vms
 spec:
   source:
-    registry:
-      url: "docker://containercraft/archlinux:latest"
+    http:
+      url: "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
   storage:
     accessModes:
       - ReadWriteOnce
