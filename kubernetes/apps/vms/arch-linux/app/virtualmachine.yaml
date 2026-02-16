@@ -16,9 +16,9 @@ spec:
     spec:
       domain:
         cpu:
-          cores: 2
+          cores: 16
         memory:
-          guest: 2Gi
+          guest: 32Gi
         devices:
           disks:
             - name: arch-linux-root
@@ -44,11 +44,11 @@ spec:
           type: pc-q35-rhel9.2.0
         resources:
           requests:
-            memory: 2Gi
-            cpu: 1
+            memory: 32Gi
+            cpu: 8
           limits:
-            memory: 2Gi
-            cpu: 2
+            memory: 32Gi
+            cpu: 16
       networks:
         - name: default
           pod: {}
