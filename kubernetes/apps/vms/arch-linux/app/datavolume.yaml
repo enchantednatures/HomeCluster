@@ -7,8 +7,8 @@ metadata:
   namespace: vms
 spec:
   source:
-    http:
-      url: "https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+    registry:
+      url: "docker://ghcr.io/bgh-github/arch-uefi-cloudimg/arch-uefi-cloudimg:latest"
   storage:
     accessModes:
       - ReadWriteOnce
