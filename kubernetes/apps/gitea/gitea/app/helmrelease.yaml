@@ -48,11 +48,6 @@ spec:
           HOST: gitea-db-rw.gitea.svc.cluster.local:5432
           NAME: gitea
           USER: gitea
-          PASSWD:
-            valueFrom:
-              secretKeyRef:
-                name: gitea-db-user
-                key: password
           SSL_MODE: disable
         server:
           PROTOCOL: http
@@ -69,6 +64,12 @@ spec:
       additionalConfigSources:
         - secret:
             secretName: gitea-admin-secret
+      additionalConfigFromEnvs:
+        - name: GITEA__database__PASSWD
+          valueFrom:
+            secretKeyRef:
+              name: gitea-db-user
+              key: password
     postgresql:
       enabled: false
     postgresql-ha:
