@@ -146,7 +146,7 @@ spec:
                   - "[STATUS] == 200"
               - name: External DNS
                 group: Infrastructure
-                url: 1.1.1.1
+                url: icmp://1.1.1.1
                 interval: 5m
                 conditions:
                   - "[CONNECTED] == true"
