@@ -12,7 +12,7 @@ spec:
   chart:
     spec:
       chart: rook-ceph
-      version: v1.19.1  # Using stable version for Talos compatibility
+      version: v1.19.1 # datasource=helm depName=rook-ceph repository=https://charts.rook.io/release
       sourceRef:
         kind: HelmRepository
         name: rook-charts
@@ -35,6 +35,7 @@ spec:
   values:
     image:
       repository: rook/ceph
+      # datasource=docker depName=rook/ceph
       tag: v1.19.1
     monitoring:
       enabled: true

@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: flink-kubernetes-operator
-      version: 1.10.0
+      version: 1.10.0 # datasource=helm depName=flink-kubernetes-operator repository=https://downloads.apache.org/flink/flink-kubernetes-operator-1.10.0
       sourceRef:
         kind: HelmRepository
         name: flink-charts

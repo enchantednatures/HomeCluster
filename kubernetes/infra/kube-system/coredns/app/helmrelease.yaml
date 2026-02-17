@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: coredns
-      version: 1.45.2
+      version: 1.45.2 # datasource=helm depName=coredns repository=https://coredns.github.io/helm
       sourceRef:
         kind: HelmRepository
         name: coredns

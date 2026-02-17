@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: eck-operator
-      version: 3.3.0
+      version: 3.3.0 # datasource=helm depName=eck-operator repository=https://helm.elastic.co
       sourceRef:
         kind: HelmRepository
         name: elastic
@@ -22,5 +22,6 @@ spec:
   values:
     image:
       repository: docker.elastic.co/eck/eck-operator
+      # datasource=docker depName=docker.elastic.co/eck/eck-operator
       tag: 3.3.0
       pullPolicy: IfNotPresent

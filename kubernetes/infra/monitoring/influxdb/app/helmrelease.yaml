@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: influxdb2
-      version: 2.1.2
+      version: 2.1.2 # datasource=helm depName=influxdb2 repository=https://helm.influxdata.com
       sourceRef:
         kind: HelmRepository
         name: influx-data
@@ -32,6 +32,7 @@ spec:
   values:
     image:
       repository: influxdb
+      # datasource=docker depName=influxdb
       tag: 2.8.0-alpine
       pullPolicy: IfNotPresent
 

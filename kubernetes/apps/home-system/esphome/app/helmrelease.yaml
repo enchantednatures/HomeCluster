@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.3
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -25,6 +25,7 @@ spec:
         app:
           image:
             repository: esphome/esphome
+            # datasource=docker depName=esphome/esphome
             tag: 2026.1.5@sha256:75adfbe90d9afe52c5137decf8cf12369cee00b1acfe2a92e866bfe0d1887904
           env:
             ESPHOME_DASHBOARD_USE_PING: true

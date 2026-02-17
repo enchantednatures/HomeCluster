@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: tailscale-operator
-      version: 1.94.2
+      version: 1.94.2 # datasource=helm depName=tailscale-operator repository=https://pkgs.tailscale.com/helmcharts
       sourceRef:
         kind: HelmRepository
         name: tailscale-charts
@@ -40,11 +40,13 @@ spec:
     installCRDs: "true"
     image:
       repository: docker.io/tailscale/k8s-operator
+      # datasource=docker depName=tailscale/k8s-operator
       tag: v1.94.2
     operatorConfig: {}
     proxyConfig:
       image:
         repository: tailscale/tailscale
+        # datasource=docker depName=tailscale/tailscale
         tag: v1.94.2
       firewallMode: auto
     apiServerProxyConfig:

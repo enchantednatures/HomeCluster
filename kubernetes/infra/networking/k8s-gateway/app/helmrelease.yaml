@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: k8s-gateway
-      version: 2.4.0
+      version: 2.4.0 # datasource=helm depName=k8s-gateway repository=https://ori-edge.github.io/k8s-gateway
       sourceRef:
         kind: HelmRepository
         name: k8s-gateway

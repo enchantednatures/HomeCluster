@@ -12,7 +12,7 @@ spec:
   chart:
     spec:
       chart: tempo-distributed
-      version: 1.61.3
+      version: 1.61.3 # datasource=helm depName=tempo-distributed repository=https://grafana.github.io/helm-charts
       sourceRef:
         kind: HelmRepository
         name: grafana

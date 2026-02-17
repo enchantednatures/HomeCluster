@@ -33,6 +33,7 @@ spec:
   values:
     image:
       repository: ghcr.io/fluxcd/flagger
+      # datasource=docker depName=ghcr.io/fluxcd/flagger
       tag: 1.42.0
 
     # Configure for Istio mesh provider

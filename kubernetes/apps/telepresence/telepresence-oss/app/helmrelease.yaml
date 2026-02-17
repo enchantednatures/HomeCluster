@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: telepresence-oss
-      version: 2.26.2
+      version: 2.26.2 # datasource=helm depName=telepresence-oss repository=oci://ghcr.io/telepresenceio/telepresence-oss
       sourceRef:
         kind: HelmRepository
         name: telepresence

@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: keda
-      version: 2.19.0
+      version: 2.19.0 # datasource=helm depName=keda repository=https://kedacore.github.io/charts
       sourceRef:
         kind: HelmRepository
         name: kedacore

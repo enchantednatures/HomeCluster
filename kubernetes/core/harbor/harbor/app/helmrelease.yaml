@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: harbor
-      version: 1.18.2
+      version: 1.18.2 # datasource=helm depName=harbor repository=https://helm.goharbor.io
       sourceRef:
         kind: HelmRepository
         name: harbor-charts

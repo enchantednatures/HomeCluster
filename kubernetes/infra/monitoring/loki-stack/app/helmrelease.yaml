@@ -14,7 +14,7 @@ spec:
   chart:
     spec:
       chart: loki
-      version: 6.53.0
+      version: 6.53.0 # datasource=helm depName=loki repository=https://grafana.github.io/helm-charts
       sourceRef:
         kind: HelmRepository
         name: grafana

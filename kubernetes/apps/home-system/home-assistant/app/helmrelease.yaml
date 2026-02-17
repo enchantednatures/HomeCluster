@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.3
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s
       interval: 30m
       sourceRef:
         kind: HelmRepository
@@ -38,6 +38,7 @@ spec:
           app:
             image:
               repository: lscr.io/linuxserver/homeassistant
+              # datasource=docker depName=lscr.io/linuxserver/homeassistant
               tag: latest
             ports:
               - name: http
@@ -63,6 +64,7 @@ spec:
           code-server:
             image:
               repository: ghcr.io/coder/code-server
+              # datasource=docker depName=ghcr.io/coder/code-server
               tag: 4.109.2@sha256:1b84cd817fe8eb1159323ae9d2f29b3c70c6ccd44958d651a94900cf7f0ff9c4
             args:
               - --auth

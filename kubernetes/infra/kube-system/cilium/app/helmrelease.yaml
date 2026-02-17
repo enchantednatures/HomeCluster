@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: cilium
-      version: 1.19.0
+      version: 1.19.0 # datasource=helm depName=cilium repository=https://helm.cilium.io
       sourceRef:
         kind: HelmRepository
         name: cilium

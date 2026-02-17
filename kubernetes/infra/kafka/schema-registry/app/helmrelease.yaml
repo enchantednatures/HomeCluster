@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: schema-registry
-      version: 26.0.5
+      version: 26.0.5 # datasource=helm depName=schema-registry repository=oci://registry-1.docker.io/bitnamicharts
       sourceRef:
         kind: HelmRepository
         name: bitnami

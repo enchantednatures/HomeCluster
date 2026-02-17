@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: external-dns
-      version: 1.20.0
+      version: 1.20.0 # datasource=helm depName=external-dns repository=https://kubernetes-sigs.github.io/external-dns
       sourceRef:
         kind: HelmRepository
         name: external-dns

@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: reloader
-      version: 2.2.8
+      version: 2.2.8 # datasource=helm depName=reloader repository=https://stakater.github.io/stakater-charts
       sourceRef:
         kind: HelmRepository
         name: stakater

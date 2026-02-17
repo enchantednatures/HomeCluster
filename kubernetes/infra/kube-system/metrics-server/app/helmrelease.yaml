@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: metrics-server
-      version: 3.13.0
+      version: 3.13.0 # datasource=helm depName=metrics-server repository=https://kubernetes-sigs.github.io/metrics-server
       sourceRef:
         kind: HelmRepository
         name: metrics-server

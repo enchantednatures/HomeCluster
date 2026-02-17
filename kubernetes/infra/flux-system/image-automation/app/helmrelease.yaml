@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: flux2
-      version: 2.17.2
+      version: 2.17.2 # datasource=helm depName=flux2 repository=https://fluxcd-community.github.io/helm-charts
       sourceRef:
         kind: HelmRepository
         name: fluxcd-community

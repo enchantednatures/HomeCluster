@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: gitea
-      version: 12.5.0
+      version: 12.5.0 # datasource=helm depName=gitea repository=https://dl.gitea.com/charts
       sourceRef:
         kind: HelmRepository
         name: gitea-charts
@@ -31,6 +31,7 @@ spec:
     image:
       registry: docker.gitea.com
       repository: gitea
+      # datasource=docker depName=docker.gitea.com/gitea
       tag: "1.24.6"
       pullPolicy: IfNotPresent
     persistence:

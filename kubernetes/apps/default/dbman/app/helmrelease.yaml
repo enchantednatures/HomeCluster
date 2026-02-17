@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: dbman
-      version: 0.123.2
+      version: 0.123.2 # datasource=helm depName=dbman repository=oci://ghcr.io/hugginsio/charts
       sourceRef:
         kind: HelmRepository
         name: dbman-charts

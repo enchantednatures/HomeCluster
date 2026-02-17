@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: kiali-server
-      version: 2.21.0
+      version: 2.21.0 # datasource=helm depName=kiali-server repository=https://kiali.org/helm-charts
       sourceRef:
         kind: HelmRepository
         name: kiali

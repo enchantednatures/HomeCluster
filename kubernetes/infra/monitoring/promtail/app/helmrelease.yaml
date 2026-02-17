@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: promtail
-      version: 6.17.1
+      version: 6.17.1 # datasource=helm depName=promtail repository=https://grafana.github.io/helm-charts
       sourceRef:
         kind: HelmRepository
         name: grafana

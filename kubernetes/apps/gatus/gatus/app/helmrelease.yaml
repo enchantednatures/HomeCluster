@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: app-template
-      version: 3.7.3
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s/helm
       sourceRef:
         kind: HelmRepository
         name: bjw-s
@@ -37,6 +37,7 @@ spec:
           gatus:
             image:
               repository: ghcr.io/twin/gatus
+              # datasource=docker depName=ghcr.io/twin/gatus
               tag: v5.15.0
             env:
               TZ: America/Los_Angeles
