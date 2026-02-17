@@ -6843,7 +6843,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: apicurio-registry-operator
-  namespace: PLACEHOLDER_NAMESPACE
+  namespace: schema-registry
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -6856,7 +6856,7 @@ metadata:
     app.kubernetes.io/part-of: apicurio-registry
     app.kubernetes.io/version: 3.2.0-SNAPSHOT
   name: apicurio-registry-operator-v3.2.0-snapshot
-  namespace: PLACEHOLDER_NAMESPACE
+  namespace: schema-registry
 spec:
   replicas: 1
   selector:
