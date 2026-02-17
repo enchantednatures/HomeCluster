@@ -11,6 +11,7 @@ resources:
   # - ./flink
   - ./flagger
   - ./kubevirt
+  - ./medik8s
   - ./rabbitmq-operator
   - ./redpanda
   - ./schema-registry

@@ -1,0 +1,79 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fence-agents-remediation-manager
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - delete
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - delete
+      - deletecollection
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods/exec
+    verbs:
+      - create
+  - apiGroups:
+      - fence-agents-remediation.medik8s.io
+    resources:
+      - fenceagentsremediations
+      - fenceagentsremediationtemplates
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - fence-agents-remediation.medik8s.io
+    resources:
+      - fenceagentsremediations/finalizers
+      - fenceagentsremediationtemplates/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - fence-agents-remediation.medik8s.io
+    resources:
+      - fenceagentsremediations/status
+      - fenceagentsremediationtemplates/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - volumeattachments
+    verbs:
+      - delete
+      - get
+      - list
+      - watch

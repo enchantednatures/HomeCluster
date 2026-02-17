@@ -1,0 +1,15 @@
+---
+apiVersion: fence-agents-remediation.medik8s.io/v1alpha1
+kind: FenceAgentsRemediationTemplate
+metadata:
+  name: fenceagentsremediationtemplate-ipmilan
+  namespace: medik8s-system
+spec:
+  template:
+    spec:
+      agent: fence_ipmilan
+      remediationStrategy: OutOfServiceTaint
+      retrycount: 3
+      retryinterval: 5s
+      timeout: 60s
+      sharedSecretName: ipmi-credentials-shared

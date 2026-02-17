@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/kustomization_v1beta1.json
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: medik8s-system
+resources:
+  - ./nodehealthcheck.yaml
+  - ./ipmi-credentials.sops.yaml

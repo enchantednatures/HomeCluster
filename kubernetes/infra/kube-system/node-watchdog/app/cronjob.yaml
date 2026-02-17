@@ -1,0 +1,96 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: node-watchdog
+  namespace: kube-system
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: node-watchdog
+          containers:
+            - name: watchdog
+              image: ghcr.io/home-operations/kubectl-bash:v1.32.2@sha256:0
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -o errexit -o pipefail
+
+                  # Node to watch (set via env var)
+                  NODE_NAME="${WATCHDOG_NODE}"
+                  UNHEALTHY_THRESHOLD="${UNHEALTHY_THRESHOLD:-300}"
+
+                  echo "Checking node: ${NODE_NAME}"
+
+                  # Get node status
+                  NODE_STATUS=$(kubectl get node "${NODE_NAME}" -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}')
+                  HEARTBEAT=$(kubectl get node "${NODE_NAME}" -o jsonpath='{.status.conditions[?(@.type=="Ready")].lastHeartbeatTime}')
+
+                  if [[ "${NODE_STATUS}" != "True" ]]; then
+                    echo "Node ${NODE_NAME} is not Ready: ${NODE_STATUS}"
+
+                    # Calculate time since last heartbeat
+                    if [[ -n "${HEARTBEAT}" ]]; then
+                      HEARTBEAT_EPOCH=$(date -d "${HEARTBEAT}" +%s 2>/dev/null || echo "0")
+                      NOW_EPOCH=$(date +%s)
+                      SECONDS_UNHEALTHY=$((NOW_EPOCH - HEARTBEAT_EPOCH))
+
+                      echo "Node has been unhealthy for ${SECONDS_UNHEALTHY} seconds (threshold: ${UNHEALTHY_THRESHOLD})"
+
+                      if [[ ${SECONDS_UNHEALTHY} -ge ${UNHEALTHY_THRESHOLD} ]]; then
+                        echo "Threshold exceeded! Triggering IPMI reboot..."
+
+                        # Execute IPMI reboot
+                        ipmitool -I lanplus \
+                          -H "${IPMI_HOST}" \
+                          -U "${IPMI_USERNAME}" \
+                          -P "${IPMI_PASSWORD}" \
+                          power reset
+
+                        echo "IPMI reboot command sent successfully"
+                      fi
+                    fi
+                  else
+                    echo "Node ${NODE_NAME} is healthy"
+                  fi
+              env:
+                - name: WATCHDOG_NODE
+                  value: "supermicro-node"
+                - name: UNHEALTHY_THRESHOLD
+                  value: "300"
+                - name: IPMI_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: node-watchdog-ipmi
+                      key: host
+                - name: IPMI_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: node-watchdog-ipmi
+                      key: username
+                - name: IPMI_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: node-watchdog-ipmi
+                      key: password
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+          restartPolicy: OnFailure
+          tolerations:
+            - effect: NoSchedule
+              key: node-role.kubernetes.io/control-plane
+              operator: Exists
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: "true"

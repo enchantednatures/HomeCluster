@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app fence-agents-remediation-operator
+  namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/disabled: "false"
+spec:
+  targetNamespace: medik8s-system
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/operators/medik8s/fence-agents-remediation/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+  dependsOn:
+    - name: node-healthcheck-operator
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: fence-agents-remediation-controller-manager
+      namespace: medik8s-system
