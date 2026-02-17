@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: discord-webhook-secret
+    namespace: monitoring
+data:
+    webhook-url: ENC[AES256_GCM,data:xXvohr7xUE+gBfFtvkERHF7FSbIT016L+GxddQ3Ke8863foBPHTTfgLiE9+o9m1wLkQLPve3+pDA0GBxkkfDsQdC7Ua05HrGF1ocgt+R6JcTVWhm3xvI8QRSsnfZ7Pd2T3Eplow5/Ed9mToEODmjWbVYXyDpNpk8NHprvXJtgTpPN+50HJyntAeG41mYh0vuQca1tajpjFORNNcDtw9Tjw5IMzs=,iv:qMsbblwZElLvMnf1YvxSb6Wkf9PIEREGNUjdMAsmAos=,tag:EKGcNAWEKwTw+IMGh75pnQ==,type:str]
+sops:
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAreXRtSUhaclZsdGswZTFX
+            TGRUKzZZamR0dWZJYWoyVzA1REtERE05MUhVCjBsS3RhWUs0ekJZSWRBaGtFaVZR
+            S1JaK2ZmRWY0MFJXUG81THN3N0JScTAKLS0tIGYzekdXVGxhQ2JFRzlQdStMaGZH
+            Vnd0OXZ4S1VDaWE1engvT1ByMGFkOVEK2yTa/UOk5zjum3feR1tedSlT+g+lJ90V
+            yd5x9aII/zkv80wHQo4M3xPqA/04UcG4L65GDnCAX1oVv5QxjK+YHg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-17T15:03:48Z"
+    mac: ENC[AES256_GCM,data:drWyr/xy5oHegd2gQJmI9SeTh+ZeBdU8iBrmhaD74QEi8C7dUct38sjaQpx+syr4N6yGHTODUyMiIgx/zLZt80OI1U9za8h7Epde95Q8j5Xr1AIpZT8gV0IprY0gMxd0Lr0aYUlbgg1CD7YR1Vn51QEDvArI6bAB5sRb6zDYx3k=,iv:C1mCM0LlRmX5LY/TiRsV4IDUmU6IAV3il2m/vpZ/7c4=,tag:tlSQD7/+Sjo0kWzooutRhQ==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0

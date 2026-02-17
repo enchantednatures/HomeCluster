@@ -14,7 +14,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 82.0.0
+      version: 82.0.0 # datasource=helm depName=kube-prometheus-stack repository=oci://ghcr.io/prometheus-community/charts
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
@@ -47,8 +47,14 @@ spec:
           - hosts: [*host]
       alertmanagerSpec:
         replicas: 3
-        # useExistingSecret: true
-        # configSecret: alertmanager-secret
+        useExistingSecret: true
+        configSecret: alertmanager-kube-prometheus-stack-config
+        env:
+          - name: DISCORD_WEBHOOK_URL
+            valueFrom:
+              secretKeyRef:
+                name: discord-webhook-secret
+                key: webhook-url
         storage:
           volumeClaimTemplate:
             spec:
