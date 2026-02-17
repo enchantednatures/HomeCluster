@@ -1,0 +1,16 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/networkpolicy_v1.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-apicurio-operator
+  namespace: schema-registry
+spec:
+  podSelector:
+    matchLabels:
+      app: apicurio-registry-operator
+  policyTypes:
+    - Egress
+  egress:
+    # Allow all egress traffic
+    - {}
