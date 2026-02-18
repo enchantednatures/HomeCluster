@@ -16,4 +16,4 @@ spec:
     enabled: true
     env:
       - name: REGISTRY_API_URL
-        value: http://apicurio-registry-app-service.schema-registry.svc.cluster.local:8080/apis/registry/v3
+        value: https://registry.${SECRET_DOMAIN}/apis/registry/v3
