@@ -13,6 +13,14 @@ spec:
   http:
     - match:
         - uri:
+            prefix: /apis/
+      route:
+        - destination:
+            host: apicurio-registry-app-service.schema-registry.svc.cluster.local
+            port:
+              number: 8080
+    - match:
+        - uri:
             prefix: /
       route:
         - destination:
