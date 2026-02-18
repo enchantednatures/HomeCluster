@@ -14,3 +14,6 @@ spec:
     replicas: 1
   ui:
     enabled: true
+    env:
+      - name: REGISTRY_API_URL
+        value: https://registry.${SECRET_DOMAIN}/apis/registry/v3
