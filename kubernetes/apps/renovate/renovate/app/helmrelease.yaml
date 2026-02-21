@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: renovate
-      version: 39.86.0 # datasource=helm depName=renovate repository=https://docs.renovatebot.com/helm-charts
+      version: 39.264.0 # datasource=helm depName=renovate repository=https://docs.renovatebot.com/helm-charts
       sourceRef:
         kind: HelmRepository
         name: renovate
