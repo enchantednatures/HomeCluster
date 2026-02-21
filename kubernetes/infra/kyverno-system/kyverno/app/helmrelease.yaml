@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: kyverno
-      version: 3.7.0 # datasource=helm depName=kyverno repository=https://kyverno.github.io/kyverno
+      version: 3.7.1 # datasource=helm depName=kyverno repository=https://kyverno.github.io/kyverno
       sourceRef:
         kind: HelmRepository
         name: kyverno
