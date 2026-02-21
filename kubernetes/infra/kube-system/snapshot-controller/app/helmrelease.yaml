@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: snapshot-controller
-      version: 5.0.2 # datasource=helm depName=snapshot-controller repository=https://piraeus.io/helm-charts
+      version: 5.0.3 # datasource=helm depName=snapshot-controller repository=https://piraeus.io/helm-charts
       sourceRef:
         kind: HelmRepository
         name: piraeus
