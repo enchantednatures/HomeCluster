@@ -32,7 +32,7 @@ spec:
       registry: docker.gitea.com
       repository: gitea
       # datasource=docker depName=docker.gitea.com/gitea
-      tag: "1.24.6"
+      tag: "1.25.4"
       pullPolicy: IfNotPresent
     persistence:
       enabled: true
