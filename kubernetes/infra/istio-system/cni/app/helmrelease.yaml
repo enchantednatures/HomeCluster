@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: cni
-      version: 1.28.3 # datasource=helm depName=cni repository=https://istio-release.storage.googleapis.com/charts
+      version: 1.29.0 # datasource=helm depName=cni repository=https://istio-release.storage.googleapis.com/charts
       sourceRef:
         kind: HelmRepository
         name: istio
