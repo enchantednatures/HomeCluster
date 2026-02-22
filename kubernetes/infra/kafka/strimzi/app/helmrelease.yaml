@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: strimzi-kafka-operator
-      version: 0.50.0 # datasource=helm depName=strimzi-kafka-operator repository=https://strimzi.io/charts
+      version: 0.50.1 # datasource=helm depName=strimzi-kafka-operator repository=https://strimzi.io/charts
       sourceRef:
         kind: HelmRepository
         name: strimzi
