@@ -9,16 +9,16 @@ Talos Kubernetes cluster on Proxmox VMs, provisioned via OpenTofu. GitOps with F
 ## Commands
 
 ```bash
-task configure                 # Template + encrypt + validate (run before every commit)
-task kubernetes:kubeconform    # Schema-validate manifests
-task sops:encrypt              # Encrypt *.sops.yaml files (REQUIRED before commit)
-task sops:decrypt              # Decrypt for inspection
-task flux:reconcile            # Force git sync
-task flux:apply path=ns/app    # Apply specific app
-task kubernetes:resources      # List pods, helmreleases, kustomizations
-task kubernetes:ceph:health    # Ceph cluster health
-task terraform:proxmox:plan    # Preview VM changes
-task terraform:proxmox:apply   # Apply VM config
+make configure                    # Template + encrypt + validate (run before every commit)
+make kubernetes-kubeconform     # Schema-validate manifests
+make sops-encrypt                 # Encrypt *.sops.yaml files (REQUIRED before commit)
+make sops-decrypt                 # Decrypt for inspection
+make flux-reconcile               # Force git sync
+make flux-apply path=ns/app     # Apply specific app
+make kubernetes-resources         # List pods, helmreleases, kustomizations
+make kubernetes-ceph-health       # Ceph cluster health
+make terraform-proxmox-plan       # Preview VM changes
+make terraform-proxmox-apply      # Apply VM config
 ```
 
 **Debugging**: `flux get kustomizations -A`, `flux get helmreleases -A`, `stern -n <ns> <name>`, `kubectl -n <ns> get events --sort-by=.metadata.creationTimestamp`
@@ -45,7 +45,6 @@ kubernetes/
 └── flux/       # Flux config, repositories, vars
 provision/terraform/  # OpenTofu/Terraform for Proxmox VMs
 scripts/              # Utility scripts (kubeconform, ceph ops, standardization)
-.taskfiles/           # Task runner modules
 ```
 
 ### App Structure
@@ -99,7 +98,7 @@ kubernetes/apps/<namespace>/<app-name>/
 
 - Files MUST end with `.sops.yaml`
 - SOPS encrypts only `^(data|stringData)$` per `.sops.yaml` config
-- Run `task sops:encrypt` before every commit
+- Run `make sops-encrypt` before every commit
 - Pre-commit hook (`forbid-secrets`) blocks plaintext secrets
 - Age key: `~/.config/sops/age/keys.txt` or `$SOPS_AGE_KEY_FILE`
 
@@ -126,9 +125,9 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 
 ## Pre-Commit Checklist
 
-1. `task configure` — template, encrypt, validate
-2. `task kubernetes:kubeconform` — schema validation
-3. `task sops:encrypt` — encrypt secrets
+1. `make configure` — template, encrypt, validate
+2. `make kubernetes-kubeconform` — schema validation
+3. `make sops-encrypt` — encrypt secrets
 4. Verify `git diff` shows encrypted fields only
 5. `pre-commit run --all-files` — trailing whitespace, line endings, tabs, smartquotes, secret check
 
@@ -136,7 +135,7 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 
 - **ALL changes go through Git** — never `kubectl apply` directly
 - **Never commit plaintext secrets**
-- **Always validate before committing** (`task configure`)
+- **Always validate before committing** (`make configure`)
 - Flux Kustomizations live in `flux-system` namespace, deploy to `targetNamespace`
 - Use `dependsOn` to enforce ordering (app → operator → core → infra)
 
