@@ -14,7 +14,7 @@ spec:
   chart:
     spec:
       chart: kube-prometheus-stack
-      version: 82.0.0 # datasource=helm depName=kube-prometheus-stack repository=oci://ghcr.io/prometheus-community/charts
+      version: 82.4.0 # datasource=helm depName=kube-prometheus-stack repository=oci://ghcr.io/prometheus-community/charts
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
