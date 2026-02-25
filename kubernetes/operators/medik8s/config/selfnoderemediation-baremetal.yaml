@@ -1,0 +1,13 @@
+---
+apiVersion: self-node-remediation.medik8s.io/v1alpha1
+kind: SelfNodeRemediationTemplate
+metadata:
+  name: selfnoderemediationtemplate-baremetal
+  namespace: medik8s-system
+spec:
+  template:
+    spec:
+      remediationStrategy: Automatic
+      watchdogFilePath: /dev/watchdog
+      isSoftwareRebootEnabled: true
+      safeTimeToAssumeNodeRebootedSeconds: 180

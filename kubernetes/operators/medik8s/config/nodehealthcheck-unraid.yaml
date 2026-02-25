@@ -1,0 +1,27 @@
+---
+apiVersion: remediation.medik8s.io/v1alpha1
+kind: NodeHealthCheck
+metadata:
+  name: nodehealthcheck-unraid
+spec:
+  minHealthy: 1
+  selector:
+    matchExpressions:
+      - key: kubernetes.io/hostname
+        operator: In
+        values: ["unraid-worker"]
+  unhealthyConditions:
+    - type: Ready
+      status: "False"
+      duration: 600s
+    - type: Ready
+      status: Unknown
+      duration: 600s
+  escalatingRemediations:
+    - order: 1
+      remediationTemplate:
+        apiVersion: self-node-remediation.medik8s.io/v1alpha1
+        kind: SelfNodeRemediationTemplate
+        name: selfnoderemediationtemplate-unraid
+        namespace: medik8s-system
+      timeout: 300s

@@ -1,46 +1,23 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
----
 apiVersion: v1
 kind: Secret
 metadata:
-  name: alertmanager-kube-prometheus-stack-config
-  namespace: monitoring
+    name: alertmanager-kube-prometheus-stack-config
+    namespace: monitoring
 stringData:
-  alertmanager.yaml: |
-    global:
-      resolve_timeout: 5m
-    route:
-      receiver: discord
-      group_by:
-        - alertname
-        - namespace
-        - severity
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 12h
-      routes:
-        - receiver: discord
-          matchers:
-            - severity =~ "warning|critical"
-    receivers:
-      - name: discord
-        discord_configs:
-          - webhook_url: "${DISCORD_WEBHOOK_URL}"
-            title: "{{ .GroupLabels.alertname }}"
-            message: |
-              {{ range .Alerts }}
-              **Alert:** {{ .Annotations.summary }}
-              **Severity:** {{ .Labels.severity }}
-              **Namespace:** {{ .Labels.namespace }}
-              **Description:** {{ .Annotations.description }}
-              **Started:** {{ .StartsAt.Format "2006-01-02 15:04:05" }}
-              {{ end }}
-            send_resolved: true
-    inhibit_rules:
-      - source_matchers:
-          - severity = critical
-        target_matchers:
-          - severity = warning
-        equal:
-          - alertname
-          - namespace
+    alertmanager.yaml: ENC[AES256_GCM,data:/EbqaYI/ljYT4fBLLRoSZ47t8p9NlSnrjqNZp86bf/ysr03jA7XY+U3ocXw8/Mu5gAUuMhkfMP3M91hZDWB49QHtLMUihqxaEmX0UhjJ6PWbz1EJrg5VmfDYhZqsXTJKfNGRHGWvqTjiWj0Jafvn+aIhEWGfTf1ptGrqm6ftG48Kikp9vULrYaUKfCO8TwKjyCOjdyM9yjJYu34LAW7mxPUf3rL8Hp5mun2LRR2TDXid8k3P3mmEocxWvr9+iVLltInndEx3kV1VMJ+GRqNZAVxe0CCRyYVT/a7UeIphlwClBx4bEA0Ef2yzkYAAF5O7zu6zhqjkfsk1LQyfgT/m+OybiJB+LqSy3pttD5EeE7IKjEN8UqPvLHWBAXA977fiShAC8CxaI4pN2R9SxUTIZUL2EHHmji59hYozD1iPVOUB2JXANhZUSGYUr2imTHjnRAjq4fHc8doZWYyH0D3OMkCHcZlpH/cKQchFe5pGczvFdwtKVEp6251rRbwkQ+Sqdqxgt4j3KnwKhD+9cpjuxZqszRlZq0G6HU2eCUCPY14U1criQhz+uyaHQ/8NZNf3ORgylTKbz1CGhGH/Ir+QLrLI48AleNW0I+JGMFgSPeRqIG44OVBXdp5lH3uKCl1FvG1LEah5nJw+XIaBhdTUJv86q8pMPb2tY6lDpPHP5lOJVlskNM/HDJsuEHleZyCuAyK4tnB2rLLRqWJyoH/TqX3YwF59lW8oZPUO+hrX0tC2qM3jWVvTuX2gcIgBQiy3RmNRCyqcY0hrz6ecmt11td/p8j/H313cphMzwXzriZwmW7kzlau/wFCbeYeEZEWxY71kjLHlLxD9pSMXBW9mcjYNbT3gI/JDDWb8n2F25cexPaq72wCrM7IvuuG59LsGw4Ng0QmI+g9bW6YcKGYXWoKt2jVQkzTBIzaxMiNdTKD/+JabVe2QbU8thTVBmDFc/STYeos9fuQb6fHUwb/u+IP2/yWytV20mi/FHpgcS4x9qIPWbiB6IjUzFjBlUtl+07m3O+kQIsgnnQixgY6Oz/D1copP1iM4NhsNLIazh+D2BOEv3OECPXbJVLJ9pSX7I/d9DOzzRMcdqX76cSdqsth72QG6uKrpyVtdx0OL3VKqWDXhUX9DUwkyAjKLN4D7Rm/4wpw749stCyVBxybaiHYjs2F8fxUu7FeIyM2Eql6ktoFI7ezFPgnnr8ujZlVBffL/fkt+wPs4HI0vZkdnsE9IdBZzaSVYww==,iv:RjCtuMuxOj7cnuzs80NxVGouNis67EmZZKRpggC2mTI=,tag:dRTldDMecYs6dxDnf2ACAA==,type:str]
+sops:
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBKQW9QWitmVzNZdFdNblFB
+            dWNzTkR1eUZjdjcvbXgrTzk0VzF4VUlwT1YwCjQ0N2hiT2FqQldUWVlUdUp4SXlj
+            aWRpZTVtUE9RcVlMTlZPVXVFT3Z3NFEKLS0tIDZMU1p6U3NFQk13ZkNtaG1TRVhW
+            cFZIRk10WExHWVdzK2FpMVpyYytodmMK3ioQzzKHikFXcUC089Qtw4XLt+I9qs/3
+            PDJOykMmD9hLStzAIIxUUhAaEAWvkC69qdXV8+PtBrVZI+1TAQnZaQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-02-25T15:12:30Z"
+    mac: ENC[AES256_GCM,data:j3nXAri8SnR4eQ/rR6FKjmHZDywrRpJym5AVaigvtHhaLvpH36N0h1i2PEV0Ky9G24bpdsPhS4Q24mIWlpgrt8x1ViHOoZx/vxVt/gSY5nT27ABGTddoBMoSOPn1Z813Y7vKx6OknIbbfLru/qIcN+xBP7w6xctNyuF+q1McYN8=,iv:INEQvyRdR0Vl/AZAQl6I1TrBV7F299y41dH0lqB/BNI=,tag:7qtch6M++6gsHBTPs3+j9w==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.11.0

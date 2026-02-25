@@ -1,0 +1,18 @@
+---
+apiVersion: fence-agents-remediation.medik8s.io/v1alpha1
+kind: FenceAgentsRemediationTemplate
+metadata:
+  name: fenceagentsremediationtemplate-proxmox
+  namespace: medik8s-system
+spec:
+  template:
+    spec:
+      agent: fence_proxmox
+      nodeparameters:
+        plug: "{{ .NodeName }}"
+      sharedparameters:
+        api-user: "root@pam"
+        api-password-secret-name: "proxmox-fence-credentials"
+        api-password-secret-namespace: "medik8s-system"
+        ipport: "8006"
+        ssl-insecure: "true"

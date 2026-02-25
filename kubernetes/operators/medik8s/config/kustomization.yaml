@@ -4,5 +4,16 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: medik8s-system
 resources:
-  - ./nodehealthcheck.yaml
-  - ./ipmi-credentials.sops.yaml
+  # NodeHealthCheck configurations for different node types
+  - ./nodehealthcheck-proxmox.yaml
+  - ./nodehealthcheck-baremetal.yaml
+  - ./nodehealthcheck-unraid.yaml
+  # SelfNodeRemediation templates
+  - ./selfnoderemediation-proxmox.yaml
+  - ./selfnoderemediation-baremetal.yaml
+  - ./selfnoderemediation-unraid.yaml
+  # FenceAgentsRemediation templates
+  - ./fenceagentsremediation-proxmox.yaml
+  # Secrets
+  - ./ipmi-credentials-shared.sops.yaml
+  - ./proxmox-fence-credentials.sops.yaml
