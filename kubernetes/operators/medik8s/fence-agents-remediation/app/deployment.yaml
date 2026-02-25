@@ -63,7 +63,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          image: quay.io/medik8s/fence-agents-remediation-operator:v0.6.0
+          image: quay.io/medik8s/fence-agents-remediation-operator:v0.7.0
           livenessProbe:
             httpGet:
               path: /healthz
