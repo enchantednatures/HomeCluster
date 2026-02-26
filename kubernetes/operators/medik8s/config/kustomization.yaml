@@ -13,6 +13,7 @@ resources:
   - ./selfnoderemediation-baremetal.yaml
   - ./selfnoderemediation-unraid.yaml
   # FenceAgentsRemediation templates
+  - ./fenceagentsremediation-ipmilan.yaml
   - ./fenceagentsremediation-proxmox.yaml
   # Secrets
   - ./ipmi-credentials-shared.sops.yaml

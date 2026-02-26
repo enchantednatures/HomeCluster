@@ -6,6 +6,5 @@ resources:
   - ./namespace.yaml
   - ./addons
   - ./addons/ks.yaml
-  - ./weave-gitops/ks.yaml
   - ./image-automation/ks.yaml
   - ./image-automation/resources-ks.yaml

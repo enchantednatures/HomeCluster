@@ -9,4 +9,3 @@ resources:
   - ./prometheus-community.yaml
   - ./spegel.yaml
   - ./telepresence.yaml
-  - ./weave-gitops.yaml

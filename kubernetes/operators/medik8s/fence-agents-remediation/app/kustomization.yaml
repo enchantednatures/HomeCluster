@@ -9,4 +9,3 @@ resources:
   - ./clusterrole.yaml
   - ./clusterrolebinding.yaml
   - ./deployment.yaml
-  - ./fenceagentsremediationtemplate.yaml
