@@ -8,7 +8,7 @@ resources:
   # - ./coredns/ks.yaml
   - ./metrics-server/ks.yaml
   - ./node-watchdog/ks.yaml
-  - ./nvme-labeler/ks.yaml
+  # - ./nvme-labeler/ks.yaml
   - ./reloader/ks.yaml
   - ./snapshot-controller/ks.yaml
   - ./csi-driver-nfs/ks.yaml

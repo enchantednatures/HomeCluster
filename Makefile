@@ -14,25 +14,25 @@ SCRIPTS_DIR := $(ROOT_DIR)/scripts
 TF_PROXMOX_DIR := $(ROOT_DIR)/provision/terraform/proxmox
 
 # Files
-AGE_FILE := ~/.config/sops/age/keys.txt
+AGE_FILE := $(HOME)/.config/sops/age/keys.txt
 BOOTSTRAP_CONFIG_FILE := $(ROOT_DIR)/config.yaml
-KUBECONFIG_FILE := ~/.kube/config
+KUBECONFIG_FILE := $(HOME)/.kube/config
 MAKEJINJA_CONFIG_FILE := $(ROOT_DIR)/makejinja.toml
 PIP_REQUIREMENTS_FILE := $(ROOT_DIR)/requirements.txt
 SOPS_CONFIG_FILE := $(ROOT_DIR)/.sops.yaml
 
 # Binaries
 PYTHON_BIN := python3
-VIRTUAL_ENV := $(ROOT_DIR)/.venv)
+VIRTUAL_ENV := $(ROOT_DIR)/.venv
 
 # Flux-specific paths
 CLUSTER_SECRET_SOPS_FILE := $(KUBERNETES_DIR)/flux/vars/cluster-secrets.sops.yaml
 CLUSTER_SETTINGS_FILE := $(KUBERNETES_DIR)/flux/vars/cluster-settings.yaml
 GITHUB_DEPLOY_KEY_FILE := $(KUBERNETES_DIR)/bootstrap/flux/github-deploy-key.sops.yaml
 
-# Workstation paths
-BREWFILE := $(ROOT_DIR)/.taskfiles/Workstation/Brewfile
-ARCHFILE := $(ROOT_DIR)/.taskfiles/Workstation/Archfile
+# Workstation paths (removed .taskfiles/ - update these paths as needed)
+BREWFILE := $(ROOT_DIR)/Brewfile
+ARCHFILE := $(ROOT_DIR)/Archfile
 GENERIC_BIN_DIR := $(ROOT_DIR)/.bin
 
 # Environment exports
@@ -114,7 +114,7 @@ configure: init workstation-direnv workstation-venv sops-age-keygen ## Configure
 	@if [ "$$SOPS_AGE_KEY_FILE" != "$(AGE_FILE)" ]; then \
 		echo "WARNING: SOPS_AGE_KEY_FILE is not set to the expected value, this may cause conflicts."; \
 	fi
-	@if test -f ~/.config/sops/age/keys.txt; then \
+	@if test -f $(HOME)/.config/sops/age/keys.txt; then \
 		echo "WARNING: SOPS Age key found in home directory, this may cause conflicts."; \
 	fi
 
