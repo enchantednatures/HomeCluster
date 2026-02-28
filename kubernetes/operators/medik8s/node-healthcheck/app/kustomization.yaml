@@ -6,6 +6,7 @@ namespace: medik8s-system
 resources:
   - ./namespace.yaml
   - ./crds.yaml
+  - ./certificate.yaml
   - ./serviceaccount.yaml
   - ./clusterrole.yaml
   - ./clusterrolebinding.yaml

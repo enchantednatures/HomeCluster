@@ -8,8 +8,10 @@ spec:
   template:
     spec:
       agent: fence_proxmox
-      nodeparameters:
-        plug: "{{ .NodeName }}"
+      remediationStrategy: OutOfServiceTaint
+      retrycount: 3
+      retryinterval: 5s
+      timeout: 60s
       sharedparameters:
         api-user: "root@pam"
         api-password-secret-name: "proxmox-fence-credentials"

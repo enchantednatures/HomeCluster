@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: fence-agents-remediation-webhook-server-cert
+  namespace: medik8s-system
+spec:
+  dnsNames:
+    - fence-agents-remediation-webhook-service.medik8s-system.svc
+    - fence-agents-remediation-webhook-service.medik8s-system.svc.cluster.local
+  issuerRef:
+    kind: ClusterIssuer
+    name: selfsigned-issuer
+  secretName: fence-agents-remediation-webhook-server-cert

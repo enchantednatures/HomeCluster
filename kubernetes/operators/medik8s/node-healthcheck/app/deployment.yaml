@@ -89,6 +89,9 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
             requests:
               cpu: 100m
               memory: 20Mi
@@ -128,4 +131,4 @@ spec:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: webhook-server-cert
+            secretName: node-healthcheck-webhook-server-cert

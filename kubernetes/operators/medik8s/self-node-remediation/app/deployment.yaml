@@ -62,11 +62,16 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
+            limits:
+              cpu: 500m
+              memory: 256Mi
             requests:
               cpu: 20m
               memory: 110Mi
           securityContext:
             allowPrivilegeEscalation: false
+            runAsUser: 65532
+            runAsGroup: 65532
           volumeMounts:
             - mountPath: /tmp/k8s-webhook-server/serving-certs
               name: cert
@@ -118,4 +123,4 @@ spec:
         - name: cert
           secret:
             defaultMode: 420
-            secretName: webhook-server-cert
+            secretName: self-node-remediation-webhook-server-cert

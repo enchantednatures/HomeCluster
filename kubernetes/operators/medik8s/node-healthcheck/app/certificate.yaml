@@ -1,0 +1,14 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: node-healthcheck-webhook-server-cert
+  namespace: medik8s-system
+spec:
+  dnsNames:
+    - node-healthcheck-webhook-service.medik8s-system.svc
+    - node-healthcheck-webhook-service.medik8s-system.svc.cluster.local
+  issuerRef:
+    kind: ClusterIssuer
+    name: selfsigned-issuer
+  secretName: node-healthcheck-webhook-server-cert

@@ -8,6 +8,7 @@ rules:
       - ""
     resources:
       - namespaces
+      - secrets
     verbs:
       - get
       - list
@@ -76,4 +77,16 @@ rules:
       - delete
       - get
       - list
+      - watch
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
       - watch

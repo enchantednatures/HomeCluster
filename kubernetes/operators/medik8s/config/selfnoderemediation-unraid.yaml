@@ -8,6 +8,3 @@ spec:
   template:
     spec:
       remediationStrategy: Automatic
-      watchdogFilePath: /dev/watchdog
-      isSoftwareRebootEnabled: true
-      safeTimeToAssumeNodeRebootedSeconds: 300

@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: medik8s-system
 resources:
   - ./crds.yaml
+  - ./certificate.yaml
   - ./serviceaccount.yaml
   - ./clusterrole.yaml
   - ./clusterrolebinding.yaml
