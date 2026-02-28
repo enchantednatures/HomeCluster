@@ -28,7 +28,7 @@ spec:
   chart:
     spec:
       chart: kube-state-metrics
-      version: 7.1.0 # datasource=helm depName=kube-state-metrics repository=oci://ghcr.io/prometheus-community/charts
+      version: 7.2.0 # datasource=helm depName=kube-state-metrics repository=oci://ghcr.io/prometheus-community/charts
       interval: 30m
       sourceRef:
         kind: HelmRepository
