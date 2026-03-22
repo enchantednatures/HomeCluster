@@ -26,7 +26,7 @@ spec:
           image:
             repository: esphome/esphome
             # datasource=docker depName=esphome/esphome
-            tag: 2026.2.1@sha256:420db742510744543043ec5b922811b32ff1f32ab559f3fc7f3d7ceff7091f68
+            tag: 2026.3.0@sha256:5673d64947385928ae9f61e4f16eb9ad04a60cd27ff29986d54caa74c69a7925
           env:
             ESPHOME_DASHBOARD_USE_PING: true
           probes:
