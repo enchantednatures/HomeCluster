@@ -6897,7 +6897,7 @@ spec:
           value: quay.io/apicurio/apicurio-registry:3.1.7
         - name: REGISTRY_UI_IMAGE
           value: quay.io/apicurio/apicurio-registry-ui:3.1.7
-        image: quay.io/apicurio/apicurio-registry-3-operator:3.1.7
+        image: quay.io/apicurio/apicurio-registry-3-operator:3.2.0
         imagePullPolicy: Always
         livenessProbe:
           httpGet:
