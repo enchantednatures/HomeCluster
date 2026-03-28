@@ -16,7 +16,7 @@ spec:
           serviceAccountName: node-watchdog
           containers:
             - name: watchdog
-              image: ghcr.io/home-operations/kubectl-bash:v1.32.2
+              image: bitnami/kubectl:1.32.2
               command:
                 - /bin/bash
                 - -c
