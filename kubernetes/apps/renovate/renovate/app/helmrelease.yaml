@@ -35,7 +35,7 @@ spec:
         {
           "platform": "github",
           "autodiscover": false,
-          "repositories": ["hcasten/HomeCluster"],
+          "repositories": ["enchantednatures/HomeCluster"],
           "extends": [
             "config:recommended",
             ":dependencyDashboard"
