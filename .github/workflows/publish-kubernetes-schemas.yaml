@@ -24,7 +24,7 @@ jobs:
         uses: fluxcd/flux2/action@main
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: azure/setup-kubectl@776406bce94f63e41d621b960d78ee25c8b76ede # v4
+      - uses: azure/setup-kubectl@15650b3ad78fff148532a140b8a4c821796b2d7b # v5
         with:
           version: v1.26.3
       - name: Setup Python
