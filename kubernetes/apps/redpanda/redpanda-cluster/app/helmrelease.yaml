@@ -84,5 +84,4 @@ spec:
         auto_create_topics_enabled: true
 
     monitoring:
-      enabled: true
-      scrapeInterval: 30s
+      enabled: false

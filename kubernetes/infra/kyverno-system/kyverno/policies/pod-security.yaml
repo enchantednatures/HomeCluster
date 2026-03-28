@@ -41,6 +41,7 @@ spec:
             - immich
             - open-webui
             - postgres
+            - redpanda
             - default
       validate:
         message: "Containers must run as non-root user"
@@ -67,6 +68,7 @@ spec:
             - rook-ceph
             - openebs-system
             - istio-system
+            - redpanda
       preconditions:
         all:
         - key: "{{ request.object.spec.initContainers[] || '' }}"
