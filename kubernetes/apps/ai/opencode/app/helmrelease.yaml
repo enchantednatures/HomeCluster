@@ -56,6 +56,9 @@ spec:
                 cp -r dotfiles/.config/opencode/* opencode/ && \
                 rm -rf dotfiles && \
                 chown -R 1000:1000 /home/opencode
+            volumeMounts:
+              - name: home
+                mountPath: /home/opencode
         containers:
           app:
             image:
