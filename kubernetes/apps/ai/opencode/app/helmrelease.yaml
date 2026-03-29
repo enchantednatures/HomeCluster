@@ -50,11 +50,12 @@ spec:
               - -c
               - |
                 mkdir -p /home/opencode/.config && \
+                mkdir -p /home/opencode/.local && \
                 cd /home/opencode/.config && \
                 git clone --depth 1 https://github.com/enchantednatures/.dotfiles.git dotfiles && \
                 cp -r dotfiles/.config/opencode/* opencode/ && \
                 rm -rf dotfiles && \
-                chown -R 1000:1000 /home/opencode/.config
+                chown -R 1000:1000 /home/opencode
         containers:
           app:
             image:
@@ -112,7 +113,7 @@ spec:
           http:
             port: *port
     persistence:
-      config:
+      home:
         type: emptyDir
         globalMounts:
-          - path: /home/opencode/.config/opencode
+          - path: /home/opencode
