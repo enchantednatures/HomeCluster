@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app opencode
+  namespace: ai
+spec:
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s/helm
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      opencode:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        initContainers:
+          clone-dotfiles:
+            image:
+              repository: alpine/git
+              tag: latest
+            securityContext:
+              runAsUser: 0
+            command:
+              - sh
+              - -c
+              - |
+                mkdir -p /home/opencode/.config && \
+                cd /home/opencode/.config && \
+                git clone --depth 1 https://github.com/enchantednatures/.dotfiles.git dotfiles && \
+                cp -r dotfiles/.config/opencode/* opencode/ && \
+                rm -rf dotfiles && \
+                chown -R 1000:1000 /home/opencode/.config
+        containers:
+          app:
+            image:
+              repository: ghcr.io/anomalyco/opencode
+              tag: 1.2.27@sha256:f2bbfa29335cade41bf6928673582b42c56acbaaa75c0020dba34650adb7ce0a
+            env:
+              TZ: ${TIMEZONE}
+              CORS_DOMAIN: ${SECRET_DOMAIN}
+              HOME: /home/opencode
+            envFrom:
+              - secretRef:
+                  name: opencode-secret
+            command:
+              - opencode
+              - web
+              - --hostname
+              - "0.0.0.0"
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: &probe
+                    path: /
+                    port: &port 4096
+                  initialDelaySeconds: 10
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet: *probe
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  timeoutSeconds: 3
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 1000m
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+              capabilities:
+                drop: [ALL]
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: *port
+    persistence:
+      config:
+        type: emptyDir
+        globalMounts:
+          - path: /home/opencode/.config/opencode

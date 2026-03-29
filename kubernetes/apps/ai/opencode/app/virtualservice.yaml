@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/virtualservice_v1.json
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: opencode
+  namespace: ai
+spec:
+  hosts:
+    - opencode.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: opencode.ai.svc.cluster.local
+            port:
+              number: 4096
