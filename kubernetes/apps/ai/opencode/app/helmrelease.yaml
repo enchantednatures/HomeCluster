@@ -42,7 +42,7 @@ spec:
           clone-dotfiles:
             image:
               repository: alpine/git
-              tag: latest
+              tag: 2.47.2
             securityContext:
               runAsUser: 0
             command:
