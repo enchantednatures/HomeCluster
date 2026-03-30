@@ -82,6 +82,9 @@ spec:
                   httpGet: &probe
                     path: /global/health
                     port: &port 4096
+                    httpHeaders:
+                      - name: Authorization
+                        value: Basic b3BlbmNvZGU6eW91ci1zZWN1cmUtcGFzc3dvcmQtaGVyZQ==
                   initialDelaySeconds: 10
                   periodSeconds: 30
                   timeoutSeconds: 5
