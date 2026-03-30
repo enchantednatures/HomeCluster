@@ -50,7 +50,7 @@ spec:
               - -c
               - |
                 rm -rf /home/opencode/.config/dotfiles && \
-                mkdir -p /home/opencode/.config && \
+                mkdir -p /home/opencode/.config/opencode && \
                 mkdir -p /home/opencode/.local && \
                 cd /home/opencode/.config && \
                 git clone --depth 1 https://github.com/enchantednatures/.dotfiles.git dotfiles && \
