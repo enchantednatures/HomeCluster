@@ -71,7 +71,7 @@ spec:
                   name: opencode-secret
             command:
               - opencode
-              - web
+              - serve
               - --hostname
               - "0.0.0.0"
             probes:
