@@ -80,7 +80,7 @@ spec:
                 custom: true
                 spec:
                   httpGet: &probe
-                    path: /
+                    path: /global/health
                     port: &port 4096
                   initialDelaySeconds: 10
                   periodSeconds: 30
