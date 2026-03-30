@@ -49,6 +49,7 @@ spec:
               - sh
               - -c
               - |
+                rm -rf /home/opencode/.config/dotfiles && \
                 mkdir -p /home/opencode/.config && \
                 mkdir -p /home/opencode/.local && \
                 cd /home/opencode/.config && \
