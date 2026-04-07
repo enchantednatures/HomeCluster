@@ -12,4 +12,5 @@ spec:
       retrycount: 3
       retryinterval: 5s
       timeout: 60s
-      sharedSecretName: ipmi-credentials-shared
+      nodeSecretNames:
+        melusine: melusine-ipmi-credentials
