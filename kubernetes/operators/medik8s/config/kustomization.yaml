@@ -17,4 +17,5 @@ resources:
   - ./fenceagentsremediation-proxmox.yaml
   # Secrets
   - ./ipmi-credentials-shared.sops.yaml
+  - ./melusine-ipmi-credentials.sops.yaml
   - ./proxmox-fence-credentials.sops.yaml
