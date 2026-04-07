@@ -14,5 +14,6 @@ spec:
       timeout: 60s
       sharedparameters:
         action: reboot
+      sharedSecretName: ipmi-credentials-shared
       nodeSecretNames:
         melusine: melusine-ipmi-credentials
