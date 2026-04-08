@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: replicate-cnpg-object-store
+  annotations:
+    policies.kyverno.io/title: Replicate CloudNative-PG Object Store
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: ObjectStore
+    policies.kyverno.io/description: >-
+      This policy replicates the minio-store ObjectStore from the postgres
+      namespace to all newly created namespaces, providing a consistent barman
+      backup configuration for CloudNative-PG clusters without per-namespace
+      ObjectStore management.
+spec:
+  background: true
+  rules:
+    - name: generate-cnpg-object-store
+      match:
+        any:
+          - resources:
+              kinds:
+                - Namespace
+      exclude:
+        any:
+          - resources:
+              names:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - kyverno-system
+                - flux-system
+                - istio-system
+                - rook-ceph
+                - openebs-system
+                - monitoring
+                - knative-*
+      generate:
+        synchronize: true
+        apiVersion: barmancloud.cnpg.io/v1
+        kind: ObjectStore
+        name: minio-store
+        namespace: "{{request.object.metadata.name}}"
+        clone:
+          namespace: postgres
+          name: minio-store

@@ -9,3 +9,6 @@ resources:
   - ./resource-limits.yaml
   - ./git-push-token-replication.yaml
   - ./ghcr-pull-secret-replication.yaml
+  - ./pg-backup-secret-replication.yaml
+  - ./cnpg-object-store-replication.yaml
+  - ./cnpg-disable-istio-sidecar.yaml

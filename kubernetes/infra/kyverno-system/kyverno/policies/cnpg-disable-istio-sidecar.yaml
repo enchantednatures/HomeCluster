@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: cnpg-disable-istio-sidecar
+  annotations:
+    policies.kyverno.io/title: Disable Istio Sidecar on CloudNative-PG Clusters
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: Cluster
+    policies.kyverno.io/description: >-
+      PostgreSQL pods managed by CloudNative-PG must not run Istio sidecars
+      as they interfere with streaming replication and connection pooling.
+      This policy mutates all CNPG Cluster resources to inject
+      inheritedMetadata that disables the Istio sidecar on managed pods.
+spec:
+  rules:
+    - name: inject-istio-sidecar-disable
+      match:
+        any:
+          - resources:
+              kinds:
+                - postgresql.cnpg.io/v1/Cluster
+      mutate:
+        patchStrategicMerge:
+          spec:
+            inheritedMetadata:
+              annotations:
+                sidecar.istio.io/inject: "false"

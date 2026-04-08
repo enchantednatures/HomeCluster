@@ -7,8 +7,6 @@ resources:
   - database.yaml
   - db-user.sops.yaml
   - hunter-user.sops.yaml
-  - object-store.yaml
   - scheduled-backup.yaml
-  - secret.sops.yaml
   - service.yaml
   - superusersecret.sops.yaml

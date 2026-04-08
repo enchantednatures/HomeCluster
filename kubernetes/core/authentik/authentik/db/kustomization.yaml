@@ -8,8 +8,6 @@ resources:
   - db-user.sops.yaml
   - hunter-user.sops.yaml
   - minio-serviceentry.yaml
-  - object-store.yaml
   - scheduled-backup.yaml
-  - secret.sops.yaml
   - service.yaml
   - superusersecret.sops.yaml
