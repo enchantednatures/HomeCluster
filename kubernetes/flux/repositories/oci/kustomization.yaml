@@ -6,6 +6,7 @@ resources:
   - ./bitnami-schema-registry.yaml
   - ./bitnami.yaml
   - ./bjw-s.yaml
+  - ./enchantednatures.yaml
   - ./prometheus-community.yaml
   - ./spegel.yaml
   - ./telepresence.yaml
