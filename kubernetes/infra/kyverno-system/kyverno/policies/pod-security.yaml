@@ -68,7 +68,14 @@ spec:
             - rook-ceph
             - openebs-system
             - istio-system
+            - atuin
+            - authentik
+            - harbor
+            - immich
+            - open-webui
+            - postgres
             - redpanda
+            - default
       preconditions:
         all:
         - key: "{{ request.object.spec.initContainers[] || '' }}"

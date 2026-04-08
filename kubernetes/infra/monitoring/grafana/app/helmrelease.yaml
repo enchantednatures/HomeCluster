@@ -47,8 +47,8 @@ spec:
         allow_assign_grafana_admin: true
         scopes: openid profile email
         auth_url: https://auth.${SECRET_DOMAIN}/application/o/authorize/
-        token_url: https://auth.${SECRET_DOMAIN}/application/o/token/
-        api_url: https://auth.${SECRET_DOMAIN}/application/o/userinfo/
+        token_url: http://authentik-server.authentik.svc.cluster.local/application/o/token/
+        api_url: http://authentik-server.authentik.svc.cluster.local/application/o/userinfo/
         # Optionally map user groups to Grafana roles
         role_attribute_path:
           contains(groups, 'Grafana Admins') && 'Admin' || contains(groups,

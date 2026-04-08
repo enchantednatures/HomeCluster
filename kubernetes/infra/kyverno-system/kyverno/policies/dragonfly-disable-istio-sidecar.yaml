@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: dragonfly-disable-istio-sidecar
+  annotations:
+    policies.kyverno.io/title: Disable Istio Sidecar on Dragonfly Clusters
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: Dragonfly
+    policies.kyverno.io/description: >-
+      DragonflyDB pods must not run Istio sidecars as they interfere with
+      in-memory replication. This policy mutates all Dragonfly resources to
+      inject spec.annotations that disables the Istio sidecar on managed pods.
+spec:
+  rules:
+    - name: inject-istio-sidecar-disable
+      match:
+        any:
+          - resources:
+              kinds:
+                - dragonflydb.io/v1alpha1/Dragonfly
+      mutate:
+        patchStrategicMerge:
+          spec:
+            annotations:
+              sidecar.istio.io/inject: "false"
