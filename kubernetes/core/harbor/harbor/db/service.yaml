@@ -16,5 +16,4 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: harbor-db
-    cnpg.io/instanceRole: primary
+    cnpg.io/poolerName: harbor-db-pooler-rw

@@ -16,5 +16,4 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: authentik-db
-    cnpg.io/instanceRole: primary
+    cnpg.io/poolerName: authentik-db-pooler-rw

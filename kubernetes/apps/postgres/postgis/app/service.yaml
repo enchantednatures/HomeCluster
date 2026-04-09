@@ -18,5 +18,4 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: postgris-db
-    cnpg.io/instanceRole: primary
+    cnpg.io/poolerName: postgis-db-pooler-rw

@@ -19,5 +19,4 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: atuin-db
-    cnpg.io/instanceRole: primary
+    cnpg.io/poolerName: atuin-db-pooler-rw

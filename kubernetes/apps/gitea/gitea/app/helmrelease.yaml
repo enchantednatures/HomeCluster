@@ -47,7 +47,7 @@ spec:
       config:
         database:
           DB_TYPE: postgres
-          HOST: gitea-db-rw.gitea.svc.cluster.local:5432
+          HOST: gitea-db-pooler-rw.gitea.svc.cluster.local:5432
           NAME: app
           USER: app
           SSL_MODE: disable

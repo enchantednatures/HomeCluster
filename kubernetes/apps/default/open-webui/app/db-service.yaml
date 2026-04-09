@@ -15,5 +15,4 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: openwebui-db
-    cnpg.io/instanceRole: primary
+    cnpg.io/poolerName: openwebui-db-pooler-rw

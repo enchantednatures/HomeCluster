@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - cluster.yaml
   - db-hunter.sops.yaml
+  - pooler.yaml
   - db-user.sops.yaml
   - immich-db-user.sops.yaml
   - scheduled-backup.yaml

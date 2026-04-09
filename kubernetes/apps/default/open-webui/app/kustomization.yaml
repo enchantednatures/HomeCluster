@@ -13,6 +13,7 @@ resources:
   - ./dragonfly.yaml
   - ./cluster.yaml
   - ./db-service.yaml
+  - ./pooler.yaml
   - ./db-secret.sops.yaml
   - ./db-user.sops.yaml
   - ./scheduled-backup.yaml

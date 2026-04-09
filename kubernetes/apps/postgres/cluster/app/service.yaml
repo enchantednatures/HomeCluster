@@ -20,5 +20,4 @@ spec:
       protocol: TCP
       targetPort: 5432
   selector:
-    cnpg.io/cluster: postgres-db
-    cnpg.io/instanceRole: primary
+    cnpg.io/poolerName: postgres-db-pooler-rw

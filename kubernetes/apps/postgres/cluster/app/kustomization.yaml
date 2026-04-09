@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - cluster.yaml
   - object-store.yaml
+  - pooler.yaml
   - service.yaml
   - secret.sops.yaml
   - db-user.sops.yaml
