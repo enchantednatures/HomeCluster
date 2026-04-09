@@ -84,24 +84,6 @@ spec:
         ports:
           http:
             port: *port
-    ingress:
-      gatus:
-        className: istio
-        annotations:
-          kubernetes.io/tls-acme: "true"
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          external-dns/is-public: "true"
-        hosts:
-          - host: &host status.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                service:
-                  identifier: *app
-                  port: http
-        tls:
-          - hosts: [*host]
-            secretName: gatus-tls
     configMaps:
       config:
         enabled: true

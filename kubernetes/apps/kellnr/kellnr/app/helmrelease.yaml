@@ -54,12 +54,4 @@ spec:
       limits:
         memory: 1Gi
     ingress:
-      enabled: true
-      className: istio
-      annotations:
-        kubernetes.io/tls-acme: "true"
-        cert-manager.io/cluster-issuer: letsencrypt-production
-        external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-        external-dns/is-public: "true"
-      tls:
-        secretName: kellnr-tls
+      enabled: false

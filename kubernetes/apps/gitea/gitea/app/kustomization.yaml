@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./gitea-admin-secret.sops.yaml
+  - ./virtualservice.yaml
