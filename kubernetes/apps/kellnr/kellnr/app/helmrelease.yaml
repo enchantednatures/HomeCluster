@@ -85,16 +85,3 @@ spec:
         memory: 1Gi
     ingress:
       enabled: false
-  valuesFrom:
-    - kind: Secret
-      name: kellnr-s3-secret
-      valuesKey: access-key
-      targetPath: kellnr.s3.accessKey
-    - kind: Secret
-      name: kellnr-s3-secret
-      valuesKey: secret-key
-      targetPath: kellnr.s3.secretKey
-    - kind: Secret
-      name: kellnr-oauth2-secret
-      valuesKey: client-id
-      targetPath: kellnr.oauth2.clientId

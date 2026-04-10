@@ -5,6 +5,5 @@ kind: Kustomization
 resources:
   - ./helmrelease.yaml
   - ./kellnr-admin-secret.sops.yaml
-  - ./kellnr-s3-secret.sops.yaml
   - ./kellnr-oauth2-secret.sops.yaml
   - ./virtualservice.yaml
