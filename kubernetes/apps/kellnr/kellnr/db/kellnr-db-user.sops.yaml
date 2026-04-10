@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: kellnr-db-user
+    namespace: kellnr
+type: kubernetes.io/basic-auth
+stringData:
+    username: ENC[AES256_GCM,data:9+dJ5Q9j,iv:Lw5tUSzbp0PH53Amk+E9UNUEZ2dXiUV7vpLl1iTXN1Q=,tag:6/d2A/9375WhmhZYp/B/cQ==,type:str]
+    password: ENC[AES256_GCM,data:OBR+oXVw0UeSshkyQDCxxsLIQ2skbL7z,iv:7vAuRDgJJgMtvh9cId0q8zsoc5d8Hrdc/DqZnS070O8=,tag:Yu4M/xqHeDR6yCoLP3zETw==,type:str]
+sops:
+    age:
+        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB2RVNaWU41Y2t4UU5heFRE
+            Y251aTl1WkhPcmtTRENkdDVRdjJJdkpHWjJJCnkrRU9MSFVjWW5jR29rUGxmN3dz
+            ZUZDbXZmaVJOWEZEYzZ1L0dQSXFOcDQKLS0tIHJIT0N3N2ZjZHZ1SmluREhMN0FH
+            MEEwQU9HbytNUEFxbUpzMjNlUm5wV2MKGFL8kMSlc7MW7CDfYH+oANL5S3FBYAqR
+            8rYMFqlUqjjbP97COBpMptmKnOG0wvhK3H8H+ZglXNzCf+aYy/aQAA==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-04-10T00:04:47Z"
+    mac: ENC[AES256_GCM,data:BEj+dtkvdbmBBAzt6Ef4AvmsC5ZMd3wvVnko5X2UpOKz20HeuwK9izBDSSzDI8pVFZf6H5Xn9oRqJQmhj9qpJ3NUxL/m4tWEJyZfamImEv/mV+rptQNsqZEgAw8oiBTQj0ONy8LgHlwTwqjHlVvCWfbbawB7/5+N+xhbBEEJ0yA=,iv:sLPJBh32TMOrS9DoVZHRavJVrBt6WtvLtTrbgwtIyhg=,tag:u3lV34cjh0dTP+CiHGqiag==,type:str]
+    encrypted_regex: ^(data|stringData)$
+    version: 3.12.2

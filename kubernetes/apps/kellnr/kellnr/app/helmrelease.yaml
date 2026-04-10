@@ -37,11 +37,41 @@ spec:
         protocol: https
       registry:
         maxCrateSize: 50
+        authRequired: true
       docs:
         enabled: true
         maxSize: 100
       proxy:
         enabled: true
+        numThreads: 20
+      postgres:
+        enabled: true
+        address: kellnr-db-pooler-rw.kellnr.svc.cluster.local
+        port: 5432
+        db: kellnr
+        user: kellnr
+        pwdSecretRef:
+          name: kellnr-db-user
+          key: password
+      s3:
+        enabled: true
+        endpoint: http://minio-service.networking.svc.cluster.local:9768
+        region: us-east-1
+        allowHttp: true
+        crates_bucket: kellnr-crates
+        cratesio_bucket: kellnr-cratesio
+        toolchain_bucket: kellnr-toolchain
+      oauth2:
+        enabled: true
+        issuerUrl: https://auth.${SECRET_DOMAIN}/application/o/kellnr/
+        clientSecretRef:
+          name: kellnr-oauth2-secret
+          key: client-secret
+        scopes: "openid,profile,email"
+        autoProvisionUsers: true
+        adminGroupClaim: groups
+        adminGroupValue: Kellnr Admins
+        buttonText: Login with Authentik
     pvc:
       enabled: true
       name: kellnr
@@ -55,3 +85,16 @@ spec:
         memory: 1Gi
     ingress:
       enabled: false
+  valuesFrom:
+    - kind: Secret
+      name: kellnr-s3-secret
+      valuesKey: access-key
+      targetPath: kellnr.s3.accessKey
+    - kind: Secret
+      name: kellnr-s3-secret
+      valuesKey: secret-key
+      targetPath: kellnr.s3.secretKey
+    - kind: Secret
+      name: kellnr-oauth2-secret
+      valuesKey: client-id
+      targetPath: kellnr.oauth2.clientId
