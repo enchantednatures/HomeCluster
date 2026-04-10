@@ -83,28 +83,5 @@ spec:
         memory: 256Mi
       limits:
         memory: 1Gi
-    importCert:
-      enabled: true
-      certificate: |
-        -----BEGIN CERTIFICATE-----
-        MIIDRjCCAi6gAwIBAgIRAIIWLvpHBK37nuSIsEgbo60wDQYJKoZIhvcNAQELBQAw
-        PDESMBAGA1UEChMJYXV0aGVudGlrMSYwJAYDVQQDEx1hdXRoZW50aWsgZGVmYXVs
-        dCBjZXJ0aWZpY2F0ZTAeFw0yNjA0MDkwOTM4MDFaFw0yNzA0MDkwOTM4MDFaMDwx
-        EjAQBgNVBAoTCWF1dGhlbnRpazEmMCQGA1UEAxMdYXV0aGVudGlrIGRlZmF1bHQg
-        Y2VydGlmaWNhdGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCY3ujA
-        1dM88ww5AxEsFvDJJr1Y/KG3w/2CePNVirCMfTX5MmFgC/ns6Vda2lHro8Kl11Oc
-        RBY1CCXGUSEXrCYqEuXcl8abrjBzd/Cp++PIdu3nX7kwCNPQfugZAEqH5OV1pNN0
-        HKXeCX/U+gA4HdcfVA9G6Nfva/B6h1HckKfjOROP52VhQoqYCMhL4m2xnT0QzKE4
-        M7ZZpemP7OWBMY6ce+BN8hhXXLpaL4Q6JOmLcAUaY6cuQPPQrINQarIQa6eAy5F3
-        PbjD4PHZEOmnLsr8Ah0iEzMsbk9o97sT82dQk6tnz+obOaDhL8Vf3PxuW7E+cXdJ
-        Elj2CeqlOlHV/eepAgMBAAGjQzBBMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAK
-        BggrBgEFBQcDATAMBgNVHRMBAf8EAjAAMAwGA1UdEQQFMAOCASowDQYJKoZIhvcN
-        AQELBQADggEBAAVQqHlDayRqK8TfQdA0K3LN5LHehfnHPl37IGu5TQV6GDsg6Ggn
-        gApfE966C1/SKZO7ZzenBMbk60GTr1ZdKmADHe5fOpX/s5JN0tfs7wXD/9qThQp8
-        j8EFCA43DO2ugLPyH4wQusWRxbYz01TWQEKx3vDwKLrxVS9SKsxSc190jEOStiAk
-        1sE/HeHNVBFVEIMKtmDVsScFTFwJ9T7dF2ojRpOen4O5MRAgYc0muzUu0yEpuDIO
-        27ZVtZ92QAZI4EXeQpodIXsnewBbNcVzlJYzppV7ssMSDuI0CMKwSnbeZxIOIdxU
-        U5zQuLfbUm+RdqMVHvtO4c12VAw7G3nm27w=
-        -----END CERTIFICATE-----
     ingress:
       enabled: false

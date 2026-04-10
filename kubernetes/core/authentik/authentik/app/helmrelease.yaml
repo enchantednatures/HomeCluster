@@ -75,6 +75,14 @@ spec:
     server:
       ingress:
         enabled: false
+      volumes:
+        - name: authentik-server-tls
+          secret:
+            secretName: authentik-server-tls
+      volumeMounts:
+        - name: authentik-server-tls
+          mountPath: /certs/auth.${SECRET_DOMAIN}
+          readOnly: true
       resources:
         requests:
           cpu: 15m
@@ -83,6 +91,14 @@ spec:
           cpu: 500m
           memory: 1024M
     worker:
+      volumes:
+        - name: authentik-server-tls
+          secret:
+            secretName: authentik-server-tls
+      volumeMounts:
+        - name: authentik-server-tls
+          mountPath: /certs/auth.${SECRET_DOMAIN}
+          readOnly: true
       resources:
         requests:
           cpu: 15m
