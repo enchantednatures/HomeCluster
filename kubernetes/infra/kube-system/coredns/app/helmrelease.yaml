@@ -49,6 +49,11 @@ spec:
             configBlock: |-
               lameduck 5s
           - name: ready
+          - name: rewrite
+            parameters: stop
+            configBlock: |-
+              name exact auth.${SECRET_DOMAIN} authentik-server.authentik.svc.cluster.local
+              answer name authentik-server.authentik.svc.cluster.local auth.${SECRET_DOMAIN}
           - name: kubernetes
             parameters: cluster.local in-addr.arpa ip6.arpa
             configBlock: |-
