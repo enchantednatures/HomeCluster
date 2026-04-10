@@ -43,3 +43,16 @@ variable "minio_client" {
     }))
   })
 }
+
+variable "kellnr_client" {
+  type = object({
+    client_id     = string
+    client_secret = string
+    icon          = string
+    launch_url    = string
+    redirect_urls = list(object({
+      matching_mode = string,
+      url           = string
+    }))
+  })
+}
