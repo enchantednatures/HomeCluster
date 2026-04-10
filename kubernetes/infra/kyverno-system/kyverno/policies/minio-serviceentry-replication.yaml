@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: replicate-minio-serviceentry
+  annotations:
+    policies.kyverno.io/title: Replicate MinIO ServiceEntry
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: ServiceEntry
+    policies.kyverno.io/description: >-
+      This policy replicates a MinIO Istio ServiceEntry into all namespaces,
+      enabling cross-namespace access to the MinIO object storage service
+      running in the networking namespace with Istio ambient mode. Without this
+      ServiceEntry, pods in ambient mode cannot reach MinIO as it is treated
+      as an external service outside the mesh.
+spec:
+  background: true
+  rules:
+    - name: generate-minio-serviceentry
+      match:
+        any:
+          - resources:
+              kinds:
+                - Namespace
+      exclude:
+        any:
+          - resources:
+              names:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - kyverno-system
+                - flux-system
+                - istio-system
+                - istio-ingress
+                - rook-ceph
+                - openebs-system
+                - monitoring
+                - knative-*
+                - cnpg-system
+                - networking
+      generate:
+        synchronize: true
+        apiVersion: networking.istio.io/v1beta1
+        kind: ServiceEntry
+        name: minio-service-access
+        namespace: "{{request.object.metadata.name}}"
+        data:
+          spec:
+            hosts:
+              - minio-service.networking.svc.cluster.local
+            ports:
+              - number: 9768
+                name: minio-api
+                protocol: HTTP
+            location: MESH_EXTERNAL
+            resolution: DNS

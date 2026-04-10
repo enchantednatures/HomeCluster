@@ -9,4 +9,3 @@ resources:
   - ./service.yaml
   - ./virtualservice.yaml
   - ./volsync-secret.sops.yaml
-  - ./minio-serviceentry.yaml

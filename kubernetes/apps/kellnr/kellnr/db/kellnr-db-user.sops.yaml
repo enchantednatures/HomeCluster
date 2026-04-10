@@ -6,20 +6,20 @@ metadata:
     namespace: kellnr
 type: kubernetes.io/basic-auth
 stringData:
-    username: ENC[AES256_GCM,data:9+dJ5Q9j,iv:Lw5tUSzbp0PH53Amk+E9UNUEZ2dXiUV7vpLl1iTXN1Q=,tag:6/d2A/9375WhmhZYp/B/cQ==,type:str]
-    password: ENC[AES256_GCM,data:OBR+oXVw0UeSshkyQDCxxsLIQ2skbL7z,iv:7vAuRDgJJgMtvh9cId0q8zsoc5d8Hrdc/DqZnS070O8=,tag:Yu4M/xqHeDR6yCoLP3zETw==,type:str]
+    username: ENC[AES256_GCM,data:YKRa5Ms4,iv:csJWZkp9GJZFPCB2/WRrhHVkK+e0YYqJ19BfnddoNzc=,tag:v80uv//64TkpuAGzSUnV7g==,type:str]
+    password: ENC[AES256_GCM,data:jxrtgQE/nsUunH4SRglfokrJ+XKtI5bpQCDIpvacEC4=,iv:vNFUehjfXgXiNRX/EBrG0fOY3K0uLXmz0nWMg86v1us=,tag:/P+/7MxPl7Q47dK32JSXzA==,type:str]
 sops:
     age:
         - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB2RVNaWU41Y2t4UU5heFRE
-            Y251aTl1WkhPcmtTRENkdDVRdjJJdkpHWjJJCnkrRU9MSFVjWW5jR29rUGxmN3dz
-            ZUZDbXZmaVJOWEZEYzZ1L0dQSXFOcDQKLS0tIHJIT0N3N2ZjZHZ1SmluREhMN0FH
-            MEEwQU9HbytNUEFxbUpzMjNlUm5wV2MKGFL8kMSlc7MW7CDfYH+oANL5S3FBYAqR
-            8rYMFqlUqjjbP97COBpMptmKnOG0wvhK3H8H+ZglXNzCf+aYy/aQAA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEd1JvMi9oNmFZWGFEdVhz
+            eVpGRXI4WVI5SzhJZlZOR1Z6ejNEeG4rU25rClptMmk2dVc3TlN1SkRNK01rZWlE
+            L3JTZ0VtMjNnVC9yMnlqQ1lxUUozWmsKLS0tIEphVGZCTWtJRU9BZnlEb2EvRXZU
+            cWgxOTUzK1crOFVuT3dpT2g5YVNwTncKbx3uYqEMV1wRevdrdqnsn/wVRvLUCqEB
+            64GkYuzG4TOwvdoWOs831A5iREWfuWd5ky7XDtC2U8+2gFQwkVf4dA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-04-10T00:04:47Z"
-    mac: ENC[AES256_GCM,data:BEj+dtkvdbmBBAzt6Ef4AvmsC5ZMd3wvVnko5X2UpOKz20HeuwK9izBDSSzDI8pVFZf6H5Xn9oRqJQmhj9qpJ3NUxL/m4tWEJyZfamImEv/mV+rptQNsqZEgAw8oiBTQj0ONy8LgHlwTwqjHlVvCWfbbawB7/5+N+xhbBEEJ0yA=,iv:sLPJBh32TMOrS9DoVZHRavJVrBt6WtvLtTrbgwtIyhg=,tag:u3lV34cjh0dTP+CiHGqiag==,type:str]
+    lastmodified: "2026-04-10T02:46:28Z"
+    mac: ENC[AES256_GCM,data:3mNH5VB7xKDM8OWCM7pZAhHGzYo3uSPJoNINTZXbNn+Yyb++wdjl0dc3Gp+vWxEv7un/bvNw2L1e+P9zniZmsrxtBBCTMONecVqNp7GvLz8dXZFqH5eTBFLC65OPZR59tN+Q5g7EX41CEXXaaxLxkqSTgliXlV76W3+RwypDo6s=,iv:dvUJuPWaXbRgixVfK+CPizM0Q9pINl/0V5oIczTAxqM=,tag:AdQYO1xATxVvScv3D+iJ/g==,type:str]
     encrypted_regex: ^(data|stringData)$
     version: 3.12.2

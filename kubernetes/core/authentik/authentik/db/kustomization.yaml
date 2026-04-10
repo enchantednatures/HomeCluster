@@ -8,7 +8,6 @@ resources:
   - pooler.yaml
   - db-user.sops.yaml
   - hunter-user.sops.yaml
-  - minio-serviceentry.yaml
   - scheduled-backup.yaml
   - service.yaml
   - superusersecret.sops.yaml

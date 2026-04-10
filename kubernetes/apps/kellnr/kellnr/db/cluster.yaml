@@ -49,6 +49,12 @@ spec:
         passwordSecret:
           name: kellnr-db-user
         inRoles: [pg_monitor, pg_signal_backend]
+  bootstrap:
+    initdb:
+      database: app
+      owner: kellnr
+      secret:
+        name: kellnr-db-user
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
