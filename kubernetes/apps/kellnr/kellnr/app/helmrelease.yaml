@@ -48,7 +48,7 @@ spec:
         enabled: true
         address: kellnr-db-pooler-rw.kellnr.svc.cluster.local
         port: 5432
-        db: kellnr
+        db: app
         user: kellnr
         pwdSecretRef:
           name: kellnr-db-user

@@ -39,6 +39,7 @@ spec:
             - authentik
             - harbor
             - immich
+            - kellnr
             - open-webui
             - postgres
             - redpanda
@@ -72,6 +73,7 @@ spec:
             - authentik
             - harbor
             - immich
+            - kellnr
             - open-webui
             - postgres
             - redpanda
