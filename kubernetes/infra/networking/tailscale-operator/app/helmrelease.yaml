@@ -41,7 +41,7 @@ spec:
     image:
       repository: docker.io/tailscale/k8s-operator
       # datasource=docker depName=tailscale/k8s-operator
-      tag: v1.94.2
+      tag: v1.96.5
     operatorConfig: {}
     proxyConfig:
       image:
