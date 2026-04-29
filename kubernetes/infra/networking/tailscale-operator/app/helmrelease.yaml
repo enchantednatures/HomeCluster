@@ -47,7 +47,7 @@ spec:
       image:
         repository: tailscale/tailscale
         # datasource=docker depName=tailscale/tailscale
-        tag: v1.94.2
+        tag: v1.96.5
       firewallMode: auto
     apiServerProxyConfig:
       mode: "true" # "true", "false", "noauth"
