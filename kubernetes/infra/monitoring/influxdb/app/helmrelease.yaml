@@ -33,7 +33,7 @@ spec:
     image:
       repository: influxdb
       # datasource=docker depName=influxdb
-      tag: 2.8.0-alpine
+      tag: 2.9.1-alpine
       pullPolicy: IfNotPresent
 
     adminUser:
