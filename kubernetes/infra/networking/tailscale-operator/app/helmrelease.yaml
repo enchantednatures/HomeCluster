@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: tailscale-operator
-      version: 1.94.2 # datasource=helm depName=tailscale-operator repository=https://pkgs.tailscale.com/helmcharts
+      version: 1.96.5 # datasource=helm depName=tailscale-operator repository=https://pkgs.tailscale.com/helmcharts
       sourceRef:
         kind: HelmRepository
         name: tailscale-charts
