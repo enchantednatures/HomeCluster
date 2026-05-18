@@ -32,14 +32,14 @@ jobs:
         with:
           python-version: 3.x
       - name: Setup crd-extractor
-        uses: robinraju/release-downloader@daf26c55d821e836577a15f77d86ddc078948b05 # v1.12
+        uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1.13
         with:
           repository: datreeio/CRDs-catalog
           latest: true
           fileName: crd-extractor.zip
       - name: Write kubeconfig
         id: kubeconfig
-        uses: timheuer/base64-to-file@adaa40c0c581f276132199d4cf60afa07ce60eac # v1.2
+        uses: timheuer/base64-to-file@dfa5a5dd38803cb4f5c3a081eeb28e8362d43e9c # v2.0
         with:
           encodedString: ${{ secrets.KUBECONFIG }}
           fileName: kubeconfig

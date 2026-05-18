@@ -10,7 +10,7 @@ spec:
   chart:
     spec:
       chart: flagger
-      version: "1.42.0"  # datasource=helm depName=flagger
+      version: "1.43.0"  # datasource=helm depName=flagger
       sourceRef:
         kind: HelmRepository
         name: flagger
@@ -34,7 +34,7 @@ spec:
     image:
       repository: ghcr.io/fluxcd/flagger
       # datasource=docker depName=ghcr.io/fluxcd/flagger
-      tag: 1.42.0
+      tag: 1.43.0
 
     # Configure for Istio mesh provider
     meshProvider: istio

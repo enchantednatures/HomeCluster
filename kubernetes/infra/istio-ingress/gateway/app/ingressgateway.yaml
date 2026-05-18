@@ -33,7 +33,7 @@ spec:
             value: "0"
       containers:
         - name: istio-proxy
-          image: docker.io/istio/proxyv2:1.29.1
+          image: docker.io/istio/proxyv2:1.29.2
           args:
             - proxy
             - router

@@ -20,12 +20,12 @@ terraform {
   required_providers {
     authentik = {
       source  = "goauthentik/authentik"
-      version = "~> 2025.12.0"
+      version = "~> 2026.2.0"
     }
 
     harbor = {
       source  = "goharbor/harbor"
-      version = "3.11.5"
+      version = "3.11.6"
     }
   }
 }
