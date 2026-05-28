@@ -69,3 +69,11 @@ spec:
               protocol: TCP
             - port: "8844"
               protocol: TCP
+    # Allow egress to postgres pooler
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: postgres
+      toPorts:
+        - ports:
+            - port: "5432"
+              protocol: TCP
