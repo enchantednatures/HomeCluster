@@ -1,0 +1,58 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kyverno-alerts
+  namespace: kyverno-system
+  labels:
+    prometheus: kube-prometheus-stack
+    role: alert-rules
+spec:
+  groups:
+    - name: kyverno-policy-failures
+      rules:
+        - alert: KyvernoPolicyReconciliationFailure
+          expr: >
+            increase(kyverno_policy_results_total{rule_result="fail"}[15m]) > 0
+            or
+            increase(kyverno_policy_results_total{rule_result="error"}[15m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Kyverno policy validation/reconciliation failed
+            description: >-
+              Policy {{ $labels.policy_name }} in namespace {{ $labels.resource_namespace }}
+              failed with result {{ $labels.rule_result }} for rule {{ $labels.rule_name }}.
+
+        - alert: KyvernoBackgroundScanFailures
+          expr: increase(kyverno_background_scan_results_total{status="fail"}[30m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: Kyverno background scan detected policy violations
+            description: >-
+              Background scan found {{ $value }} violations for policy {{ $labels.policy_name }}
+              in namespace {{ $labels.namespace }}.
+
+    - name: kyverno-component-health
+      rules:
+        - alert: KyvernoAdmissionControllerDown
+          expr: up{job="kyverno-admission-controller"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Kyverno admission controller is down
+            description: Kyverno admission controller has been down for more than 5 minutes.
+
+        - alert: KyvernoBackgroundControllerDown
+          expr: up{job="kyverno-background-controller"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Kyverno background controller is down
+            description: Kyverno background controller has been down for more than 5 minutes.

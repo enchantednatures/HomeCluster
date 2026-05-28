@@ -23,7 +23,7 @@ metadata:
 rules:
   - apiGroups: ["barmancloud.cnpg.io"]
     resources: ["objectstores"]
-    verbs: ["get", "list"]
+    verbs: ["get", "list", "create", "update", "delete"]
 ---
 # yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: rbac.authorization.k8s.io/v1
