@@ -9,3 +9,5 @@ spec:
   images:
     - image: ghcr.io/cloudnative-pg/barman-cloud:0.5.0
       major: 16
+    - image: ghcr.io/cloudnative-pg/barman-cloud:0.5.0
+      major: 17

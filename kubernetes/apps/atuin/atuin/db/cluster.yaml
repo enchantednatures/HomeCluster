@@ -49,12 +49,6 @@ spec:
         passwordSecret:
           name: atuin-db-user
         inRoles: [pg_monitor, pg_signal_backend]
-      - name: cnpg_pooler_pgbouncer
-        ensure: present
-        comment: PgBouncer auth user
-        login: true
-        superuser: false
-        inRoles: [pg_monitor]
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
