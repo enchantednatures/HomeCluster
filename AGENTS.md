@@ -1,5 +1,9 @@
 # AGENTS.md - HomeCluster Repository Guidelines
 
+**Generated:** 2026-05-28 13:42:32 UTC
+**Commit:** 91cf63164
+**Branch:** main
+
 ## Architecture
 
 Talos Kubernetes cluster on Proxmox VMs, provisioned via OpenTofu. GitOps with FluxCD v2. Cilium CNI + Istio ambient mode. Rook-Ceph (block/object) + OpenEBS (local). SOPS/Age for secrets. Renovate for dependency updates.
@@ -47,19 +51,18 @@ provision/terraform/  # OpenTofu/Terraform for Proxmox VMs
 scripts/              # Utility scripts (kubeconform, ceph ops, standardization)
 ```
 
-### App Structure
+## Where to Look
 
-```
-kubernetes/apps/<namespace>/<app-name>/
-├── ks.yaml               # Flux Kustomization(s)
-├── kustomization.yaml     # Root kustomization
-├── namespace.yaml
-├── app/
-│   ├── helmrelease.yaml
-│   └── kustomization.yaml
-├── db/                    # Optional CloudNative-PG cluster
-└── dragonfly/             # Optional DragonflyDB cache
-```
+| Task | Location | Notes |
+|------|----------|-------|
+| Add new app | `kubernetes/apps/<ns>/<app>/` | See `kubernetes/apps/immich/immich/` for multi-component example |
+| Add operator | `kubernetes/operators/<name>/` | Operator + CRD/app subdirs |
+| Infra changes | `kubernetes/infra/<component>/` | Cilium, Istio, monitoring, networking |
+| Flux config | `kubernetes/flux/` | Repos, vars, kustomizations |
+| Terraform | `provision/terraform/` | Proxmox VMs, Authentik OAuth |
+| Validation scripts | `scripts/` | kubeconform, standardization |
+| Secrets/vars | `kubernetes/flux/vars/` | `cluster-settings.yaml`, `cluster-secrets.sops.yaml` |
+| Bootstrap | `kubernetes/bootstrap/` | Flux install, deploy key |
 
 ## Code Style
 
@@ -131,6 +134,16 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 4. Verify `git diff` shows encrypted fields only
 5. `pre-commit run --all-files` — trailing whitespace, line endings, tabs, smartquotes, secret check
 
+## Anti-Patterns
+
+- **NEVER** `kubectl apply` directly — all changes go through Git
+- **NEVER** commit plaintext secrets — use `.sops.yaml` and encrypt
+- **NEVER** use brackets in YAML — multi-line lists only
+- **NEVER** use unquoted truthy values — only `"true"` / `"false"`
+- **NEVER** skip `make configure` before committing
+- **NEVER** remove more than one Ceph OSD at a time
+- **NEVER** edit auto-generated files in `clusters/*/flux-system/`
+
 ## Critical Rules
 
 - **ALL changes go through Git** — never `kubectl apply` directly
@@ -138,9 +151,3 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 - **Always validate before committing** (`make configure`)
 - Flux Kustomizations live in `flux-system` namespace, deploy to `targetNamespace`
 - Use `dependsOn` to enforce ordering (app → operator → core → infra)
-
-## Reference Examples
-
-- Multi-component app: `kubernetes/apps/immich/immich/` (app + db + cache)
-- Simple app: `kubernetes/apps/atuin/atuin/`
-- Complex with Istio: `kubernetes/core/harbor/harbor/`
