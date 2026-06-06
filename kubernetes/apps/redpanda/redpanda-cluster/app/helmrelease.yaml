@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: redpanda
-      version: 26.1.5 # datasource=helm depName=redpanda repository=https://charts.redpanda.com
+      version: 26.1.4 # datasource=helm depName=redpanda repository=https://charts.redpanda.com
       sourceRef:
         kind: HelmRepository
         name: redpanda-charts
