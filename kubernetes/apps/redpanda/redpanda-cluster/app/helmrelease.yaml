@@ -33,7 +33,7 @@ spec:
     image:
       repository: docker.redpanda.com/redpandadata/redpanda
       # datasource=docker depName=docker.redpanda.com/redpandadata/redpanda
-      tag: v26.1.9
+      tag: v26.1.10
 
     auth:
       sasl:
