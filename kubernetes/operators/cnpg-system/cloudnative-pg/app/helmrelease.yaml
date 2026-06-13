@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: cloudnative-pg
-      version: 0.28.3 # datasource=helm depName=cloudnative-pg repository=https://cloudnative-pg.github.io/charts
+      version: 0.28.2 # datasource=helm depName=cloudnative-pg repository=https://cloudnative-pg.github.io/charts
       sourceRef:
         kind: HelmRepository
         name: cloudnative-pg-charts
