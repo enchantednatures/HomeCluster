@@ -12,7 +12,7 @@ spec:
   chart:
     spec:
       chart: rook-ceph
-      version: v1.20.0 # datasource=helm depName=rook-ceph repository=https://charts.rook.io/release
+      version: v1.20.4 # datasource=helm depName=rook-ceph repository=https://charts.rook.io/release
       sourceRef:
         kind: HelmRepository
         name: rook-charts
@@ -36,7 +36,7 @@ spec:
     image:
       repository: rook/ceph
       # datasource=docker depName=rook/ceph
-      tag: v1.20.0
+      tag: v1.20.4
     monitoring:
       enabled: true
     pspEnable: false
