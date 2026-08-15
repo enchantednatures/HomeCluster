@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: goldilocks
-      version: 10.5.0 # datasource=helm depName=goldilocks repository=https://charts.fairwinds.com/stable
+      version: 10.6.0 # datasource=helm depName=goldilocks repository=https://charts.fairwinds.com/stable
       sourceRef:
         kind: HelmRepository
         name: fairwinds
