@@ -5,6 +5,8 @@ kind: Kustomization
 metadata:
   name: &app knative-operator
   namespace: flux-system
+  labels:
+    substitution.flux.home.arpa/disabled: "true"
 spec:
   dependsOn:
     - name: istio-gateway

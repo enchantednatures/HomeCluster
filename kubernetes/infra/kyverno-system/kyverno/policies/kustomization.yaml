@@ -14,3 +14,4 @@ resources:
   - ./cnpg-disable-istio-sidecar.yaml
   - ./dragonfly-disable-istio-sidecar.yaml
   - ./minio-serviceentry-replication.yaml
+  - ./serviceentry-rbac.yaml
