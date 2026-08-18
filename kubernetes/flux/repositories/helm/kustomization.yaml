@@ -53,7 +53,6 @@ resources:
   - ./renovate.yaml
   - ./rook-ceph.yaml
   - ./sail-operator.yaml
-  - ./sealed-secrets.yaml
   - ./stakater.yaml
   - ./strimzi.yaml
   - ./tailscale-charts.yaml

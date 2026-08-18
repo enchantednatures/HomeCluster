@@ -35,10 +35,10 @@ spec:
           external-dns/is-public: "false"
           kubernetes.io/ingress.class: internal
         hosts:
-          - host: goldilocks.chastened.lan
+          - host: goldilocks.${SECRET_DOMAIN}
             paths:
               - path: /
                 type: ImplementationSpecific
         tls:
-          - hosts: [goldilocks.chastened.lan]
+          - hosts: [goldilocks.${SECRET_DOMAIN}]
             secretName: my-dynamic-certificate-tls

@@ -54,4 +54,4 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: gitea-v4
+        serverName: gitea-v5

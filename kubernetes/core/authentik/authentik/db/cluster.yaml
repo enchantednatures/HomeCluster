@@ -12,6 +12,13 @@ spec:
   imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
   instances: 1
   primaryUpdateStrategy: unsupervised
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
   storage:
     size: 10Gi
     storageClass: openebs-hostpath
@@ -47,7 +54,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: &currentCluster authentik-v11
+        serverName: authentik-v12
   bootstrap:
     recovery:
       source: &previousCluster authentik-v6
