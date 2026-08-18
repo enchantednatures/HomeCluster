@@ -6,3 +6,4 @@ resources:
   - ./install.yaml
   - ./networkpolicy.yaml
   - ./networkpolicy-app.yaml
+  - ./lease-rbac.yaml

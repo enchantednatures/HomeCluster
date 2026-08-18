@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/role_v1.json
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: apicurio-registry-operator-leases
+  namespace: schema-registry
+  labels:
+    app: apicurio-registry-operator
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/instance: apicurio-registry-operator
+    app.kubernetes.io/name: apicurio-registry-operator
+    app.kubernetes.io/part-of: apicurio-registry
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - create
+      - update
+      - get
+      - list
+      - watch
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/rolebinding_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: apicurio-registry-operator-leases
+  namespace: schema-registry
+  labels:
+    app: apicurio-registry-operator
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/instance: apicurio-registry-operator
+    app.kubernetes.io/name: apicurio-registry-operator
+    app.kubernetes.io/part-of: apicurio-registry
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: apicurio-registry-operator-leases
+subjects:
+  - kind: ServiceAccount
+    name: apicurio-registry-operator
+    namespace: schema-registry
