@@ -39,14 +39,14 @@ jobs:
             kustomization) target="ks" ;;
           esac
           rc=0
-          flate diff "${target}" \
-            --path ./kubernetes \
-            -o diff > diff-full.patch 2>&1 || rc=$?
-          head -c 60000 diff-full.patch > diff.patch || true
+          {
+            echo '```diff'
+            flate diff "${target}" \
+              --path ./kubernetes \
+              -o diff 2>&1 || rc=$?
+            echo '```'
+          } > diff.patch
           cat diff.patch
-          echo "diff<<EOF" >> "$GITHUB_OUTPUT"
-          cat diff.patch >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
           exit "${rc}"
       - if: ${{ always() }}
         name: Add comment
@@ -55,7 +55,5 @@ jobs:
           message-id: ${{ github.event.pull_request.number }}/${{ matrix.paths }}/${{
             matrix.resources }}
           message-failure: Diff was not successful
-          message: |-
-            ```diff
-            ${{ steps.diff.outputs.diff }}
-            ```
+          message-path: diff.patch
+          truncate: simple
