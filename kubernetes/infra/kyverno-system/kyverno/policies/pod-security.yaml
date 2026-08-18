@@ -44,6 +44,7 @@ spec:
             - postgres
             - redpanda
             - default
+            - monitoring
       validate:
         message: "Containers must run as non-root user"
         pattern:
@@ -78,6 +79,7 @@ spec:
             - postgres
             - redpanda
             - default
+            - monitoring
       preconditions:
         all:
         - key: "{{ request.object.spec.initContainers[] || '' }}"
