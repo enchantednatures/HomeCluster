@@ -202,8 +202,8 @@ data:
       ## Using the same metadata source as device_tags, you can also customize the
       ## name of the device via templates.
       ## The 'name_templates' parameter is a list of templates to try and apply to
-      ## the device. The template may contain variables in the form of '$PROPERTY' or
-      ## '${PROPERTY}'. The first template which does not contain any variables not
+      ## the device. The template may contain variables in the form of '$$PROPERTY' or
+      ## '$${PROPERTY}'. The first template which does not contain any variables not
       ## present for the device is used as the device name tag.
       ## The typical use case is for LVM volumes, to get the VG/LV name instead of
       ## the near-meaningless DM-0 name.
