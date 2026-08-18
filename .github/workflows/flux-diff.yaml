@@ -4,7 +4,7 @@ name: Flux Diff
 on:
   pull_request:
     branches: [main]
-    paths: [kubernetes/**]
+    paths: [kubernetes/**, .github/workflows/flux-diff.yaml]
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
@@ -23,33 +23,32 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          path: pull
-      - name: Checkout Default Branch
-        uses: actions/checkout@v6
+          fetch-depth: 0
+      - name: Setup flate
+        uses: home-operations/flate/action@v0.5.0
         with:
-          ref: ${{ github.event.repository.default_branch }}
-          path: default
+          cache: true
       - name: Diff Resources
-        uses: docker://ghcr.io/allenporter/flux-local:v8.4.0
-        with:
-          args: >-
-            diff ${{ matrix.resources }}
-            --unified 6
-            --path /github/workspace/pull/${{ matrix.paths }}/flux
-            --path-orig /github/workspace/default/${{ matrix.paths }}/flux
-            --strip-attrs "helm.sh/chart,checksum/config,app.kubernetes.io/version,chart"
-            --limit-bytes 10000
-            --all-namespaces
-            --sources "home-kubernetes"
-            --output-file diff.patch
-      - name: Generate Diff
         id: diff
+        env:
+          RESOURCES: ${{ matrix.resources }}
         run: |
+          set -o pipefail
+          case "${RESOURCES}" in
+            helmrelease) target="hr" ;;
+            kustomization) target="ks" ;;
+          esac
+          rc=0
+          flate diff "${target}" \
+            --path ./kubernetes \
+            -o diff > diff-full.patch 2>&1 || rc=$?
+          head -c 60000 diff-full.patch > diff.patch || true
           cat diff.patch
-          echo "diff<<EOF" >> $GITHUB_OUTPUT
-          cat diff.patch >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-      - if: ${{ steps.diff.outputs.diff != '' }}
+          echo "diff<<EOF" >> "$GITHUB_OUTPUT"
+          cat diff.patch >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          exit "${rc}"
+      - if: ${{ always() }}
         name: Add comment
         uses: mshick/add-pr-comment@v3
         with:
