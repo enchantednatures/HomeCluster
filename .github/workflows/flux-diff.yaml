@@ -56,4 +56,4 @@ jobs:
             matrix.resources }}
           message-failure: Diff was not successful
           message-path: diff.patch
-          truncate: true
+          truncate: simple
