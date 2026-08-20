@@ -111,7 +111,7 @@ spec:
                   - "[STATUS] == 200"
               - name: Immich
                 group: Apps
-                url: https://photos.${SECRET_DOMAIN}
+                url: https://immich.${SECRET_DOMAIN}
                 interval: 5m
                 conditions:
                   - "[STATUS] == 200"

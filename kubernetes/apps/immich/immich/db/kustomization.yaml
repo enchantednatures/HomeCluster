@@ -1,13 +1,12 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/kustomization_v1beta1.json
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - cluster.yaml
-  - db-hunter.sops.yaml
-  - pooler.yaml
-  - db-user.sops.yaml
-  - immich-db-user.sops.yaml
-  - scheduled-backup.yaml
-  - secret.sops.yaml
-  - superusersecret.sops.yaml
+  - ./cluster.yaml
+  - ./database.yaml
+  - ./pooler.yaml
+  - ./scheduled-backup.yaml
+  - ./immich-db-user.sops.yaml
+  - ./immich-db-superuser.sops.yaml
+  - ./cloudnative-pg-secret.sops.yaml

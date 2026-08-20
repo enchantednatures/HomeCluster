@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/postgresql.cnpg.io/database_v1.json
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: immich-db
+  namespace: immich
+spec:
+  name: immich
+  owner: immich
+  cluster:
+    name: immich-db
+  ensure: present
+  extensions:
+    - name: vector
+      ensure: present
+    - name: vchord
+      ensure: present
+    - name: cube
+      ensure: present
+    - name: earthdistance
+      ensure: present

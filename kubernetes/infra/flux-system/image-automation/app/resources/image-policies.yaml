@@ -35,6 +35,8 @@ spec:
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/image.toolkit.fluxcd.io/imagepolicy_v1beta2.json
 # ImagePolicy for immich-server - semver for stable releases
+# NOTE: The Immich chart lags behind upstream app releases, so `image.tag` is
+# pinned in the HelmRelease while these policies track v3.x app releases.
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
@@ -45,11 +47,13 @@ spec:
     name: immich-server
   policy:
     semver:
-      range: '>=1.0.0'
+      range: '>=3.0.0'
   digestReflectionPolicy: IfNotPresent
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/image.toolkit.fluxcd.io/imagepolicy_v1beta2.json
 # ImagePolicy for immich-machine-learning - semver for stable releases
+# NOTE: The Immich chart lags behind upstream app releases, so `image.tag` is
+# pinned in the HelmRelease while these policies track v3.x app releases.
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
 metadata:
@@ -60,5 +64,5 @@ spec:
     name: immich-machine-learning
   policy:
     semver:
-      range: '>=1.0.0'
+      range: '>=3.0.0'
   digestReflectionPolicy: IfNotPresent

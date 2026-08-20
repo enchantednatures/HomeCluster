@@ -1,25 +1,26 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
 apiVersion: v1
-stringData:
-    password: ENC[AES256_GCM,data:SqUBTKh1JcDRHkNte6wHPgypr5IhQwfoxlz1DXc4t3EfGhtG,iv:dAVFnI3dWHUKPGIgdCDEsIv/NnVOkfTKdRfSx9xhJzQ=,tag:5dMknft9eavMzrrOZA/1sA==,type:str]
-    username: ENC[AES256_GCM,data:vwCeSkEq,iv:7q4CUTv1M2UMZwg4UDFxW7T/8fwNgSzopvQhSDLnF2g=,tag:HHdsCXfPZhrImLc69LyABQ==,type:str]
 kind: Secret
 metadata:
-    name: immich-pg-user
-    namespace: immich
+    name: immich-db-user
+    labels:
+        cnpg.io/reload: "true"
 type: kubernetes.io/basic-auth
+stringData:
+    username: ENC[AES256_GCM,data:ThXy33Fz,iv:f8cmLw8xdItxV8c72Yy2XHCiZAdsgDZ89qVSqeIOBTc=,tag:iuAOGV2sKcPRqeIsaw3/5Q==,type:str]
+    password: ENC[AES256_GCM,data:rkyMuCjErrR6cmHpMTMo5OJ+iiP13uYbG3x2YQGbJ5w=,iv:fE7Ujp3zUHlDOK8ymQTccudT2TaCx3+L8zcuy4JwrIo=,tag:YxJXtDLRsge4vItR2fu1hQ==,type:str]
 sops:
     age:
-        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
-          enc: |
+        - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBOMENjWEZjbjBGdkJzNFkv
-            SjFWZG5iU2lrKzV5dnRoaEVTSTBQK2JJaFRVClYwVk4vZVZQVEJEb001WGFZeHR4
-            M1VCR21UOHFIUnAzeVJzVk5JbDRkcDQKLS0tIHk0blNlajI3N0w0cHlOQzZFRmtJ
-            aDdPNnFtQ2phRmtIQ3VlcHQzL3NEQ0kKhmWBRRDcCgqbqwdDst1gCoKT/zLRQy21
-            mZtgOa83GgVg+OwZ4Ag1fHJSqlUzNLqSvxzXoqkOyn2j/eM1DE3/jA==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAwUUVReTRwclNUMlJlSVBu
+            OGZ6ZytkWk1HODNTT0pKcHpvd0loOUVzY1IwCmVQM0E5WEhwMUlzemtOZ2k5MTZp
+            VVNJS1AzUXdwTzBmcU82bGNvbm03bWMKLS0tIGE3MEpjUG1abXVxeGhTbzZNdktv
+            R0VxcmM0WW1NR2hCSUZnREcrbGZTRDQKibVBCdHqZEbdUwQuzzazo1GvI3jzkw/v
+            +N+0iT0a+fu8hCb3Q+Zti5aD98Lbfytcp48Y8DHM3NXdKapcQJCWoQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2025-07-19T02:28:47Z"
-    mac: ENC[AES256_GCM,data:fC8hCvamnlokZCrcWCvq46a6q/y9AoMkC4WdNpMODbrg/axsliepIpek+PGB1AmsH2YK0YkshVMybL86borAU4wLhUFVDyKWWg4iFrTdhZ2OxtBe1yr633MY46Zh7xyst7Z3M2AKRUbK5PeBs3jWbD/gDJnZUwLIFz9xsmj+0Qs=,iv:G+Q/tcU7CU0lHmEgvD3FlfcCFA+J7wEGFwqapUimrck=,tag:qMCEsREl33vfd5flSdC9Nw==,type:str]
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
     encrypted_regex: ^(data|stringData)$
-    version: 3.10.2
+    lastmodified: "2026-08-20T01:07:46Z"
+    mac: ENC[AES256_GCM,data:q7JzT6uwFcixhSvWF4gCpnAR12EkaVo2RGEV+NhAXraLNraC/Vn63SbivrIYyLAIy8SpymVL3gxUWhEmlslwKv6vGqgql+WYhIXIi44Hk8qC+gWC1zCn8UX1ODHJyt2soj86I3ZUVfLs5YPSwSznSOGnTlBaUqJH9W821Qm1+B0=,iv:1a7WeWVb17zYznaAMr55+IWUmTmIiJ7ylB/Qq/jXgdg=,tag:W74vRpKcE4ZGoTXXqlMlsg==,type:str]
+    version: 3.13.3

@@ -3,9 +3,10 @@
 apiVersion: dragonflydb.io/v1alpha1
 kind: Dragonfly
 metadata:
-  labels:
-    app.kubernetes.io/name: immich-dragonfly
   name: dragonfly
+  namespace: immich
+  labels:
+    app.kubernetes.io/name: immich
 spec:
   replicas: 3
   resources:

@@ -1,5 +1,5 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/pooler_v1.json
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Pooler
 metadata:
@@ -10,7 +10,7 @@ metadata:
 spec:
   cluster:
     name: immich-db
-  instances: 1
+  instances: 3
   type: rw
   pgbouncer:
     poolMode: transaction
@@ -33,7 +33,7 @@ metadata:
 spec:
   cluster:
     name: immich-db
-  instances: 1
+  instances: 3
   type: ro
   pgbouncer:
     poolMode: session

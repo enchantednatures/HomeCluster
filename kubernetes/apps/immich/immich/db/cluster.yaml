@@ -3,61 +3,58 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: immich-db
+  name: &app immich-db
   namespace: immich
   labels:
-    app.kubernetes.io/name: immich-db
+    app.kubernetes.io/name: *app
 spec:
-  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
-  imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.3-v0.2.1
+  # renovate: datasource=docker depName=ghcr.io/tensorchord/cloudnative-vectorchord versioning=redhat
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:16.5-v0.3.0
   instances: 1
+  primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
     storageClass: openebs-hostpath
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
   enableSuperuserAccess: true
   superuserSecret:
-    name: immich-superuser
-  startDelay: 30
-  stopDelay: 100
-  primaryUpdateStrategy: unsupervised
-  primaryUpdateMethod: restart
+    name: immich-db-superuser
   postgresql:
+    parameters:
+      max_connections: "300"
+      shared_buffers: 512MB
     shared_preload_libraries:
-      - "vectors.so"
-    enableAlterSystem: true
+      - vchord.so
   monitoring:
     enablePodMonitor: true
   managed:
     roles:
-      - name: hunter
+      - name: immich
         ensure: present
-        comment: Hunter
-        login: true
-        superuser: true
-        passwordSecret:
-          name: immich-db-hunter
-        inRoles: [pg_monitor, pg_signal_backend]
-      - name: postgresql_immich_pgsql
-        ensure: present
-        comment: immich
+        comment: Immich
         login: true
         superuser: false
         passwordSecret:
           name: immich-db-user
-        inRoles: [pg_monitor, pg_signal_backend]
+        inRoles:
+          - pg_monitor
+          - pg_signal_backend
   backup:
     retentionPolicy: 30d
-    barmanObjectStore: &barmanObjectStore
+    barmanObjectStore:
       data:
-        compression: bzip2
+        compression: gzip
       wal:
-        compression: bzip2
-        maxParallel: 8
+        compression: gzip
       destinationPath: s3://cloudnative-pg/
       endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      # Note: serverName version needs to be incremented
-      # when recovering from an existing cnpg cluster
-      serverName: &currentCluster immich-v1
+      serverName: immich
       s3Credentials:
         accessKeyId:
           name: cloudnative-pg-secret
@@ -66,31 +63,8 @@ spec:
           name: cloudnative-pg-secret
           key: aws-secret-access-key
   bootstrap:
-    # initdb:
-    #   database: immich
-    #   owner: immich
-    #   secret:
-    #     name: immich-pg-user
-    #   dataChecksums: true
-    #   postInitApplicationSQL:
-    #     - ALTER SYSTEM SET search_path TO "$user", public, vectors;
-    #     - SET search_path TO "$user", public, vectors;
-    #     - CREATE EXTENSION IF NOT EXISTS "vectors";
-    #     - CREATE EXTENSION IF NOT EXISTS "cube";
-    #     - CREATE EXTENSION IF NOT EXISTS "earthdistance";
-    #     - ALTER SCHEMA vectors OWNER TO "immich";
-    #     - GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA vectors TO "immich";
-    #     - GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO "immich";
-    #     # - CREATE EXTENSION IF NOT EXISTS "vector";
-    #     # - ALTER ROLE "immich" WITH "superuser";
-    recovery:
-      source: &previousCluster immich-v0
+    initdb:
       database: immich
       owner: immich
       secret:
-        name: immich-pg-user
-  externalClusters:
-    - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+        name: immich-db-user

@@ -6,5 +6,6 @@ metadata:
   name: immich
   namespace: flux-system
 spec:
+  type: oci
   interval: 5m
-  url: https://immich-app.github.io/immich-charts
+  url: oci://ghcr.io/immich-app/immich-charts/immich

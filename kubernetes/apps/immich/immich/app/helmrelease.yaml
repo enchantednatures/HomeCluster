@@ -1,88 +1,93 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: immich
+  namespace: immich
 spec:
+  maxHistory: 2
   interval: 30m
   chart:
     spec:
       chart: immich
-      version: 0.12.0 # datasource=helm depName=immich repository=https://immich-app.github.io/immich-charts
+      version: 0.13.1 # datasource=helm depName=immich repository=oci://ghcr.io/immich-app/immich-charts
       sourceRef:
         kind: HelmRepository
         name: immich
         namespace: flux-system
-  maxHistory: 2
+  timeout: 15m
   install:
     remediation:
       retries: 3
   upgrade:
     cleanupOnFail: true
     remediation:
+      strategy: rollback
       retries: 3
   uninstall:
     keepHistory: false
   values:
-    env:
-      REDIS_HOSTNAME: dragonfly.immich.svc.cluster.local
-      DB_HOSTNAME: immich-db-pooler-rw.immich.svc.cluster.local
-      DB_USERNAME: immich
-      DB_DATABASE_NAME: immich
-      DB_PASSWORD:
-        valueFrom:
-          secretKeyRef:
-            name: immich-pg-user
-            key: password
-      IMMICH_MACHINE_LEARNING_URL: '{{ printf "http://%s-machine-learning:3003" .Release.Name }}'
-
-    image:
-      tag: v1.119.0 # {"$imagepolicy": "flux-system:immich-server:tag"}
-
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              tag: v3.1.0 # {"$imagepolicy": "flux-system:immich-server:tag"}
+            env:
+              IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning.immich.svc.cluster.local:3003
+              REDIS_HOSTNAME: dragonfly.immich.svc.cluster.local
+              REDIS_PORT: "6379"
     immich:
       metrics:
         enabled: true
       persistence:
         library:
-          existingClaim: immich-media
-
-    postgresql:
-      enabled: false
-      global:
-        postgresql:
-          auth:
-            existingSecret: immich-db-password
-    redis:
-      enabled: false
+          existingClaim: immich-library-pvc
     server:
-      enabled: true
-      image:
-        repository: ghcr.io/immich-app/immich-server # {"$imagepolicy": "flux-system:immich-server:name"}
-        pullPolicy: IfNotPresent
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: ghcr.io/immich-app/immich-server # {"$imagepolicy": "flux-system:immich-server:name"}
+              envFrom:
+                - secretRef:
+                    name: immich-secret
+              env:
+                DB_HOSTNAME: immich-db-pooler-rw.immich.svc.cluster.local
+                DB_PORT: "5432"
+                DB_USERNAME: immich
+                DB_DATABASE_NAME: immich
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 2Gi
       ingress:
         main:
           enabled: false
-          annotations:
-            # proxy-body-size is set to 0 to remove the body limit on file uploads
-            nginx.ingress.kubernetes.io/proxy-body-size: "0"
-          hosts:
-            - host: immich.local
-              paths:
-                - path: "/"
-          tls: []
-
     machine-learning:
       enabled: true
-      image:
-        repository: ghcr.io/immich-app/immich-machine-learning # {"$imagepolicy": "flux-system:immich-machine-learning:name"}
-        pullPolicy: IfNotPresent
-      env:
-        TRANSFORMERS_CACHE: /cache
+      controllers:
+        main:
+          containers:
+            main:
+              image:
+                repository: ghcr.io/immich-app/immich-machine-learning # {"$imagepolicy": "flux-system:immich-machine-learning:name"}
+              resources:
+                requests:
+                  cpu: "1"
+                  memory: 2Gi
+                limits:
+                  cpu: "4"
+                  memory: 4Gi
       persistence:
         cache:
           enabled: true
-          size: 10Gi
-          type: pvc
-          accessMode: ReadWriteMany
-          storageClass: csi-nfs
+          type: persistentVolumeClaim
+          existingClaim: immich-ml-cache-pvc
+    valkey:
+      enabled: false
