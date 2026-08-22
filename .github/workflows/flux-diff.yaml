@@ -25,7 +25,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Setup flate
-        uses: home-operations/flate/action@v0.5.0
+        uses: home-operations/flate/action@v0.5.1
         with:
           cache: true
       - name: Diff Resources
