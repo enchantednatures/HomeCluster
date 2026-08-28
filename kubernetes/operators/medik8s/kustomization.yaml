@@ -6,4 +6,4 @@ resources:
   - ./node-healthcheck
   - ./self-node-remediation
   - ./fence-agents-remediation
-  - ./config
+  - ./config/ks.yaml
