@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: k8s-gateway
-      version: 2.4.0 # datasource=helm depName=k8s-gateway repository=https://ori-edge.github.io/k8s-gateway
+      version: 3.7.2 # datasource=helm depName=k8s-gateway repository=https://k8s-gateway.kryptonian.kapsi.fi
       sourceRef:
         kind: HelmRepository
         name: k8s-gateway
@@ -26,6 +26,8 @@ spec:
     keepHistory: false
   values:
     fullnameOverride: k8s-gateway
+    image:
+      tag: "1.8.2" # chart default 1.7.0 lags its own appVersion 1.8.0
     domain: ${SECRET_DOMAIN}
     ttl: 1
     service:
