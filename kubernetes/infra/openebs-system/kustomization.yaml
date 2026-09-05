@@ -2,4 +2,4 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: [./namespace.yaml, ./openebs/ks.yaml]
+resources: [./namespace.yaml, ./storageclasses-perdisk.yaml, ./openebs/ks.yaml]
