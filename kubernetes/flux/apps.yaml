@@ -12,6 +12,7 @@ spec:
   dependsOn:
     - name: cluster-core
     - name: cluster-infrastructure
+    - name: kyverno-policies
   sourceRef:
     kind: GitRepository
     name: flux-system

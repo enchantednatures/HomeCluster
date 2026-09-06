@@ -255,10 +255,17 @@ kubernetes-ceph-health: ## Check Ceph cluster health using toolbox
 # FLUX
 # =============================================================================
 
+.PHONY: flux-install
+flux-install: ## Install Flux controllers into a fresh cluster (run once, before Flux is self-managing)
+	@test -f $(KUBECONFIG_FILE) || (echo "Missing kubeconfig" && exit 1)
+	@kubectl apply --server-side --force-conflicts --kustomize $(KUBERNETES_DIR)/bootstrap/flux
+	@kubectl wait --namespace flux-system --for=condition=available --timeout=5m deployment --all
+
 .PHONY: flux-bootstrap
-flux-bootstrap: ## Bootstrap Flux into a Kubernetes cluster
+flux-bootstrap: ## Apply SOPS age key, cluster variables and the cluster Kustomization (requires Flux installed)
 	@test -f $(KUBECONFIG_FILE) || (echo "Missing kubeconfig" && exit 1)
 	@test -f $(AGE_FILE) || (echo "Missing Sops Age key file" && exit 1)
+	@kubectl -n flux-system create secret generic sops-age --from-file=age.agekey=$(AGE_FILE) --dry-run=client -o yaml | kubectl apply --server-side --force-conflicts --filename -
 	@sops --decrypt $(CLUSTER_SECRET_SOPS_FILE) | kubectl apply --server-side --filename -
 	@kubectl apply --server-side --filename $(CLUSTER_SETTINGS_FILE)
 	@kubectl apply --server-side --kustomize $(KUBERNETES_DIR)/flux/config
