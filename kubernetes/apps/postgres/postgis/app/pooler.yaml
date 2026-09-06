@@ -7,6 +7,10 @@ metadata:
   labels:
     app.kubernetes.io/name: postgis-db
 spec:
+  template:
+    metadata:
+      labels:
+        istio.io/dataplane-mode: "none"
   cluster:
     name: postgis-db
   instances: 3
@@ -29,6 +33,10 @@ metadata:
   labels:
     app.kubernetes.io/name: postgis-db
 spec:
+  template:
+    metadata:
+      labels:
+        istio.io/dataplane-mode: "none"
   cluster:
     name: postgis-db
   instances: 3

@@ -7,6 +7,9 @@ metadata:
   labels:
     app.kubernetes.io/name: postgis-db
 spec:
+  inheritedMetadata:
+    labels:
+      istio.io/dataplane-mode: "none"
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgis versioning=redhat
   imageName: ghcr.io/cloudnative-pg/postgis:17-3.5-18
   instances: 3

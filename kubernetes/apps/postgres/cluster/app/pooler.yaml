@@ -8,6 +8,10 @@ metadata:
   labels:
     app.kubernetes.io/name: postgres-db
 spec:
+  template:
+    metadata:
+      labels:
+        istio.io/dataplane-mode: "none"
   cluster:
     name: postgres-db
   instances: 1
@@ -31,6 +35,10 @@ metadata:
   labels:
     app.kubernetes.io/name: postgres-db
 spec:
+  template:
+    metadata:
+      labels:
+        istio.io/dataplane-mode: "none"
   cluster:
     name: postgres-db
   instances: 1

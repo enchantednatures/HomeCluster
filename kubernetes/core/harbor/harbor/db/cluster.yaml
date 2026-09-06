@@ -8,6 +8,9 @@ metadata:
   labels:
     app.kubernetes.io/name: harbor-db
 spec:
+  inheritedMetadata:
+    labels:
+      istio.io/dataplane-mode: "none"
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
   imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
   instances: 3

@@ -8,6 +8,10 @@ metadata:
   labels:
     app.kubernetes.io/name: atuin-db
 spec:
+  template:
+    metadata:
+      labels:
+        istio.io/dataplane-mode: "none"
   cluster:
     name: atuin-db
   instances: 3
@@ -31,6 +35,10 @@ metadata:
   labels:
     app.kubernetes.io/name: atuin-db
 spec:
+  template:
+    metadata:
+      labels:
+        istio.io/dataplane-mode: "none"
   cluster:
     name: atuin-db
   instances: 3

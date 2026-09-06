@@ -7,6 +7,9 @@ metadata:
   labels:
     app.kubernetes.io/name: openwebui-db
 spec:
+  inheritedMetadata:
+    labels:
+      istio.io/dataplane-mode: "none"
   imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
   instances: 3
   primaryUpdateStrategy: unsupervised
