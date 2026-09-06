@@ -54,4 +54,4 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: atuin-v4
+        serverName: atuin-v5

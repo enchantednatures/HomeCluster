@@ -54,7 +54,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: harbor-v4
+        serverName: harbor-v5
   bootstrap:
     recovery:
       source: &previousCluster harbor-v0

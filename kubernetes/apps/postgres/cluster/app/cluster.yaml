@@ -54,4 +54,4 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: postgres-v11
+        serverName: postgres-v12
