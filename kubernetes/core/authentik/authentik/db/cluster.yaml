@@ -60,7 +60,7 @@ spec:
         serverName: authentik-v13
   bootstrap:
     recovery:
-      source: &previousCluster authentik-v6
+      source: &previousCluster authentik-v12
       database: authentik
       owner: authentik
       secret:
