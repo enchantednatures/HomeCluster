@@ -35,6 +35,9 @@ spec:
               - op: add
                 path: /spec/template/metadata/labels/istio.io~1dataplane-mode
                 value: "none"
+              - op: add
+                path: /spec/template/metadata/annotations/sidecar.istio.io~1inject
+                value: "false"
   values:
     secret:
       enabled: true
