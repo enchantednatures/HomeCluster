@@ -6,4 +6,4 @@ metadata:
   name: kellnr
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
-    istio-injection: enabled
+    istio-injection: disabled
