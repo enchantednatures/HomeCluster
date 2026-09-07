@@ -47,7 +47,6 @@ spec:
             - cnpg-system
             - harbor
             - market-data
-            - media
             - postgres
             - authentik
             - atuin
