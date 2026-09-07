@@ -7,6 +7,12 @@ metadata:
   namespace: flux-system
 spec:
   targetNamespace: kiali
+  dependsOn:
+    - name: istio-base
+    - name: istio-cni
+    - name: ztunnel
+    - name: istiod
+    - name: istio-ambient-config
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app
