@@ -28,6 +28,11 @@ spec:
     keepHistory: false
   values:
     replicaCount: 2
+    valkey-cluster:
+      enabled: false
+    valkey:
+      enabled: true
+      architecture: standalone
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
