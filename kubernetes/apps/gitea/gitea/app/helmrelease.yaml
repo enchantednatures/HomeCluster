@@ -31,6 +31,9 @@ spec:
     deployment:
       labels:
         istio.io/dataplane-mode: "none"
+    valkey:
+      podLabels:
+        istio.io/dataplane-mode: "none"
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
