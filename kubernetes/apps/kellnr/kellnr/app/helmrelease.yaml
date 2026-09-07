@@ -31,10 +31,7 @@ spec:
           - target:
               kind: Deployment
               name: kellnr
-            patch:
-              - op: add
-                path: /spec/template/metadata/labels/istio.io~1dataplane-mode
-                value: "none"
+            patch: |-
               - op: add
                 path: /spec/template/metadata/annotations/sidecar.istio.io~1inject
                 value: "false"
