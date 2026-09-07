@@ -9,4 +9,3 @@ resources:
   - ./ztunnel/ks.yaml
   - ./istiod/ks.yaml
   - ./ambient-config/ks.yaml
-  - ./kiali/ks.yaml
