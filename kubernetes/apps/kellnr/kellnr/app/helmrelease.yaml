@@ -25,6 +25,16 @@ spec:
       retries: 3
   uninstall:
     keepHistory: false
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: kellnr
+            patch:
+              - op: add
+                path: /spec/template/metadata/labels/istio.io~1dataplane-mode
+                value: "none"
   values:
     secret:
       enabled: true
