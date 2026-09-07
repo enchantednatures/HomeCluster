@@ -23,8 +23,8 @@ spec:
       cpu: 1000m
       memory: 2Gi
   storage:
-    size: 10Gi
-    storageClass: openebs-hostpath
+    size: 20Gi
+    storageClass: csi-nfs
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
