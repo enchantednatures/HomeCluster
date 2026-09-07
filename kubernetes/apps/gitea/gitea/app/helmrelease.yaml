@@ -40,6 +40,8 @@ spec:
                   operator: NotIn
                   values:
                     - melusine
+                    - unraid-worker
+                    - work-03
     dnsConfig:
       options:
         # UDP DNS is being dropped on some nodes; force TCP for the Go resolver
