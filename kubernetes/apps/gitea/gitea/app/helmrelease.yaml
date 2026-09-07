@@ -40,6 +40,10 @@ spec:
                   operator: NotIn
                   values:
                     - melusine
+    dnsConfig:
+      options:
+        # UDP DNS is being dropped on some nodes; force TCP for the Go resolver
+        - name: use-vc
     image:
       registry: docker.gitea.com
       repository: gitea
