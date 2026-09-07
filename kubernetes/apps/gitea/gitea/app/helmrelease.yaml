@@ -28,6 +28,15 @@ spec:
     keepHistory: false
   values:
     replicaCount: 2
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                    - melusine
     image:
       registry: docker.gitea.com
       repository: gitea
