@@ -33,7 +33,7 @@ spec:
             limits:
               memory: 128Mi
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/pooler_v1.json
 apiVersion: postgresql.cnpg.io/v1
@@ -69,4 +69,4 @@ spec:
             limits:
               memory: 128Mi
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false

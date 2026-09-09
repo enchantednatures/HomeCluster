@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/podmonitor.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: postgres-db
+  namespace: postgres
+  labels:
+    app.kubernetes.io/name: postgres-db
+spec:
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+      - postgres
+  selector:
+    matchLabels:
+      cnpg.io/cluster: postgres-db
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 30s

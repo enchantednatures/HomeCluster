@@ -24,25 +24,13 @@ spec:
       max_connections: "300"
       shared_buffers: 512MB
   monitoring:
-    enablePodMonitor: true
-  backup:
-    retentionPolicy: 30d
-    barmanObjectStore: &barmanObjectStore
-      data:
-        compression: bzip2
-      wal:
-        compression: bzip2
-        maxParallel: 8
-      destinationPath: s3://cloudnative-pg/
-      endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: &currentCluster openwebui-v8
-      s3Credentials:
-        accessKeyId:
-          name: openwebui-pg-secret
-          key: aws-access-key-id
-        secretAccessKey:
-          name: openwebui-pg-secret
-          key: aws-secret-access-key
+    enablePodMonitor: false
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: &currentCluster openwebui-v8
   bootstrap:
     recovery:
       source: &previousCluster openwebui-v7
@@ -52,6 +40,8 @@ spec:
         name: openwebui-app-user
   externalClusters:
     - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-store
+          serverName: *previousCluster

@@ -35,7 +35,7 @@ spec:
     shared_preload_libraries:
       - vchord.so
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
   managed:
     roles:
       - name: immich
@@ -48,23 +48,12 @@ spec:
         inRoles:
           - pg_monitor
           - pg_signal_backend
-  backup:
-    retentionPolicy: 30d
-    barmanObjectStore:
-      data:
-        compression: gzip
-      wal:
-        compression: gzip
-      destinationPath: s3://cloudnative-pg/
-      endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      serverName: immich
-      s3Credentials:
-        accessKeyId:
-          name: cloudnative-pg-secret
-          key: aws-access-key-id
-        secretAccessKey:
-          name: cloudnative-pg-secret
-          key: aws-secret-access-key
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: immich
   bootstrap:
     initdb:
       database: immich

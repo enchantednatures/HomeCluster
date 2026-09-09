@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/podmonitor.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: atuin-db
+  namespace: atuin
+  labels:
+    app.kubernetes.io/name: atuin-db
+spec:
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+      - atuin
+  selector:
+    matchLabels:
+      cnpg.io/cluster: atuin-db
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 30s

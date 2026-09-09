@@ -49,27 +49,15 @@ spec:
   # pg_hba:
   #   - host all all 10.244.0.0/16 md5
   monitoring:
-    enablePodMonitor: true
-  backup:
-    retentionPolicy: 30d
-    barmanObjectStore: &barmanObjectStore
-      data:
-        compression: bzip2
-      wal:
-        compression: bzip2
-        maxParallel: 8
-      destinationPath: s3://cloudnative-pg/
-      endpointURL: http://minio-service.networking.svc.cluster.local:9768
-      # Note: serverName version needs to be incremented
-      # when recovering from an existing cnpg cluster
-      serverName: &currentCluster postgis-v7
-      s3Credentials:
-        accessKeyId:
-          name: cloudnative-pg-postgis-secret
-          key: aws-access-key-id
-        secretAccessKey:
-          name: cloudnative-pg-postgis-secret
-          key: aws-secret-access-key
+    enablePodMonitor: false
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store
+        # Note: serverName version needs to be incremented
+        # when recovering from an existing cnpg cluster
+        serverName: &currentCluster postgis-v7
   # Note: previousCluster needs to be set to the name of the previous
   # cluster when recovering from an existing cnpg cluster
   bootstrap:
@@ -91,6 +79,8 @@ spec:
         name: postgis-app-user
   externalClusters:
     - name: *previousCluster
-      barmanObjectStore:
-        <<: *barmanObjectStore
-        serverName: *previousCluster
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-store
+          serverName: *previousCluster

@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/podmonitor.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: gitea-db
+  namespace: gitea
+  labels:
+    app.kubernetes.io/name: gitea-db
+spec:
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+      - gitea
+  selector:
+    matchLabels:
+      cnpg.io/cluster: gitea-db
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 30s

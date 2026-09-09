@@ -33,7 +33,7 @@ spec:
       max_connections: "300"
       shared_buffers: 512MB
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
   managed:
     roles:
       - name: hunter
