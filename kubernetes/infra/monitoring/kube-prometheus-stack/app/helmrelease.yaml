@@ -188,7 +188,7 @@ spec:
         retentionSize: 8GB
         replicas: 2
         disableCompaction: true
-        podAntiAffinity: hard
+        podAntiAffinity: soft
         podAntiAffinityTopologyKey: kubernetes.io/hostname
         tolerations:
           - effect: NoSchedule
