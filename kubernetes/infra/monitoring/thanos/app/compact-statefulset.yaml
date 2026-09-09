@@ -37,6 +37,10 @@ spec:
         seccompProfile:
           type: RuntimeDefault
         fsGroup: 65534
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
         - name: thanos-compact
           # datasource=docker depName=quay.io/thanos/thanos
@@ -94,7 +98,7 @@ spec:
     - metadata:
         name: data
       spec:
-        storageClassName: openebs-hostpath
+        storageClassName: csi-nfs
         accessModes:
           - ReadWriteOnce
         resources:

@@ -37,6 +37,10 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
       containers:
         - name: thanos-query-frontend
           # datasource=docker depName=quay.io/thanos/thanos
