@@ -36,11 +36,11 @@ spec:
         url: http://prometheus-operated.monitoring.svc.cluster.local:9090
       grafana:
         enabled: true
-        in_cluster_url: http://grafana.monitoring.svc.cluster.local:3000
+        in_cluster_url: http://grafana.monitoring.svc.cluster.local:80
         url: https://grafana.${SECRET_DOMAIN}
       tracing:
         enabled: true
-        in_cluster_url: http://tempo.monitoring.svc.cluster.local:3100
+        in_cluster_url: http://tempo-query-frontend.monitoring.svc.cluster.local:3200
         url: https://tempo.${SECRET_DOMAIN}
     istio_namespace: istio-system
     deployment:
