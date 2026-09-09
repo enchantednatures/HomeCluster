@@ -33,7 +33,7 @@ spec:
       max_connections: "300"
       shared_buffers: 512MB
   monitoring:
-    enablePodMonitor: true
+    enablePodMonitor: false
   managed:
     roles:
       - name: hunter
@@ -60,22 +60,15 @@ spec:
         serverName: harbor-v5
   bootstrap:
     recovery:
-      source: &previousCluster harbor-v4
+      source: &previousCluster harbor-v2
       database: registry
       owner: harbor
       secret:
         name: harbor-db-user
   externalClusters:
     - name: *previousCluster
-      barmanObjectStore:
-        destinationPath: s3://cloudnative-pg/
-        endpointURL: http://minio-service.networking.svc.cluster.local:9768
-        s3Credentials:
-          accessKeyId:
-            name: pg-backup-secret
-            key: aws-access-key-id
-          secretAccessKey:
-            name: pg-backup-secret
-            key: aws-secret-access-key
-        wal:
-          compression: bzip2
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: minio-store
+          serverName: harbor-v2

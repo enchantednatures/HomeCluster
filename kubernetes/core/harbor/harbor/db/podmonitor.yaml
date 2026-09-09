@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/podmonitor.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: harbor-db
+  namespace: harbor
+  labels:
+    app.kubernetes.io/name: harbor-db
+spec:
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+      - harbor
+  selector:
+    matchLabels:
+      cnpg.io/cluster: harbor-db
+  podMetricsEndpoints:
+    - port: metrics
+      interval: 30s

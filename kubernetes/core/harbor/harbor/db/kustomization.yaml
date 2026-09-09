@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - cluster.yaml
   - databases.yaml
+  - podmonitor.yaml
   - pooler.yaml
   - db-user.sops.yaml
   - hunter-user.sops.yaml
