@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: influxdb-backup
+  namespace: monitoring
+spec:
+  # Live-verified 2026-09-09: the static influxdb-data PVC (../app/pvc.yaml) is
+  # Pending/unbound; the chart-created influxdb-influxdb2 PVC (openebs-hostpath,
+  # 50Gi) is the actual data volume mounted by influxdb-influxdb2-0
+  sourcePVC: influxdb-influxdb2
+  trigger:
+    # Run backup daily at 3:20 AM
+    schedule: "20 3 * * *"
+  restic:
+    # The secret containing S3/restic credentials
+    repository: influxdb-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    copyMethod: Direct
+    # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    # Prune removes unreferenced data from the repository
+    pruneIntervalDays: 7
+    # Storage for the mover pod (temporary, during backup) - hostpath source
+    # requires the mover to schedule on the PV's node
+    storageClassName: openebs-hostpath
+    # Cache for faster incremental backups
+    cacheStorageClassName: openebs-hostpath
+    cacheCapacity: 10Gi
+    # Mover runs as uid/gid 1000 to read files owned by influxdb (1000:1000)
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    # Mover pod resources
+    moverPodLabels:
+      app: volsync-influxdb-backup

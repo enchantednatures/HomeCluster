@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/v1/serviceentry.json
+apiVersion: networking.istio.io/v1
+kind: ServiceEntry
+metadata:
+  name: minio-service-access
+  namespace: monitoring
+spec:
+  hosts:
+    - minio-service.networking.svc.cluster.local
+  location: MESH_EXTERNAL
+  ports:
+    - name: minio-api
+      number: 9768
+      protocol: HTTP
+  resolution: DNS
+  endpoints:
+    - address: 192.168.1.241
