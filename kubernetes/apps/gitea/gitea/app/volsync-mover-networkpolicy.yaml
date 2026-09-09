@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/v1/networkpolicy.json
+# Allows VolSync restic mover pods (auto-labeled app.kubernetes.io/created-by=volsync,
+# stable across all mover pods - see .sisyphus/evidence/task-3-mover-labels.txt) to reach
+# MinIO and DNS. The namespace default-deny blocks all other egress for movers; the
+# pod-scoped gitea-app NP does NOT cover mover pods (different podSelector).
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-volsync-mover
+  namespace: gitea
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/created-by: volsync
+  policyTypes:
+    - Egress
+  egress:
+    # MinIO S3 via ClusterIP (minio-service.networking :9768)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: networking
+      ports:
+        - protocol: TCP
+          port: 9768
+    # MinIO S3 via direct backend IP (ambient mesh / headless path)
+    - to:
+        - ipBlock:
+            cidr: 192.168.1.241/32
+      ports:
+        - protocol: TCP
+          port: 9768
+    # DNS: CoreDNS VIP (observed 10.96.0.10) + kube-dns pods in kube-system
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.10/32
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53

@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: gitea-backup
+  namespace: gitea
+spec:
+  sourcePVC: gitea-data
+  trigger:
+    # Run backup daily at 2:40 AM (staggered after arch-linux 02:00)
+    schedule: "40 2 * * *"
+  restic:
+    # The secret containing S3/restic credentials
+    repository: gitea-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    copyMethod: Direct
+    # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    # Prune removes unreferenced data from the repository
+    pruneIntervalDays: 7
+    # Storage for the mover pod (temporary, during backup)
+    storageClassName: csi-nfs
+    # Cache for faster incremental backups
+    cacheStorageClassName: csi-nfs
+    cacheCapacity: 10Gi
+    # Mover runs as gitea uid/gid 1000 to read the PVC (dirs owned 1000:1000, gitea/ is 0700)
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
