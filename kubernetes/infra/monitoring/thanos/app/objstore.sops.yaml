@@ -1,0 +1,23 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: thanos-objstore
+    namespace: monitoring
+stringData:
+    objstore.yml: ENC[AES256_GCM,data:M/ip7nK+Mr0ricsfjKRJ+11CqcpyGsMTiYT1/vXUAW2upVY+KN0MjBP5BNffP8phtnl0FzTJ4m6eEUm6QQAKBEx+zP/isChIYavzQJrJvwKEIEDlNNloqeLRuu4XnfhInWlq13eJo2Z0JpY9Yz5Yoe7asAdFfu2kF1U3/XKHup+n8LO8Kfz9DkYpoRzAAmQfRY2wGvhXmch7aUo5bDMwOQ4uJTLRPbUhSBhJgdyMonZPTRB/AQlipTI75bz+s6E=,iv:tdjJ80Ex7zch2jjroYmNHi1902qDYnjdjL+dXLWhpA8=,tag:12r3jsR0TQ74w9bB6bv6nQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA1Q3RzNkRYNnlkbDkxMXVS
+            UzJ5SXd0aTkyWCtVTkZHbElKNERSVjZHZlNvCkZKNFowSm81WGp6eWdqTzFOaFV3
+            NmZlVWFlUmlJc2RXUVpIYVQza3ozZFEKLS0tIGtSMXFNTU03QlFqcFBNMWFHUy9V
+            MUtacWxDUEYvYjBDdk1IalNmTzJjQUEKEDW4tfO3ij9Bn9gED9c2AzagW+jgWeVi
+            trFGU0Svmb9tb6UCgS0sYtdmS5F3fW27ML/4ub2mlkjqdZLkuEDHSQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-09-09T04:34:27Z"
+    mac: ENC[AES256_GCM,data:e+9mcTJWjahq+FLdO0jMdJyOSll8jWOeLG/bO2U6Of/L1zCwEFzp0nxZm5njSLIcZl4A2QCIGG8DOIxpEmcRx1Ov0pDEswF0Pk4CuY9jaOIMoKUs0u10p/LIzx365cVvWzIVkSY3GbMmqo9CLXYPfiuSsaQAtkAzfPaO+HfFBMw=,iv:qMY/gGEQaK0w5bHmN1KeLwyv/7sk2/KcO9Y5Kl8OXAw=,tag:4wJI2jHJHxQjq8dCIxcRDw==,type:str]
+    version: 3.13.3

@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/kustomization_v1beta1.json
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./objstore.sops.yaml
+  - ./pdb.yaml
+  - ./query-deployment.yaml
+  - ./query-frontend-deployment.yaml
+  - ./query-frontend-service.yaml
+  - ./query-service.yaml
+  - ./compact-service.yaml
+  - ./compact-statefulset.yaml
+  - ./store-service.yaml
+  - ./store-statefulset.yaml
