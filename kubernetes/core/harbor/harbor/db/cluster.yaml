@@ -60,7 +60,7 @@ spec:
         serverName: harbor-v5
   bootstrap:
     recovery:
-      source: &previousCluster harbor-v2
+      source: &previousCluster harbor-db-v2
       database: registry
       owner: harbor
       secret:
@@ -71,4 +71,4 @@ spec:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: minio-store
-          serverName: harbor-v2
+          serverName: harbor-db-v2
