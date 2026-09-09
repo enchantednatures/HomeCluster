@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: node-red-backup
+  namespace: home-system
+spec:
+  sourcePVC: node-red
+  trigger:
+    # Run backup daily at 4 AM
+    schedule: "0 4 * * *"
+  restic:
+    # The secret containing S3/restic credentials
+    repository: node-red-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    copyMethod: Direct
+    # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    # Prune removes unreferenced data from the repository
+    pruneIntervalDays: 7
+    # Storage for the mover pod (temporary, during backup)
+    storageClassName: csi-nfs
+    # Cache for faster incremental backups
+    cacheStorageClassName: csi-nfs
+    cacheCapacity: 5Gi
+    # Mover resources: required by the cluster-wide Kyverno require-pod-resources
+    # policy (enforce, home-system not in its exclude list)
+    moverResources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+    # Mover runs as the node-red app identity (helmrelease pod securityContext
+    # runAsUser 1000 / runAsGroup 150 / fsGroup 140) so PVC files are readable;
+    # same pattern as gitea (match mover ids to data ownership on csi-nfs)
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 150
+      fsGroup: 140
+    moverPodLabels:
+      app: volsync-node-red-backup

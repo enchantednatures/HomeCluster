@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationdestination_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: node-red-restore
+  namespace: home-system
+spec:
+  # Paused by default: Flux reconciles the manifest; trigger manually via
+  # kubectl patch on spec.trigger.manual for restore drills
+  paused: true
+  trigger:
+    manual: ""
+  restic:
+    repository: node-red-backup-secret
+    copyMethod: Direct
+    destinationPVC: node-red
+    cacheStorageClassName: csi-nfs
+    cacheCapacity: 5Gi
+    # Mover resources: required by the cluster-wide Kyverno require-pod-resources
+    # policy (enforce, home-system not in its exclude list)
+    moverResources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
+    # Mover ids match the node-red app pod securityContext (uid 1000 / gid 150 /
+    # fsGroup 140) so restored files stay app-readable
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 150
+      fsGroup: 140

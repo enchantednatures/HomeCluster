@@ -25,9 +25,9 @@ spec:
       retries: 3
   dependsOn:
     - name: home-assistant
-      namespace: home-automation
+      namespace: home-system
     - name: volsync
-      namespace: storage
+      namespace: volsync-system
   uninstall:
     keepHistory: false
   values:
