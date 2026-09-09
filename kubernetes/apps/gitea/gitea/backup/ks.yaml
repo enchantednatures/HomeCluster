@@ -11,7 +11,9 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   dependsOn:
-    - name: gitea
+    # Do not add a gitea dependency: the gitea HelmRelease can be Failed
+    # independently (app crashloop) and would block backup reconciliation.
+    # The gitea-data PVC exists regardless of app health.
     - name: volsync
       namespace: flux-system
   path: ./kubernetes/apps/gitea/gitea/backup
