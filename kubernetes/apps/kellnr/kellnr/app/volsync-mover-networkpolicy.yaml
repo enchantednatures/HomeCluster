@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/v1/networkpolicy.json
+# VolSync mover pods (label app.kubernetes.io/created-by=volsync) are NOT covered
+# by the pod-scoped kellnr-app NP; without this policy Kyverno's default-deny
+# blocks their egress to MinIO + DNS.
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-volsync-mover
+  namespace: kellnr
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/created-by: volsync
+  policyTypes:
+    - Egress
+  egress:
+    # MinIO via in-cluster selectorless ClusterIP Service (networking ns)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: networking
+      ports:
+        - protocol: TCP
+          port: 9768
+    # MinIO direct backend path (ambient/ztunnel may bypass the ClusterIP)
+    - to:
+        - ipBlock:
+            cidr: 192.168.1.241/32
+      ports:
+        - protocol: TCP
+          port: 9768
+    # DNS: CoreDNS ClusterIP + kube-dns pods (observed IP outside SERVICE_CIDR)
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.10/32
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53

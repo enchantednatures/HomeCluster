@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: kellnr-backup
+  namespace: kellnr
+spec:
+  sourcePVC: kellnr
+  trigger:
+    # Run backup daily at 3 AM (staggered against other VolSync schedules)
+    schedule: "0 3 * * *"
+  restic:
+    # The secret containing S3/restic credentials
+    repository: kellnr-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    # (csi-driver-nfs has no VolumeSnapshot support)
+    copyMethod: Direct
+    # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    # Prune removes unreferenced data from the repository
+    pruneIntervalDays: 7
+    # Storage for the mover pod (temporary, during backup)
+    storageClassName: csi-nfs
+    # Cache for faster incremental backups
+    cacheStorageClassName: csi-nfs
+    cacheCapacity: 10Gi
+    # Kellnr runs as root (uid 0); data dir is world-readable - no
+    # moverSecurityContext override needed (mover default uid 65532 can read)
+    # Per-app label for mover pod identification/debugging
+    moverPodLabels:
+      app: volsync-kellnr-backup
