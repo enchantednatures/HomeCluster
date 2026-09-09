@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: home-assistant-backup
+  namespace: home-system
+spec:
+  sourcePVC: home-assistant-config
+  trigger:
+    # Run backup daily at 3:40 AM
+    schedule: "40 3 * * *"
+  restic:
+    # The secret containing S3/restic credentials
+    repository: home-assistant-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    copyMethod: Direct
+    # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    # Prune removes unreferenced data from the repository
+    pruneIntervalDays: 7
+    # Storage for the mover pod (temporary, during backup)
+    storageClassName: csi-nfs
+    # Cache for faster incremental backups
+    cacheStorageClassName: csi-nfs
+    cacheCapacity: 5Gi
+    # No moverSecurityContext: home-assistant runs as root (pod securityContext
+    # runAsUser/Group/fsGroup 0) so config files are root-owned; the default
+    # root mover can read them
+    # Mover pod resources
+    moverPodLabels:
+      app: volsync-home-assistant-backup
