@@ -226,23 +226,299 @@ spec:
         kafka:
           url: https://raw.githubusercontent.com/strimzi/strimzi-kafka-operator/refs/tags/0.45.0/examples/metrics/grafana-dashboards/strimzi-kafka.json
           datasource: Prometheus
-    # alerting:
-    #   alertmanagers:
-    #     - name: discord-webhook
-    #       namespace: monitoring
-    #       service: alertmanager
-    #       port: web
-    #       pathPrefix: /
-    #       scheme: http
-    #       timeout: 10s
-    #       apiVersion: v1
-    #       webhook:
-    #         url:
-    #           valueFrom:
-    #             secretKeyRef:
-    #               name: discord-webhook-url
-    #               key: url
-    #         sendResolved: true
+    # Grafana-managed alerts are forwarded to the kube-prometheus-stack Alertmanager,
+    # whose Discord receiver delivers them. Keep {{ }} Helm-escaped (chart 10.x applies
+    # templating to alerting values) or the rule annotations below break.
+    alerting:
+      contactpoints.yaml:
+        apiVersion: 1
+        contactPoints:
+          - orgId: 1
+            name: alertmanager
+            receivers:
+              - uid: alertmanager-forward
+                type: prometheus-alertmanager
+                disableResolveMessage: false
+                settings:
+                  url: http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093
+      policies.yaml:
+        apiVersion: 1
+        policies:
+          - orgId: 1
+            receiver: alertmanager
+            group_by:
+              - grafana_folder
+              - alertname
+            group_wait: 30s
+            group_interval: 5m
+            repeat_interval: 4h
+      kubernetes-health.yaml:
+        apiVersion: 1
+        groups:
+          - orgId: 1
+            name: kubernetes-health
+            folder: Kubernetes
+            interval: 1m
+            rules:
+              - uid: node-down
+                title: Node Down
+                condition: C
+                for: 5m
+                noDataState: Alerting
+                execErrState: Error
+                labels:
+                  severity: critical
+                annotations:
+                  summary: 'Node {{ "{{" }} $labels.instance {{ "}}" }} has been unreachable for 5 minutes.'
+                data:
+                  - refId: A
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    datasourceUid: prometheus
+                    model:
+                      datasource:
+                        type: prometheus
+                        uid: prometheus
+                      editorMode: code
+                      expr: 'up{job="node-exporter"} == 0'
+                      instant: true
+                      intervalMs: 1000
+                      legendFormat: __auto
+                      maxDataPoints: 43200
+                      range: false
+                      refId: A
+                  - &reduce-last
+                    refId: B
+                    datasourceUid: __expr__
+                    model:
+                      datasource:
+                        type: __expr__
+                        uid: __expr__
+                      expression: A
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      reducer: last
+                      type: reduce
+                  - &threshold-lt-1
+                    refId: C
+                    datasourceUid: __expr__
+                    model:
+                      conditions:
+                        - evaluator:
+                            params:
+                              - 1
+                            type: lt
+                          operator:
+                            type: and
+                          query:
+                            params:
+                              - B
+                          reducer:
+                            type: last
+                          type: query
+                      datasource:
+                        type: __expr__
+                        uid: __expr__
+                      expression: B
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      type: threshold
+              - uid: pod-crashlooping
+                title: Pod Crash Looping
+                condition: C
+                for: 5m
+                noDataState: OK
+                execErrState: Error
+                labels:
+                  severity: warning
+                annotations:
+                  summary: 'Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }} restarted {{ "{{" }} printf "%.0f" $value {{ "}}" }} times in the last hour.'
+                data:
+                  - refId: A
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    datasourceUid: prometheus
+                    model:
+                      datasource:
+                        type: prometheus
+                        uid: prometheus
+                      editorMode: code
+                      expr: 'sum by (namespace, pod, container) (increase(kube_pod_container_status_restarts_total[1h]))'
+                      instant: true
+                      intervalMs: 1000
+                      legendFormat: __auto
+                      maxDataPoints: 43200
+                      range: false
+                      refId: A
+                  - *reduce-last
+                  - refId: C
+                    datasourceUid: __expr__
+                    model:
+                      conditions:
+                        - evaluator:
+                            params:
+                              - 5
+                            type: gt
+                          operator:
+                            type: and
+                          query:
+                            params:
+                              - B
+                          reducer:
+                            type: last
+                          type: query
+                      datasource:
+                        type: __expr__
+                        uid: __expr__
+                      expression: B
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      type: threshold
+              - uid: pod-oomkilled
+                title: Container OOMKilled
+                condition: C
+                for: 1m
+                noDataState: OK
+                execErrState: Error
+                labels:
+                  severity: warning
+                annotations:
+                  summary: 'Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }} was OOM-killed.'
+                data:
+                  - refId: A
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    datasourceUid: prometheus
+                    model:
+                      datasource:
+                        type: prometheus
+                        uid: prometheus
+                      editorMode: code
+                      expr: 'kube_pod_container_status_last_terminated_reason{reason="OOMKilled"} == 1'
+                      instant: true
+                      intervalMs: 1000
+                      legendFormat: __auto
+                      maxDataPoints: 43200
+                      range: false
+                      refId: A
+                  - *reduce-last
+                  - &threshold-gt-0
+                    refId: C
+                    datasourceUid: __expr__
+                    model:
+                      conditions:
+                        - evaluator:
+                            params:
+                              - 0
+                            type: gt
+                          operator:
+                            type: and
+                          query:
+                            params:
+                              - B
+                          reducer:
+                            type: last
+                          type: query
+                      datasource:
+                        type: __expr__
+                        uid: __expr__
+                      expression: B
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      type: threshold
+              - uid: pod-pending
+                title: Pod Stuck Pending
+                condition: C
+                for: 15m
+                noDataState: OK
+                execErrState: Error
+                labels:
+                  severity: warning
+                annotations:
+                  summary: 'Pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }} has been Pending for more than 15 minutes.'
+                data:
+                  - refId: A
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    datasourceUid: prometheus
+                    model:
+                      datasource:
+                        type: prometheus
+                        uid: prometheus
+                      editorMode: code
+                      expr: 'kube_pod_status_phase{phase="Pending"} == 1'
+                      instant: true
+                      intervalMs: 1000
+                      legendFormat: __auto
+                      maxDataPoints: 43200
+                      range: false
+                      refId: A
+                  - *reduce-last
+                  - *threshold-gt-0
+              - uid: pod-image-pull-error
+                title: Pod Image Pull Error
+                condition: C
+                for: 5m
+                noDataState: OK
+                execErrState: Error
+                labels:
+                  severity: warning
+                annotations:
+                  summary: 'Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }} cannot pull its image ({{ "{{" }} $labels.reason {{ "}}" }}).'
+                data:
+                  - refId: A
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    datasourceUid: prometheus
+                    model:
+                      datasource:
+                        type: prometheus
+                        uid: prometheus
+                      editorMode: code
+                      expr: 'kube_pod_container_status_waiting_reason{reason=~"ErrImagePull|ImagePullBackOff"} == 1'
+                      instant: true
+                      intervalMs: 1000
+                      legendFormat: __auto
+                      maxDataPoints: 43200
+                      range: false
+                      refId: A
+                  - *reduce-last
+                  - *threshold-gt-0
+              - uid: container-not-ready
+                title: Container Not Ready
+                condition: C
+                for: 15m
+                noDataState: OK
+                execErrState: Error
+                labels:
+                  severity: warning
+                annotations:
+                  summary: 'Container {{ "{{" }} $labels.container {{ "}}" }} in pod {{ "{{" }} $labels.namespace {{ "}}" }}/{{ "{{" }} $labels.pod {{ "}}" }} has not been ready for more than 15 minutes.'
+                data:
+                  - refId: A
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    datasourceUid: prometheus
+                    model:
+                      datasource:
+                        type: prometheus
+                        uid: prometheus
+                      editorMode: code
+                      expr: 'kube_pod_container_status_ready == 0'
+                      instant: true
+                      intervalMs: 1000
+                      legendFormat: __auto
+                      maxDataPoints: 43200
+                      range: false
+                      refId: A
+                  - *reduce-last
+                  - *threshold-lt-1
 
     sidecar:
       dashboards:
