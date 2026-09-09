@@ -173,6 +173,10 @@ spec:
     prometheus:
       ingress:
         enabled: false
+      thanosService:
+        enabled: true
+      thanosServiceMonitor:
+        enabled: true
       prometheusSpec:
         ruleSelectorNilUsesHelmValues: false
         serviceMonitorSelectorNilUsesHelmValues: false
@@ -182,6 +186,19 @@ spec:
         enableAdminAPI: true
         walCompression: true
         retentionSize: 8GB
+        replicas: 2
+        disableCompaction: true
+        podAntiAffinity: hard
+        podAntiAffinityTopologyKey: kubernetes.io/hostname
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values:
+                        - melusine
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -189,6 +206,20 @@ spec:
               resources:
                 requests:
                   storage: 1Gi
+        thanos:
+          # datasource=docker depName=quay.io/thanos/thanos
+          image: quay.io/thanos/thanos:v0.42.4
+          version: v0.42.4
+          objectStorageConfig:
+            existingSecret:
+              name: thanos-objstore
+              key: objstore.yml
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 512Mi
     grafana:
       enabled: false
       forceDeployDashboards: true

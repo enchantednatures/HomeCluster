@@ -8,6 +8,7 @@ metadata:
 spec:
   dependsOn:
     - name: csi-driver-nfs
+    - name: thanos
   targetNamespace: monitoring
   commonMetadata:
     labels:
