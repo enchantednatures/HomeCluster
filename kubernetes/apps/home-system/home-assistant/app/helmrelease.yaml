@@ -60,6 +60,15 @@ spec:
               capabilities:
                 drop:
                   - ALL
+                add:
+                  # linuxserver s6 init (root -> PUID 1000) needs these;
+                  # dropping ALL makes s6-applyuidgid fatal and HA never starts
+                  - CHOWN
+                  - DAC_OVERRIDE
+                  - FOWNER
+                  - SETGID
+                  - SETUID
+                  - SETFCAP
 
           code-server:
             image:
