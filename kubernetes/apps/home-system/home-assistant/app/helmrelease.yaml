@@ -62,10 +62,14 @@ spec:
                   - ALL
                 add:
                   # linuxserver s6 init (root -> PUID 1000) needs these;
-                  # dropping ALL makes s6-applyuidgid fatal and HA never starts
+                  # dropping ALL makes s6-applyuidgid fatal and HA never starts.
+                  # NET_BIND_SERVICE: the image's python3.14 binary carries
+                  # cap_net_bind_service=ep file caps - execve returns EPERM
+                  # unless the cap is in the container bounding set
                   - CHOWN
                   - DAC_OVERRIDE
                   - FOWNER
+                  - NET_BIND_SERVICE
                   - SETGID
                   - SETUID
                   - SETFCAP
