@@ -13,6 +13,8 @@ spec:
   restic:
     # The secret containing S3/restic credentials
     repository: arch-linux-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    copyMethod: Direct
     # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
     retain:
       daily: 7

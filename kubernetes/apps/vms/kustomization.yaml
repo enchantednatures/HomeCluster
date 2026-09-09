@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./arch-linux/ks.yaml
+  - ./arch-linux/backup/ks.yaml
