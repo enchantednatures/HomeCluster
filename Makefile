@@ -86,16 +86,6 @@ init: ## Initialize configuration files
 		echo "Configuration file already exists at $(BOOTSTRAP_CONFIG_FILE)"; \
 	fi
 
-.PHONY: configure
-define CONFIGURE_PROMPT
-WARNING: Any conflicting config in the kubernetes directory will be overwritten.
-Continue? [y/N]
-endef
-export CONFIGURE_PROMPT
-
-configure: init workstation-direnv workstation-venv sops-age-keygen ## Configure repository from bootstrap vars
-	@echo "$$CONFIGURE_PROMPT" && read -r response && [ "$$response" = "y" ] && $(MAKE) .template sops-encrypt .validate || echo "Aborted"
-
 .PHONY: .template
 .template: ## Internal: Run makejinja templating
 	@test -d $(VIRTUAL_ENV) || (echo "Missing virtual environment" && exit 1)
