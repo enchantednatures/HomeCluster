@@ -1,0 +1,9 @@
+# task-9 evidence: home-assistant-backup ReplicationSource (backfilled 2026-09-09)
+$ kubectl -n home-system get replicationsource home-assistant-backup -o jsonpath='{.status.lastSyncTime}{"\n"}{.status.lastSyncDuration}{"\n"}'
+2026-09-09T16:27:58Z
+9.028530862s
+
+$ kubectl -n home-system get replicationsource home-assistant-backup -o jsonpath='{.status.latestMoverStatus}'
+{"logs":"=== Initialize Dir ===\ncreated restic repository 7283f36484 at s3:http://minio-service.networking.svc.cluster.local:9768/volsync-backups/home-system-home-assistant-config\nno parent snapshot found, will read all files\nAdded to the repository: 3.338 MiB (920.026 KiB stored)\nprocessed 30 files, 3.320 MiB in 0:00\nsnapshot d218ed6f saved\nRestic completed in 4s","result":"Successful"}
+
+# ASSERTION: latestMoverStatus.result == "Successful" — RS synced successfully (lastSync 2026-09-09T16:27:58Z, ~16:27 UTC, duration 9.03s, snapshot d218ed6f to MinIO volsync-backups bucket)

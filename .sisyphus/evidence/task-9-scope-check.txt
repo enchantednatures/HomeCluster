@@ -1,0 +1,8 @@
+# task-9 evidence: scope check — only home-assistant-backup RS in home-system (backfilled 2026-09-09)
+$ kubectl -n home-system get replicationsource
+NAME                    SOURCE                  LAST SYNC              DURATION       NEXT SYNC
+home-assistant-backup   home-assistant-config   2026-09-09T16:27:58Z   9.028530862s   2026-09-10T03:40:00Z
+node-red-backup         node-red                2026-09-09T22:12:53Z   9.536050745s
+
+# ASSERTION: home-assistant-backup present; NO hass-cache ReplicationSource exists (scope respected).
+# Note: node-red-backup also present (from task-10 scope, separate app).

@@ -1,0 +1,20 @@
+# task-13 evidence: docs/backup-restore.md runbook command provenance audit (backfilled 2026-09-09)
+
+## Command provenance
+All kubectl/flux commands in docs/backup-restore.md are annotated with or traceable to task evidence:
+- monitoring influxdb commands (lines 43-66) -> task-8-influxdb-backup.log
+- vms arch job/patch/destination commands (lines 96-158) -> task-3-backup.log, task-3-restore.log, task-3-mover-labels.txt
+- gitea secret command (line 232) -> task-6-gitea-roundtrip.log
+- flux get kustomizations (line 56) -> task-1-flux-baseline.txt
+- generic verification command (line 252) -> task-5/7/8/9 backup logs (latestMoverStatus.result: Successful pattern)
+
+## Forbidden app mentions
+grep -cE 'open-webui|inspircd' docs/backup-restore.md -> 0 (PASS)
+
+## Schedule table vs committed replicationsource.yaml files (7 committed)
+Spot-check 3:
+- arch-linux: table `0 2 * * *` (line 21) -> matches kubernetes/apps/vms/arch/backup/replicationsource.yaml schedule
+- gitea: table `40 2 * * *` (line 23) -> matches kubernetes/apps/gitea/gitea/backup/replicationsource.yaml schedule
+- node-red: table `0 4 * * *` (line 27) -> matches kubernetes/apps/home-system/node-red/backup/replicationsource.yaml schedule
+
+RESULT: AUDIT PASS — runbook committed in 4d6e71479 is consistent with live cluster state and Git manifests.
