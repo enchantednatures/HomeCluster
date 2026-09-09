@@ -34,3 +34,11 @@ spec:
       runAsUser: 1000
       runAsGroup: 1000
       fsGroup: 1000
+    # Kyverno require-pod-resources (gitea ns is not excluded) mandates
+    # requests cpu+memory and limits memory on the mover container
+    moverResources:
+      requests:
+        cpu: 250m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
