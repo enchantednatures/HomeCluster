@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumnetworkpolicy_v2.json
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-gatus
+  namespace: gatus
+spec:
+  endpointSelector: {}
+  ingress:
+    # istio-ingress gateway (status page via external-gateway VirtualService)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: istio-ingress
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+    # Prometheus scraping /metrics
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
+  egress:
+    # DNS (TCP + UDP)
+    - toEndpoints:
+        - matchLabels:
+            k8s:k8s-app: kube-dns
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    # istiod (xDS + workload certificate issuance for the sidecar)
+    - toEndpoints:
+        - matchLabels:
+            k8s:app: istiod
+            k8s:io.kubernetes.pod.namespace: istio-system
+      toPorts:
+        - ports:
+            - port: "15012"
+              protocol: TCP
+    # HTTPS health checks against public endpoints (public DNS-resolved
+    # ${SECRET_DOMAIN} URLs); 'world' = any destination outside the cluster
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    # ICMP echo health check (icmp://1.1.1.1)
+    - toCIDR:
+        - 1.1.1.1/32
+      icmps:
+        - fields:
+            - family: IPv4
+              type: 8
