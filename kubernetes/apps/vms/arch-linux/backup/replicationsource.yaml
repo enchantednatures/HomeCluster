@@ -27,6 +27,12 @@ spec:
     # Cache for faster incremental backups
     cacheStorageClassName: openebs-hostpath
     cacheCapacity: 10Gi
+    # Mover runs as qemu uid/gid 107 to read the KubeVirt disk.img (mode 0660, owner 107:107)
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 107
+      runAsGroup: 107
+      fsGroup: 107
     # Mover pod resources
     moverPodLabels:
       app: volsync-arch-linux-backup

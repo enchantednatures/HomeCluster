@@ -18,3 +18,9 @@ spec:
     destinationPVC: arch-linux-root
     cacheStorageClassName: openebs-hostpath
     cacheCapacity: 10Gi
+    # Mover runs as qemu uid/gid 107 so restored disk.img stays qemu-readable
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 107
+      runAsGroup: 107
+      fsGroup: 107
