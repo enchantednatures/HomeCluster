@@ -18,6 +18,14 @@ spec:
     destinationPVC: home-assistant-config
     cacheStorageClassName: csi-nfs
     cacheCapacity: 5Gi
+    # Mover resources: required by the cluster-wide Kyverno require-pod-resources
+    # policy (enforce, home-system not in its exclude list)
+    moverResources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
     # No moverSecurityContext: home-assistant runs as root (pod securityContext
     # runAsUser/Group/fsGroup 0) so restored files stay root-owned and
     # app-readable
