@@ -51,6 +51,8 @@ spec:
                       - work-01
                       - work-02
       config:
+        query:
+          maxMemoryPerNode: 512MB
         nodeScheduler:
           includeCoordinator: true
       jvm:
