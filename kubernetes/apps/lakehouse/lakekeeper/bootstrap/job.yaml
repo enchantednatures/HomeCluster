@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app lakekeeper-bootstrap-v6
+  name: &app lakekeeper-bootstrap-v7
   namespace: lakehouse
 spec:
   backoffLimit: 3
@@ -43,7 +43,7 @@ spec:
                 --header "$${AUTH}" \
                 --header "Content-Type: application/json" \
                 --post-data '{"accept-terms-of-use":true}' \
-                "$${API}/management/v1/bootstrap" 2>&1 | awk '/HTTP\//{print $2}' | tail -n1)" || true
+                "$${API}/management/v1/bootstrap" 2>&1 | grep -o 'HTTP/[0-9.]* [0-9][0-9][0-9]' | tail -n1 | awk '{print $NF}')" || true
               echo "bootstrap status: $${STATUS}"
               case "$${STATUS}" in
                 200|201|409) ;;
@@ -65,7 +65,7 @@ spec:
                 --header "$${AUTH}" \
                 --header "Content-Type: application/json" \
                 --post-data "$(cat /tmp/warehouse.json)" \
-                "$${API}/management/v1/warehouse" 2>&1 | awk '/HTTP\//{print $2}' | tail -n1)" || true
+                "$${API}/management/v1/warehouse" 2>&1 | grep -o 'HTTP/[0-9.]* [0-9][0-9][0-9]' | tail -n1 | awk '{print $NF}')" || true
               echo "warehouse create status: $${STATUS}"
               case "$${STATUS}" in
                 200|201|409) ;;
