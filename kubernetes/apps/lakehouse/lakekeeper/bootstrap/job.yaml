@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app lakekeeper-bootstrap-v3
+  name: &app lakekeeper-bootstrap-v4
   namespace: lakehouse
 spec:
   backoffLimit: 3
@@ -47,6 +47,8 @@ spec:
               echo "bootstrap status: $${STATUS}"
               case "$${STATUS}" in
                 200|201|409) ;;
+                # 400 = CatalogAlreadyBootstrapped (idempotent re-run)
+                400) echo "already bootstrapped" ;;
                 *) echo "bootstrap failed unexpectedly"; exit 1 ;;
               esac
 
