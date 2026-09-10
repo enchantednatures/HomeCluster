@@ -31,28 +31,28 @@ graph TB
             PROVIDERS[OAuth Providers]
             APPLICATIONS[Applications]
         end
-        
+
         subgraph "Container Registry"
             HARBOR[Harbor Configuration]
             PROJECTS[Harbor Projects]
             USERS[Harbor Users]
             POLICIES[Security Policies]
         end
-        
+
         subgraph "External Integrations"
             GRAFANA_OAUTH[Grafana OAuth]
             MINIO_OAUTH[MinIO OAuth]
             FORWARD_AUTH[Forward Auth]
         end
     end
-    
+
     AUTHENTIK --> GROUPS
     AUTHENTIK --> PROVIDERS
     PROVIDERS --> APPLICATIONS
     PROVIDERS --> GRAFANA_OAUTH
     PROVIDERS --> MINIO_OAUTH
     PROVIDERS --> FORWARD_AUTH
-    
+
     HARBOR --> PROJECTS
     HARBOR --> USERS
     HARBOR --> POLICIES
@@ -106,7 +106,7 @@ resource "authentik_provider_proxy" "istio_forward_auth" {
   external_host      = "https://auth.${var.cluster_domain}"
   mode               = "forward_single"
   authorization_flow = data.authentik_flow.default-authorization-flow.id
-  
+
   skip_path_regex = "^/(healthz|metrics|\\.well-known/.*|outpost\\.goauthentik\\.io/.*)$"
 }
 ```
@@ -130,7 +130,7 @@ sequenceDiagram
     participant Grafana
     participant Authentik
     participant Groups
-    
+
     User->>Grafana: Access Dashboard
     Grafana->>Authentik: OAuth2 Redirect
     Authentik->>User: Login Prompt
@@ -158,7 +158,7 @@ resource "authentik_provider_oauth2" "minio" {
   client_id          = var.minio_client.client_id
   client_secret      = var.minio_client.client_secret
   authorization_flow = data.authentik_flow.default-authorization-flow.id
-  
+
   allowed_redirect_uris = var.minio_client.redirect_urls
 }
 ```
@@ -172,7 +172,7 @@ resource "authentik_outpost" "istio_forward_auth" {
   name               = "istio-forward-auth"
   type               = "proxy"
   protocol_providers = [authentik_provider_proxy.istio_forward_auth.id]
-  
+
   config = jsonencode({
     authentik_host          = "https://auth.${var.cluster_domain}"
     kubernetes_namespace    = "authentik"
@@ -256,19 +256,19 @@ graph TB
             LOCAL[Local Backend]
             LOCK[State Locking]
         end
-        
+
         subgraph "Remote State"
             S3[S3 Backend]
             DYNAMODB[DynamoDB Locking]
         end
-        
+
         subgraph "State Operations"
             PLAN[Terraform Plan]
             APPLY[Terraform Apply]
             DESTROY[Terraform Destroy]
         end
     end
-    
+
     LOCAL --> PLAN
     S3 --> PLAN
     PLAN --> APPLY
@@ -349,7 +349,7 @@ sequenceDiagram
     participant CI as CI Pipeline
     participant TF as Terraform
     participant Providers as External Providers
-    
+
     Dev->>Git: Push Changes
     Git->>CI: Trigger Pipeline
     CI->>TF: Terraform Plan

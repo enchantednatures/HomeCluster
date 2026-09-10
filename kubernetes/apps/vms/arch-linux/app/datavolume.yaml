@@ -17,5 +17,3 @@ spec:
       requests:
         storage: 40Gi
     storageClassName: openebs-hostpath
-
-

@@ -2,12 +2,14 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/kustomization_v1beta1.json
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources: [
-  ./dragonfly.yaml,
-  ./helmrelease.yaml,
-  ./secret.sops.yaml,
-  ./virtualservice.yaml,
-]
+resources:
+  [
+    ./dragonfly.yaml,
+    ./helmrelease.yaml,
+    ./ingress.yaml,
+    ./secret.sops.yaml,
+    ./virtualservice.yaml,
+  ]
 configMapGenerator:
   - name: searxng-configmap
     files: [./resources/limiter.toml, ./resources/settings.yml]

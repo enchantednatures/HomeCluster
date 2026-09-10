@@ -158,7 +158,7 @@ spec:
 
 1. **Every 10 minutes**: ImageRepository resources scan container registries
 2. **Every 30 minutes**: ImageUpdateAutomation checks for new images matching policies
-3. **On update detected**: 
+3. **On update detected**:
    - Updates manifest files with new image references
    - Commits to `flux-image-updates` branch
    - Pushes to GitHub

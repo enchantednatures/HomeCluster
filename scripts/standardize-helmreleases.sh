@@ -75,30 +75,30 @@ log_error() {
 
 analyze_helmrelease() {
     local file="$1"
-    
+
     # Check if it's actually a HelmRelease
     if ! grep -q "^kind: HelmRelease" "$file" 2>/dev/null; then
         return 0
     fi
-    
+
     stats_total=$((stats_total + 1))
-    
+
     local needs_update=false
-    
+
     # Check for maxHistory
     if ! grep -q "^  maxHistory:" "$file"; then
         needs_max_history["$file"]="true"
         needs_update=true
         log_info "Missing maxHistory: $file"
     fi
-    
+
     # Check for uninstall.keepHistory
     if ! grep -q "keepHistory:" "$file"; then
         needs_uninstall["$file"]="true"
         needs_update=true
         log_info "Missing uninstall.keepHistory: $file"
     fi
-    
+
     # Check for install remediation strategy
     if grep -q "^  install:" "$file"; then
         if ! grep -A5 "^  install:" "$file" | grep -q "strategy:"; then
@@ -107,7 +107,7 @@ analyze_helmrelease() {
             log_info "Missing install.remediation.strategy: $file"
         fi
     fi
-    
+
     # Check for upgrade remediation strategy
     if grep -q "^  upgrade:" "$file"; then
         if ! grep -A5 "^  upgrade:" "$file" | grep -q "strategy:"; then
@@ -116,7 +116,7 @@ analyze_helmrelease() {
             log_info "Missing upgrade.remediation.strategy: $file"
         fi
     fi
-    
+
     if [[ "$needs_update" == "true" ]]; then
         stats_would_modify=$((stats_would_modify + 1))
     else
@@ -130,14 +130,14 @@ analyze_helmrelease() {
 
 add_max_history() {
     local file="$1"
-    
+
     # Add maxHistory: 2 after the spec: line
     sed -i '/^spec:$/a\  maxHistory: 2' "$file"
 }
 
 add_uninstall_keep_history() {
     local file="$1"
-    
+
     # Check if uninstall section exists
     if grep -q "^  uninstall:" "$file"; then
         # Add keepHistory under existing uninstall
@@ -160,7 +160,7 @@ add_uninstall_keep_history() {
 add_remediation_strategy() {
     local file="$1"
     local section="$2"  # "install" or "upgrade"
-    
+
     # Find the remediation section within install/upgrade
     if grep -A10 "^  ${section}:" "$file" | grep -q "remediation:"; then
         # Remediation exists, add strategy after it
@@ -185,32 +185,32 @@ add_remediation_strategy() {
 standardize_file() {
     local file="$1"
     local dry_run="$2"
-    
+
     if [[ "$dry_run" == "false" ]]; then
         # Add maxHistory if needed
         if [[ "${needs_max_history[$file]}" == "true" ]]; then
             add_max_history "$file"
             log_info "  ✓ Added maxHistory: 2"
         fi
-        
+
         # Add uninstall.keepHistory if needed
         if [[ "${needs_uninstall[$file]}" == "true" ]]; then
             add_uninstall_keep_history "$file"
             log_info "  ✓ Added uninstall.keepHistory: false"
         fi
-        
+
         # Add install strategy if needed
         if [[ "${needs_install_strategy[$file]}" == "true" ]]; then
             add_remediation_strategy "$file" "install"
             log_info "  ✓ Added install.remediation.strategy: rollback"
         fi
-        
+
         # Add upgrade strategy if needed
         if [[ "${needs_upgrade_strategy[$file]}" == "true" ]]; then
             add_remediation_strategy "$file" "upgrade"
             log_info "  ✓ Added upgrade.remediation.strategy: rollback"
         fi
-        
+
         stats_modified=$((stats_modified + 1))
         log_success "Updated: $file"
     else
@@ -237,17 +237,17 @@ standardize_file() {
 process_directory() {
     local target_path="$1"
     local dry_run="$2"
-    
+
     # Find all HelmRelease files
     local files=()
     while IFS= read -r -d '' file; do
         files+=("$file")
     done < <(find "$target_path" -type f -name "helmrelease.yaml" -print0)
-    
+
     local total=${#files[@]}
-    
+
     print_header "Analyzing ${total} HelmRelease files"
-    
+
     # Phase 1: Analyze
     local current=0
     for file in "${files[@]}"; do
@@ -256,11 +256,11 @@ process_directory() {
         analyze_helmrelease "$file"
     done
     printf "\r[%4d/%4d] Analysis complete!\n" "$total" "$total"
-    
+
     # Phase 2: Standardize
     if [[ $stats_would_modify -gt 0 ]]; then
         print_header "Standardizing HelmReleases"
-        
+
         current=0
         for file in "${files[@]}"; do
             # Only process files that need updates
@@ -284,7 +284,7 @@ process_directory() {
 generate_report() {
     local mode="$1"
     local output_file="helmrelease-standardization-report-$(date +%Y%m%d-%H%M%S).txt"
-    
+
     {
         echo "======================================================"
         echo "  HelmRelease Standardization Report"
@@ -302,14 +302,14 @@ generate_report() {
         fi
         echo "  Errors:                     $stats_errors"
         echo ""
-        
+
         if [[ $stats_would_modify -gt 0 ]] || [[ $stats_modified -gt 0 ]]; then
             echo "CHANGES MADE/PLANNED:"
             local count_max_history=0
             local count_uninstall=0
             local count_install_strategy=0
             local count_upgrade_strategy=0
-            
+
             for file in "${!needs_max_history[@]}"; do
                 count_max_history=$((count_max_history + 1))
             done
@@ -322,16 +322,16 @@ generate_report() {
             for file in "${!needs_upgrade_strategy[@]}"; do
                 count_upgrade_strategy=$((count_upgrade_strategy + 1))
             done
-            
+
             echo "  Added maxHistory: 2                    → $count_max_history files"
             echo "  Added uninstall.keepHistory: false     → $count_uninstall files"
             echo "  Added install.remediation.strategy     → $count_install_strategy files"
             echo "  Added upgrade.remediation.strategy     → $count_upgrade_strategy files"
             echo ""
         fi
-        
+
         echo "======================================================"
-        
+
         if [[ "$mode" == "DRY-RUN" ]]; then
             echo ""
             echo "Run with --execute to apply changes."
@@ -343,7 +343,7 @@ generate_report() {
             echo "  3. Commit: git commit -m \"refactor: standardize HelmRelease specifications\""
         fi
     } | tee "$output_file"
-    
+
     echo ""
     log_success "Report saved to: $output_file"
 }
@@ -373,10 +373,10 @@ OPTIONS:
 EXAMPLES:
     # Preview what would change (default)
     $(basename "$0")
-    
+
     # Apply changes
     $(basename "$0") --execute
-    
+
     # Verbose output
     $(basename "$0") --execute --verbose
 
@@ -417,7 +417,7 @@ parse_arguments() {
 
 main() {
     parse_arguments "$@"
-    
+
     # Print header
     if [[ "${DRY_RUN}" == "true" ]]; then
         print_header "HelmRelease Standardization Tool - DRY RUN"
@@ -426,20 +426,20 @@ main() {
         print_header "HelmRelease Standardization Tool - EXECUTE MODE"
         log_warning "Files will be modified!"
     fi
-    
+
     echo ""
-    
+
     # Check git repository
     if ! git rev-parse --git-dir > /dev/null 2>&1; then
         log_error "Not in a git repository"
         exit 1
     fi
-    
+
     log_success "Git repository: OK"
-    
+
     # Process files
     process_directory "${KUBERNETES_DIR}" "${DRY_RUN}"
-    
+
     # Generate report
     echo ""
     local mode="EXECUTE"

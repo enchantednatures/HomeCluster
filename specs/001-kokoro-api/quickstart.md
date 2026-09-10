@@ -1,6 +1,6 @@
 # Quickstart: Kokoro Text-to-Speech API
 
-**Feature**: 001-kokoro-api  
+**Feature**: 001-kokoro-api
 **Last Updated**: 2026-01-20
 
 ## Prerequisites

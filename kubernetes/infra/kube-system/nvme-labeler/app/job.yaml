@@ -69,4 +69,3 @@ spec:
         seccompProfile:
           type: RuntimeDefault
 ---
-

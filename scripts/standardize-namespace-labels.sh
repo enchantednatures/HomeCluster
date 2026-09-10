@@ -93,7 +93,7 @@ log_error() {
 
 is_istio_enabled_namespace() {
     local ns_name="$1"
-    
+
     for istio_ns in "${ISTIO_ENABLED_NAMESPACES[@]}"; do
         if [[ "$ns_name" == "$istio_ns" ]]; then
             return 0
@@ -104,41 +104,41 @@ is_istio_enabled_namespace() {
 
 extract_namespace_name() {
     local file="$1"
-    
+
     # Extract namespace name from metadata.name (handle variable indentation)
     grep "^ *name:" "$file" 2>/dev/null | head -1 | awk '{print $2}'
 }
 
 analyze_namespace() {
     local file="$1"
-    
+
     # Check if it's actually a Namespace
     if ! grep -q "^kind: Namespace" "$file" 2>/dev/null; then
         return 0
     fi
-    
+
     stats_total=$((stats_total + 1))
-    
+
     local ns_name
     ns_name=$(extract_namespace_name "$file")
     namespace_names["$file"]="$ns_name"
-    
+
     local needs_update=false
-    
+
     # Check for prune label
     if ! grep -q "${LABEL_PRUNE}: disabled" "$file"; then
         needs_prune_label["$file"]="true"
         needs_update=true
         log_info "Missing prune label: $file ($ns_name)"
     fi
-    
+
     # Check for Istio dataplane label
     if ! grep -q "${LABEL_ISTIO_DATAPLANE}:" "$file"; then
         needs_istio_label["$file"]="true"
         needs_update=true
         log_info "Missing Istio dataplane label: $file ($ns_name)"
     fi
-    
+
     # Check for pod security label (optional)
     if [[ "${ADD_POD_SECURITY}" == "true" ]]; then
         if ! grep -q "${LABEL_POD_SECURITY}:" "$file"; then
@@ -147,7 +147,7 @@ analyze_namespace() {
             log_info "Missing pod security label: $file ($ns_name)"
         fi
     fi
-    
+
     if [[ "$needs_update" == "true" ]]; then
         stats_would_modify=$((stats_would_modify + 1))
     else
@@ -163,38 +163,38 @@ add_labels_to_namespace() {
     local file="$1"
     local dry_run="$2"
     local ns_name="${namespace_names[$file]}"
-    
+
     if [[ "$dry_run" == "false" ]]; then
         local temp_file="${file}.tmp"
         local in_metadata=false
         local labels_section_exists=false
         local added_labels=false
-        
+
         # Read file line by line
         while IFS= read -r line; do
             echo "$line"
-            
+
             # Detect metadata section
             if [[ "$line" == "metadata:" ]]; then
                 in_metadata=true
             elif [[ "$line" =~ ^[a-z] ]] && [[ "$in_metadata" == "true" ]]; then
                 in_metadata=false
             fi
-            
+
             # Detect labels section within metadata
             if [[ "$in_metadata" == "true" ]] && [[ "$line" == "  labels:" ]]; then
                 labels_section_exists=true
             fi
-            
+
             # Add labels after the metadata.name line if no labels section exists
             if [[ "$in_metadata" == "true" ]] && [[ "$line" =~ ^[[:space:]]+name: ]] && [[ "$labels_section_exists" == "false" ]] && [[ "$added_labels" == "false" ]]; then
                 echo "  labels:"
-                
+
                 # Add prune label
                 if [[ "${needs_prune_label[$file]}" == "true" ]]; then
                     echo "    ${LABEL_PRUNE}: disabled"
                 fi
-                
+
                 # Add Istio label
                 if [[ "${needs_istio_label[$file]}" == "true" ]]; then
                     if is_istio_enabled_namespace "$ns_name"; then
@@ -203,16 +203,16 @@ add_labels_to_namespace() {
                         echo "    ${LABEL_ISTIO_DATAPLANE}: disabled"
                     fi
                 fi
-                
+
                 # Add pod security label
                 if [[ "${needs_pod_security[$file]}" == "true" ]] && [[ "${ADD_POD_SECURITY}" == "true" ]]; then
                     echo "    ${LABEL_POD_SECURITY}: restricted"
                 fi
-                
+
                 added_labels=true
                 labels_section_exists=true
             fi
-            
+
             # Add labels at the end of existing labels section
             if [[ "$labels_section_exists" == "true" ]] && [[ "$added_labels" == "false" ]] && [[ "$line" =~ ^[[:space:]]{0,2}[a-z] ]] && [[ ! "$line" =~ ^[[:space:]]+[a-z./] ]]; then
                 # We've left the labels section, add our labels before this line
@@ -232,9 +232,9 @@ add_labels_to_namespace() {
                 added_labels=true
                 continue  # Skip the original line since we already printed it
             fi
-            
+
         done < "$file" > "$temp_file"
-        
+
         # If labels section exists but we didn't add labels yet, append them
         if [[ "$labels_section_exists" == "true" ]] && [[ "$added_labels" == "false" ]]; then
             {
@@ -255,9 +255,9 @@ add_labels_to_namespace() {
             } > "${temp_file}.2"
             mv "${temp_file}.2" "$temp_file"
         fi
-        
+
         mv "$temp_file" "$file"
-        
+
         stats_modified=$((stats_modified + 1))
         log_success "Updated: $file ($ns_name)"
     else
@@ -285,17 +285,17 @@ add_labels_to_namespace() {
 process_directory() {
     local target_path="$1"
     local dry_run="$2"
-    
+
     # Find all namespace.yaml files
     local files=()
     while IFS= read -r -d '' file; do
         files+=("$file")
     done < <(find "$target_path" -type f -name "namespace.yaml" -print0)
-    
+
     local total=${#files[@]}
-    
+
     print_header "Analyzing ${total} Namespace files"
-    
+
     # Phase 1: Analyze
     local current=0
     for file in "${files[@]}"; do
@@ -304,11 +304,11 @@ process_directory() {
         analyze_namespace "$file"
     done
     printf "\r[%4d/%4d] Analysis complete!\n" "$total" "$total"
-    
+
     # Phase 2: Standardize
     if [[ $stats_would_modify -gt 0 ]]; then
         print_header "Standardizing Namespaces"
-        
+
         current=0
         for file in "${files[@]}"; do
             # Only process files that need updates
@@ -331,7 +331,7 @@ process_directory() {
 generate_report() {
     local mode="$1"
     local output_file="namespace-standardization-report-$(date +%Y%m%d-%H%M%S).txt"
-    
+
     {
         echo "======================================================"
         echo "  Namespace Standardization Report"
@@ -348,13 +348,13 @@ generate_report() {
             echo "  Modified:                   $stats_modified"
         fi
         echo ""
-        
+
         if [[ $stats_would_modify -gt 0 ]] || [[ $stats_modified -gt 0 ]]; then
             echo "LABELS ADDED:"
             local count_prune=0
             local count_istio=0
             local count_pod_security=0
-            
+
             for file in "${!needs_prune_label[@]}"; do
                 count_prune=$((count_prune + 1))
             done
@@ -364,7 +364,7 @@ generate_report() {
             for file in "${!needs_pod_security[@]}"; do
                 count_pod_security=$((count_pod_security + 1))
             done
-            
+
             echo "  ${LABEL_PRUNE}: disabled          → $count_prune namespaces"
             echo "  ${LABEL_ISTIO_DATAPLANE}: ambient/disabled → $count_istio namespaces"
             if [[ "${ADD_POD_SECURITY}" == "true" ]]; then
@@ -372,15 +372,15 @@ generate_report() {
             fi
             echo ""
         fi
-        
+
         echo "ISTIO AMBIENT MODE NAMESPACES:"
         for ns in "${ISTIO_ENABLED_NAMESPACES[@]}"; do
             echo "  - $ns"
         done
         echo ""
-        
+
         echo "======================================================"
-        
+
         if [[ "$mode" == "DRY-RUN" ]]; then
             echo ""
             echo "Run with --execute to apply changes."
@@ -392,7 +392,7 @@ generate_report() {
             echo "  3. Commit: git commit -m \"refactor: standardize namespace labels\""
         fi
     } | tee "$output_file"
-    
+
     echo ""
     log_success "Report saved to: $output_file"
 }
@@ -422,10 +422,10 @@ OPTIONS:
 EXAMPLES:
     # Preview what would change (default)
     $(basename "$0")
-    
+
     # Apply changes
     $(basename "$0") --execute
-    
+
     # Include pod security labels
     $(basename "$0") --execute --pod-security
 
@@ -470,7 +470,7 @@ parse_arguments() {
 
 main() {
     parse_arguments "$@"
-    
+
     # Print header
     if [[ "${DRY_RUN}" == "true" ]]; then
         print_header "Namespace Standardization Tool - DRY RUN"
@@ -479,20 +479,20 @@ main() {
         print_header "Namespace Standardization Tool - EXECUTE MODE"
         log_warning "Files will be modified!"
     fi
-    
+
     echo ""
-    
+
     # Check git repository
     if ! git rev-parse --git-dir > /dev/null 2>&1; then
         log_error "Not in a git repository"
         exit 1
     fi
-    
+
     log_success "Git repository: OK"
-    
+
     # Process files
     process_directory "${KUBERNETES_DIR}" "${DRY_RUN}"
-    
+
     # Generate report
     echo ""
     local mode="EXECUTE"

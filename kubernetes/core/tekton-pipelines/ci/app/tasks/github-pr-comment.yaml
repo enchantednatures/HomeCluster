@@ -49,7 +49,7 @@ spec:
 
         # Read the plan output and format it for GitHub
         PLAN_BODY=$(cat "$(params.PLAN_FILE)")
-        
+
         # Create the comment body with proper escaping
         COMMENT_BODY="### $(params.COMMENT_TITLE)
 

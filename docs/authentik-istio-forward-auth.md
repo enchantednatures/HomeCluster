@@ -77,7 +77,7 @@ spec:
 
 **To Upstream Services:**
 - `x-authentik-username`
-- `x-authentik-groups` 
+- `x-authentik-groups`
 - `x-authentik-email`
 - `x-authentik-name`
 - `x-authentik-uid`

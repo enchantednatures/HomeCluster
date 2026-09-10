@@ -88,13 +88,13 @@ log_error() {
 
 should_exclude_line() {
     local line="$1"
-    
+
     for pattern in "${EXCLUDE_PATTERNS[@]}"; do
         if echo "$line" | grep -q "$pattern"; then
             return 0  # Should exclude
         fi
     done
-    
+
     return 1  # Should not exclude
 }
 
@@ -102,17 +102,17 @@ detect_context_for_ip() {
     local file="$1"
     local ip="$2"
     local line_num="$3"
-    
+
     # Get surrounding context (5 lines before/after)
     local context_start=$((line_num > 5 ? line_num - 5 : 1))
     local context_end=$((line_num + 5))
     local context
     context=$(sed -n "${context_start},${context_end}p" "$file" 2>/dev/null | tr '[:upper:]' '[:lower:]')
-    
+
     # Also check filename
     local filename_context
     filename_context=$(basename "$file" | tr '[:upper:]' '[:lower:]')
-    
+
     # Check for keywords
     if echo "$context $filename_context" | grep -qE "nfs|csi-driver-nfs"; then
         echo "NFS_SERVER"
@@ -133,27 +133,27 @@ detect_context_for_ip() {
 
 scan_for_ips() {
     local file="$1"
-    
+
     local line_num=0
     while IFS= read -r line; do
         line_num=$((line_num + 1))
-        
+
         # Skip excluded patterns
         if should_exclude_line "$line"; then
             continue
         fi
-        
+
         # Find all IPs in the line
         local ips
         ips=$(echo "$line" | grep -oE "$IP_PATTERN" || true)
-        
+
         for ip in $ips; do
             stats_ips_found=$((stats_ips_found + 1))
-            
+
             # Detect context
             local context
             context=$(detect_context_for_ip "$file" "$ip" "$line_num")
-            
+
             # Check if IP has a port
             if echo "$line" | grep -qE "${ip}:[0-9]+"; then
                 local port
@@ -161,11 +161,11 @@ scan_for_ips() {
                 ip_has_port["$ip"]="true"
                 ip_port_value["$ip"]="$port"
             fi
-            
+
             # Track IP
             ip_contexts["$ip"]="$context"
             ip_occurrences["$ip"]=$((${ip_occurrences["$ip"]:-0} + 1))
-            
+
             # Track files
             if [[ -n "${ip_files["$ip"]}" ]]; then
                 ip_files["$ip"]="${ip_files["$ip"]}|$file"
@@ -183,7 +183,7 @@ scan_for_ips() {
 generate_variable_name() {
     local ip="$1"
     local context="${ip_contexts[$ip]}"
-    
+
     # Check if this IP already has a variable
     for var in "${!existing_variables[@]}"; do
         if [[ "${existing_variables[$var]}" == "$ip" ]]; then
@@ -191,7 +191,7 @@ generate_variable_name() {
             return 0
         fi
     done
-    
+
     # Generate new variable name based on context
     case "$context" in
         "NFS_SERVER")
@@ -216,7 +216,7 @@ parse_existing_variables() {
         log_warning "Cluster settings file not found: ${CLUSTER_SETTINGS_FILE}"
         return
     fi
-    
+
     # Parse existing variables from cluster-settings.yaml
     while IFS= read -r line; do
         # Match lines like "  KUBE_VIP_ADDR: 192.168.1.201"
@@ -236,27 +236,27 @@ parse_existing_variables() {
 replace_ips_in_file() {
     local file="$1"
     local dry_run="$2"
-    
+
     local temp_file="${file}.tmp"
     local modifications=0
-    
+
     while IFS= read -r line; do
         local new_line="$line"
-        
+
         # Skip excluded patterns
         if should_exclude_line "$line"; then
             echo "$new_line"
             continue
         fi
-        
+
         # Find all IPs in this line
         local ips
         ips=$(echo "$line" | grep -oE "$IP_PATTERN" || true)
-        
+
         for ip in $ips; do
             local var_name
             var_name=$(generate_variable_name "$ip")
-            
+
             # Handle different replacement patterns
             if [[ "${ip_has_port[$ip]}" == "true" ]]; then
                 # IP with port: split into IP and PORT variables
@@ -267,15 +267,15 @@ replace_ips_in_file() {
                 # IP without port
                 new_line=$(echo "$new_line" | sed "s|${ip}|\${${var_name}}|g")
             fi
-            
+
             if [[ "$new_line" != "$line" ]]; then
                 modifications=$((modifications + 1))
             fi
         done
-        
+
         echo "$new_line"
     done < "$file" > "$temp_file"
-    
+
     # Apply changes if not dry-run
     if [[ "$dry_run" == "false" ]] && [[ $modifications -gt 0 ]]; then
         mv "$temp_file" "$file"
@@ -295,30 +295,30 @@ replace_ips_in_file() {
 
 update_cluster_settings() {
     local dry_run="$1"
-    
+
     if [[ ! -f "${CLUSTER_SETTINGS_FILE}" ]]; then
         log_error "Cluster settings file not found: ${CLUSTER_SETTINGS_FILE}"
         return 1
     fi
-    
+
     # Build variables to add
     local new_vars_infra=""
     local new_vars_storage=""
     local new_vars_monitoring=""
     local added_count=0
-    
+
     for ip in "${!ip_contexts[@]}"; do
         local var_name
         var_name=$(generate_variable_name "$ip")
-        
+
         # Skip if variable already exists with same value
         if [[ -n "${existing_variables[$var_name]}" ]] && \
            [[ "${existing_variables[$var_name]}" == "$ip" ]]; then
             continue
         fi
-        
+
         local context="${ip_contexts[$ip]}"
-        
+
         # Categorize variable
         if [[ "$context" == *"PROXMOX"* || "$context" == *"KUBERNETES"* ]]; then
             new_vars_infra+="  ${var_name}: ${ip}\n"
@@ -334,19 +334,19 @@ update_cluster_settings() {
         elif [[ "$context" == *"PROMETHEUS"* || "$context" == *"GRAFANA"* ]]; then
             new_vars_monitoring+="  ${var_name}: ${ip}\n"
         fi
-        
+
         added_count=$((added_count + 1))
     done
-    
+
     if [[ $added_count -eq 0 ]]; then
         log_info "No new variables to add"
         return 0
     fi
-    
+
     # Update cluster-settings.yaml
     if [[ "$dry_run" == "false" ]]; then
         local temp_file="${CLUSTER_SETTINGS_FILE}.tmp"
-        
+
         # Append new variables to the end of the data section
         {
             cat "${CLUSTER_SETTINGS_FILE}"
@@ -364,13 +364,13 @@ update_cluster_settings() {
                 echo -e "$new_vars_monitoring"
             fi
         } > "$temp_file"
-        
+
         mv "$temp_file" "${CLUSTER_SETTINGS_FILE}"
         log_success "Updated ${CLUSTER_SETTINGS_FILE} with ${added_count} new variables"
     else
         log_info "Would add ${added_count} new variables to ${CLUSTER_SETTINGS_FILE}"
     fi
-    
+
     stats_variables_created=$added_count
 }
 
@@ -381,7 +381,7 @@ update_cluster_settings() {
 process_directory() {
     local target_path="$1"
     local dry_run="$2"
-    
+
     # Find all YAML files
     local files=()
     while IFS= read -r -d '' file; do
@@ -391,11 +391,11 @@ process_directory() {
              -not -path "*/.archive/*" \
              -not -path "*/.git/*" \
              -print0)
-    
+
     local total=${#files[@]}
-    
+
     print_header "Scanning ${total} YAML files for hardcoded IPs"
-    
+
     # Phase 1: Scan for IPs
     local current=0
     for file in "${files[@]}"; do
@@ -404,14 +404,14 @@ process_directory() {
         scan_for_ips "$file"
     done
     printf "\r[%4d/%4d] Scan complete!\n" "$total" "$total"
-    
+
     # Parse existing variables
     parse_existing_variables
-    
+
     # Phase 2: Replace IPs
     if [[ ${#ip_contexts[@]} -gt 0 ]]; then
         print_header "Replacing IPs with variables"
-        
+
         current=0
         for file in "${files[@]}"; do
             current=$((current + 1))
@@ -419,7 +419,7 @@ process_directory() {
             replace_ips_in_file "$file" "$dry_run"
         done
         printf "\r[%4d/%4d] Replacement complete!\n" "$total" "$total"
-        
+
         # Phase 3: Update cluster-settings.yaml
         update_cluster_settings "$dry_run"
     else
@@ -434,7 +434,7 @@ process_directory() {
 generate_report() {
     local mode="$1"
     local output_file="ip-extraction-report-$(date +%Y%m%d-%H%M%S).txt"
-    
+
     {
         echo "======================================================"
         echo "  IP to Variable Extraction Report"
@@ -444,20 +444,20 @@ generate_report() {
         echo ""
         echo "DISCOVERED IP ADDRESSES:"
         echo ""
-        
+
         for ip in "${!ip_contexts[@]}"; do
             local var_name
             var_name=$(generate_variable_name "$ip")
             local context="${ip_contexts[$ip]}"
             local occurrences="${ip_occurrences[$ip]}"
-            
+
             echo "IP: $ip ($var_name)"
             echo "  Context: $context"
             echo "  Occurrences: $occurrences"
             if [[ "${ip_has_port[$ip]}" == "true" ]]; then
                 echo "  Has Port: ${ip_port_value[$ip]}"
             fi
-            
+
             # Show unique files
             local file_list="${ip_files[$ip]}"
             local unique_files
@@ -466,7 +466,7 @@ generate_report() {
             while IFS= read -r file; do
                 echo "    - $file"
             done <<< "$unique_files"
-            
+
             local file_count
             file_count=$(echo "$file_list" | tr '|' '\n' | sort -u | wc -l)
             if [[ $file_count -gt 5 ]]; then
@@ -474,7 +474,7 @@ generate_report() {
             fi
             echo ""
         done
-        
+
         echo "======================================================"
         echo "SUMMARY"
         echo "======================================================"
@@ -487,7 +487,7 @@ generate_report() {
         fi
         echo "Variables created: $stats_variables_created"
         echo ""
-        
+
         if [[ "$mode" == "DRY-RUN" ]]; then
             echo "Run with --execute to apply changes."
         else
@@ -499,7 +499,7 @@ generate_report() {
         fi
         echo "======================================================"
     } | tee "$output_file"
-    
+
     echo ""
     log_success "Report saved to: $output_file"
 }
@@ -523,10 +523,10 @@ OPTIONS:
 EXAMPLES:
     # Preview what would change (default)
     $(basename "$0")
-    
+
     # Apply changes
     $(basename "$0") --execute
-    
+
     # Verbose output
     $(basename "$0") --execute --verbose
 
@@ -567,7 +567,7 @@ parse_arguments() {
 
 main() {
     parse_arguments "$@"
-    
+
     # Print header
     if [[ "${DRY_RUN}" == "true" ]]; then
         print_header "IP to Variable Extraction Tool - DRY RUN"
@@ -576,20 +576,20 @@ main() {
         print_header "IP to Variable Extraction Tool - EXECUTE MODE"
         log_warning "Files will be modified!"
     fi
-    
+
     echo ""
-    
+
     # Check git repository
     if ! git rev-parse --git-dir > /dev/null 2>&1; then
         log_error "Not in a git repository"
         exit 1
     fi
-    
+
     log_success "Git repository: OK"
-    
+
     # Process files
     process_directory "${KUBERNETES_DIR}" "${DRY_RUN}"
-    
+
     # Generate report
     echo ""
     local mode="EXECUTE"

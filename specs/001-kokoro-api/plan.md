@@ -11,18 +11,18 @@ Deploy Kokoro-FastAPI text-to-speech service as containerized Kubernetes workloa
 
 ## Technical Context
 
-**Language/Version**: Python (Kokoro-FastAPI container), YAML (Kubernetes manifests)  
-**Primary Dependencies**: Kokoro-FastAPI container (https://github.com/remsky/Kokoro-FastAPI), Istio ambient mesh, Cilium CNI  
-**Storage**: Ephemeral or persistent volume for temporary audio output (OpenEBS/Rook-Ceph) - NEEDS CLARIFICATION on volume type  
-**Testing**: Integration tests via `task kubernetes:kubeconform`, manual validation post-deployment - NEEDS CLARIFICATION on automated testing approach  
-**Target Platform**: Talos Kubernetes cluster on Proxmox VMs (HomeCluster environment)  
-**Project Type**: Kubernetes infrastructure deployment (manifest-based GitOps)  
-**Performance Goals**: <5s audio generation for 500-word inputs, <2s p95 response time, 10+ concurrent requests  
-**Constraints**: No external API dependencies, no authentication required, no caching layer, 99.5% success rate for valid requests  
-**Scale/Scope**: Single-service deployment, primarily English language support initially, majority of inputs <1000 words  
-**Resource Requirements**: NEEDS CLARIFICATION on CPU/memory requests and limits for Kokoro container  
-**Container Registry**: NEEDS CLARIFICATION on where to host Kokoro-FastAPI image (internal registry vs. public)  
-**Ingress Pattern**: NEEDS CLARIFICATION on Istio Gateway vs. Cloudflare Tunnel for external access  
+**Language/Version**: Python (Kokoro-FastAPI container), YAML (Kubernetes manifests)
+**Primary Dependencies**: Kokoro-FastAPI container (https://github.com/remsky/Kokoro-FastAPI), Istio ambient mesh, Cilium CNI
+**Storage**: Ephemeral or persistent volume for temporary audio output (OpenEBS/Rook-Ceph) - NEEDS CLARIFICATION on volume type
+**Testing**: Integration tests via `task kubernetes:kubeconform`, manual validation post-deployment - NEEDS CLARIFICATION on automated testing approach
+**Target Platform**: Talos Kubernetes cluster on Proxmox VMs (HomeCluster environment)
+**Project Type**: Kubernetes infrastructure deployment (manifest-based GitOps)
+**Performance Goals**: <5s audio generation for 500-word inputs, <2s p95 response time, 10+ concurrent requests
+**Constraints**: No external API dependencies, no authentication required, no caching layer, 99.5% success rate for valid requests
+**Scale/Scope**: Single-service deployment, primarily English language support initially, majority of inputs <1000 words
+**Resource Requirements**: NEEDS CLARIFICATION on CPU/memory requests and limits for Kokoro container
+**Container Registry**: NEEDS CLARIFICATION on where to host Kokoro-FastAPI image (internal registry vs. public)
+**Ingress Pattern**: NEEDS CLARIFICATION on Istio Gateway vs. Cloudflare Tunnel for external access
 **Retry Configuration**: NEEDS CLARIFICATION on exact Istio VirtualService retry policy parameters (attempts, timeout, backoff)
 
 ## Constitution Check
@@ -73,7 +73,7 @@ kubernetes/apps/<namespace>/kokoro-api/
     └── configmap.yaml                # ConfigMap for Kokoro configuration (if needed)
 ```
 
-**Structure Decision**: Kubernetes infrastructure-only deployment (no application code). 
+**Structure Decision**: Kubernetes infrastructure-only deployment (no application code).
 
 This follows the HomeCluster pattern:
 - `/kubernetes/apps/<namespace>/kokoro-api/` structure per AGENTS.md

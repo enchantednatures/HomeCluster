@@ -1,7 +1,7 @@
 # Data Model: Kokoro Text-to-Speech API Integration
 
-**Feature**: 001-kokoro-api  
-**Date**: 2026-01-20  
+**Feature**: 001-kokoro-api
+**Date**: 2026-01-20
 **Phase**: 1 - Design & Contracts
 
 ## Overview

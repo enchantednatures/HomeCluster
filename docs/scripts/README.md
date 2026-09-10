@@ -385,13 +385,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Validate YAML syntax
         run: task scripts:validate-schemas
-      
+
       - name: Validate Kubernetes resources
         run: task kubernetes:kubeconform
-      
+
       - name: Check for missing schemas
         run: |
           missing=$(task scripts:validate-schemas | grep "Files without schema" | awk '{print $4}')
@@ -493,6 +493,6 @@ task --list | grep scripts
 
 ---
 
-**Last Updated:** 2026-01-22  
-**Schema Coverage:** 99% (667/671 files)  
+**Last Updated:** 2026-01-22
+**Schema Coverage:** 99% (667/671 files)
 **Validation Status:** ✅ All manifests valid

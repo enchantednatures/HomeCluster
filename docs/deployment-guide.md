@@ -139,11 +139,11 @@ Edit `config.yaml` with your environment-specific settings:
 cluster:
   name: "homelab"
   domain: "example.com"
-  
+
 network:
   pod_cidr: "10.42.0.0/16"
   service_cidr: "10.43.0.0/16"
-  
+
 cloudflare:
   domain: "example.com"
   tunnel_id: "your-tunnel-id"
@@ -251,12 +251,12 @@ graph TB
         INFRA --> ISTIO[Istio Service Mesh]
         INFRA --> STORAGE[OpenEBS Storage]
         INFRA --> MONITORING[Monitoring Stack]
-        
+
         CILIUM --> READY1[Ready]
         ISTIO --> READY2[Ready]
         STORAGE --> READY3[Ready]
         MONITORING --> READY4[Ready]
-        
+
         READY1 --> CORE[Core Services]
         READY2 --> CORE
         READY3 --> CORE

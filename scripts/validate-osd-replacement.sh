@@ -129,7 +129,7 @@ if [[ -n "$osd_usage" ]]; then
     min_usage=$(echo "$osd_usage" | sort -n | head -1)
     max_usage=$(echo "$osd_usage" | sort -n | tail -1)
     variance=$((max_usage - min_usage))
-    
+
     if [[ $variance -le 10 ]]; then
         print_status "OK" "Storage is well balanced (max variance: ${variance}%)"
     elif [[ $variance -le 20 ]]; then
@@ -165,7 +165,7 @@ for pool in $pools; do
     size=$(ceph_exec ceph osd pool get "$pool" size | awk '{print $2}')
     min_size=$(ceph_exec ceph osd pool get "$pool" min_size | awk '{print $2}')
     print_status "INFO" "Pool '$pool': size=$size, min_size=$min_size"
-    
+
     if [[ $size -eq 3 && $min_size -eq 2 ]]; then
         print_status "OK" "Pool '$pool' has proper replication settings"
     else
@@ -253,7 +253,7 @@ kubectl apply -f /tmp/test-pvc.yaml
 # Wait for PVC to be bound
 if kubectl wait --for=condition=bound pvc/$test_pvc_name -n default --timeout=300s; then
     print_status "OK" "Test PVC bound successfully"
-    
+
     # Create test pod
     test_pod_name="validation-test-pod-$(date +%s)"
     cat > /tmp/test-pod.yaml << EOF
@@ -279,7 +279,7 @@ spec:
 EOF
 
     kubectl apply -f /tmp/test-pod.yaml
-    
+
     if kubectl wait --for=condition=ready pod/$test_pod_name -n default --timeout=300s; then
         # Check if file was written
         sleep 5
@@ -292,7 +292,7 @@ EOF
     else
         print_status "ERROR" "Test pod failed to start"
     fi
-    
+
     # Cleanup
     kubectl delete pod $test_pod_name -n default --ignore-not-found=true
 else

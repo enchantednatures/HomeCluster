@@ -85,7 +85,7 @@ log_action() {
     local action="$1"
     local file="$2"
     local resource_type="$3"
-    
+
     case "$action" in
         "ADD")
             echo -e "${GREEN}+${NC} ${file} (${CYAN}${resource_type}${NC})" ;;
@@ -93,7 +93,7 @@ log_action() {
             echo -e "${YELLOW}↻${NC} ${file} (${CYAN}${resource_type}${NC})" ;;
         "SKIP")
             if [[ "${VERBOSE}" == "true" ]]; then
-                echo -e "${BLUE}−${NC} ${file} (${CYAN}${resource_type}${NC})" 
+                echo -e "${BLUE}−${NC} ${file} (${CYAN}${resource_type}${NC})"
             fi ;;
     esac
 }
@@ -104,7 +104,7 @@ log_action() {
 
 get_schema_url() {
     local resource_type="$1"
-    
+
     case "$resource_type" in
         # Flux CD Resources
         "HelmRelease")
@@ -123,7 +123,7 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/image.toolkit.fluxcd.io/imagepolicy_v1beta2.json" ;;
         "ImageUpdateAutomation")
             echo "${SCHEMA_BASE}/image.toolkit.fluxcd.io/imageupdateautomation_v1beta2.json" ;;
-        
+
         # Istio Resources - Networking
         "VirtualService")
             echo "${SCHEMA_BASE}/networking.istio.io/virtualservice_v1.json" ;;
@@ -139,7 +139,7 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/networking.istio.io/workloadentry_v1.json" ;;
         "WorkloadGroup")
             echo "${SCHEMA_BASE}/networking.istio.io/workloadgroup_v1.json" ;;
-        
+
         # Istio Resources - Security
         "AuthorizationPolicy")
             echo "${SCHEMA_BASE}/security.istio.io/authorizationpolicy_v1.json" ;;
@@ -147,11 +147,11 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/security.istio.io/peerauthentication_v1.json" ;;
         "RequestAuthentication")
             echo "${SCHEMA_BASE}/security.istio.io/requestauthentication_v1.json" ;;
-        
+
         # Istio Resources - Telemetry
         "Telemetry")
             echo "${SCHEMA_BASE}/telemetry.istio.io/telemetry_v1.json" ;;
-        
+
         # Core Kubernetes Resources (v1)
         "Namespace")
             echo "${SCHEMA_BASE}/v1/namespace.json" ;;
@@ -175,7 +175,7 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/v1/limitrange.json" ;;
         "ResourceQuota")
             echo "${SCHEMA_BASE}/v1/resourcequota.json" ;;
-        
+
         # Apps Resources (apps/v1)
         "Deployment")
             echo "${SCHEMA_BASE}/apps/v1/deployment.json" ;;
@@ -185,13 +185,13 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/apps/v1/daemonset.json" ;;
         "ReplicaSet")
             echo "${SCHEMA_BASE}/apps/v1/replicaset.json" ;;
-        
+
         # Batch Resources (batch/v1)
         "Job")
             echo "${SCHEMA_BASE}/batch/v1/job.json" ;;
         "CronJob")
             echo "${SCHEMA_BASE}/batch/v1/cronjob.json" ;;
-        
+
         # Networking Resources (networking.k8s.io/v1)
         "Ingress")
             echo "${SCHEMA_BASE}/networking.k8s.io/v1/ingress.json" ;;
@@ -199,7 +199,7 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/networking.k8s.io/v1/networkpolicy.json" ;;
         "IngressClass")
             echo "${SCHEMA_BASE}/networking.k8s.io/v1/ingressclass.json" ;;
-        
+
         # Storage Resources (storage.k8s.io/v1)
         "StorageClass")
             echo "${SCHEMA_BASE}/storage.k8s.io/v1/storageclass.json" ;;
@@ -209,7 +209,7 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/storage.k8s.io/v1/csidriver.json" ;;
         "CSINode")
             echo "${SCHEMA_BASE}/storage.k8s.io/v1/csinode.json" ;;
-        
+
         # RBAC Resources (rbac.authorization.k8s.io/v1)
         "Role")
             echo "${SCHEMA_BASE}/rbac.authorization.k8s.io/v1/role.json" ;;
@@ -219,17 +219,17 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/rbac.authorization.k8s.io/v1/clusterrole.json" ;;
         "ClusterRoleBinding")
             echo "${SCHEMA_BASE}/rbac.authorization.k8s.io/v1/clusterrolebinding.json" ;;
-        
+
         # Policy Resources
         "PodDisruptionBudget")
             echo "${SCHEMA_BASE}/policy/v1/poddisruptionbudget.json" ;;
         "PodSecurityPolicy")
             echo "${SCHEMA_BASE}/policy/v1beta1/podsecuritypolicy.json" ;;
-        
+
         # Custom Resource Definitions
         "CustomResourceDefinition")
             echo "${SCHEMA_BASE}/apiextensions.k8s.io/v1/customresourcedefinition.json" ;;
-        
+
         # CloudNative-PG
         "Cluster")
             echo "${SCHEMA_BASE}/postgresql.cnpg.io/cluster_v1.json" ;;
@@ -239,11 +239,11 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/postgresql.cnpg.io/scheduledbackup_v1.json" ;;
         "Pooler")
             echo "${SCHEMA_BASE}/postgresql.cnpg.io/pooler_v1.json" ;;
-        
+
         # DragonflyDB
         "Dragonfly")
             echo "${SCHEMA_BASE}/dragonflydb.io/dragonfly_v1alpha1.json" ;;
-        
+
         # Cert-Manager
         "Certificate")
             echo "${SCHEMA_BASE}/cert-manager.io/v1/certificate.json" ;;
@@ -253,7 +253,7 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/cert-manager.io/v1/issuer.json" ;;
         "CertificateRequest")
             echo "${SCHEMA_BASE}/cert-manager.io/v1/certificaterequest.json" ;;
-        
+
         # Prometheus Operator
         "ServiceMonitor")
             echo "${SCHEMA_BASE}/monitoring.coreos.com/v1/servicemonitor.json" ;;
@@ -267,13 +267,13 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/monitoring.coreos.com/v1/podmonitor.json" ;;
         "Probe")
             echo "${SCHEMA_BASE}/monitoring.coreos.com/v1/probe.json" ;;
-        
+
         # Kyverno
         "ClusterPolicy")
             echo "${SCHEMA_BASE}/kyverno.io/v1/clusterpolicy.json" ;;
         "Policy")
             echo "${SCHEMA_BASE}/kyverno.io/v1/policy.json" ;;
-        
+
         # Rook-Ceph
         "CephCluster")
             echo "${SCHEMA_BASE}/ceph.rook.io/v1/cephcluster.json" ;;
@@ -283,11 +283,11 @@ get_schema_url() {
             echo "${SCHEMA_BASE}/ceph.rook.io/v1/cephobjectstore.json" ;;
         "CephFilesystem")
             echo "${SCHEMA_BASE}/ceph.rook.io/v1/cephfilesystem.json" ;;
-        
+
         # Native Kustomization
         "NativeKustomization")
             echo "${SCHEMA_BASE}/kustomize.config.k8s.io/kustomization_v1beta1.json" ;;
-        
+
         # Unknown/Generic - use generic Kubernetes schema
         *)
             echo "https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json" ;;
@@ -300,7 +300,7 @@ get_schema_url() {
 
 detect_resource_type() {
     local file="$1"
-    
+
     # Special case: detect kustomization.yaml by filename
     local basename
     basename="$(basename "$file")"
@@ -322,25 +322,25 @@ detect_resource_type() {
             return 0
         fi
     fi
-    
+
     # Extract all 'kind:' values from the file
     local kinds=()
     while IFS= read -r kind; do
         kinds+=("$kind")
     done < <(grep "^kind:" "$file" 2>/dev/null | awk '{print $2}' | sort -u)
-    
+
     # No kinds found
     if [[ ${#kinds[@]} -eq 0 ]]; then
         echo "UNKNOWN"
         return 0
     fi
-    
+
     # Single kind - return it
     if [[ ${#kinds[@]} -eq 1 ]]; then
         echo "${kinds[0]}"
         return 0
     fi
-    
+
     # Multiple kinds - check if all the same
     local first="${kinds[0]}"
     local all_same=true
@@ -350,7 +350,7 @@ detect_resource_type() {
             break
         fi
     done
-    
+
     if [[ "$all_same" == "true" ]]; then
         echo "$first"
     else
@@ -378,7 +378,7 @@ is_schema_correct() {
     local expected_url="$2"
     local existing
     existing="$(get_existing_schema "$file")"
-    
+
     [[ "$existing" =~ "$expected_url" ]]
 }
 
@@ -386,10 +386,10 @@ add_or_update_schema() {
     local file="$1"
     local schema_url="$2"
     local has_existing="$3"
-    
+
     local schema_line="# yaml-language-server: \$schema=${schema_url}"
     local temp_file="${file}.tmp"
-    
+
     if [[ "$has_existing" == "false" ]]; then
         # Add new schema at the top
         {
@@ -400,7 +400,7 @@ add_or_update_schema() {
         # Replace existing schema
         sed "s|^# yaml-language-server:.*|$schema_line|" "$file" > "$temp_file"
     fi
-    
+
     # Move temp file to original
     mv "$temp_file" "$file"
 }
@@ -408,39 +408,39 @@ add_or_update_schema() {
 process_file() {
     local file="$1"
     local dry_run="$2"
-    
+
     stats_total=$((stats_total + 1))
-    
+
     # Detect resource type
     local resource_type
     resource_type="$(detect_resource_type "$file")"
-    
+
     # Handle unknown resources
     if [[ "$resource_type" == "UNKNOWN" ]]; then
         log_warning "Unknown resource type: ${file}"
         stats_unknown=$((stats_unknown + 1))
         return 0
     fi
-    
+
     # Handle mixed resource types
     if [[ "$resource_type" == MIXED:* ]]; then
         log_warning "Mixed resource types in file: ${file} (${resource_type#MIXED:})"
         log_info "  → Using generic Kubernetes schema"
         resource_type="UNKNOWN"  # Will use generic schema
     fi
-    
+
     # Track resource type count
     type_counts["$resource_type"]=$((${type_counts["$resource_type"]:-0} + 1))
-    
+
     # Get appropriate schema URL
     local schema_url
     schema_url="$(get_schema_url "$resource_type")"
-    
+
     # Check existing schema
     local has_existing=false
     if has_schema_annotation "$file"; then
         has_existing=true
-        
+
         # Check if it's correct
         if is_schema_correct "$file" "$schema_url"; then
             log_action "SKIP" "$file" "$resource_type"
@@ -485,45 +485,45 @@ process_file() {
 
 build_find_command() {
     local target_path="$1"
-    
+
     # Build find command with exclusions
     local find_cmd="find \"$target_path\" -type f \\( -name '*.yaml' -o -name '*.yml' \\)"
-    
+
     for exclude_dir in "${EXCLUDE_DIRS[@]}"; do
         find_cmd+=" -not -path '*/${exclude_dir}/*'"
     done
-    
+
     find_cmd+=" -print0"
-    
+
     echo "$find_cmd"
 }
 
 process_directory() {
     local target_path="$1"
     local dry_run="$2"
-    
+
     # Find all YAML files
     local files=()
     local find_cmd
     find_cmd="$(build_find_command "$target_path")"
-    
+
     while IFS= read -r -d '' file; do
         files+=("$file")
     done < <(eval "$find_cmd")
-    
+
     local total=${#files[@]}
-    
+
     if [[ $total -eq 0 ]]; then
         log_error "No YAML files found in ${target_path}"
         exit 1
     fi
-    
+
     print_header "Processing ${total} YAML files in ${target_path}"
-    
+
     local current=0
     for file in "${files[@]}"; do
         current=$((current + 1))
-        
+
         # Show progress
         if [[ "${VERBOSE}" == "false" ]]; then
             printf "\r[%4d/%4d] Processing..." "$current" "$total"
@@ -531,11 +531,11 @@ process_directory() {
             echo ""
             log_info "[${current}/${total}] Processing: ${file}"
         fi
-        
+
         # Process the file
         process_file "$file" "$dry_run"
     done
-    
+
     if [[ "${VERBOSE}" == "false" ]]; then
         printf "\r[%4d/%4d] Complete!     \n" "$total" "$total"
     fi
@@ -548,7 +548,7 @@ process_directory() {
 generate_report() {
     local mode="$1"
     local output_file="schema-annotation-report-$(date +%Y%m%d-%H%M%S).txt"
-    
+
     {
         echo "======================================================"
         echo "  YAML Schema Annotation Report"
@@ -567,7 +567,7 @@ generate_report() {
         echo "  Unknown resource types:       $stats_unknown"
         echo "  Errors:                       $stats_errors"
         echo ""
-        
+
         if [[ ${#type_counts[@]} -gt 0 ]]; then
             echo "RESOURCE TYPE BREAKDOWN:"
             for type in "${!type_counts[@]}"; do
@@ -575,9 +575,9 @@ generate_report() {
             done | sort -k2 -rn
             echo ""
         fi
-        
+
         echo "======================================================"
-        
+
         if [[ "$mode" == "DRY-RUN" ]]; then
             echo ""
             echo "Run with --execute to apply changes."
@@ -589,7 +589,7 @@ generate_report() {
             echo "  3. Commit changes: git commit -m \"feat: add YAML schema annotations\""
         fi
     } | tee "$output_file"
-    
+
     echo ""
     log_success "Report saved to: $output_file"
 }
@@ -604,13 +604,13 @@ check_prerequisites() {
         log_error "Not in a git repository"
         exit 1
     fi
-    
+
     # Check if target directory exists
     if [[ ! -d "${TARGET_PATH}" ]]; then
         log_error "Target directory does not exist: ${TARGET_PATH}"
         exit 1
     fi
-    
+
     # Warn if working tree is dirty (only if not force mode and executing)
     if [[ "${FORCE}" != "true" ]] && [[ "${DRY_RUN}" == "false" ]] && ! git diff-index --quiet HEAD -- 2>/dev/null; then
         log_warning "Git working tree has uncommitted changes"
@@ -623,7 +623,7 @@ check_prerequisites() {
             exit 0
         fi
     fi
-    
+
     log_success "Git repository: OK"
 }
 
@@ -648,16 +648,16 @@ OPTIONS:
 EXAMPLES:
     # Preview what would change (default)
     $(basename "$0")
-    
+
     # Preview specific directory
     $(basename "$0") --path kubernetes/apps
-    
+
     # Apply changes to all files
     $(basename "$0") --execute
-    
+
     # Apply changes with verbose output
     $(basename "$0") --execute --verbose
-    
+
     # Force execution ignoring git status
     $(basename "$0") --execute --force
 
@@ -707,7 +707,7 @@ parse_arguments() {
 
 main() {
     parse_arguments "$@"
-    
+
     # Print header
     if [[ "${DRY_RUN}" == "true" ]]; then
         print_header "YAML Schema Annotation Tool - DRY RUN MODE"
@@ -716,18 +716,18 @@ main() {
         print_header "YAML Schema Annotation Tool - EXECUTE MODE"
         log_warning "Files will be modified!"
     fi
-    
+
     echo ""
-    
+
     # Pre-flight checks
     check_prerequisites
-    
+
     # Process files
     local mode="EXECUTE"
     [[ "${DRY_RUN}" == "true" ]] && mode="DRY-RUN"
-    
+
     process_directory "${TARGET_PATH}" "${DRY_RUN}"
-    
+
     # Generate report
     echo ""
     generate_report "$mode"

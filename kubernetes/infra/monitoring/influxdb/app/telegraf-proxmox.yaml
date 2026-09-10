@@ -251,18 +251,17 @@ data:
     # Monitor process cpu and memory usage
     [[inputs.procstat]]
       ## PID file to monitor process
-      # pid_file = "/var/run/nginx.pid"
-      ## executable name (ie, pgrep <exe>)
+      ##
       exe = "pvestatd"
       ## pattern as argument for pgrep (ie, pgrep -f <pattern>)
-      # pattern = "nginx"
+      # pattern = "telegraf"
       ## user as argument for pgrep (ie, pgrep -u <user>)
-      # user = "nginx"
+      # user = "telegraf"
       ## Systemd unit name, supports globs when include_systemd_children is set to true
-      # systemd_unit = "nginx.service"
+      # systemd_unit = "telegraf.service"
       # include_systemd_children = false
       ## CGroup name or path, supports globs when include_cgroup_children is set to true
-      # cgroup = "systemd/system.slice/nginx.service"
+      # cgroup = "systemd/system.slice/telegraf.service"
       # include_cgroup_children = false
       ## Windows service name
       # win_service = ""
