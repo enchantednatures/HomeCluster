@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/ingress_v1.json
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app home-assistant-tailscale
+  namespace: home-system
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+  annotations:
+    tailscale.com/hostname: hass
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: home-assistant
+      port:
+        number: 8123
