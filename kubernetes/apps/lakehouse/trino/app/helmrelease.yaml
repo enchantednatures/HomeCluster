@@ -36,18 +36,9 @@ spec:
       exchange:
         compression: enabled
     coordinator:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: kubernetes.io/hostname
-                    operator: In
-                    values:
-                      - ctrl-01
-                      - work-00
-                      - work-01
-                      - work-02
+      labels:
+        # melusine ztunnel crash-loops and breaks ambient kubelet probes — mesh-exclude like CNPG
+        istio.io/dataplane-mode: none
       config:
         nodeScheduler:
           includeCoordinator: true
@@ -57,10 +48,10 @@ spec:
       resources:
         requests:
           cpu: 500m
-          memory: 2Gi
+          memory: 1Gi
         limits:
           cpu: "2"
-          memory: 4Gi
+          memory: 2Gi
     catalogs:
       lakekeeper: |
         connector.name=iceberg
