@@ -51,6 +51,8 @@ spec:
         audience: ""
         createClusterRoleBinding: true
     catalog:
+      podLabels:
+        istio.io/dataplane-mode: none
       replicas: 1
       resources:
         requests:
