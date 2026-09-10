@@ -74,7 +74,7 @@ spec:
         iceberg.rest-catalog.nested-namespace-enabled=true
         iceberg.rest-catalog.vended-credentials-enabled=false
         iceberg.unique-table-location=true
-        fs.s3.enabled=true
+        fs.native-s3.enabled=true
         s3.region=us-east-1
         s3.endpoint=http://minio-service.networking.svc.cluster.local:9768
         s3.path-style-access=true
