@@ -21,3 +21,25 @@ spec:
   interval: 10m
   retryInterval: 1m
   timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app lakekeeper
+  namespace: flux-system
+spec:
+  targetNamespace: lakehouse
+  dependsOn:
+    - name: lakekeeper-db
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/apps/lakehouse/lakekeeper/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: false
+  interval: 10m
+  retryInterval: 1m
+  timeout: 5m

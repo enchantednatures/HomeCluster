@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: lakekeeper
+  namespace: lakehouse
+spec:
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: lakekeeper
+      version: 0.12.0 # datasource=helm depName=lakekeeper repository=https://lakekeeper.github.io/lakekeeper-charts
+      sourceRef:
+        kind: HelmRepository
+        name: lakekeeper
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    postgresql:
+      enabled: false
+    externalDatabase:
+      host_read: lakekeeper-db-rw.lakehouse.svc.cluster.local
+      host_write: lakekeeper-db-rw.lakehouse.svc.cluster.local
+      port: 5432
+      database: lakekeeper
+      userSecret: lakekeeper-db-user
+      userSecretKey: postgresql-user
+      passwordSecret: lakekeeper-db-user
+      passwordSecretKey: postgresql-password
+    secretBackend:
+      postgres:
+        encryptionKeySecret: lakekeeper-encryption-key
+    auth:
+      oauth2:
+        providerUri: ""
+      k8s:
+        enabled: true
+        audience: ""
+        createClusterRoleBinding: true
+    catalog:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+    serviceAccount:
+      automount: true
+    service:
+      type: ClusterIP
