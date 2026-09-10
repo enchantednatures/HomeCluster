@@ -43,6 +43,7 @@ resources:
   - ./kestra-charts.yaml
   - ./kiali.yaml
   - ./kyverno.yaml
+  - ./lakekeeper.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
@@ -55,5 +56,6 @@ resources:
   - ./stakater.yaml
   - ./strimzi.yaml
   - ./tailscale-charts.yaml
+  - ./trino.yaml
   - ./velero.yaml
   - ./vmware-tanzu.yaml
