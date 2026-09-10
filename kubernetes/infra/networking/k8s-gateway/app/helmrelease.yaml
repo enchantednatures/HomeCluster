@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: k8s-gateway
-      version: 3.7.2 # datasource=helm depName=k8s-gateway repository=https://k8s-gateway.kryptonian.kapsi.fi
+      version: 3.7.3 # datasource=helm depName=k8s-gateway repository=https://k8s-gateway.kryptonian.kapsi.fi
       sourceRef:
         kind: HelmRepository
         name: k8s-gateway
