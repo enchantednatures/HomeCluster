@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app lakekeeper-bootstrap-v2
+  name: &app lakekeeper-bootstrap-v3
   namespace: lakehouse
 spec:
   backoffLimit: 3
