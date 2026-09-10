@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+# https://kubernetes.io/docs/concepts/configuration/secret/
+apiVersion: v1
+kind: Secret
+metadata:
+    name: lakekeeper-minio-credentials
+    namespace: lakehouse
+type: Opaque
+stringData:
+    MINIO_ACCESS_KEY: ENC[AES256_GCM,data:9P7APPABgP7+VEIeIwmVGjKRq0o=,iv:E30ukdKTAnB6k52hc7W2vivy+TQsOC/ohRd4hkRWpTk=,tag:STgGBoCXnWFFAY02D3zzhQ==,type:str]
+    MINIO_SECRET_KEY: ENC[AES256_GCM,data:+TKkt/9Bhh8Tsc0bNu/VGITfg6Ncd1EKo7qxJraxOORKL8wTSQn9Qw==,iv:5WHHTR4gr+AeLLOIYEYq9JarkDG8UzaFybb2+Jz33OI=,tag:zUUVNiTF2cGqVnK3wAwjLw==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBtTktub2Jyd2E5WEh2UW05
+            MCs5SGsxNWJNbE1zV0tSWVFRa0FxTjQxYkhRCktaVmlVcUtWUHdua0VmMmp4Sk9P
+            Qm9YbWNEZWt3d3FuMEtjamFxOTVtK0kKLS0tIDh6NmdPR1VuWHE0SGxraHVFWHc4
+            MitIV1kzU1Y5aVVRTUdwSDdlMTg2dEkKjV7Trr2AEOLSIFPC8j4mJ4/m0GjjJHFk
+            NxVK1M42ZFM/fz9C8+5uINSf8I/N1iTSUG8n/ZLGblD7UhzjtQWlPA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-09-10T16:56:02Z"
+    mac: ENC[AES256_GCM,data:fXk6p6AYBgafmyRgTJjnhp9SYIreH3JVxhUZGoXrisX0QU9JbOHOla1rn/znjtvPbpEj1zrBTFpjOBiGMFl0sm5r+K8guDSSYZuwcWfDHpxbj40x6qlHEWOWvbHMSp5xHI/c2fbYfeA46zyS+vrHAQP0WfHKP+ISFah8Qe2Eir0=,iv:3TlRr2DSKtkvtCbixuQcNxCdYzlkOnvCWtseqtUFSDk=,tag:foJ0YUg9vQsOsJmltUD3Ag==,type:str]
+    version: 3.13.3

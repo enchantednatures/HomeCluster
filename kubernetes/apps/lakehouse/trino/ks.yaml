@@ -13,6 +13,10 @@ spec:
     labels:
       app.kubernetes.io/name: *app
   path: ./kubernetes/apps/lakehouse/trino/app
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: lakekeeper-minio-credentials
   prune: true
   sourceRef:
     kind: GitRepository

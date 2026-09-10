@@ -67,8 +67,8 @@ spec:
         s3.region=us-east-1
         s3.endpoint=http://minio-service.networking.svc.cluster.local:9768
         s3.path-style-access=true
-        s3.aws-access-key=REPLACE_ME_ACCESS_KEY
-        s3.aws-secret-key=REPLACE_ME_SECRET_KEY
+        s3.aws-access-key=${MINIO_ACCESS_KEY}
+        s3.aws-secret-key=${MINIO_SECRET_KEY}
     service:
       type: ClusterIP
       port: 8080
