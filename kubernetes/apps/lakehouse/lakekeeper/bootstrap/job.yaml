@@ -30,6 +30,12 @@ spec:
             - |
               set -o errexit
               API=http://lakekeeper.lakehouse.svc.cluster.local:8181
+              i=0
+              until nc -z -w 2 lakekeeper.lakehouse.svc.cluster.local 8181; do
+                i=$((i + 1))
+                if [ "$i" -gt 60 ]; then echo "lakekeeper not reachable after 5m"; exit 1; fi
+                sleep 5
+              done
               TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
               AUTH="Authorization: Bearer $${TOKEN}"
 
