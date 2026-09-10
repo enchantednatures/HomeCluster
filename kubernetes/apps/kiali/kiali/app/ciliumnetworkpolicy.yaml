@@ -34,7 +34,8 @@ spec:
               protocol: TCP
             - port: "6443"
               protocol: TCP
-    # istiod (xDS + workload certificate issuance for the sidecar)
+    # istiod (xDS/CA on 15012 for the sidecar; debug endpoint on 15014 for
+    # control-plane version/metrics queries)
     - toEndpoints:
         - matchLabels:
             k8s:app: istiod
@@ -42,6 +43,8 @@ spec:
       toPorts:
         - ports:
             - port: "15012"
+              protocol: TCP
+            - port: "15014"
               protocol: TCP
     # Prometheus / Grafana / Tempo query frontend (monitoring)
     - toEndpoints:
