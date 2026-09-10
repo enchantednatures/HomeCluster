@@ -36,6 +36,18 @@ spec:
       exchange:
         compression: enabled
     coordinator:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - ctrl-01
+                      - work-00
+                      - work-01
+                      - work-02
       config:
         nodeScheduler:
           includeCoordinator: true
