@@ -70,6 +70,10 @@ spec:
         connector.name=iceberg
         iceberg.catalog.type=rest
         iceberg.rest-catalog.uri=http://lakekeeper.lakehouse.svc.cluster.local:8181/catalog
+        iceberg.rest-catalog.security=OAUTH2
+        # k8s ServiceAccount token (SA lakekeeper, 1y bound token) from cluster-secrets
+        iceberg.rest-catalog.oauth2.token=${LAKEKEEPER_SA_TOKEN}
+        iceberg.rest-catalog.oauth2.token-refresh-enabled=false
         iceberg.rest-catalog.warehouse=lakehouse
         iceberg.rest-catalog.nested-namespace-enabled=true
         iceberg.rest-catalog.vended-credentials-enabled=false
