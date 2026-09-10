@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumnetworkpolicy_v2.json
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-kiali
+  namespace: kiali
+spec:
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/instance: kiali
+      k8s:app.kubernetes.io/name: kiali
+  egress:
+    # DNS (TCP + UDP)
+    - toEndpoints:
+        - matchLabels:
+            k8s:k8s-app: kube-dns
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    # Kubernetes API (pod to apiserver crosses node/host endpoints; vanilla
+    # NetworkPolicy ipBlock rules do not match node identity, must use entities)
+    - toEntities:
+        - kube-apiserver
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "6443"
+              protocol: TCP
+    # istiod (xDS + workload certificate issuance for the sidecar)
+    - toEndpoints:
+        - matchLabels:
+            k8s:app: istiod
+            k8s:io.kubernetes.pod.namespace: istio-system
+      toPorts:
+        - ports:
+            - port: "15012"
+              protocol: TCP
+    # Prometheus / Grafana / Tempo query frontend (monitoring)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+      toPorts:
+        - ports:
+            - port: "9090"
+              protocol: TCP
+            - port: "80"
+              protocol: TCP
+            - port: "3200"
+              protocol: TCP
