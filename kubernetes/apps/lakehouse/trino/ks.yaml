@@ -9,6 +9,7 @@ spec:
   targetNamespace: lakehouse
   dependsOn:
     - name: lakekeeper
+    - name: lakekeeper-bootstrap
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

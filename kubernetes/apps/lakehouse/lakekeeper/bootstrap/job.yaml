@@ -31,37 +31,37 @@ spec:
               set -o errexit
               API=http://lakekeeper.lakehouse.svc.cluster.local:8181
               TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
-              AUTH="Authorization: Bearer ${TOKEN}"
+              AUTH="Authorization: Bearer $${TOKEN}"
 
               STATUS="$(wget -S -O /dev/null \
-                --header "${AUTH}" \
+                --header "$${AUTH}" \
                 --header "Content-Type: application/json" \
                 --post-data '{"accept-terms-of-use":true}' \
-                "${API}/management/v1/bootstrap" 2>&1 | awk '/HTTP\//{print $2}' | tail -n1)" || true
-              echo "bootstrap status: ${STATUS}"
-              case "${STATUS}" in
+                "$${API}/management/v1/bootstrap" 2>&1 | awk '/HTTP\//{print $2}' | tail -n1)" || true
+              echo "bootstrap status: $${STATUS}"
+              case "$${STATUS}" in
                 200|201|409) ;;
                 *) echo "bootstrap failed unexpectedly"; exit 1 ;;
               esac
 
-              wget --header "${AUTH}" -O /tmp/warehouses.json \
-                "${API}/management/v1/warehouse" 2>/dev/null
+              wget --header "$${AUTH}" -O /tmp/warehouses.json \
+                "$${API}/management/v1/warehouse" 2>/dev/null
               if grep -q '"name":"lakehouse"' /tmp/warehouses.json; then
                 echo "warehouse lakehouse already exists"
                 exit 0
               fi
 
               cat > /tmp/warehouse.json <<EOF
-              {"warehouse-name":"lakehouse","delete-profile":{"type":"hard"},"storage-credential":{"type":"s3","credential-type":"access-key","aws-access-key-id":"${MINIO_ACCESS_KEY}","aws-secret-access-key":"${MINIO_SECRET_KEY}"},"storage-profile":{"type":"s3","bucket":"lakehouse-warehouse","region":"us-east-1","sts-enabled":false,"flavor":"s3-compat","key-prefix":"lakehouse-warehouse","endpoint":"http://minio-service.networking.svc.cluster.local:9768","path-style-access":true}}
+              {"warehouse-name":"lakehouse","delete-profile":{"type":"hard"},"storage-credential":{"type":"s3","credential-type":"access-key","aws-access-key-id":"$${MINIO_ACCESS_KEY}","aws-secret-access-key":"$${MINIO_SECRET_KEY}"},"storage-profile":{"type":"s3","bucket":"lakehouse-warehouse","region":"us-east-1","sts-enabled":false,"flavor":"s3-compat","key-prefix":"lakehouse-warehouse","endpoint":"http://minio-service.networking.svc.cluster.local:9768","path-style-access":true}}
               EOF
 
               STATUS="$(wget -S -O /dev/null \
-                --header "${AUTH}" \
+                --header "$${AUTH}" \
                 --header "Content-Type: application/json" \
                 --post-data "$(cat /tmp/warehouse.json)" \
-                "${API}/management/v1/warehouse" 2>&1 | awk '/HTTP\//{print $2}' | tail -n1)" || true
-              echo "warehouse create status: ${STATUS}"
-              case "${STATUS}" in
+                "$${API}/management/v1/warehouse" 2>&1 | awk '/HTTP\//{print $2}' | tail -n1)" || true
+              echo "warehouse create status: $${STATUS}"
+              case "$${STATUS}" in
                 200|201|409) ;;
                 *) echo "warehouse creation failed unexpectedly"; exit 1 ;;
               esac
