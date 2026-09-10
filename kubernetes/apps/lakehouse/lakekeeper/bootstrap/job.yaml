@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app lakekeeper-bootstrap-v5
+  name: &app lakekeeper-bootstrap-v6
   namespace: lakehouse
 spec:
   backoffLimit: 3
@@ -59,9 +59,7 @@ spec:
                 exit 0
               fi
 
-              cat > /tmp/warehouse.json <<EOF
-{"warehouse-name":"lakehouse","delete-profile":{"type":"hard"},"storage-credential":{"type":"s3","credential-type":"access-key","aws-access-key-id":"$${MINIO_ACCESS_KEY}","aws-secret-access-key":"$${MINIO_SECRET_KEY}"},"storage-profile":{"type":"s3","bucket":"lakehouse-warehouse","region":"us-east-1","sts-enabled":false,"flavor":"s3-compat","key-prefix":"lakehouse-warehouse","endpoint":"http://minio-service.networking.svc.cluster.local:9768","path-style-access":true}}
-EOF
+              echo "{\"warehouse-name\":\"lakehouse\",\"delete-profile\":{\"type\":\"hard\"},\"storage-credential\":{\"type\":\"s3\",\"credential-type\":\"access-key\",\"aws-access-key-id\":\"$${MINIO_ACCESS_KEY}\",\"aws-secret-access-key\":\"$${MINIO_SECRET_KEY}\"},\"storage-profile\":{\"type\":\"s3\",\"bucket\":\"lakehouse-warehouse\",\"region\":\"us-east-1\",\"sts-enabled\":false,\"flavor\":\"s3-compat\",\"key-prefix\":\"lakehouse-warehouse\",\"endpoint\":\"http://minio-service.networking.svc.cluster.local:9768\",\"path-style-access\":true}}" > /tmp/warehouse.json
 
               STATUS="$(wget -S -O /dev/null \
                 --header "$${AUTH}" \
