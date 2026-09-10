@@ -49,11 +49,6 @@ spec:
         limits:
           cpu: "2"
           memory: 4Gi
-      secretMounts:
-        - name: catalog-credentials
-          secretName: trino-catalog-credentials
-          path: /etc/trino/catalog-credentials/aws-credentials.properties
-          subPath: aws-credentials.properties
     catalogs:
       lakekeeper: |
         connector.name=iceberg

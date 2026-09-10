@@ -8,20 +8,22 @@ metadata:
         cnpg.io/reload: "true"
 type: Opaque
 stringData:
-    postgresql-user: ENC[AES256_GCM,data:6cZ6luzLLw+N8A==,iv:pZF8IyWQpYDIxY+sQtY1IHoUenU1rfsBEwPgZw0ndik=,tag:tSFYa/8/oFAIuNbAqxB0uA==,type:str]
-    postgresql-password: ENC[AES256_GCM,data:Vaqwxcz1mJg4FT6suudgs2xT+qkP/0MngcXA4YVGjng=,iv:zRpEZ8dldqvkeEnKWfpp9q9g6gB4hR128+1lBN0dvsQ=,tag:P72LQFBw+u1whQhzJVu/OA==,type:str]
+    postgresql-user: ENC[AES256_GCM,data:Yo30IXAYnnf8FQ==,iv:nT8Sg39XUChO1EvetK3TDMESsJsmZq6PDbOtIBybIEA=,tag:ECF7Gk+l9+GIS0zjMuGEew==,type:str]
+    username: ENC[AES256_GCM,data:9oypOgsWK8UwOQ==,iv:OdRjsJug6rd4io37oEClrThs6bAH1ZyIAWjxF6YVri0=,tag:6ldz6zSY1VSib5NMfyIFQQ==,type:str]
+    postgresql-password: ENC[AES256_GCM,data:/Cjf7/nE5RBVfMW1gHiC45EAfSFMDTHEUh+7b6klrSo=,iv:hklNi/mKm0dAzN4IXaBQ2AAMpcbzSJVAm0P5dNRCt8s=,tag:ZMCkpdAf9Y3x8XR+qi5fHQ==,type:str]
+    password: ENC[AES256_GCM,data:x5AjOWjMUNGf1t8+c3BkqSpM6E/j/sYWXu2CrQZLCYA=,iv:tVYL7O4fqo9LxhY53Lba9KUGIHTYzLjd6EcnnWvfh3A=,tag:Vl1tvJhaEzKuPkMN+I1B5Q==,type:str]
 sops:
     age:
         - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBGNlZEWEpMcDRmMCtZRUhV
-            c01zS201ZTcyeDg2ODhZVFhJa2hwOXVIOVhVCnN1RG5XUXlXS29LYWtMT1BEUC90
-            bWFkOWJtbHlOaFZxWTU0akRyQWJ6NncKLS0tIDZHbnRCbXZ1MUE0Y0d1V1gzdDJ3
-            d2M2NkJPcTJqSHJqVjRjZXIwYjExd1EKgzlGs7GVwrHnB74Rj2W3JNhJvfGJgksM
-            yTJ3ZYPMWqYb5if0DgFloIvM3v1bn/DBWlMhErZA06qiFXG3LtE8rg==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBsSFhFb0doZG1CTW8yckEz
+            V1drQ1l1WDNQdUZkd0s2SlJtdGVRRUpNRFZrCjNvb2lVczA0NEZ6WFlVSUVMeFMw
+            czlhMUIvNnkrbjlFQlNZQkRoVDBJZEUKLS0tIEdxSWJ1VEN4cXJacHQ4M2VoSytq
+            VlpOY1VwVkNxL3QvOFU5VGdEZ2kzdTAKdq+nB8rOafWMPEqUO9Cu/oc1H+qrMiJ2
+            /+PWOewtI+V1e6MSc1OJshXFGndhhkQXo50xY3CCb+hxm3seZvbmkA==
             -----END AGE ENCRYPTED FILE-----
           recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
     encrypted_regex: ^(data|stringData)$
-    lastmodified: "2026-09-10T16:48:16Z"
-    mac: ENC[AES256_GCM,data:ZmawkLZYbz9WLn/aXJkXag8w1R+wZzhxql1jnaLCbYONiOSqoqc5R6FGaN5HHxhPjxBaTKvj8T1q5i0kqGBHmh4t/dqhgocHiMfTZMyKfMvJ7Dg4dJ9wJue3BXdi/dYRRunqX7LST3hi9YI7U5MsMomPv7hAkZpgKSFGEZyFBv8=,iv:eCdKS82KVsv1mj/+zEagQ3/zv4fgv9fHmN4t+LC+8D0=,tag:78AbUA0OEyj/jZQqum0pnA==,type:str]
+    lastmodified: "2026-09-10T17:17:36Z"
+    mac: ENC[AES256_GCM,data:CEwxRCzMHZOkJHOeWf13ztEWcrKUAgUhxtn9liFsNo92NjzrlsrPbxFxip6lGbFCW9CiZP/Sq2/X9Nw5Qt0dacj3sWLnxg/JzXjSWbspP+ZeWko04o5akruP1BzuJfMBlbRUiLZwWjJL50Y9mqS7UwE/8kvW4o8mE93vbrVXPeE=,iv:B4gE3d4/ySk6zSbHrbNbUKcfMoK0ZA1Y43WX1gbKZJU=,tag:pkL/qfHduENHWHZE9e27FA==,type:str]
     version: 3.13.3
