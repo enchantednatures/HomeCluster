@@ -39,6 +39,17 @@ spec:
       labels:
         # melusine ztunnel crash-loops and breaks ambient kubelet probes — mesh-exclude like CNPG
         istio.io/dataplane-mode: none
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                      - work-00
+                      - work-01
+                      - work-02
       config:
         nodeScheduler:
           includeCoordinator: true
@@ -47,8 +58,8 @@ spec:
         maxHeapPercent: 70
       resources:
         requests:
-          cpu: 500m
-          memory: 1Gi
+          cpu: 100m
+          memory: 512Mi
         limits:
           cpu: "2"
           memory: 2Gi
