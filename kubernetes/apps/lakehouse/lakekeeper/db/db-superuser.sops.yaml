@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: lakekeeper-db-superuser
+    namespace: lakehouse
+    labels:
+        cnpg.io/reload: "true"
+type: Opaque
+stringData:
+    username: ENC[AES256_GCM,data:1PrLUKbSDcU=,iv:JXG7xNMSyqnl7kKPI6avYSRE5HJtovyXzGYnvM/9/pA=,tag:OG12QZT8CGre7AdrsdOxhA==,type:str]
+    password: ENC[AES256_GCM,data:tiW5yqd79XHEMmMGlH55HWQOmX+mSgBcW9aUN5w5/GA=,iv:jH2cDyMVl9BNozzg8zEaeojdxyJOMRbsSNdoYofKmX8=,tag:x0NOZVzzF8nP+D9OOrNFAg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBaV1ZtNHRZdWNlY3orVnhT
+            RnptSUNmWEt6WGxReXlFN1hwdUJkcnVLNnp3CjFiRXpwaFAxSFRYcUV4dnNoYk14
+            ZEs5MExHeEhRUXZDekZKQk1JUlBFYkkKLS0tIEVWUHV1emdUcDJtU0dDM3loMkFN
+            QTFrRDZIbGVQcGdDaHpDKytjRUp2Q3MKkP9I9wOCGA7ttbdBUdGn6LE1GrSHvq6u
+            KXEb/KklXCzCFQ9PoXQ+4CIxsc7SHesaZNCQxkSrUkQ/P9ngIBInnA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-09-10T16:48:16Z"
+    mac: ENC[AES256_GCM,data:K2GOLG93w84UJbWUi37+thbcYV63lJIVbfRKC4rhN3fB4x9rmNDxiCqUNJmaB82jkclCdy6rUFZO4q4CZZNCeYjvoZiL92TOtCfOxjJEZAdkjJnY+NeFHaqA09dQr2DcHzVvuoUgo77DzgxGWKsFo4CQx/izFybSqbTmLh5gGGo=,iv:RRWe1/LRkIai8845Mu99mUQv8mEL+VX3J3hSP4H4Hc0=,tag:Tj6k07ssZ6Vg7o6ei7ETaQ==,type:str]
+    version: 3.13.3

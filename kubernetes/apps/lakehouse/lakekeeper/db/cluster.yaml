@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: &app lakekeeper-db
+  namespace: lakehouse
+  labels:
+    app.kubernetes.io/name: *app
+spec:
+  inheritedMetadata:
+    labels:
+      istio.io/dataplane-mode: "none"
+  # renovate: datasource=docker depName=ghcr.io/tensorchord/cloudnative-vectorchord versioning=redhat
+  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:16.9-0.3.0
+  instances: 1
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: openebs-hostpath
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 4Gi
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: lakekeeper-db-superuser
+  postgresql:
+    parameters:
+      max_connections: "300"
+      shared_buffers: 512MB
+    shared_preload_libraries:
+      - vchord.so
+  monitoring:
+    enablePodMonitor: false
+  managed:
+    roles:
+      - name: lakekeeper
+        ensure: present
+        comment: Lakekeeper
+        login: true
+        superuser: false
+        passwordSecret:
+          name: lakekeeper-db-user
+        inRoles:
+          - pg_monitor
+          - pg_signal_backend
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: minio-store
+        serverName: lakekeeper
+  bootstrap:
+    initdb:
+      database: lakekeeper
+      owner: lakekeeper
+      secret:
+        name: lakekeeper-db-user
