@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: trino
+  namespace: lakehouse
+spec:
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: trino
+      version: 1.42.2 # datasource=helm depName=trino repository=https://trinodb.github.io/charts/
+      sourceRef:
+        kind: HelmRepository
+        name: trino
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    server:
+      workers: 0
+      config:
+        query:
+          maxMemory: 2GB
+      exchange:
+        compression: enabled
+    coordinator:
+      config:
+        nodeScheduler:
+          includeCoordinator: true
+      jvm:
+        maxHeapSize: null
+        maxHeapPercent: 70
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          cpu: "2"
+          memory: 4Gi
+      secretMounts:
+        - name: catalog-credentials
+          secretName: trino-catalog-credentials
+          path: /etc/trino/catalog-credentials/aws-credentials.properties
+          subPath: aws-credentials.properties
+    catalogs:
+      lakekeeper: |
+        connector.name=iceberg
+        iceberg.catalog.type=rest
+        iceberg.rest-catalog.uri=http://lakekeeper.lakehouse.svc.cluster.local:8181/catalog
+        iceberg.rest-catalog.warehouse=lakehouse
+        iceberg.rest-catalog.nested-namespace-enabled=true
+        iceberg.rest-catalog.vended-credentials-enabled=false
+        iceberg.unique-table-location=true
+        fs.s3.enabled=true
+        s3.region=us-east-1
+        s3.endpoint=http://minio-service.networking.svc.cluster.local:9768
+        s3.path-style-access=true
+        s3.aws-access-key=REPLACE_ME_ACCESS_KEY
+        s3.aws-secret-key=REPLACE_ME_SECRET_KEY
+    service:
+      type: ClusterIP
+      port: 8080
+    ingress:
+      enabled: false
