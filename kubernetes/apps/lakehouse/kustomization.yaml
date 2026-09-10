@@ -5,5 +5,6 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./networkpolicy.yaml
+  - ./ciliumnetworkpolicy.yaml
   - ./lakekeeper/ks.yaml
   - ./trino/ks.yaml
