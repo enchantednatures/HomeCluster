@@ -28,7 +28,9 @@ spec:
     istio:
       # Points to your custom Istio gateway service in istio-ingress namespace
       gateway.knative-serving.knative-ingress-gateway: "istio-ingressgateway.istio-ingress.svc.cluster.local"
-      local-gateway.knative-serving.cluster-local-gateway: "istio-ingressgateway.istio-ingress.svc.cluster.local"
+      local-gateway.knative-serving.cluster-local-gateway: "knative-local-gateway.knative-serving.svc.cluster.local"
+    features:
+      queueproxy.resource-defaults: "enabled"
     autoscaler:
       enable-scale-to-zero: "true"
       scale-to-zero-grace-period: "30s"

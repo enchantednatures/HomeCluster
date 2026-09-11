@@ -109,6 +109,7 @@ spec:
         enabled: true
       policyExceptions:
         enabled: true
+        namespace: kyverno-system
       protectManagedResources:
         enabled: false
       forceFailurePolicyIgnore:

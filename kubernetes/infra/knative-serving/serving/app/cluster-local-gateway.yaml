@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: knative-local-gateway
+  namespace: knative-serving
+spec:
+  selector:
+    istio: gateway
+  servers:
+    - port:
+        number: 8081
+        name: http
+        protocol: HTTP
+      hosts:
+        - "*"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: knative-local-gateway
+  namespace: knative-serving
+  labels:
+    app.kubernetes.io/name: knative-local-gateway
+    serving.knative.dev/release: devel
+spec:
+  type: ClusterIP
+  ports:
+    - name: http2
+      port: 80
+      targetPort: 8081
+      protocol: TCP
+  selector:
+    istio: gateway

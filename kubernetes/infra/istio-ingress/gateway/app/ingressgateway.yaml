@@ -131,6 +131,9 @@ spec:
             - containerPort: 443
               name: https
               protocol: TCP
+            - containerPort: 8081
+              name: http2-knative-local
+              protocol: TCP
           livenessProbe:
             failureThreshold: 30
             httpGet:
@@ -199,6 +202,10 @@ spec:
     - name: https
       port: 443
       targetPort: 443
+      protocol: TCP
+    - name: http2-knative-local
+      port: 8081
+      targetPort: 8081
       protocol: TCP
   selector:
     app: istio-ingressgateway
