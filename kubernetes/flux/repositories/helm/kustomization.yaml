@@ -19,6 +19,7 @@ resources:
   - ./csi-driver-nfs.yaml
   - ./dbman-charts.yaml
   - ./democratic-csi.yaml
+  - ./descheduler-charts.yaml
   - ./elastic.yaml
   - ./external-dns.yaml
   - ./fairwinds.yaml
