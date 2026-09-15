@@ -45,6 +45,7 @@ spec:
     maxLogSize: 500M
   cleanupPolicy:
     confirmation: ""  # Empty to allow normal operation
+    wipeDevicesFromOtherClusters: true
     sanitizeDisks:
       method: quick
       dataSource: zero
