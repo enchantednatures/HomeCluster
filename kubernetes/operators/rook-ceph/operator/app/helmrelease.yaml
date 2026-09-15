@@ -59,15 +59,11 @@ spec:
     nodeSelector:
       kubernetes.io/arch: amd64
 
-    # Talos tolerations
     tolerations:
-      - effect: NoSchedule
+      - key: node.kubernetes.io/unreachable
         operator: Exists
-      - effect: NoExecute
-        operator: Exists
-      - key: node-role.kubernetes.io/control-plane
-        operator: Exists
-        effect: NoSchedule
+        effect: NoExecute
+        tolerationSeconds: 5
 
     # CSI configuration for Talos
     csi:
