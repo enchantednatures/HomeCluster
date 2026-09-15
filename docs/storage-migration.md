@@ -112,3 +112,37 @@ influxdb backup dir (`kubernetes/infra/monitoring/influxdb/backup/`) is today's 
   pilot script (prom-db-copy) is named and resumable as configured here.
 - IMPORTANT: copy jobs fired 3 times failed with DiskPressure until Proxmox
   expands ephemeral data volume — block remains until then.
+
+## CLOSING HANDOFF (2026-09-15)
+
+Status: infrastructure migration DONE (13 commits verified live).
+Remaining work is precisely gated on TWO answers from the cluster operator:
+
+### Action ①   — Proxmox expansion (unblocks 5b + 6b)
+- Expand /var ephemeral on work-01, ctrl-01, unraid-worker VMs.
+- After the resize completes and kubelet untaints (`kubectl get nodes` shows no
+  `node.kubernetes.io/disk-pressure` taint), run this pilot:
+  `kubectl apply -f kubernetes/infra/monitoring/influxdb/migration/migration-pair.yaml`
+  (prometheus-db0 pilot is the alternative; both are documented in this file)
+  Then proceed with monitoring → CNPG (kubectl cnpg backup) → media → elastic
+  → redpanda → vms, one app at a time, verification checked per run.
+
+### Action ②   — locate media manifests
+- `kubernetes/apps/media/**` is no longer in main. 15 flux kustomizations
+  reference deleted paths. Options:
+  a) Re-add tree from git history (if found in old refs)
+  b) Provide the chosen manifest repo/path, I'll copy it into place, verify
+     all 36 media PVCs, then resume cutovers
+
+### Ceph live-state (for cross-checking on next session)
+```
+kubectl -n rook-ceph get cephcluster rook-ceph -o jsonpath='{.status.ceph.health}'
+# expected: HEALTH_OK
+kubectl get sc | grep ceph
+# expected: 8 ceph-* classes all functional
+```
+
+### Git pointers
+- 13 commits pushed this session, latest `1be7647d2`
+- volsync pair: kubernetes/infra/monitoring/influxdb/migration/migration-pair.yaml
+- CSI tolerations (live-verified): kubernetes/operators/rook-ceph/cluster/app/csi-driver.yaml
