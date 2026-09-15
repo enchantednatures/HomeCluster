@@ -188,6 +188,14 @@ spec:
         retentionSize: 8GB
         replicas: 2
         disableCompaction: true
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes: [ReadWriteOnce]
+              resources:
+                requests:
+                  storage: 10Gi
+              storageClassName: ceph-block
         podAntiAffinity: soft
         podAntiAffinityTopologyKey: kubernetes.io/hostname
         tolerations:
