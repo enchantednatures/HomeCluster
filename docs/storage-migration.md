@@ -99,3 +99,16 @@ influxdb backup dir (`kubernetes/infra/monitoring/influxdb/backup/`) is today's 
   explicit tolerations patch (patched live; must be committed in the rook
   helmrelease `csi.` values — patch `tolerations` per the reference examples
   already in csi-operator-rbac.yaml)
+
+## Pilot-thread update 2026-09-15b
+
+- ctrl-01 auto-untainted briefly but re-entered DiskPressure (ephemeral-storage
+  is the constrained resource). `kube-dispatcher kubectl describe node`
+  confirms DiskPressure True. Copy job was evicted 3 times.
+- unraid-worker still under the same pressure even after cleanup; influxdb's
+  source PVC remains pinned there — leaves runbook blocked.
+- Runbook is accurate for the *next* session's pilot: **prometheus-db0**
+  (1Gi, openebs-hostpath on ctrl-01) is a smaller workload than influxdb; the
+  pilot script (prom-db-copy) is named and resumable as configured here.
+- IMPORTANT: copy jobs fired 3 times failed with DiskPressure until Proxmox
+  expands ephemeral data volume — block remains until then.
