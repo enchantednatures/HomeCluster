@@ -13,7 +13,7 @@ spec:
     size: 3
     requireSafeReplicaSize: true
     replicasPerFailureDomain: 1
-    subFailureDomain: host
+    subFailureDomain: osd
   parameters:
     # Optimized PG count for 3 OSDs: (3 * 100) / 3 = 100, rounded down to nearest power of 2 = 64
     pg_num: "32" # Conservative for initial deployment
