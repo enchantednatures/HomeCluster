@@ -123,3 +123,11 @@ spec:
           operator: Exists
         - effect: NoExecute
           operator: Exists
+
+    # csi-ceph operator settings (subchart values)
+    ceph-csi-operator:
+      controllerManager:
+        manager:
+          env:
+            csiServiceAccountPrefix: ceph-csi-
+            watchNamespace: rook-ceph
