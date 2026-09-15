@@ -1,0 +1,27 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/csi.ceph.io/v1/driver.json
+apiVersion: csi.ceph.io/v1
+kind: Driver
+metadata:
+  name: rook-ceph.rbd.csi.ceph.com
+  namespace: rook-ceph
+spec:
+  fsGroupPolicy: File
+  nodePlugin:
+    updateStrategy:
+      type: RollingUpdate
+  controllerPlugin: {}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/csi.ceph.io/v1/driver.json
+apiVersion: csi.ceph.io/v1
+kind: Driver
+metadata:
+  name: rook-ceph.cephfs.csi.ceph.com
+  namespace: rook-ceph
+spec:
+  fsGroupPolicy: File
+  cephFsClientType: kernel
+  nodePlugin:
+    updateStrategy:
+      type: RollingUpdate
+  controllerPlugin: {}
