@@ -211,7 +211,7 @@ spec:
                     while IFS='/' read -r namespace pvc_name; do
 
                       if [ -n "$namespace" ] && [ -n "$pvc_name" ]; then
-                        snapshot_name="${pvc_name}-snapshot-${SNAPSHOT_DATE}"
+                        snapshot_name="$pvc_name-snapshot-$SNAPSHOT_DATE"
 
                         echo "Creating snapshot: $snapshot_name for PVC: $namespace/$pvc_name"
 
