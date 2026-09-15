@@ -47,6 +47,7 @@ spec:
           pluginConfig:
             - name: DefaultEvictor
               args:
+                nodeFit: true
                 podProtections:
                   defaultDisabled:
                     - "PodsWithLocalStorage"
@@ -88,6 +89,11 @@ spec:
               args:
                 podRestartThreshold: 100
                 includingInitContainers: true
+            - name: PodLifeTime
+              args:
+                maxPodLifeTimeSeconds: 604800
+                states:
+                  - Running
           plugins:
             balance:
               enabled:
@@ -101,3 +107,4 @@ spec:
                 - RemovePodsViolatingInterPodAntiAffinity
                 - RemoveFailedPods
                 - RemovePodsHavingTooManyRestarts
+                - PodLifeTime
