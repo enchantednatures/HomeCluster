@@ -26,7 +26,7 @@ terraform {
     }
     local = {
       source  = "hashicorp/local"
-      version = "2.9.0"
+      version = "2.9.1"
     }
     minio = {
       source  = "aminueza/minio"
