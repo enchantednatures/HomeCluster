@@ -71,10 +71,11 @@ metadata:
     app.kubernetes.io/part-of: rook-ceph
     pool-type: economy
 spec:
-  failureDomain: host
+  failureDomain: osd
   replicated:
     size: 2  # Lower replication for cost savings
     requireSafeReplicaSize: false
+  deviceClass: hdd
   parameters:
     compression_mode: aggressive  # Aggressive compression for space savings
     compression_algorithm: lz4    # Fast compression algorithm
@@ -128,7 +129,7 @@ spec:
   replicated:
     size: 3
     requireSafeReplicaSize: true
-  deviceClass: nvme  # Use NVMe device class
+  deviceClass: nvme
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
     pg_autoscale_mode: "on"

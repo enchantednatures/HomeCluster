@@ -69,6 +69,8 @@ spec:
                     - work-00
                     - work-01
                     - work-02
+                    - work-03
+                    - melusine
       tolerations:
         - effect: NoSchedule
           operator: Exists
@@ -129,6 +131,8 @@ spec:
                     - work-00
                     - work-01
                     - work-02
+                    - work-03
+                    - melusine
       tolerations:
         - effect: NoSchedule
           operator: Exists
@@ -218,24 +222,41 @@ spec:
       - name: "work-00"
         devices:
           - name: "/dev/sdb"
-        config:
-          storeType: bluestore
-          metadataDevice: ""
-          databaseSizeMB: "1024"
+          config:
+            storeType: bluestore
+            metadataDevice: ""
+            deviceClass: ssd
       - name: "work-01"
         devices:
           - name: "/dev/sdb"
-        config:
-          storeType: bluestore
-          metadataDevice: ""
-          databaseSizeMB: "1024"
+          config:
+            storeType: bluestore
+            metadataDevice: ""
+            deviceClass: ssd
       - name: "work-02"
         devices:
           - name: "/dev/sdb"
-        config:
-          storeType: bluestore
-          metadataDevice: ""
-          databaseSizeMB: "1024"
+          config:
+            storeType: bluestore
+            metadataDevice: ""
+            deviceClass: ssd
+      - name: "work-03"
+        devices:
+          - name: "/dev/sdb"
+          config:
+            storeType: bluestore
+            metadataDevice: ""
+            deviceClass: ssd
+      - name: "melusine"
+        devices:
+          - name: "/dev/disk/by-id/wwn-0x5000c500910e0aa4"
+          - name: "/dev/disk/by-id/wwn-0x50014ee2699a89a1"
+          - name: "/dev/disk/by-id/wwn-0x50026b7785a3ff96"
+          - name: "/dev/disk/by-id/wwn-0x5000c500b2e2754c"
+          config:
+            storeType: bluestore
+            metadataDevice: ""
+            deviceClass: hdd
 
   disruptionManagement:
     managePodBudgets: true
