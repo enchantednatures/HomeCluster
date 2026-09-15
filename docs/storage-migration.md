@@ -41,3 +41,40 @@ Per-PVC, HostPath → Ceph offline copy:
 
 Reference implementation (will live in the repo as `*/migration/replication*.yaml`) — the
 influxdb backup dir (`kubernetes/infra/monitoring/influxdb/backup/`) is today's volsync style guide.
+
+## Status 2026-09-15 (handoff)
+
+### Done + verified live
+- Rook-Ceph enabled & healthy: 8 OSDs, 3 mon, 2 mgr, 2 rgw, 13 pools, 11TiB avail, HEALTH_OK
+  - work-00..03 (QEMU-passed NVMe) → deviceClass ssd
+  - melusine (bare-metal HDD passthrough) → 4 OSDs, deviceClass hdd (~10TiB)
+  - economy pool: replica2, failureDomain osd, hdd class; crush rule ceph-blockpool-economy exists
+- melusine main.tf trimmed to disk0 only; talos config re-applied with disks-patch
+- Dead per-disk SCs (openebs-bulk-hdd-3t/-4t/-4t-b, openebs-ssd-480) removed from repo — 0 PVs used them
+- Pilot validated on ceph-block-economy: PVC Bound, 32MiB write + md5 read
+- infra fix during setup: kyverno require-pod-resources excludes rook-ceph
+- Runbook files: `docs/storage-migration.md`; VolSync reference pattern (`influxdb/backup/`)
+
+### NOT yet migrated (cutover batches OPEN)
+- 50 PVCs still on openebs-hostpath (68 on csi-nfs; those are out of scope):
+  media **36** (blocked: `kubernetes/apps/media/**` is gone from main; flux runs
+  those apps from stale artifact revisions — resolve media-tree source of truth first)
+  monitoring 7 — loki/tempo/kube-prom-stack/...; influxdb sts already scaled to 0
+  (good first candidate: no downtime for users), CNPG ~10 DB clusters (use
+  cnpg-native backup → cluster recreate; scp volsync rsync for other PVCs)
+  elastic 3 / redpanda 3 / vms 3
+
+### Operational temp setbacks (verify before assuming permanent)
+- replicas lowered during the collapse-cascade: loki-chunks-cache(1),
+  loki/tempo-ingester(-1 ea), istiod(1) — rebalance after DB migration lands
+- node labels added by hand: work-00..03 `node-role.kubernetes.io/worker=""`
+  (RGW placement needs it; put it in the melusine machineconfig / tofu labels)
+- `ceph config set global mon_data_avail_warn 15` (was flapping at work-02's /var
+  free space, now 69%+)
+- work-01 carries `rook.enable-hostworks=true` label used only for the operator
+  placement pin — removable once operator placement relies on FCNS only
+
+### Cleanup at the end of the whole project
+- disable localpv-provisioner in openebs helmrelease; delete remaining
+  `/var/openebs/local` kubelet mount patch; then fully erase disk0 once the last
+  PV is off it — this namespace only
