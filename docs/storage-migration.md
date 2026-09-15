@@ -78,3 +78,24 @@ influxdb backup dir (`kubernetes/infra/monitoring/influxdb/backup/`) is today's 
 - disable localpv-provisioner in openebs helmrelease; delete remaining
   `/var/openebs/local` kubelet mount patch; then fully erase disk0 once the last
   PV is off it — this namespace only
+
+## Blocking incident 2026-09-15 (mass migration暂停)
+
+- influxdb is the pilot but its openebs PV is pinned to unraid-worker: kubelet
+  rejects/evicts new pods on that node under DiskPressure — ribbon same for
+  ctrl-01 (thanos-store, kube-apiserver listed in eviction set). Two nodes are
+  currently disk-pressure tainted.
+- Lifting the mass-migration outage requires at the Proxmox boundary:
+  - Check ephemeral partition size on ctrl-01 (sda5) and unraid-worker (vda6)
+  - wipefs the txh; delete the huge ephemeral Volume data and reshape at VM
+    level; this means changing the tofu block
+- Once nodes have disk headroom, un-taint (`kubectl taint node
+  kubernetes.io/disk-pressure` is self-correcting by kubelet), then resume:
+  1) influxdb copy per migration-pair.yaml
+  2) batch of monitoring
+  3) media (locate source of truth first, currently stale artifacts)
+  4) elastic/redpanda/vms
+- Also confirmed live during migration-pair changes: csi-rbd nodeplugin needed
+  explicit tolerations patch (patched live; must be committed in the rook
+  helmrelease `csi.` values — patch `tolerations` per the reference examples
+  already in csi-operator-rbac.yaml)
