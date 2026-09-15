@@ -1,0 +1,57 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# MIGRATION PAIR — openebs-hostpath -> ceph-block for influxdb.
+# Reference: docs/storage-migration.md and influxdb/backup/ for the restic-style guide.
+
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: influxdb-to-ceph
+  namespace: monitoring
+spec:
+  # Chart-created PVC behind influxdb-influxdb2-0 (sts scaled to 0 before this runs)
+  sourcePVC: influxdb-influxdb2
+  trigger:
+    manual: ""
+  rsync:
+    # Direct copy: mover co-locates on the PV's node (openebs pinned on melusine)
+    copyMethod: Direct
+    serviceType: ClusterIP
+    # Networked copy: the destination mover exposes rsync-tls service; monitor
+    # kubectl logs -n monitoring job/volsync-influxdb-to-ceph-...
+    # Set addressConfigured by the destination's shared rsync-tls endpoint once paired
+    storageClassName: openebs-hostpath
+    cacheStorageClassName: openebs-hostpath
+    cacheCapacity: 10Gi
+    # influxdb (1000:1000) content ownership
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+    moverPodLabels:
+      app: volsync-influxdb-to-ceph
+
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationdestination_v1alpha1.json
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: influxdb-to-ceph-dest
+  namespace: monitoring
+spec:
+  paused: true # flip to false/wire trigger once the Source side is deployed and the S3/rsync endpoint exists
+  trigger:
+    manual: ""
+  rsync:
+    # Storage back-end for the ceph destination
+    # `destinationPVC`: a new PVC influxdb-influxdb2 on ceph-block (see influxdb/app/helmrelease.yaml edit)
+    copyMethod: Direct
+    storageClassName: ceph-block
+    cacheStorageClassName: ceph-block
+    cacheCapacity: 10Gi
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
