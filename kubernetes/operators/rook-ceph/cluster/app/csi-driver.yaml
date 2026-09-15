@@ -7,10 +7,10 @@ metadata:
   namespace: rook-ceph
 spec:
   fsGroupPolicy: File
-  nodePlugin:
-    updateStrategy:
-      type: RollingUpdate
-  controllerPlugin: {}
+  controllerPlugin:
+    tolerations:
+      - key: node.kubernetes.io/disk-pressure
+        operator: Exists
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/csi.ceph.io/v1/driver.json
 apiVersion: csi.ceph.io/v1
@@ -21,7 +21,7 @@ metadata:
 spec:
   fsGroupPolicy: File
   cephFsClientType: kernel
-  nodePlugin:
-    updateStrategy:
-      type: RollingUpdate
-  controllerPlugin: {}
+  controllerPlugin:
+    tolerations:
+      - key: node.kubernetes.io/disk-pressure
+        operator: Exists
