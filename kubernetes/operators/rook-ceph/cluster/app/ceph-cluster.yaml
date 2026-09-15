@@ -151,8 +151,8 @@ spec:
       limits:
         memory: "6Gi"  # Increased for better performance
       requests:
-        cpu: "1000m"
-        memory: "3Gi"  # Increased for better performance
+        cpu: "500m"
+        memory: "1Gi"
     prepareosd:
       limits:
         memory: "1Gi"
