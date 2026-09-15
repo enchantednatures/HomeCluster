@@ -16,4 +16,4 @@ resources:
   - ./redpanda
   - ./schema-registry
   - ./volsync
-  # - ./rook-ceph
+  - ./rook-ceph

@@ -132,7 +132,7 @@ spec:
               name: https
               protocol: TCP
             - containerPort: 8081
-              name: http2-knative-local
+              name: knative-local
               protocol: TCP
           livenessProbe:
             failureThreshold: 30
@@ -203,7 +203,7 @@ spec:
       port: 443
       targetPort: 443
       protocol: TCP
-    - name: http2-knative-local
+    - name: knative-local
       port: 8081
       targetPort: 8081
       protocol: TCP
