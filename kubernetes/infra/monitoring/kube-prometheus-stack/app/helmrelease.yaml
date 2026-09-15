@@ -204,6 +204,19 @@ spec:
               resources:
                 requests:
                   storage: 10Gi
+        tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/control-plane
+            operator: Exists
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values: []
+
         thanos:
           # datasource=docker depName=quay.io/thanos/thanos
           image: quay.io/thanos/thanos:v0.42.4
