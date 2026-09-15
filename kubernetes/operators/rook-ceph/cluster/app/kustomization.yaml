@@ -19,6 +19,7 @@ resources:
   - ./service-monitor.yaml
   - ./prometheus-rules.yaml
   - ./volume-snapshot-class.yaml
+  - ./ingress-tailscale.yaml
   - ./rbac-enhanced.yaml
   - ./backup-strategy-enhanced.yaml
   # Sample bucket claim for testing - comment out in production
