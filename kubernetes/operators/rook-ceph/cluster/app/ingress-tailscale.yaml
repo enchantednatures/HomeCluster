@@ -10,8 +10,7 @@ metadata:
     app.kubernetes.io/instance: *app
   annotations:
     tailscale.com/hostname: rook-dashboard
-    tailscale.com/https: "true"
-    tailscale.com/force-reconcile: "1"
+    tailscale.com/force-reconcile: "2"
 spec:
   ingressClassName: tailscale
   tls:
