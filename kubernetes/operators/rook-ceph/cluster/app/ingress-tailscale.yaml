@@ -3,17 +3,27 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: &app rook-ceph-dashboard-tailscale
+  name: &app rook-dashboard-tailscale
   namespace: rook-ceph
   labels:
     app.kubernetes.io/name: *app
     app.kubernetes.io/instance: *app
   annotations:
-    tailscale.com/hostname: rook-ceph
+    tailscale.com/hostname: rook-dashboard
+    tailscale.com/force-reconcile: "1"
 spec:
   ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: rook-ceph-mgr-dashboard
-      port:
-        number: 8443
+  tls:
+    - hosts:
+        - rook-dashboard.rya-bebop.ts.net
+  rules:
+    - host: rook-dashboard.rya-bebop.ts.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rook-ceph-mgr-dashboard
+                port:
+                  number: 8443
