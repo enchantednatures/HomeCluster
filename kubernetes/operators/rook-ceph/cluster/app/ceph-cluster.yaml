@@ -187,6 +187,13 @@ spec:
       requests:
         cpu: "500m"
         memory: "100Mi"
+    cmd-reporter:  # resources for detect-version / network detection jobs
+      limits:
+        cpu: "500m"
+        memory: "256Mi"
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
   removeOSDsIfOutAndSafeToRemove: false
   priorityClassNames:
     mon: system-node-critical
