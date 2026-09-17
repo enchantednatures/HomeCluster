@@ -208,14 +208,6 @@ spec:
           - effect: NoSchedule
             key: node-role.kubernetes.io/control-plane
             operator: Exists
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                    - key: kubernetes.io/hostname
-                      operator: NotIn
-                      values: []
 
         thanos:
           # datasource=docker depName=quay.io/thanos/thanos
