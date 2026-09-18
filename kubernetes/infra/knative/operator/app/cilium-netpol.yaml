@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/v2/ciliumnetworkpolicy.json
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-kube-output
+  namespace: knative
+spec:
+  endpointSelector: {}
+  egress:
+    # kube-apiserver (kubernetes.default.svc) for operator/webhook API access
+    - toEntities:
+        - kube-apiserver
+    # any other in-cluster service/pod
+    - toEntities:
+        - cluster
+    - toCIDR:
+        - 192.168.1.0/24
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-operator-webhook-ingress
+  namespace: knative
+spec:
+  endpointSelector:
+    matchLabels:
+      role: operator-webhook
+  ingress:
+    - fromEntities:
+        - kube-apiserver
