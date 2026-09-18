@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blocky-config
+  namespace: dns
+  labels:
+    app.kubernetes.io/name: blocky
+    app.kubernetes.io/instance: blocky
+data:
+  config.yml: |
+    upstreams:
+      init:
+        strategy: blocking
+      groups:
+        default:
+          # lancache-dns RPZ: game CDN -> cache, everything else -> recursion
+          - 192.168.1.243
+    conditional:
+      fallbackUpstream: false
+    blocking:
+      denylists:
+        ads:
+          - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+        tracking:
+          - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
+      clientGroupsBlock:
+        default:
+          - ads
+          - tracking
+      blockType: nxDomain
+      blockTTL: 1m
+      loading:
+        strategy: fast
+        refreshPeriod: 24h
+        maxErrorsPerSource: 5
+    caching:
+      minTime: 5m
+      maxTime: 30m
+      prefetching: true
+    bootstrapDns:
+      - tcp+udp:1.1.1.1
+    prometheus:
+      enable: true
+      path: /metrics
+    ports:
+      dns:
+        - 53
+      http: 4000
+    log:
+      level: info
+      privacy: true
