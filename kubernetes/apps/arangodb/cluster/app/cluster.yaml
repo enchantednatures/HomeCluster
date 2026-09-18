@@ -14,13 +14,13 @@ spec:
     resources:
       requests:
         storage: 8Gi
-    storageClassName: openebs-hostpath
+    storageClassName: ceph-block
   dbservers:
     count: 3
     resources:
       requests:
         storage: 8Gi
-    storageClassName: openebs-hostpath
+    storageClassName: ceph-block
   coordinators:
     count: 3
   image: arangodb/arangodb:3.12

@@ -7,7 +7,7 @@ metadata:
   namespace: cdi
 spec:
   config:
-    scratchSpaceStorageClass: openebs-hostpath
+    scratchSpaceStorageClass: ceph-block
     featureGates:
       - HonorWaitForFirstConsumer
   imagePullPolicy: IfNotPresent

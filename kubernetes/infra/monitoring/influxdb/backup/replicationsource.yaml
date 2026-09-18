@@ -8,7 +8,7 @@ metadata:
   namespace: monitoring
 spec:
   # Live-verified 2026-09-09: the static influxdb-data PVC (../app/pvc.yaml) is
-  # Pending/unbound; the chart-created influxdb-influxdb2 PVC (openebs-hostpath,
+  # Pending/unbound; the chart-created influxdb-influxdb2 PVC (ceph-block,
   # 50Gi) is the actual data volume mounted by influxdb-influxdb2-0
   sourcePVC: influxdb-influxdb2
   trigger:
@@ -28,9 +28,9 @@ spec:
     pruneIntervalDays: 7
     # Storage for the mover pod (temporary, during backup) - hostpath source
     # requires the mover to schedule on the PV's node
-    storageClassName: openebs-hostpath
+    storageClassName: ceph-block
     # Cache for faster incremental backups
-    cacheStorageClassName: openebs-hostpath
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
     # Mover runs as uid/gid 1000 to read files owned by influxdb (1000:1000)
     moverSecurityContext:

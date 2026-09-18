@@ -23,9 +23,9 @@ spec:
     # Prune removes unreferenced data from the repository
     pruneIntervalDays: 7
     # Storage for the mover pod (temporary, during backup)
-    storageClassName: openebs-hostpath
+    storageClassName: ceph-block
     # Cache for faster incremental backups
-    cacheStorageClassName: openebs-hostpath
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
     # Mover runs as qemu uid/gid 107 to read the KubeVirt disk.img (mode 0660, owner 107:107)
     moverSecurityContext:

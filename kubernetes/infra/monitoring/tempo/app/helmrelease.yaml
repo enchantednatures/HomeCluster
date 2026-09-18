@@ -55,7 +55,7 @@ spec:
           enabled: true
     persistence:
       enabled: true
-      storageClass: openebs-hostpath
+      storageClass: ceph-block
     tempo:
       config: |
         overrides:

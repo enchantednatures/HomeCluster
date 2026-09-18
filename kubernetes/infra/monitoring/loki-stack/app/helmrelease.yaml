@@ -118,7 +118,7 @@ spec:
         enabled: false
       persistence:
         enabled: true
-        storageClass: openebs-hostpath
+        storageClass: ceph-block
         size: 10Gi
 
     querier:
@@ -140,7 +140,7 @@ spec:
       replicas: 1
       persistence:
         enabled: true
-        storageClass: openebs-hostpath
+        storageClass: ceph-block
         size: 10Gi
 
     indexGateway:
@@ -151,7 +151,7 @@ spec:
       replicas: 1
       persistence:
         enabled: true
-        storageClass: openebs-hostpath
+        storageClass: ceph-block
         size: 10Gi
 
     # Disable unused components

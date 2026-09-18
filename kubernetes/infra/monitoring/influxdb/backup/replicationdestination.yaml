@@ -16,7 +16,7 @@ spec:
     repository: influxdb-backup-secret
     copyMethod: Direct
     destinationPVC: influxdb-influxdb2
-    cacheStorageClassName: openebs-hostpath
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
     # Mover runs as uid/gid 1000 so restored files stay influxdb-readable
     moverSecurityContext:

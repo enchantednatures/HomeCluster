@@ -16,7 +16,7 @@ spec:
     repository: arch-linux-backup-secret
     copyMethod: Direct
     destinationPVC: arch-linux-root
-    cacheStorageClassName: openebs-hostpath
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
     # Mover runs as qemu uid/gid 107 so restored disk.img stays qemu-readable
     moverSecurityContext:

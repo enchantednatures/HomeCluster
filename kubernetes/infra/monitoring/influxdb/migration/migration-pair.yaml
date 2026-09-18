@@ -1,6 +1,6 @@
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
-# MIGRATION PAIR — openebs-hostpath -> ceph-block for influxdb.
+# MIGRATION PAIR — ceph-block -> ceph-block for influxdb.
 # Reference: docs/storage-migration.md and influxdb/backup/ for the restic-style guide.
 
 apiVersion: volsync.backube/v1alpha1
@@ -20,8 +20,8 @@ spec:
     # Networked copy: the destination mover exposes rsync-tls service; monitor
     # kubectl logs -n monitoring job/volsync-influxdb-to-ceph-...
     # Set addressConfigured by the destination's shared rsync-tls endpoint once paired
-    storageClassName: openebs-hostpath
-    cacheStorageClassName: openebs-hostpath
+    storageClassName: ceph-block
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
     # influxdb (1000:1000) content ownership
     moverSecurityContext:

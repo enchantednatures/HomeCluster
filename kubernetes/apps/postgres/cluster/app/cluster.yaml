@@ -24,7 +24,7 @@ spec:
       memory: 2Gi
   storage:
     size: 10Gi
-    storageClass: openebs-hostpath
+    storageClass: ceph-block
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser

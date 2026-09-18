@@ -63,7 +63,7 @@ spec:
       ## If undefined (the default) or set to null, no storageClassName spec is
       ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
       ##   GKE, AWS & OpenStack)
-      storageClass: "openebs-hostpath"
+      storageClass: "ceph-block"
       accessMode: ReadWriteOnce
       size: 50Gi
       mountPath: /var/lib/influxdb2

@@ -49,7 +49,7 @@ spec:
       persistentVolume:
         enabled: true
         size: 20Gi
-        storageClass: openebs-hostpath
+        storageClass: ceph-block
 
     resources:
       cpu:

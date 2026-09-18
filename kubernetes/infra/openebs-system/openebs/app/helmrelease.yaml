@@ -28,7 +28,7 @@ spec:
           repository: openebs/provisioner-localpv
       hostpathClass:
         enabled: true
-        name: openebs-hostpath
+        name: ceph-block
         isDefaultClass: false
         basePath: /var/openebs/local
     openebs-crds:
