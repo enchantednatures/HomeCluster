@@ -13,16 +13,14 @@ Talos Kubernetes cluster on Proxmox VMs, provisioned via OpenTofu. GitOps with F
 ## Commands
 
 ```bash
-make configure                    # Template + encrypt + validate (run before every commit)
-make kubernetes-kubeconform     # Schema-validate manifests
-make sops-encrypt                 # Encrypt *.sops.yaml files (REQUIRED before commit)
-make sops-decrypt                 # Decrypt for inspection
-make flux-reconcile               # Force git sync
-make flux-apply path=ns/app     # Apply specific app
-make kubernetes-resources         # List pods, helmreleases, kustomizations
-make kubernetes-ceph-health       # Ceph cluster health
-make terraform-proxmox-plan       # Preview VM changes
-make terraform-proxmox-apply      # Apply VM config
+task kubernetes:kubeconform     # Schema-validate manifests
+task sops:encrypt                 # Encrypt *.sops.yaml files (REQUIRED before commit)
+task sops:decrypt                 # Decrypt for inspection
+task flux:reconcile               # Force git sync
+task kubernetes:resources         # List pods, helmreleases, kustomizations
+task kubernetes:ceph:health       # Ceph cluster health
+task terraform:proxmox:plan       # Preview VM changes
+task terraform:proxmox:apply      # Apply VM config
 ```
 
 **Debugging**: `flux get kustomizations -A`, `flux get helmreleases -A`, `stern -n <ns> <name>`, `kubectl -n <ns> get events --sort-by=.metadata.creationTimestamp`
@@ -128,11 +126,10 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 
 ## Pre-Commit Checklist
 
-1. `make configure` — template, encrypt, validate
-2. `make kubernetes-kubeconform` — schema validation
-3. `make sops-encrypt` — encrypt secrets
-4. Verify `git diff` shows encrypted fields only
-5. `pre-commit run --all-files` — trailing whitespace, line endings, tabs, smartquotes, secret check
+1. `task kubernetes:kubeconform` — schema validation
+2. `task sops:encrypt` — encrypt secrets
+3. Verify `git diff` shows encrypted fields only
+4. `pre-commit run --all-files` — trailing whitespace, line endings, tabs, smartquotes, secret check
 
 ## Anti-Patterns
 
@@ -140,7 +137,6 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 - **NEVER** commit plaintext secrets — use `.sops.yaml` and encrypt
 - **NEVER** use brackets in YAML — multi-line lists only
 - **NEVER** use unquoted truthy values — only `"true"` / `"false"`
-- **NEVER** skip `make configure` before committing
 - **NEVER** remove more than one Ceph OSD at a time
 - **NEVER** edit auto-generated files in `clusters/*/flux-system/`
 
@@ -148,6 +144,6 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 
 - **ALL changes go through Git** — never `kubectl apply` directly
 - **Never commit plaintext secrets**
-- **Always validate before committing** (`make configure`)
+- **Always validate before committing** (`task kubernetes:kubeconform` + `task sops:encrypt`)
 - Flux Kustomizations live in `flux-system` namespace, deploy to `targetNamespace`
 - Use `dependsOn` to enforce ordering (app → operator → core → infra)

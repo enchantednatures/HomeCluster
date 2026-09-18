@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app lancache
+  namespace: lancache
+spec:
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+
+    controllers:
+      monolithic:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
+            fsGroupChangePolicy: OnRootMismatch
+        containers:
+          app:
+            image:
+              repository: docker.io/lancachenet/monolithic
+              # datasource=docker depName=lancachenet/monolithic
+              tag: latest
+            ports:
+              - name: http
+                containerPort: &port 80
+                protocol: TCP
+              - name: https
+                containerPort: 443
+                protocol: TCP
+            env:
+              TZ: "${TIMEZONE}"
+              CACHE_DISK_SIZE: 900g
+              CACHE_INDEX_SIZE: 225m
+              MIN_FREE_DISK: 10g
+              CACHE_MAX_AGE: 3560d
+              CACHE_SLICE_SIZE: 1m
+              UPSTREAM_DNS: "1.1.1.1 8.8.8.8"
+            probes:
+              liveness: &heartbeat
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /lancache-heartbeat
+                    port: *port
+                  periodSeconds: 60
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *heartbeat
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+
+      dns:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        pod:
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            fsGroup: 0
+        containers:
+          app:
+            image:
+              repository: docker.io/lancachenet/lancache-dns
+              # datasource=docker depName=lancachenet/lancache-dns
+              tag: latest
+            ports:
+              - name: dns-udp
+                containerPort: 53
+                protocol: UDP
+              - name: dns-tcp
+                containerPort: 53
+                protocol: TCP
+            env:
+              TZ: "${TIMEZONE}"
+              USE_GENERIC_CACHE: "true"
+              LANCACHE_IP: 192.168.1.242
+              UPSTREAM_DNS: 1.1.1.1
+            resources:
+              requests:
+                cpu: 50m
+                memory: 256Mi
+              limits:
+                memory: 512Mi
+
+    service:
+      cache:
+        controller: monolithic
+        type: LoadBalancer
+        loadBalancerIP: 192.168.1.242
+        ports:
+          http:
+            port: *port
+            primary: true
+          https:
+            port: 443
+      dns:
+        controller: dns
+        type: LoadBalancer
+        loadBalancerIP: 192.168.1.243
+        ports:
+          dns-udp:
+            port: 53
+            protocol: UDP
+            primary: true
+          dns-tcp:
+            port: 53
+            protocol: TCP
+
+    persistence:
+      cache:
+        type: persistentVolumeClaim
+        existingClaim: lancache-cache
+        advancedMounts:
+          monolithic:
+            app:
+              - path: /data/cache
