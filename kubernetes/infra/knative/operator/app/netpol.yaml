@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/v1/networkpolicy.json
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kube-apiserver
+  namespace: knative
+spec:
+  podSelector: {}
+  policyTypes:
+    - Egress
+  egress:
+    # Kubernetes API service (10.96.0.1) and other cluster services
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.0/12
+      ports:
+        - port: 443
+          protocol: TCP
+        - port: 6443
+          protocol: TCP
+    # CoreDNS service for cluster DNS resolution
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
