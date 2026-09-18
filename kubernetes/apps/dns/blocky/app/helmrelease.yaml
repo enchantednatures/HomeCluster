@@ -45,7 +45,7 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/0xERR0R/blocky
+              repository: ghcr.io/0xerr0r/blocky
               # datasource=docker depName=0xERR0R/blocky registry=https://ghcr.io
               tag: v0.35.0@sha256:4839fe25fb0e2bca95821909098520e771434c62625d5f5f18cfeef6c1631c5d
             args:
