@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/podmonitor.json
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: blocky
+  namespace: dns
+  labels:
+    app.kubernetes.io/name: blocky
+spec:
+  jobLabel: app.kubernetes.io/name
+  namespaceSelector:
+    matchNames:
+      - dns
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: blocky
+  podMetricsEndpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

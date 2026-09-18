@@ -178,6 +178,11 @@ spec:
           gnetId: 1860 # https://grafana.com/grafana/dashboards/1860?tab=revisions
           revision: 31
           datasource: Prometheus
+      dns:
+        blocky:
+          gnetId: 13768 # https://grafana.com/grafana/dashboards/13768-blocky/
+          revision: 8
+          datasource: Prometheus
       flux:
         flux-cluster:
           url: https://raw.githubusercontent.com/fluxcd/flux2-monitoring-example/main/monitoring/configs/dashboards/cluster.json
