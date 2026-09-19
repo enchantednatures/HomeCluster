@@ -48,6 +48,12 @@ spec:
               - /bin/sh
               - -c
               - apk add --no-cache dnsmasq > /dev/null && exec /usr/sbin/dnsmasq --keep-in-foreground --conf-file=/etc/dnsmasq.d/dnsmasq.conf
+            securityContext:
+              runAsUser: 0
+              capabilities:
+                add:
+                  - NET_ADMIN
+                  - NET_RAW
             resources:
               requests:
                 cpu: 10m
