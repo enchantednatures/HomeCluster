@@ -50,7 +50,7 @@ data:
             - !Find [authentik_providers_proxy.proxyprovider, [name, netboot-proxy-provider]]
           config:
             authentik_host: https://auth.${SECRET_DOMAIN}/
-            authentik_host_insecure: false
+            authentik_host_insecure: true
             log_level: info
             object_naming_template: ak-outpost-%(name)s
             kubernetes_replicas: 2
