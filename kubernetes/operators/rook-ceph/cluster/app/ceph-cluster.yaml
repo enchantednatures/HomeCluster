@@ -28,6 +28,7 @@ spec:
     enabled: true
     ssl: false
     port: 8443
+    prometheusEndpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090
   monitoring:
     enabled: true
   network:
