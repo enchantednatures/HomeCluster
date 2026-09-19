@@ -8,7 +8,9 @@ metadata:
   labels:
     app.kubernetes.io/name: immich
 spec:
-  replicas: 3
+  # Single instance: BullMQ undeclared-key errors only occur with replication enabled
+  # https://github.com/dragonflydb/dragonfly/issues/2598
+  replicas: 1
   resources:
     requests:
       cpu: 500m
