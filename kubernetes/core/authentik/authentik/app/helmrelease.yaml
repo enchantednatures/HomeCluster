@@ -124,6 +124,9 @@ spec:
         host: authentik-db-pooler-rw.authentik.svc.cluster.local
       redis:
         host: dragonfly.authentik.svc.cluster.local
+    blueprints:
+      configMaps:
+        - authentik-blueprint-netboot-forward-auth
       # Trust proxy headers for HTTPS detection
       web:
         trusted_proxies: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
