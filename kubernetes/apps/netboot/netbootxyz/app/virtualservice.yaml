@@ -16,6 +16,6 @@ spec:
             prefix: /
       route:
         - destination:
-            host: netbootxyz-webui.netboot.svc.cluster.local
+            host: netbootxyz.netboot.svc.cluster.local
             port:
               number: 3000
