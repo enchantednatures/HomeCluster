@@ -54,6 +54,7 @@ spec:
             - name: elasticsearch
               resources:
                 requests:
+                  cpu: "1"
                   memory: 4505M
                 limits:
                   memory: 5446M
