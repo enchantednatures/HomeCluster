@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app proxydhcp
+  namespace: netboot
+spec:
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: work-00
+
+    controllers:
+      proxydhcp:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: docker.io/alpine
+              tag: "3.22" # datasource=docker depName=alpine
+            command:
+              - /bin/sh
+              - -c
+              - apk add --no-cache dnsmasq > /dev/null && exec /usr/sbin/dnsmasq --keep-in-foreground --conf-file=/etc/dnsmasq.d/dnsmasq.conf
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                memory: 128Mi
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: proxydhcp-config
+        globalMounts:
+          - path: /etc/dnsmasq.d/dnsmasq.conf
+            subPath: dnsmasq.conf

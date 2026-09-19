@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: netbootxyz-config
+  namespace: netboot
+  labels:
+    app.kubernetes.io/name: netbootxyz
+    app.kubernetes.io/instance: netbootxyz
+spec:
+  storageClassName: ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: netbootxyz-assets
+  namespace: netboot
+  labels:
+    app.kubernetes.io/name: netbootxyz
+    app.kubernetes.io/instance: netbootxyz
+spec:
+  storageClassName: ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi

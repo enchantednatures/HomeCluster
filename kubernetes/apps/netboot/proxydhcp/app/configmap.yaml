@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: proxydhcp-config
+  namespace: netboot
+data:
+  dnsmasq.conf: |
+    port=0
+    no-resolv
+    no-hosts
+    dhcp-range=192.168.1.1,proxy,255.255.255.0
+    dhcp-host=b1:0e:97:50:29:f1
+    dhcp-ignore=tag:!known
+    dhcp-no-override
+    dhcp-vendorclass=BIOS,PXEClient:Arch:00000
+    dhcp-vendorclass=UEFI,PXEClient:Arch:00007
+    dhcp-vendorclass=UEFI64,PXEClient:Arch:00009
+    dhcp-boot=tag:BIOS,netboot.xyz.kpxe,,192.168.1.211
+    dhcp-boot=tag:UEFI,netboot.xyz.efi,,192.168.1.211
+    dhcp-boot=tag:UEFI64,netboot.xyz.efi,,192.168.1.211
+    pxe-service=0,"netboot.xyz BIOS",netboot.xyz.kpxe,192.168.1.211
+    pxe-service=7,"netboot.xyz UEFI x64",netboot.xyz.efi,192.168.1.211
+    pxe-service=9,"netboot.xyz UEFI BC",netboot.xyz.efi,192.168.1.211
+    log-facility=-
+    log-dhcp
+    log-queries
