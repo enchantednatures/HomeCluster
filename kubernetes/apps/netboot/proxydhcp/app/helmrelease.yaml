@@ -43,7 +43,7 @@ spec:
           app:
             image:
               repository: docker.io/alpine
-              tag: "3.22" # datasource=docker depName=alpine
+              tag: "3.24" # datasource=docker depName=alpine
             command:
               - /bin/sh
               - -c
