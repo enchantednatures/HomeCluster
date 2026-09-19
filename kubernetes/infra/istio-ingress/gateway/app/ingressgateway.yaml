@@ -189,7 +189,8 @@ metadata:
     prometheus.io/port: "15020"
     prometheus.io/scrape: "true"
 spec:
-  type: ClusterIP
+  type: LoadBalancer
+  loadBalancerIP: 192.168.1.240
   ports:
     - name: status-port
       port: 15021
