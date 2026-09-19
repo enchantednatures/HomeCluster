@@ -35,6 +35,13 @@ BREWFILE := $(ROOT_DIR)/Brewfile
 ARCHFILE := $(ROOT_DIR)/Archfile
 GENERIC_BIN_DIR := $(ROOT_DIR)/.bin
 
+# Flate (offline Flux renderer/validation)
+FLATE := $(shell command -v flate 2>/dev/null || echo $(GENERIC_BIN_DIR)/flate)
+FLATE_KUSTOMIZATION_PATH := $(KUBERNETES_DIR)/flux
+FLATE_DIFF_PATH := $(KUBERNETES_DIR)
+FLATE_BASELINE_REF ?= main
+FLATE_BASELINE_DIR := /tmp/opencode/flate-baseline
+
 # Environment exports
 export KUBECONFIG := $(KUBECONFIG_FILE)
 export PYTHONDONTWRITEBYTECODE := 1
@@ -287,6 +294,36 @@ flux-github-deploy-key: ## Apply GitHub deploy key to cluster
 	@test -f $(GITHUB_DEPLOY_KEY_FILE) || (echo "Missing Github deploy key file" && exit 1)
 	@kubectl create namespace flux-system --dry-run=client -o yaml | kubectl --kubeconfig $(KUBECONFIG_FILE) apply --filename -
 	@sops --decrypt $(GITHUB_DEPLOY_KEY_FILE) | kubectl apply --kubeconfig $(KUBECONFIG_FILE) --server-side --filename -
+
+.PHONY: flate-install
+flate-install: ## Install flate (offline Flux renderer) into .bin if not on PATH
+	@if command -v flate >/dev/null 2>&1 && [ "$$(command -v flate)" != "$(GENERIC_BIN_DIR)/flate" ]; then \
+		echo "=== flate already installed at $$(command -v flate) ==="; \
+	elif [ -x $(GENERIC_BIN_DIR)/flate ]; then \
+		echo "=== flate already installed at $(GENERIC_BIN_DIR)/flate ==="; \
+	else \
+		test -d $(GENERIC_BIN_DIR) || mkdir -p $(GENERIC_BIN_DIR); \
+		cd $(GENERIC_BIN_DIR) && curl -fsSL "https://i.jpillora.com/home-operations/flate?as=flate&type=script" | bash; \
+	fi
+	@$(FLATE) --version
+
+.PHONY: flate-test
+flate-test: ## Render and validate the full Flux tree offline (no cluster needed)
+	@test -x "$(FLATE)" || (echo "flate not found — run: make flate-install" && exit 1)
+	@$(FLATE) test all --path $(FLATE_KUSTOMIZATION_PATH)
+
+.PHONY: flate-diff
+flate-diff: ## Diff rendered manifests against a baseline ref (arg: ref=main)
+	@test -x "$(FLATE)" || (echo "flate not found — run: make flate-install" && exit 1)
+	@test -d .git || (echo "Not a git repo" && exit 1)
+	@git worktree add --detach $(FLATE_BASELINE_DIR) $(FLATE_BASELINE_REF) >/dev/null 2>&1 || true
+	@trap 'git worktree remove --force $(FLATE_BASELINE_DIR) 2>/dev/null || true' EXIT; \
+	$(FLATE) diff all --path $(FLATE_DIFF_PATH) --path-orig $(FLATE_BASELINE_DIR)/kubernetes
+
+.PHONY: flate-get
+flate-get: ## List Kustomizations and HelmReleases flate discovers in the tree
+	@test -x "$(FLATE)" || (echo "flate not found — run: make flate-install" && exit 1)
+	@$(FLATE) get all --path $(FLATE_KUSTOMIZATION_PATH)
 
 # =============================================================================
 # TERRAFORM/OPENTOFU
