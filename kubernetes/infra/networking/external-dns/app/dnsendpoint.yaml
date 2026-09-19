@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/externaldns.k8s.io/v1alpha1_dnsendpoint.json
+---
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: external-gateway-wildcard
+  namespace: networking
+spec:
+  endpoints:
+    - dnsName: "*.enchantednatures.com"
+      recordType: CNAME
+      targets:
+        - external.enchantednatures.com
+      providerSpecific:
+        - name: external-dns.kubernetes.io/cloudflare-proxied
+          value: "true"
