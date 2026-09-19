@@ -5,6 +5,8 @@ kind: VirtualService
 metadata:
   name: netbootxyz
   namespace: netboot
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
 spec:
   hosts:
     - netboot.${SECRET_DOMAIN}

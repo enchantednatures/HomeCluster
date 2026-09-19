@@ -9,3 +9,4 @@ resources:
   - ./virtualservice.yaml
   - ./virtualservice-outpost.yaml
   - ./outpost-serviceentry.yaml
+  - ./blueprint-netboot.yaml

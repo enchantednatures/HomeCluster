@@ -151,6 +151,26 @@ spec:
   rules:
     - {}
 ---
+# Forward auth via authentik: only netboot host requires ext_authz
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: authentik-netboot-forward-auth
+  namespace: istio-ingress
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+      istio: gateway
+  action: CUSTOM
+  provider:
+    name: authentik
+  rules:
+    - to:
+        - operation:
+            hosts:
+              - netboot.${SECRET_DOMAIN}
+---
 # Allow access to Kubernetes API server from all namespaces
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule

@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-netboot-forward-auth
+  namespace: authentik
+  labels:
+    authentik_blueprint: "true"
+data:
+  netboot.yaml: |
+    ---
+    # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+    version: 1
+    metadata:
+      name: netboot-forward-auth
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
+      - model: authentik_providers_proxy.proxyprovider
+        state: present
+        identifiers:
+          name: netboot-proxy-provider
+        attrs:
+          name: netboot-proxy-provider
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+          mode: forward_single
+          external_host: https://netboot.${SECRET_DOMAIN}
+
+      - model: authentik_core.application
+        state: present
+        identifiers:
+          slug: netboot
+        attrs:
+          name: Netboot
+          slug: netboot
+          provider: !Find [authentik_providers_proxy.proxyprovider, [name, netboot-proxy-provider]]
+          launch_url: https://netboot.${SECRET_DOMAIN}
+
+      - model: authentik_outposts.outpost
+        state: present
+        identifiers:
+          name: istio-forward-auth
+        attrs:
+          name: istio-forward-auth
+          type: proxy
+          service_connection: !Find [authentik_outposts.kubernetesserviceconnection, [name, Local Kubernetes Cluster]]
+          providers:
+            - !Find [authentik_providers_proxy.proxyprovider, [name, netboot-proxy-provider]]
+          config:
+            authentik_host: https://auth.${SECRET_DOMAIN}/
+            authentik_host_insecure: false
+            log_level: info
+            object_naming_template: ak-outpost-%(name)s
+            kubernetes_replicas: 2
+            kubernetes_namespace: authentik
+            kubernetes_service_type: ClusterIP
