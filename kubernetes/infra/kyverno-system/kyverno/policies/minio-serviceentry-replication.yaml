@@ -39,7 +39,6 @@ spec:
                 - istio-system
                 - istio-ingress
                 - rook-ceph
-                - openebs-system
                 - monitoring
                 - knative-*
                 - cnpg-system

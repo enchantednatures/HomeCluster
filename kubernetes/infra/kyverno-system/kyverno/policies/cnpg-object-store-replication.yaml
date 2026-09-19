@@ -37,7 +37,6 @@ spec:
                 - flux-system
                 - istio-system
                 - rook-ceph
-                - openebs-system
                 - monitoring
                 - knative-*
       generate:

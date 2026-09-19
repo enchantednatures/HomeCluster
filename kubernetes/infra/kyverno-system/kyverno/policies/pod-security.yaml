@@ -33,7 +33,6 @@ spec:
             - kube-system
             - kyverno-system
             - rook-ceph
-            - openebs-system
             - istio-system
             - atuin
             - authentik
@@ -68,7 +67,6 @@ spec:
             - kube-system
             - kyverno-system
             - rook-ceph
-            - openebs-system
             - istio-system
             - atuin
             - authentik

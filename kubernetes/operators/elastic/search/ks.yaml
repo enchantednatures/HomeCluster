@@ -7,6 +7,7 @@ metadata:
   namespace: flux-system
 spec:
   dependsOn:
+    - name: eck-operator
     - name: csi-driver-nfs
   targetNamespace: elastic
   decryption:

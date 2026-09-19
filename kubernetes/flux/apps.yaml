@@ -12,6 +12,7 @@ spec:
   dependsOn:
     - name: cluster-core
     - name: cluster-infrastructure
+    - name: cluster-operators
     - name: kyverno-policies
   sourceRef:
     kind: GitRepository

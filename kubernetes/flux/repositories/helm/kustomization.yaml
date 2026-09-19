@@ -48,7 +48,6 @@ resources:
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
-  - ./openebs-charts.yaml
   - ./piraeus.yaml
   - ./redpanda-charts.yaml
   - ./renovate.yaml
