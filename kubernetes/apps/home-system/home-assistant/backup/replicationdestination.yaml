@@ -16,7 +16,7 @@ spec:
     repository: home-assistant-backup-secret
     copyMethod: Direct
     destinationPVC: home-assistant-config
-    cacheStorageClassName: csi-nfs
+    cacheStorageClassName: ceph-block
     cacheCapacity: 5Gi
     # Mover resources: required by the cluster-wide Kyverno require-pod-resources
     # policy (enforce, home-system not in its exclude list)

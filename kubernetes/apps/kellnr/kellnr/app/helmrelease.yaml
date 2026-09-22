@@ -85,7 +85,7 @@ spec:
     pvc:
       enabled: true
       name: kellnr
-      storageClassName: csi-nfs
+      storageClassName: ceph-block
       storage: 50Gi
     resources:
       requests:

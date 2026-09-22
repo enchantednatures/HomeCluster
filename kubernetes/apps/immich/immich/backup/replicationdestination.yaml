@@ -16,5 +16,5 @@ spec:
     repository: immich-backup-secret
     copyMethod: Direct
     destinationPVC: immich-library-pvc
-    cacheStorageClassName: csi-nfs
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi

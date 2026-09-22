@@ -24,7 +24,7 @@ spec:
       memory: 2Gi
   storage:
     size: 20Gi
-    storageClass: csi-nfs
+    storageClass: ceph-block
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser

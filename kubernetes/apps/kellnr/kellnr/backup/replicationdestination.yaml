@@ -16,5 +16,5 @@ spec:
     repository: kellnr-backup-secret
     copyMethod: Direct
     destinationPVC: kellnr
-    cacheStorageClassName: csi-nfs
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi

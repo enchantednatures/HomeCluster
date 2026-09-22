@@ -98,7 +98,7 @@ spec:
     - metadata:
         name: data
       spec:
-        storageClassName: csi-nfs
+        storageClassName: ceph-block
         accessModes:
           - ReadWriteOnce
         resources:

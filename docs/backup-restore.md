@@ -19,12 +19,12 @@ Retention on every ReplicationSource: 7 daily / 4 weekly / 12 monthly, `pruneInt
 | App | NS | PVC | Schedule (UTC) | Cache | Mover uid |
 |---|---|---|---|---|---|
 | arch-linux VM | vms | arch-linux-root | `0 2 * * *` | 10Gi openebs-hostpath | 107 (qemu) |
-| immich | immich | immich-library-pvc | `20 2 * * *` | 10Gi csi-nfs | default |
-| gitea | gitea | gitea-data | `40 2 * * *` | 10Gi csi-nfs | 1000 |
-| kellnr | kellnr | kellnr | `0 3 * * *` | 10Gi csi-nfs | default |
+| immich | immich | immich-library-pvc | `20 2 * * *` | 10Gi ceph-block | default |
+| gitea | gitea | gitea-data | `40 2 * * *` | 10Gi ceph-block | 1000 |
+| kellnr | kellnr | kellnr | `0 3 * * *` | 10Gi ceph-block | default |
 | influxdb | monitoring | influxdb-influxdb2 | `20 3 * * *` | 10Gi openebs-hostpath | 1000 |
-| home-assistant | home-system | home-assistant-config | `40 3 * * *` | 5Gi csi-nfs | default |
-| node-red | home-system | node-red | `0 4 * * *` | 5Gi csi-nfs | 1000/150/140 |
+| home-assistant | home-system | home-assistant-config | `40 3 * * *` | 5Gi ceph-block | default |
+| node-red | home-system | node-red | `0 4 * * *` | 5Gi ceph-block | 1000/150/140 |
 
 ReplicationSource names: `arch-linux-backup`, `immich-backup`, `gitea-backup`, `kellnr-backup`, `influxdb-backup`, `home-assistant-backup`, `node-red-backup`. Each app also has a paused ReplicationDestination named `<app>-restore` for rebuilds.
 
@@ -119,7 +119,7 @@ kubectl -n vms delete job volsync-dst-arch-linux-restore
 
 ## 3. Cluster-rebuild restore procedure
 
-This is the procedure proven end-to-end in task-3-restore.log (arch-linux, openebs-hostpath, 40GiB) and task-6-gitea-roundtrip.log (gitea, csi-nfs). One app is walked as the example; repeat per app.
+This is the procedure proven end-to-end in task-3-restore.log (arch-linux, openebs-hostpath, 40GiB) and task-6-gitea-roundtrip.log (gitea, ceph-block). One app is walked as the example; repeat per app.
 
 Do NOT delete existing PVCs before restoring. The ReplicationDestination restores INTO the existing empty PVC via `destinationPVC`.
 
@@ -184,7 +184,7 @@ ls -l /data
   -rw-rw---- 1 107 107 42949672960 Sep  9 14:40 disk.img
 ```
 
-And from task-6-gitea-roundtrip.log (csi-nfs path):
+And from task-6-gitea-roundtrip.log (ceph-block path):
 
 ```
 ls -A /data

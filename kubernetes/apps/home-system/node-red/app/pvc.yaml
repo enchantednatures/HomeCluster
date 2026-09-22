@@ -7,7 +7,7 @@ metadata:
   name: node-red
   namespace: home-system
 spec:
-  storageClassName: csi-nfs
+  storageClassName: ceph-block
   accessModes:
     - ReadWriteOnce
   resources:

@@ -17,7 +17,7 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: csi-nfs
+    storageClass: ceph-block
   resources:
     requests:
       memory: "512Mi"

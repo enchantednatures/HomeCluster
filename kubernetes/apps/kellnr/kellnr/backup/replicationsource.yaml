@@ -25,9 +25,9 @@ spec:
     # Prune removes unreferenced data from the repository
     pruneIntervalDays: 7
     # Storage for the mover pod (temporary, during backup)
-    storageClassName: csi-nfs
+    storageClassName: ceph-block
     # Cache for faster incremental backups
-    cacheStorageClassName: csi-nfs
+    cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
     # Kellnr runs as root (uid 0); data dir is world-readable - no
     # moverSecurityContext override needed (mover default uid 65532 can read)

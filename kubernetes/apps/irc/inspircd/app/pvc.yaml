@@ -12,7 +12,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: csi-nfs
+  storageClassName: ceph-block
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -26,4 +26,4 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: csi-nfs
+  storageClassName: ceph-block

@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/instance: immich
 spec:
-  storageClassName: csi-nfs
+  storageClassName: ceph-block
   accessModes:
     - ReadWriteOnce
   resources:
@@ -26,7 +26,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/instance: immich
 spec:
-  storageClassName: csi-nfs
+  storageClassName: ceph-block
   accessModes:
     - ReadWriteOnce
   resources:

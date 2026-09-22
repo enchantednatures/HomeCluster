@@ -24,9 +24,9 @@ spec:
     # Prune removes unreferenced data from the repository
     pruneIntervalDays: 7
     # Storage for the mover pod (temporary, during backup)
-    storageClassName: csi-nfs
+    storageClassName: ceph-block
     # Cache for faster incremental backups
-    cacheStorageClassName: csi-nfs
+    cacheStorageClassName: ceph-block
     cacheCapacity: 5Gi
     # Mover resources: required by the cluster-wide Kyverno require-pod-resources
     # policy (enforce, home-system not in its exclude list)
@@ -38,7 +38,7 @@ spec:
         memory: 1Gi
     # Mover runs as the node-red app identity (helmrelease pod securityContext
     # runAsUser 1000 / runAsGroup 150 / fsGroup 140) so PVC files are readable;
-    # same pattern as gitea (match mover ids to data ownership on csi-nfs)
+    # same pattern as gitea (match mover ids to data ownership on ceph-block)
     moverSecurityContext:
       runAsNonRoot: true
       runAsUser: 1000
