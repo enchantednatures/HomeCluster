@@ -71,6 +71,7 @@ spec:
                     - work-01
                     - work-02
                     - work-03
+                    - unraid-worker
                     - melusine
       tolerations:
         - effect: NoSchedule
@@ -133,6 +134,7 @@ spec:
                     - work-01
                     - work-02
                     - work-03
+                    - unraid-worker
                     - melusine
       tolerations:
         - effect: NoSchedule
@@ -251,6 +253,13 @@ spec:
       - name: "work-03"
         devices:
           - name: "/dev/sdb"
+        config:
+          storeType: bluestore
+          metadataDevice: ""
+          deviceClass: ssd
+      - name: "unraid-worker"
+        devices:
+          - name: "/dev/sda"
         config:
           storeType: bluestore
           metadataDevice: ""
