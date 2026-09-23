@@ -15,7 +15,7 @@ spec:
   dependsOn:
     - name: rook-ceph-operator
   path: ./kubernetes/operators/rook-ceph/cluster/app
-  prune: false # Don't prune to avoid data loss during recovery
+  prune: true # TEMP: prune required to remove the CephCluster CR for the clean rebuild; revert to false after
   sourceRef:
     kind: GitRepository
     name: flux-system
