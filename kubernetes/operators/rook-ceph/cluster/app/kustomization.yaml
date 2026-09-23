@@ -5,7 +5,7 @@ kind: Kustomization
 resources:
   - ./ceph-cluster.yaml
   - ./csi-driver.yaml
-  - ./csi-operator-rbac.yaml
+  # - ./csi-operator-rbac.yaml  # Removed: conflicts with ceph-csi-operator chart RBAC (wrong SA subject)
   # - ./ceph-toolbox.yaml  # Temporarily disabled - CRD not available
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
