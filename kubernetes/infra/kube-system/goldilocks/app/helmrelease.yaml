@@ -40,5 +40,6 @@ spec:
               - path: /
                 type: ImplementationSpecific
         tls:
-          - hosts: [goldilocks.${SECRET_DOMAIN}]
+          - hosts:
+              - goldilocks.${SECRET_DOMAIN}
             secretName: my-dynamic-certificate-tls
