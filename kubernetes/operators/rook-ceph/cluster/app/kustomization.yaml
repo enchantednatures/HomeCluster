@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./ceph-cluster.yaml
   - ./csi-driver.yaml
+  - ./csi-operator-config.yaml
   - ./csi-plugin-rbac.yaml
   # - ./ceph-toolbox.yaml  # Temporarily disabled - CRD not available
   - ./storage-classes.yaml
