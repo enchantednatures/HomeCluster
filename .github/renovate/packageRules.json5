@@ -8,6 +8,12 @@
       "allowedVersions": "<17"
     },
     {
+      "description": ["Hold ceph at stable major, dev tags like v21.1.0 umbrella break rook"],
+      "matchDatasources": ["docker"],
+      "matchPackagePatterns": ["ceph/ceph"],
+      "allowedVersions": "<21"
+    },
+    {
       "description": ["Custom schedule for frequently updated container digests"],
       "matchDataSources": ["docker"],
       "matchPackagePatterns": ["postgresql"],
