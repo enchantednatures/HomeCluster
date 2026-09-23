@@ -129,4 +129,5 @@ spec:
       controllerManager:
         manager:
           env:
+            csiServiceAccountPrefix: ceph-csi-
             watchNamespace: rook-ceph
