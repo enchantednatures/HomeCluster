@@ -279,6 +279,11 @@ spec:
     osdMaintenanceTimeout: 30
     pgHealthCheckTimeout: 0
   healthCheck:
+    muteHealthWarning:
+      AUTH_INSECURE_KEYS_ALLOWED:
+        policy: mute
+      AUTH_INSECURE_KEYS_CREATABLE:
+        policy: mute
     daemonHealth:
       mon:
         disabled: false
