@@ -45,7 +45,7 @@ spec:
     periodicity: daily
     maxLogSize: 500M
   cleanupPolicy:
-    confirmation: "yes-really-destroy-data"  # TEMP: full teardown + disk zap; revert to "" after clean re-create
+    confirmation: ""  # Orchestration is skipped while the destroy flag is armed; keep unset in normal operation
     wipeDevicesFromOtherClusters: true
     sanitizeDisks:
       method: quick
