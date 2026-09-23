@@ -96,19 +96,6 @@ spec:
             storage:
               type: memory
             endpoints:
-              - name: HomeCluster
-                group: Core
-                url: https://home.${SECRET_DOMAIN}
-                interval: 5m
-                conditions:
-                  - "[STATUS] == 200"
-                  - "[RESPONSE_TIME] < 500"
-              - name: Gitea
-                group: Core
-                url: https://gitea.${SECRET_DOMAIN}
-                interval: 5m
-                conditions:
-                  - "[STATUS] == 200"
               - name: Immich
                 group: Apps
                 url: https://immich.${SECRET_DOMAIN}
