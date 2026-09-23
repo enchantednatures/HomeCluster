@@ -33,7 +33,7 @@ metadata:
     app.kubernetes.io/part-of: rook-ceph
   annotations:
     # Set as default storage class
-    storageclass.kubernetes.io/is-default-class: "false"
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: rook-ceph.rbd.csi.ceph.com
 parameters:
   clusterID: rook-ceph
