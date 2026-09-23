@@ -274,6 +274,16 @@ spec:
           storeType: bluestore
           metadataDevice: ""
 
+  security:
+    cephx:
+      csi:
+        keyType: aes
+        keyRotationPolicy: KeyGeneration
+        keyGeneration: 2
+        keepPriorKeyCountMax: 1
+      daemon: {}
+      rbdMirrorPeer: {}
+
   disruptionManagement:
     managePodBudgets: true
     osdMaintenanceTimeout: 30

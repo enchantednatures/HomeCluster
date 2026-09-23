@@ -11,6 +11,13 @@ spec:
     tolerations:
       - key: node.kubernetes.io/disk-pressure
         operator: Exists
+  nodePlugin:
+    tolerations:
+      - key: node.kubernetes.io/disk-pressure
+        operator: Exists
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/csi.ceph.io/v1/driver.json
 apiVersion: csi.ceph.io/v1
@@ -25,3 +32,10 @@ spec:
     tolerations:
       - key: node.kubernetes.io/disk-pressure
         operator: Exists
+  nodePlugin:
+    tolerations:
+      - key: node.kubernetes.io/disk-pressure
+        operator: Exists
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
