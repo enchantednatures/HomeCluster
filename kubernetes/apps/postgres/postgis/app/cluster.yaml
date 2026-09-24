@@ -55,11 +55,14 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        # Note: serverName version needs to be incremented
-        # when recovering from an existing cnpg cluster
-        serverName: &currentCluster postgis-v7
+    # Note: serverName version needs to be incremented
+    # when recovering from an existing cnpg cluster
+    serverName: &currentCluster postgis-v7
   # Note: previousCluster needs to be set to the name of the previous
   # cluster when recovering from an existing cnpg cluster
+  # postgis-v6 is unrecoverable: its only backup (20250721T000001) has
+  # truncated WAL ("WAL ends before end of online backup"). postgis-v5's
+  # last backup (20250701T000001, timeline 39) is status=DONE and restorable.
   bootstrap:
     # initdb:
     #   database: app
@@ -72,7 +75,7 @@ spec:
     #     - CREATE EXTENSION fuzzystrmatch;
     #     - CREATE EXTENSION postgis_tiger_geocoder;
     recovery:
-      source: &previousCluster postgis-v6
+      source: &previousCluster postgis-v5
       database: app
       owner: app
       secret:
