@@ -59,14 +59,13 @@ spec:
         barmanObjectName: minio-store
         serverName: authentik-v15
   bootstrap:
-    recovery:
-      source: &previousCluster authentik-v12
+    initdb:
       database: authentik
       owner: authentik
       secret:
         name: authentik-db-user
   externalClusters:
-    - name: *previousCluster
+    - name: authentik-v12
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:

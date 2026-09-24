@@ -62,28 +62,23 @@ spec:
   # cluster when recovering from an existing cnpg cluster
   # postgis-v6 is unrecoverable: its only backup (20250721T000001) has
   # truncated WAL ("WAL ends before end of online backup"). postgis-v5's
-  # last backup (20250701T000001, timeline 39) is status=DONE and restorable.
+  # last backup (20250701T000001, timeline 39) is status=DONE but was
+  # judged stale during the 2026-09 rebuild; bootstrapping fresh instead.
   bootstrap:
-    # initdb:
-    #   database: app
-    #   owner: app
-    #   secret:
-    #     name: postgis-app-user
-    #   postInitTemplateSQL:
-    #     - CREATE EXTENSION postgis;
-    #     - CREATE EXTENSION postgis_topology;
-    #     - CREATE EXTENSION fuzzystrmatch;
-    #     - CREATE EXTENSION postgis_tiger_geocoder;
-    recovery:
-      source: &previousCluster postgis-v5
+    initdb:
       database: app
       owner: app
       secret:
         name: postgis-app-user
+      postInitTemplateSQL:
+        - CREATE EXTENSION postgis;
+        - CREATE EXTENSION postgis_topology;
+        - CREATE EXTENSION fuzzystrmatch;
+        - CREATE EXTENSION postgis_tiger_geocoder;
   externalClusters:
-    - name: *previousCluster
+    - name: postgis-v5
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: minio-store
-          serverName: *previousCluster
+          serverName: postgis-v5

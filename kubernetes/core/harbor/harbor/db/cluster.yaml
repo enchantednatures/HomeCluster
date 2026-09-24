@@ -59,14 +59,13 @@ spec:
         barmanObjectName: minio-store
         serverName: harbor-v5
   bootstrap:
-    recovery:
-      source: &previousCluster harbor-db-v2
+    initdb:
       database: registry
       owner: harbor
       secret:
         name: harbor-db-user
   externalClusters:
-    - name: *previousCluster
+    - name: harbor-db-v2
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
