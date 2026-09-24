@@ -53,11 +53,11 @@ spec:
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
+      # Note: serverName version needs to be incremented
+      # when recovering from an existing cnpg cluster
+      serverName: &currentCluster postgis-v7
       parameters:
         barmanObjectName: minio-store
-    # Note: serverName version needs to be incremented
-    # when recovering from an existing cnpg cluster
-    serverName: &currentCluster postgis-v7
   # Note: previousCluster needs to be set to the name of the previous
   # cluster when recovering from an existing cnpg cluster
   # postgis-v6 is unrecoverable: its only backup (20250721T000001) has
