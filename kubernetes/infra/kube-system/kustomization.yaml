@@ -6,6 +6,7 @@ resources:
   - ./namespace.yaml
   - ./cilium/ks.yaml
   - ./coredns/ks.yaml
+  - ./goldilocks/ks.yaml
   - ./metrics-server/ks.yaml
   # - ./nvme-labeler/ks.yaml
   - ./reloader/ks.yaml

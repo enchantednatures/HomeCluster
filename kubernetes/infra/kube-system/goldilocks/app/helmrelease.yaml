@@ -31,15 +31,5 @@ spec:
       ingress:
         enabled: true
         annotations:
-          cert-manager.io/cluster-issuer: selfsigned-issuer
-          external-dns/is-public: "false"
-          kubernetes.io/ingress.class: internal
-        hosts:
-          - host: goldilocks.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                type: ImplementationSpecific
-        tls:
-          - hosts:
-              - goldilocks.${SECRET_DOMAIN}
-            secretName: my-dynamic-certificate-tls
+          kubernetes.io/ingress.class: tailscale
+          tailscale.com/hostname: goldilocks
