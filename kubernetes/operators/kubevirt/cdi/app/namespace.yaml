@@ -6,3 +6,4 @@ metadata:
   name: cdi
   labels:
     name: cdi
+    goldilocks.fairwinds.com/enabled: "true"

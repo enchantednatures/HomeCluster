@@ -7,3 +7,4 @@ metadata:
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
     istio-injection: disabled
+    goldilocks.fairwinds.com/enabled: "true"

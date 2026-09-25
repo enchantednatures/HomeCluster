@@ -6,3 +6,4 @@ metadata:
   name: kubevirt
   labels:
     name: kubevirt
+    goldilocks.fairwinds.com/enabled: "true"

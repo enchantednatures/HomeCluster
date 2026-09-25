@@ -6,3 +6,4 @@ metadata:
   name: volsync-system
   labels:
     app.kubernetes.io/name: volsync
+    goldilocks.fairwinds.com/enabled: "true"

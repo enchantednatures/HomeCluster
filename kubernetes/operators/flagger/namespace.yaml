@@ -6,3 +6,4 @@ metadata:
   name: flagger-system
   labels:
     name: flagger-system
+    goldilocks.fairwinds.com/enabled: "true"

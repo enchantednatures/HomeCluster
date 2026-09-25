@@ -6,3 +6,4 @@ metadata:
   name: lancache
   labels:
     kustomize.toolkit.fluxcd.io/prune: disabled
+    goldilocks.fairwinds.com/enabled: "true"
