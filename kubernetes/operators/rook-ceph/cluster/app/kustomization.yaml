@@ -7,7 +7,8 @@ resources:
   - ./csi-driver.yaml
   - ./csi-operator-config.yaml
   - ./csi-plugin-rbac.yaml
-  # - ./ceph-toolbox.yaml  # Temporarily disabled - CRD not available
+  - ./ceph-toolbox.yaml  # Standalone Deployment - no CephToolbox CRD required
+  - ./ceph-discovery-job.yaml
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
   - ./ceph-filesystem.yaml

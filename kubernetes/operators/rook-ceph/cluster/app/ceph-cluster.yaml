@@ -22,8 +22,12 @@ spec:
     modules:
       - name: pg_autoscaler
         enabled: true
+      # rook mgr module disabled: prometheus module calls node_proxy_fullreport() on it,
+      # raising NotImplementedError every ~15s (crash storm, Rook #18124 / tracker 79106).
+      # Re-enable when Ceph ships the #70967 backport. Trade-off: `ceph orch` CLI and
+      # dashboard orchestrator integration unavailable while disabled.
       - name: rook
-        enabled: true
+        enabled: false
   dashboard:
     enabled: true
     ssl: false

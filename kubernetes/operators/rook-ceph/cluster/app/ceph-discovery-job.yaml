@@ -1,0 +1,152 @@
+---
+# One-shot read-only Ceph evidence collector for the storage hygiene plan.
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-discovery-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-discovery
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: diagnostics
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 86400
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-ceph-discovery
+        app.kubernetes.io/component: diagnostics
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      containers:
+        - name: ceph-discovery
+          image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              # Render keyring + ceph.conf (upstream rook toolbox pattern)
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # shellcheck disable=SC2001
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              echo "=== SECTION: ceph health detail ==="
+              ceph health detail
+
+              echo "=== SECTION: insecure-key entities (aes) ==="
+              ceph --format=json-pretty auth dump-keys | jq -r '.data.secrets[] | select(.auth.key.type_str == "aes") | "\(.entity.type_str).\(.entity.id)"'
+
+              echo "=== SECTION: ceph osd crush tree --show-shadow ==="
+              ceph osd crush tree --show-shadow
+
+              echo "=== SECTION: ceph osd pool ls detail ==="
+              ceph osd pool ls detail
+
+              echo "=== SECTION: ceph osd crush rule dump ==="
+              ceph osd crush rule dump
+
+              echo "=== SECTION: ceph osd crush rule ls ==="
+              ceph osd crush rule ls
+
+              echo "=== SECTION: ceph df detail ==="
+              ceph df detail
+
+              echo "=== SECTION: ceph osd perf ==="
+              ceph osd perf
+
+              echo "=== SECTION: ceph osd metadata (rotational + bluefs_db_devices) ==="
+              for i in 3 4 5 6 7 8; do
+                echo "--- osd.$i ---"
+                ceph osd metadata osd.$i
+              done
+
+              echo "=== SECTION: ceph crash stat ==="
+              ceph crash stat
+
+              echo "=== SECTION: ceph crash sample ==="
+              if [ -z "$(ceph crash ls-new | head -1)" ]; then
+                echo "no new crashes"
+              else
+                ceph crash ls-new | head -5
+                ceph crash info "$(ceph crash ls-new | head -1 | awk '{print $1}')"
+              fi
+
+              echo "=== SECTION: ceph osd tree ==="
+              ceph osd tree
+
+              echo "=== SECTION: discovery complete ==="
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5
