@@ -10,6 +10,7 @@ resources:
   # - ./ceph-toolbox.yaml  # Temporarily disabled - CRD not available
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
+  - ./ceph-filesystem.yaml
   - ./ceph-object-store.yaml
   # - ./virtual-service.yaml  # Temporarily disabled due to Istio validation issues
   # - ./istio-config-enhanced.yaml  # Temporarily disabled due to schema issues
