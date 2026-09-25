@@ -6,7 +6,9 @@ metadata:
   name: &app rook-ceph-cluster
   namespace: flux-system
   labels:
-    substitution.flux.home.arpa/disabled: "false"
+    # Disable Flux envsubst: manifests contain shell variables ($VAR) in
+    # toolbox/Job scripts that must NOT be substituted by postBuild
+    substitution.flux.home.arpa/disabled: "true"
 spec:
   targetNamespace: rook-ceph
   commonMetadata:
