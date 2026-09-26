@@ -86,11 +86,12 @@ spec:
           effect: NoSchedule
 
   # Hosting configuration for Istio service mesh
+  # dnsNames intentionally omitted: this Kustomization has Flux envsubst disabled
+  # (toolbox scripts contain shell variables), so ${SECRET_DOMAIN} cannot be
+  # substituted and fails DNS-1123 validation. External access is handled by
+  # the (currently disabled) virtual-service.yaml instead.
   hosting:
     advertiseEndpoint:
       dnsName: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
       port: 80
       useTls: false
-    dnsNames:
-      - rgw.${SECRET_DOMAIN}
-      - s3.${SECRET_DOMAIN}
