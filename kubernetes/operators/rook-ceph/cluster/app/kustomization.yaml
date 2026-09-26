@@ -9,6 +9,7 @@ resources:
   - ./csi-plugin-rbac.yaml
   - ./ceph-toolbox.yaml  # Standalone Deployment - no CephToolbox CRD required
   - ./ceph-discovery-job.yaml
+  - ./ceph-crash-hygiene.yaml
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
   - ./ceph-filesystem.yaml

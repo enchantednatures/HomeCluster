@@ -1,0 +1,304 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# One-shot crash archive: clears the live RECENT_MGR_MODULE_CRASH warning by
+# archiving the accumulated crash backlog. Versioned name because Flux cannot
+# mutate a completed/flux-managed Job spec in place.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-crash-archive-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-crash-hygiene
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 86400
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-ceph-crash-hygiene
+        app.kubernetes.io/component: maintenance
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      containers:
+        - name: ceph-crash-hygiene
+          image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              # Render keyring + ceph.conf (upstream rook toolbox pattern)
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # shellcheck disable=SC2001
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              # Poll ~30s for a responsive mgr after an explicit failover.
+              wait_for_active_mgr() {
+                local deadline=$((SECONDS + 30))
+                while [ "${SECONDS}" -lt "${deadline}" ]; do
+                  if ceph mgr stat >/dev/null 2>&1; then
+                    echo "new active mgr is responsive"
+                    return 0
+                  fi
+                  sleep 3
+                done
+                echo "warning: no responsive mgr within 30s; proceeding to retry anyway"
+                return 0
+              }
+
+              echo "running: ceph crash archive-all"
+              archive_status=0
+              set +o errexit
+              archive_output=$(ceph crash archive-all 2>&1)
+              archive_status=$?
+              set -o errexit
+              printf '%s\n' "${archive_output}"
+
+              if [ "${archive_status}" -ne 0 ]; then
+                if printf '%s' "${archive_output}" | grep -q "EIO"; then
+                  echo "ceph crash archive-all failed with EIO (tracker 79357); failing over mgr and retrying once"
+                  ceph mgr fail
+                  wait_for_active_mgr
+                  echo "running: ceph crash archive-all (retry)"
+                  ceph crash archive-all
+                else
+                  echo "ceph crash archive-all failed without EIO; aborting" >&2
+                  exit "${archive_status}"
+                fi
+              fi
+
+              echo "running: ceph crash prune 14"
+              ceph crash prune 14
+
+              echo "crash hygiene complete"
+              ceph crash stat
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/cronjob.json
+# Recurring crash hygiene: archives new crashes (clears RECENT_MGR_MODULE_CRASH)
+# then prunes entries older than the 14-day retention window.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: rook-ceph-crash-hygiene
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-crash-hygiene
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  schedule: "17 3 * * *"
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: rook-ceph-crash-hygiene
+            app.kubernetes.io/component: maintenance
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: rook-ceph-default
+          containers:
+            - name: ceph-crash-hygiene
+              image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -o errexit -o pipefail
+
+                  # Render keyring + ceph.conf (upstream rook toolbox pattern)
+                  ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+                  KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+                  CEPH_CONFIG="/etc/ceph/ceph.conf"
+                  KEYRING_FILE="/etc/ceph/keyring"
+
+                  ceph_secret=$(cat "${KEYRING_MOUNT}")
+                  cat <<EOF > "${KEYRING_FILE}"
+                  [${ROOK_CEPH_USERNAME}]
+                  key = ${ceph_secret}
+                  EOF
+
+                  # shellcheck disable=SC2001
+                  mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+                  cat <<EOF > "${CEPH_CONFIG}"
+                  [global]
+                  mon_host = ${mon_endpoints}
+
+                  [client.admin]
+                  keyring = ${KEYRING_FILE}
+                  EOF
+
+                  # Poll ~30s for a responsive mgr after an explicit failover.
+                  wait_for_active_mgr() {
+                    local deadline=$((SECONDS + 30))
+                    while [ "${SECONDS}" -lt "${deadline}" ]; do
+                      if ceph mgr stat >/dev/null 2>&1; then
+                        echo "new active mgr is responsive"
+                        return 0
+                      fi
+                      sleep 3
+                    done
+                    echo "warning: no responsive mgr within 30s; proceeding to retry anyway"
+                    return 0
+                  }
+
+                  echo "running: ceph crash archive-all"
+                  archive_status=0
+                  set +o errexit
+                  archive_output=$(ceph crash archive-all 2>&1)
+                  archive_status=$?
+                  set -o errexit
+                  printf '%s\n' "${archive_output}"
+
+                  if [ "${archive_status}" -ne 0 ]; then
+                    if printf '%s' "${archive_output}" | grep -q "EIO"; then
+                      echo "ceph crash archive-all failed with EIO (tracker 79357); failing over mgr and retrying once"
+                      ceph mgr fail
+                      wait_for_active_mgr
+                      echo "running: ceph crash archive-all (retry)"
+                      ceph crash archive-all
+                    else
+                      echo "ceph crash archive-all failed without EIO; aborting" >&2
+                      exit "${archive_status}"
+                    fi
+                  fi
+
+                  echo "running: ceph crash prune 14"
+                  ceph crash prune 14
+
+                  echo "crash hygiene complete"
+                  ceph crash stat
+              env:
+                - name: ROOK_CEPH_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: rook-ceph-mon
+                      key: ceph-username
+              volumeMounts:
+                - name: ceph-config
+                  mountPath: /etc/ceph
+                - name: mon-endpoint-volume
+                  mountPath: /etc/rook
+                  readOnly: true
+                - name: ceph-admin-secret
+                  mountPath: /var/lib/rook-ceph-mon
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsNonRoot: true
+                runAsUser: 2016
+                runAsGroup: 2016
+          volumes:
+            - name: ceph-admin-secret
+              secret:
+                secretName: rook-ceph-mon
+                optional: false
+                items:
+                  - key: ceph-secret
+                    path: secret.keyring
+            - name: mon-endpoint-volume
+              configMap:
+                name: rook-ceph-mon-endpoints
+                items:
+                  - key: data
+                    path: mon-endpoints
+            - name: ceph-config
+              emptyDir: {}
+          tolerations:
+            - key: "node.kubernetes.io/unreachable"
+              operator: "Exists"
+              effect: "NoExecute"
+              tolerationSeconds: 5
