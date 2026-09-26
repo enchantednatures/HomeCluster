@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cluster.redpanda.com/redpanda_v1alpha2.json
+---
+apiVersion: cluster.redpanda.com/v1alpha2
+kind: Redpanda
+metadata:
+  name: redpanda-cluster
+  namespace: redpanda
+spec:
+  # clusterSpec is a pass-through of the redpanda Helm chart values
+  # https://docs.redpanda.com/current/reference/cluster-properties/
+  clusterSpec:
+    image:
+      repository: docker.redpanda.com/redpandadata/redpanda
+      # datasource=docker depName=docker.redpanda.com/redpandadata/redpanda
+      tag: v26.2.3
+
+    auth:
+      sasl:
+        enabled: false
+
+    tls:
+      enabled: false
+
+    statefulset:
+      replicas: 3
+
+    storage:
+      persistentVolume:
+        enabled: true
+        size: 20Gi
+        storageClass: ceph-block
+
+    resources:
+      cpu:
+        cores: 1
+      memory:
+        container:
+          max: 2.5Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+      limits:
+        cpu: 2000m
+        memory: 2.5Gi
+
+    console:
+      enabled: false
+
+    listeners:
+      kafka:
+        port: 9092
+      admin:
+        port: 9644
+      http:
+        enabled: true
+        port: 8082
+      schemaRegistry:
+        enabled: true
+        port: 8081
+
+    config:
+      cluster:
+        auto_create_topics_enabled: true
+
+    monitoring:
+      enabled: false

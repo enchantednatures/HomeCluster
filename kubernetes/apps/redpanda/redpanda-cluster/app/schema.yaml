@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cluster.redpanda.com/schema_v1alpha2.json
+---
+apiVersion: cluster.redpanda.com/v1alpha2
+kind: Schema
+metadata:
+  name: example-schema
+  namespace: redpanda
+spec:
+  cluster:
+    clusterRef:
+      name: redpanda-cluster
+  schemaType: avro
+  compatibilityLevel: Backward
+  text: |
+    {
+      "type": "record",
+      "name": "ExampleRecord",
+      "fields": [
+        { "type": "string", "name": "field1" },
+        { "type": "int", "name": "field2" }
+      ]
+    }
