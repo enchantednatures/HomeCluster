@@ -75,6 +75,13 @@ spec:
     server:
       ingress:
         enabled: false
+      # Startup probe budget raised: initial boot on a fresh DB runs ~1000 Django
+      # migrations (10+ min). Default 60x10s kills the pod mid-migration, which
+      # leaks an idle-in-transaction pgbouncer connection holding Django's
+      # pg_advisory_lock and deadlocks every subsequent boot.
+      startupProbe:
+        failureThreshold: 180
+        periodSeconds: 10
       volumes:
         - name: authentik-server-tls
           secret:
@@ -91,6 +98,10 @@ spec:
           cpu: 500m
           memory: 1024M
     worker:
+      # Same migration deadlock guard as server (see comment there).
+      startupProbe:
+        failureThreshold: 180
+        periodSeconds: 10
       volumes:
         - name: authentik-server-tls
           secret:
