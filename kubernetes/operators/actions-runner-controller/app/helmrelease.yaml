@@ -20,6 +20,8 @@ metadata:
   name: &name actions-runner-controller
   namespace: actions-runner-system
 spec:
+  driftDetection:
+    mode: enabled
   chartRef:
     kind: OCIRepository
     name: gha-runner-scale-set-controller

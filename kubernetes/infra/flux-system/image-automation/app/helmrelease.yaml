@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: flux-image-automation
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   chart:
     spec:

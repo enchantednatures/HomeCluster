@@ -6,6 +6,8 @@ metadata:
   name: kube-state-metrics
   namespace: monitoring
 spec:
+  driftDetection:
+    mode: enabled
   dependsOn:
     - name: prometheus-operator-crds
       namespace: monitoring

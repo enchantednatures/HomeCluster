@@ -6,6 +6,8 @@ metadata:
   name: flink
   namespace: &namespace flink
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   chart:
     spec:

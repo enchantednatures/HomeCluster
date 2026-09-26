@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: authentik
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   # Must exceed the startupProbe budget below: Helm fails the release otherwise
   # while the initial migration run is still in flight.
@@ -98,7 +100,7 @@ spec:
           cpu: 15m
           memory: 476M
         limits:
-          cpu: 500m
+          cpu: "2"
           memory: 1024M
     worker:
       # Same migration deadlock guard as server (see comment there).
@@ -118,7 +120,7 @@ spec:
           cpu: 15m
           memory: 512M
         limits:
-          cpu: 500m
+          cpu: "2"
           memory: 1024M
     geoip:
       enabled: false
@@ -131,7 +133,7 @@ spec:
         use_ssl: true
       error_reporting:
         enabled: false
-      log_level: debug
+      log_level: info
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
       postgresql:

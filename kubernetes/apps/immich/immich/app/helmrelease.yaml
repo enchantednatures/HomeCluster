@@ -6,6 +6,8 @@ metadata:
   name: immich
   namespace: immich
 spec:
+  driftDetection:
+    mode: enabled
   maxHistory: 2
   interval: 30m
   chart:

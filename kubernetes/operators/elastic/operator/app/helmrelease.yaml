@@ -6,6 +6,8 @@ metadata:
   name: eck-operator
   namespace: elastic
 spec:
+  driftDetection:
+    mode: enabled
   maxHistory: 2
   interval: 5m
   chart:

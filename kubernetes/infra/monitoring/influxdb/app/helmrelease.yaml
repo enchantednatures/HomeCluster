@@ -6,6 +6,8 @@ metadata:
   name: influxdb
   namespace: monitoring
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   chart:
     spec:

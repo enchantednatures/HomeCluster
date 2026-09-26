@@ -6,6 +6,8 @@ metadata:
   name: promtail
   namespace: monitoring
 spec:
+  driftDetection:
+    mode: enabled
   maxHistory: 2
   interval: 5m
   chart:

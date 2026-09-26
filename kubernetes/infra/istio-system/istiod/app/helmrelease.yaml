@@ -6,6 +6,8 @@ metadata:
   name: istiod
   namespace: istio-system
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   dependsOn:
     - name: istio-base

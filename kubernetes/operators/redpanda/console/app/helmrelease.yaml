@@ -5,6 +5,8 @@ metadata:
   name: &app console
   namespace: redpanda
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   timeout: 20m
   chart:

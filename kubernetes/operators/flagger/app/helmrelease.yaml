@@ -6,6 +6,8 @@ metadata:
   name: flagger
   namespace: flagger-system
 spec:
+  driftDetection:
+    mode: enabled
   interval: 15m
   chart:
     spec:

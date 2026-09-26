@@ -6,6 +6,8 @@ metadata:
   name: schema-registry
   namespace: kafka
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   timeout: 60m
   chart:

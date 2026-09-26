@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: csi-driver-nfs
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   chart:
     spec:

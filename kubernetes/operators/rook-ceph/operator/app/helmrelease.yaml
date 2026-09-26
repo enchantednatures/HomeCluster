@@ -8,6 +8,8 @@ metadata:
   annotations:
     fluxcd.io/reconcileAt: "2024-01-01T00:00:00Z"
 spec:
+  driftDetection:
+    mode: enabled
   interval: 15m
   chart:
     spec:

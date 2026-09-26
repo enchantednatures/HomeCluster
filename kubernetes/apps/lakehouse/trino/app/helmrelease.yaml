@@ -6,6 +6,8 @@ metadata:
   name: trino
   namespace: lakehouse
 spec:
+  driftDetection:
+    mode: enabled
   maxHistory: 2
   interval: 30m
   chart:

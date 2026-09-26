@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: metrics-server
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   chart:
     spec:

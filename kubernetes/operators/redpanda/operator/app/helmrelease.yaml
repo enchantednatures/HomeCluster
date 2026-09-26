@@ -6,6 +6,8 @@ metadata:
   name: redpanda
   namespace: redpanda
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   timeout: 60m
   chart:

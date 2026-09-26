@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: &app kiali
 spec:
+  driftDetection:
+    mode: enabled
   maxHistory: 2
   interval: 30m
   chart:

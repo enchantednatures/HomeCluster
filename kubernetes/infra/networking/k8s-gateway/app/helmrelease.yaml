@@ -5,6 +5,8 @@ kind: HelmRelease
 metadata:
   name: k8s-gateway
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   chart:
     spec:

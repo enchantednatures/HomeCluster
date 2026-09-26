@@ -6,6 +6,8 @@ metadata:
   name: istio-cni
   namespace: istio-system
 spec:
+  driftDetection:
+    mode: enabled
   interval: 30m
   timeout: 15m
   chart:

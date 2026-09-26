@@ -6,6 +6,8 @@ metadata:
   name: tempo
   namespace: monitoring
 spec:
+  driftDetection:
+    mode: enabled
   maxHistory: 2
   timeout: 30m
   interval: 6h
