@@ -10,6 +10,7 @@ resources:
   - ./ceph-toolbox.yaml  # Standalone Deployment - no CephToolbox CRD required
   - ./ceph-discovery-job.yaml
   - ./ceph-crash-hygiene.yaml
+  - ./ceph-reclass-job.yaml
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
   - ./ceph-filesystem.yaml

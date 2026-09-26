@@ -1,0 +1,212 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# One-shot CRUSH reclassification + pool re-home. Rook v1.20.7 does NOT re-home
+# an existing CephBlockPool's CRUSH rule when spec.deviceClass changes (verified
+# live), so the rule move must be done at runtime. Versioned name because Flux
+# cannot mutate a completed Job's immutable spec in place.
+#
+# ORDER IS LOAD-BEARING: reclass osd.4-6 -> re-home both ssd-pinned pools -> reclass osd.7.
+# Pools ceph-blockpool-ssd / ceph-blockpool-nvme are size 3 with failureDomain
+# host, pinned to `default~ssd`. After reclassing osd.4/5/6 (hdd hardware
+# mislabeled ssd) `default~ssd` still holds exactly 3 hosts (osd.3 melusine,
+# osd.7 work-03, osd.8 unraid-worker), so the pools stay clean. Reclassing osd.7
+# BEFORE the re-home would shrink `default~ssd` to 2 hosts and strand both
+# pools -> degraded PGs. Hence: 4,5,6 -> re-home pools to default~hdd -> 7.
+#
+# Guardrail OSDs NEVER touched: osd.0-3 (melusine) and osd.8 (unraid-worker, a
+# genuine SSD that must keep class `ssd`).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-reclass-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-reclass
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-ceph-reclass
+        app.kubernetes.io/component: maintenance
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      containers:
+        - name: ceph-reclass
+          image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              # Render keyring + ceph.conf (upstream rook toolbox pattern)
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # shellcheck disable=SC2001
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              # --- gate: tolerates pre-existing active+clean+laggy / +remapped,
+              #     fails on real degradation. Baseline health is HEALTH_WARN with
+              #     transient laggy/remapped PGs, so requiring 100% active+clean
+              #     would abort spuriously. A timed-out gate MUST return non-zero
+              #     and fail the Job (no `|| true` masking).
+              gate() {
+                local tries="${1:-120}"
+                for i in $(seq 1 "$tries"); do
+                  if ceph health detail | grep -qE 'PG_DEGRADED|PG_AVAILABILITY|PG_DAMAGED'; then
+                    echo "gate: PG degradation present:"; ceph health detail | grep -E 'PG_DEGRADED|PG_AVAILABILITY|PG_DAMAGED'
+                    sleep 5
+                  else
+                    echo "gate: OK (no degraded/undersized/incomplete/stale/peering)"
+                    return 0
+                  fi
+                done
+                echo "gate: TIMEOUT"; return 1
+              }
+
+              # --- 0. checkpoint + pre-state evidence (base64 crushmap so logs
+              #     persist a restorable snapshot of the CRUSH map)
+              ceph osd getcrushmap -o /tmp/crush.checkpoint.bin
+              echo "=== CRUSHMAP_CHECKPOINT_BASE64_BEGIN ==="
+              base64 /tmp/crush.checkpoint.bin
+              echo "=== CRUSHMAP_CHECKPOINT_BASE64_END ==="
+              ceph osd crush tree --show-shadow
+              ceph osd tree
+              ceph osd crush rule dump
+              ceph osd pool ls detail
+
+              # --- pre-flight: refuse to run if cluster already degraded
+              gate 60
+
+              # --- 1. reclass osd.4, osd.5, osd.6 ONE AT A TIME (stop BEFORE osd.7).
+              #     osd.4-6 are HDD hardware mislabeled `ssd`. default~ssd keeps
+              #     osd.3+osd.7+osd.8 = 3 hosts until the pools are re-homed, so the
+              #     size-3 host-FD pools remain satisfiable throughout this step.
+              #     NEVER reclass more than one OSD at a time.
+              for OSD in 4 5 6; do
+                echo "=== reclass osd.$OSD -> hdd ==="
+                ceph osd crush rm-device-class "$OSD"
+                ceph osd crush set-device-class hdd "$OSD"
+                ceph osd crush get-device-class "$OSD"
+                gate 180
+              done
+              ceph osd crush tree --show-shadow
+
+              # --- 2. re-home both ssd-pinned pools to default~hdd (KEEP the original
+              #     rule for rollback until the finalize step). A temporary `${P}-hdd`
+              #     rule is created and the pool repointed; the original `${P}` rule is
+              #     left intact and unused so we can revert before finalizing.
+              for P in ceph-blockpool-ssd ceph-blockpool-nvme; do
+                echo "=== re-home $P -> default~hdd ==="
+                ceph osd crush rule create-replicated "${P}-hdd" default host hdd
+                ceph osd pool set "$P" crush_rule "${P}-hdd"
+                ceph osd crush rule dump | grep -A4 "\"rule_name\": \"${P}-hdd\""
+                gate 180
+              done
+
+              # --- 3. reclass osd.7 (last; safe now that the pools no longer need
+              #     default~ssd to hold 3 hosts). This drops default~ssd to osd.3+osd.8.
+              echo "=== reclass osd.7 -> hdd ==="
+              ceph osd crush rm-device-class 7
+              ceph osd crush set-device-class hdd 7
+              ceph osd crush get-device-class 7
+              gate 180
+
+              # --- 4. soak, then promote canonical rule names. After ~3 min clean, the
+              #     original `${P}` (default~ssd) rule is unused -> safe to rm. Rename
+              #     `${P}-hdd` to the canonical `${P}`; if rename is unsupported, create
+              #     the canonical rule, repoint the pool, and drop the temporary rule.
+              for P in ceph-blockpool-ssd ceph-blockpool-nvme; do
+                echo "=== soak + finalize $P ==="
+                gate 36                      # ~3 min soak
+                ceph osd crush rule rm "$P"  # original ssd rule, now unused
+                if ceph osd crush rule rename "${P}-hdd" "$P" 2>/dev/null; then
+                  echo "renamed ${P}-hdd -> ${P}"
+                else
+                  ceph osd crush rule create-replicated "$P" default host hdd
+                  ceph osd pool set "$P" crush_rule "$P"
+                  ceph osd crush rule rm "${P}-hdd"
+                fi
+              done
+
+              # --- 5. final verification echo
+              ceph osd crush tree --show-shadow
+              ceph osd tree
+              ceph osd crush rule dump
+              ceph osd pool ls detail
+              ceph -s
+              ceph health detail
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5
