@@ -6,7 +6,6 @@ resources:
   - ./helmrelease.yaml
   - ./scrape-config.yaml
   - ./rules.yaml
-  - ./virtualservice.yaml
   - ./alertmanager-config.sops.yaml
   - ./discord-webhook.sops.yaml
   # - ./istio-config.yaml  # Disabled due to IstioOperator CRD issue
