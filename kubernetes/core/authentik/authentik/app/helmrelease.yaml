@@ -8,7 +8,7 @@ spec:
   interval: 30m
   # Must exceed the startupProbe budget below: Helm fails the release otherwise
   # while the initial migration run is still in flight.
-  timeout: 45m
+  timeout: 120m
   chart:
     spec:
       chart: authentik
@@ -83,7 +83,7 @@ spec:
       # leaks an idle-in-transaction pgbouncer connection holding Django's
       # pg_advisory_lock and deadlocks every subsequent boot.
       startupProbe:
-        failureThreshold: 600
+        failureThreshold: 900
         periodSeconds: 10
       volumes:
         - name: authentik-server-tls
@@ -103,7 +103,7 @@ spec:
     worker:
       # Same migration deadlock guard as server (see comment there).
       startupProbe:
-        failureThreshold: 600
+        failureThreshold: 900
         periodSeconds: 10
       volumes:
         - name: authentik-server-tls
