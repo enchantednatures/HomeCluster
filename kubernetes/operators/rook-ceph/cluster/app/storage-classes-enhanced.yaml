@@ -14,7 +14,7 @@ spec:
   replicated:
     size: 3
     requireSafeReplicaSize: true
-  deviceClass: ssd
+  deviceClass: hdd
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
     pg_autoscale_mode: "on"
@@ -130,7 +130,7 @@ spec:
   replicated:
     size: 3
     requireSafeReplicaSize: true
-  deviceClass: ssd
+  deviceClass: hdd
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
     pg_autoscale_mode: "on"

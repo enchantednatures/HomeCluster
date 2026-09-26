@@ -239,28 +239,28 @@ spec:
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: ssd
+          deviceClass: hdd
       - name: "work-01"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: ssd
+          deviceClass: hdd
       - name: "work-02"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: ssd
+          deviceClass: hdd
       - name: "work-03"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: ssd
+          deviceClass: hdd
       - name: "unraid-worker"
         devices:
           - name: "/dev/sda"
