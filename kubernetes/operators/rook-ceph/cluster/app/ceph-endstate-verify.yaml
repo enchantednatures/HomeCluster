@@ -1,0 +1,303 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# One-shot assertion of the ACCEPTED ceph-health-hygiene end state.
+# Prints PASS/FAIL per check and exits non-zero if ANY check fails.
+# Versioned name because Flux cannot mutate a completed Job's immutable spec.
+#
+# Accepted end state (see docs/ceph-hygiene-runbook.md):
+#   HEALTH_WARN = AUTH_INSECURE_CLIENT_KEY_TYPE (4, raw/unmuted, kernel-gated)
+#               + AUTH_INSECURE_KEYS_ALLOWED (muted)
+#               + AUTH_INSECURE_KEYS_CREATABLE (muted)
+#               + BLUESTORE_SLOW_OP_ALERT (accepted residual, T7 NO-GO)
+#   RECENT_MGR_MODULE_CRASH must be ABSENT (the key win).
+# The plan's original "exactly 3 warnings" target was amended to include the
+# accepted BLUESTORE_SLOW_OP_ALERT residual (T7 returned NO-GO for the slow OSD).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-endstate-verify-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-endstate-verify
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 86400
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-ceph-endstate-verify
+        app.kubernetes.io/component: maintenance
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      containers:
+        - name: ceph-endstate-verify
+          image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              # Render keyring + ceph.conf (upstream rook toolbox pattern)
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # shellcheck disable=SC2001
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              # --- assertion harness: one PASS/FAIL line per check, accumulate
+              #     failures, exit 1 if any failed. `check` runs the named check
+              #     function in an `if` context so `set -o errexit` does not abort
+              #     on an expected failure. No blanket `|| true` anywhere.
+              failures=0
+              check() {
+                local desc="$1"
+                shift
+                local out
+                if out=$("$@" 2>&1); then
+                  echo "PASS: ${desc}"
+                else
+                  echo "FAIL: ${desc}"
+                  if [ -n "${out}" ]; then
+                    printf '      %s\n' "${out}"
+                  fi
+                  failures=$((failures + 1))
+                fi
+              }
+
+              health_json=$(ceph health --format=json)
+
+              check_health_status() {
+                echo "${health_json}" | jq -e '.status == "HEALTH_WARN"' >/dev/null
+              }
+
+              # AUTH_INSECURE_CLIENT_KEY_TYPE: present, raw (muted false), count 4.
+              # `summary` is an object in some releases and an array in others.
+              check_auth_client_key_type() {
+                echo "${health_json}" | jq -e '
+                  .checks.AUTH_INSECURE_CLIENT_KEY_TYPE != null
+                  and .checks.AUTH_INSECURE_CLIENT_KEY_TYPE.muted == false
+                ' >/dev/null || return 1
+                local count
+                count=$(echo "${health_json}" | jq -r '
+                  .checks.AUTH_INSECURE_CLIENT_KEY_TYPE.summary
+                  | if type == "array" then .[0].count else .count end
+                ')
+                [ "${count}" = "4" ]
+              }
+
+              check_code_present() {
+                echo "${health_json}" | jq -e --arg c "$1" '.checks[$c] != null' >/dev/null
+              }
+
+              check_code_present_muted() {
+                echo "${health_json}" | jq -e --arg c "$1" '
+                  .checks[$c] != null and .checks[$c].muted == true
+                ' >/dev/null
+              }
+
+              check_code_absent() {
+                echo "${health_json}" | jq -e --arg c "$1" '.checks[$c] == null' >/dev/null
+              }
+
+              # Only the accepted codes may appear. SLOW_OPS is the classic
+              # host-latency check; it is not a stable code in this cluster, but a
+              # transient flap is tolerated so it cannot fail an otherwise-correct
+              # end state. Both are documented as accepted in the runbook.
+              check_only_accepted_codes() {
+                local extra
+                extra=$(echo "${health_json}" | jq -r '.checks | keys[]' \
+                  | grep -vE '^(AUTH_INSECURE_CLIENT_KEY_TYPE|AUTH_INSECURE_KEYS_ALLOWED|AUTH_INSECURE_KEYS_CREATABLE|BLUESTORE_SLOW_OP_ALERT|SLOW_OPS)$')
+                if [ -n "${extra}" ]; then
+                  echo "unexpected health code(s): ${extra}"
+                  return 1
+                fi
+                return 0
+              }
+
+              # rook mgr module must not be enabled (the crash-storm source was
+              # removed, not muted).
+              check_rook_module_disabled() {
+                if ceph mgr module ls | grep -qE '^rook[[:space:]]+on'; then
+                  return 1
+                fi
+                local json
+                if json=$(ceph mgr module ls --format=json 2>/dev/null); then
+                  if printf '%s' "${json}" | jq -e '
+                    (.enabled_modules // []) as $m
+                    | if ($m | type) == "array"
+                      then ($m | index("rook") != null)
+                      else ($m | has("rook"))
+                      end
+                  ' >/dev/null 2>&1; then
+                    return 1
+                  fi
+                fi
+                return 0
+              }
+
+              check_no_unarchived_crashes() {
+                local count
+                count=$(ceph crash ls-new --format=json | jq 'length')
+                [ "${count}" = "0" ]
+              }
+
+              # osd.4-7 must sit under default~hdd; osd.3 and osd.8 under
+              # default~ssd. JSON ancestor walk is robust to bucket nesting.
+              check_crush_shadow_placement() {
+                ceph osd crush tree --show-shadow --format=json | jq -e '
+                  def parents_of($nodes; $id):
+                    [ $nodes[] | select((.children // []) | index($id) != null) ];
+                  def ancestor_names($nodes; $id):
+                    [ parents_of($nodes; $id)[] as $p
+                      | $p.name, (ancestor_names($nodes; $p.id)[])
+                    ];
+                  . as $r
+                  | ($r.nodes) as $n
+                  | ((ancestor_names($n; 4) | index("default~hdd")) != null)
+                    and ((ancestor_names($n; 5) | index("default~hdd")) != null)
+                    and ((ancestor_names($n; 6) | index("default~hdd")) != null)
+                    and ((ancestor_names($n; 7) | index("default~hdd")) != null)
+                    and ((ancestor_names($n; 3) | index("default~ssd")) != null)
+                    and ((ancestor_names($n; 8) | index("default~ssd")) != null)
+                ' >/dev/null
+              }
+
+              # Pool's crush rule name must be a canonical ceph-blockpool-* rule
+              # and that rule must take default~hdd (robust to rule id changes).
+              check_pool_rule_on_hdd() {
+                local pool="$1"
+                local rule
+                rule=$(ceph osd pool get "${pool}" crush_rule | awk -F': ' '{print $2}')
+                case "${rule}" in
+                  ceph-blockpool-*) ;;
+                  *)
+                    echo "pool ${pool} crush_rule='${rule}' is not a ceph-blockpool-* rule"
+                    return 1
+                    ;;
+                esac
+                ceph osd crush rule dump "${rule}" --format=json \
+                  | jq -e '[.steps[]?.item_name] | index("default~hdd") != null' >/dev/null
+              }
+
+              check_no_pg_degradation() {
+                if ceph health detail | grep -qE 'PG_DEGRADED|PG_AVAILABILITY|PG_DAMAGED'; then
+                  ceph health detail | grep -E 'PG_DEGRADED|PG_AVAILABILITY|PG_DAMAGED'
+                  return 1
+                fi
+                return 0
+              }
+
+              check_osd_tree_hdd_class() {
+                ceph osd tree | awk '
+                  {
+                    for (i = 1; i <= NF; i++) {
+                      if ($i ~ /^osd\.(4|5|6|7)$/) {
+                        if ($2 != "hdd") {
+                          print "osd " $i " class " $2
+                          bad = 1
+                        }
+                      }
+                    }
+                  }
+                  END { exit (bad ? 1 : 0) }
+                '
+              }
+
+              echo "=== rook-ceph accepted end-state verification ==="
+              echo "--- health status + codes ---"
+              echo "${health_json}" | jq -r '.status, (.checks | keys[])' || true
+              echo "---------------------------------------------"
+
+              check "health status is HEALTH_WARN" check_health_status
+              check "AUTH_INSECURE_CLIENT_KEY_TYPE present, unmuted, count 4" check_auth_client_key_type
+              check "AUTH_INSECURE_KEYS_ALLOWED present and muted" check_code_present_muted AUTH_INSECURE_KEYS_ALLOWED
+              check "AUTH_INSECURE_KEYS_CREATABLE present and muted" check_code_present_muted AUTH_INSECURE_KEYS_CREATABLE
+              check "BLUESTORE_SLOW_OP_ALERT present (accepted residual)" check_code_present BLUESTORE_SLOW_OP_ALERT
+              check "RECENT_MGR_MODULE_CRASH absent" check_code_absent RECENT_MGR_MODULE_CRASH
+              check "only accepted health codes present" check_only_accepted_codes
+              check "rook mgr module not enabled" check_rook_module_disabled
+              check "no unarchived crashes" check_no_unarchived_crashes
+              check "osd.4-7 under default~hdd, osd.3/8 under default~ssd" check_crush_shadow_placement
+              check "ceph-blockpool-ssd rule takes default~hdd" check_pool_rule_on_hdd ceph-blockpool-ssd
+              check "ceph-blockpool-nvme rule takes default~hdd" check_pool_rule_on_hdd ceph-blockpool-nvme
+              check "no PG degradation" check_no_pg_degradation
+              check "ceph osd tree shows osd.4-7 class hdd" check_osd_tree_hdd_class
+
+              echo "---------------------------------------------"
+              if [ "${failures}" -ne 0 ]; then
+                echo "RESULT: FAIL (${failures} check(s) failed)"
+                exit 1
+              fi
+              echo "RESULT: PASS (all checks passed)"
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5

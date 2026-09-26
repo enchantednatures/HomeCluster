@@ -17,7 +17,10 @@ spec:
   instances: 1
   type: rw
   pgbouncer:
-    poolMode: transaction
+    # Session mode required: authentik's migration runner takes a SESSION-level
+    # pg_advisory_lock. In transaction mode a client killed mid-migrate leaks
+    # that lock into the pooled backend, deadlocking every subsequent boot.
+    poolMode: session
     parameters:
       max_client_conn: "1000"
       default_pool_size: "25"

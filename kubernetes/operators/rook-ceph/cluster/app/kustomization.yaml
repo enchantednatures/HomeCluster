@@ -11,6 +11,7 @@ resources:
   - ./ceph-discovery-job.yaml
   - ./ceph-crash-hygiene.yaml
   - ./ceph-reclass-job.yaml
+  - ./ceph-endstate-verify.yaml
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
   - ./ceph-filesystem.yaml
