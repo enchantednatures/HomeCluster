@@ -15,7 +15,7 @@ spec:
   chart:
     spec:
       chart: istiod
-      version: 1.30.4 # datasource=helm depName=istiod repository=https://istio-release.storage.googleapis.com/charts
+      version: 1.30.5 # datasource=helm depName=istiod repository=https://istio-release.storage.googleapis.com/charts
       sourceRef:
         kind: HelmRepository
         name: istio
