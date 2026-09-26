@@ -10,10 +10,20 @@ metadata:
     app.kubernetes.io/instance: *app
   annotations:
     tailscale.com/hostname: kiali
+    tailscale.com/force-reconcile: "2"
 spec:
   ingressClassName: tailscale
-  defaultBackend:
-    service:
-      name: kiali
-      port:
-        number: 20001
+  tls:
+    - hosts:
+        - kiali.rya-bebop.ts.net
+  rules:
+    - host: kiali.rya-bebop.ts.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kiali
+                port:
+                  number: 20001

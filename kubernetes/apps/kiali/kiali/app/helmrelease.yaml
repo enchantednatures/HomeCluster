@@ -51,19 +51,3 @@ spec:
           memory: 128Mi
         limits:
           memory: 512Mi
-      ingress:
-        enabled: true
-        class_name: istio
-        annotations:
-          kubernetes.io/tls-acme: "true"
-          cert-manager.io/cluster-issuer: letsencrypt-production
-          external-dns.alpha.kubernetes.io/target: external.${SECRET_DOMAIN}
-          external-dns/is-public: "true"
-        hosts:
-          - host: &host kiali.${SECRET_DOMAIN}
-            paths:
-              - path: /
-                path_type: Prefix
-        tls:
-          - hosts: [*host]
-            secretName: kiali-tls
