@@ -35,7 +35,7 @@ spec:
       # Kill abandoned pgbouncer sessions holding advisory locks:
       # leaked idle-in-transaction backends from crashed authentik pods
       # deadlock subsequent migration runs.
-      idle_in_transaction_session_timeout: 60000
+      idle_in_transaction_session_timeout: "60000"
   monitoring:
     enablePodMonitor: false
   managed:
