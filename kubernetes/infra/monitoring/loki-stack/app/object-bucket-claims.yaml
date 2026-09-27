@@ -11,33 +11,3 @@ metadata:
 spec:
   bucketName: loki-chunks
   storageClassName: ceph-bucket-retain
-  additionalConfig:
-    bucketOwner: loki-objectstore-user
----
-apiVersion: objectbucket.io/v1alpha1
-kind: ObjectBucketClaim
-metadata:
-  name: &app2 loki-ruler
-  namespace: monitoring
-  labels:
-    app.kubernetes.io/name: *app2
-    app.kubernetes.io/part-of: loki
-spec:
-  bucketName: loki-ruler
-  storageClassName: ceph-bucket-retain
-  additionalConfig:
-    bucketOwner: loki-objectstore-user
----
-apiVersion: objectbucket.io/v1alpha1
-kind: ObjectBucketClaim
-metadata:
-  name: &app3 loki-admin
-  namespace: monitoring
-  labels:
-    app.kubernetes.io/name: *app3
-    app.kubernetes.io/part-of: loki
-spec:
-  bucketName: loki-admin
-  storageClassName: ceph-bucket-retain
-  additionalConfig:
-    bucketOwner: loki-objectstore-user

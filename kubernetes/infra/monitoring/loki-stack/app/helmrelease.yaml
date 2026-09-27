@@ -85,10 +85,13 @@ spec:
               period: 24h
       storage:
         type: s3
+        # All Loki data shares one bucket: a single ObjectBucketClaim yields one
+        # credential set, and Loki supports backing the Ruler with the chunks
+        # bucket. Separate buckets would each need their own provisioned user.
         bucketNames:
           chunks: loki-chunks
-          ruler: loki-ruler
-          admin: loki-admin
+          ruler: loki-chunks
+          admin: loki-chunks
         s3:
           endpoint: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local:80
           region: us-east-1

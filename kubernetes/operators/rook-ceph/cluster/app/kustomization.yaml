@@ -20,7 +20,6 @@ resources:
   # - ./istio-config-enhanced.yaml  # Temporarily disabled due to schema issues
   - ./ceph-object-store-secret.sops.yaml
   - ./ceph-objectstore-admin-user.yaml
-  - ./loki-objectstore-user.yaml
   - ./grafana-dashboard-configmap.yaml
   - ./ceph-dashboard-grafana.yaml
   # - ./network-policies-enhanced.yaml  # Temporarily disabled due to port range validation
