@@ -12,15 +12,17 @@ Talos Kubernetes cluster on Proxmox VMs, provisioned via OpenTofu. GitOps with F
 
 ## Commands
 
+This repository uses `Makefile` targets (a native replacement for `go-task`). Run `make help` to list all targets.
+
 ```bash
-task kubernetes:kubeconform     # Schema-validate manifests
-task sops:encrypt                 # Encrypt *.sops.yaml files (REQUIRED before commit)
-task sops:decrypt                 # Decrypt for inspection
-task flux:reconcile               # Force git sync
-task kubernetes:resources         # List pods, helmreleases, kustomizations
-task kubernetes:ceph:health       # Ceph cluster health
-task terraform:proxmox:plan       # Preview VM changes
-task terraform:proxmox:apply      # Apply VM config
+make kubernetes-kubeconform     # Schema-validate manifests
+make sops-encrypt               # Encrypt *.sops.yaml files (REQUIRED before commit)
+make sops-decrypt               # Decrypt for inspection
+make flux-reconcile             # Force git sync
+make kubernetes-resources       # List pods, helmreleases, kustomizations
+make kubernetes-ceph-health     # Ceph cluster health
+make terraform-proxmox-plan     # Preview VM changes
+make terraform-proxmox-apply    # Apply VM config
 ```
 
 **Debugging**: `flux get kustomizations -A`, `flux get helmreleases -A`, `stern -n <ns> <name>`, `kubectl -n <ns> get events --sort-by=.metadata.creationTimestamp`
@@ -126,8 +128,8 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 
 ## Pre-Commit Checklist
 
-1. `task kubernetes:kubeconform` — schema validation
-2. `task sops:encrypt` — encrypt secrets
+1. `make kubernetes-kubeconform` — schema validation
+2. `make sops-encrypt` — encrypt secrets
 3. Verify `git diff` shows encrypted fields only
 4. `pre-commit run --all-files` — trailing whitespace, line endings, tabs, smartquotes, secret check
 
@@ -144,6 +146,6 @@ Flux substitutes `${SECRET_DOMAIN}`, `${CLUSTER_NAME}`, etc. from:
 
 - **ALL changes go through Git** — never `kubectl apply` directly
 - **Never commit plaintext secrets**
-- **Always validate before committing** (`task kubernetes:kubeconform` + `task sops:encrypt`)
+- **Always validate before committing** (`make kubernetes-kubeconform` + `make sops-encrypt`)
 - Flux Kustomizations live in `flux-system` namespace, deploy to `targetNamespace`
 - Use `dependsOn` to enforce ordering (app → operator → core → infra)
