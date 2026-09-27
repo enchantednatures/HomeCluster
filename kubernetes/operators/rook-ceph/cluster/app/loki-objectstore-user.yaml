@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+---
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  name: loki-objectstore-user
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: loki-objectstore-user
+    app.kubernetes.io/instance: ceph-objectstore
+    app.kubernetes.io/component: object-storage
+spec:
+  store: ceph-objectstore
+  displayName: "Loki Object Store User"
+  quotas:
+    maxBuckets: 3
