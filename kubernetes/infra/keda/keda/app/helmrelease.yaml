@@ -7,6 +7,20 @@ metadata:
 spec:
   driftDetection:
     mode: enabled
+    ignore:
+      # caBundle is injected at runtime by the KEDA operator.
+      - paths:
+          - /webhooks
+        target:
+          group: admissionregistration.k8s.io
+          kind: (MutatingWebhookConfiguration|ValidatingWebhookConfiguration)
+      # The operator patches the APIService caBundle with its generated CA.
+      - paths:
+          - /spec/caBundle
+        target:
+          group: apiregistration.k8s.io
+          kind: APIService
+          name: v1beta1.external.metrics.k8s.io
   interval: 30m
   chart:
     spec:

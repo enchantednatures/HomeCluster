@@ -7,6 +7,13 @@ metadata:
 spec:
   driftDetection:
     mode: enabled
+    ignore:
+      # operator-oauth is managed by secret.sops.yaml, not the Helm chart.
+      - paths:
+          - ""
+        target:
+          kind: Secret
+          name: operator-oauth
   maxHistory: 2
   interval: 30m
   chart:

@@ -8,6 +8,13 @@ metadata:
 spec:
   driftDetection:
     mode: enabled
+    ignore:
+      # caBundle is injected at runtime by the admission webhook certgen job.
+      - paths:
+          - /webhooks
+        target:
+          group: admissionregistration.k8s.io
+          kind: (MutatingWebhookConfiguration|ValidatingWebhookConfiguration)
   dependsOn:
     - name: prometheus-operator-crds
       namespace: monitoring

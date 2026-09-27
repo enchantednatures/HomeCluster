@@ -7,6 +7,13 @@ metadata:
 spec:
   driftDetection:
     mode: enabled
+    ignore:
+      # caBundle is injected at runtime by the CloudNative-PG operator.
+      - paths:
+          - /webhooks
+        target:
+          group: admissionregistration.k8s.io
+          kind: (MutatingWebhookConfiguration|ValidatingWebhookConfiguration)
   interval: 15m
   chart:
     spec:

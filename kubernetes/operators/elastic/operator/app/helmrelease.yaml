@@ -8,6 +8,13 @@ metadata:
 spec:
   driftDetection:
     mode: enabled
+    ignore:
+      # caBundle is injected at runtime by the ECK operator.
+      - paths:
+          - /webhooks
+        target:
+          group: admissionregistration.k8s.io
+          kind: (MutatingWebhookConfiguration|ValidatingWebhookConfiguration)
   maxHistory: 2
   interval: 5m
   chart:
