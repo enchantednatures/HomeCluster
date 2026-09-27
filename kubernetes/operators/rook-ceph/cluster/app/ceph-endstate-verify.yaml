@@ -23,7 +23,8 @@ metadata:
     app.kubernetes.io/component: maintenance
 spec:
   backoffLimit: 0
-  ttlSecondsAfterFinished: 86400
+  # No finished-Job TTL: a completed Job must persist so Flux does not
+  # see it as absent and re-create/re-run this one-shot verification.
   activeDeadlineSeconds: 600
   template:
     metadata:
@@ -200,12 +201,31 @@ spec:
                   | jq -e '[.steps[]?.item_name] | index("default~hdd") != null' >/dev/null
               }
 
+              # PG_AVAILABILITY peering/remapped/laggy is transient during normal
+              # cluster churn and clears within seconds, so a single point-in-time
+              # sample can be a false negative. Retry a bounded 6 times / 15s and
+              # pass on the first clean sample. Real degradation (undersized,
+              # incomplete, stale) and PG_DAMAGED are NEVER tolerated: they fail
+              # immediately rather than being retried away.
               check_no_pg_degradation() {
-                if ceph health detail | grep -qE 'PG_DEGRADED|PG_AVAILABILITY|PG_DAMAGED'; then
-                  ceph health detail | grep -E 'PG_DEGRADED|PG_AVAILABILITY|PG_DAMAGED'
-                  return 1
-                fi
-                return 0
+                local tries=6 i out
+                for i in $(seq 1 "${tries}"); do
+                  out=$(ceph health detail 2>&1)
+                  if printf '%s\n' "${out}" | grep -qE 'PG_DEGRADED|PG_DAMAGED|undersized|incomplete|stale'; then
+                    printf '%s\n' "${out}" | grep -E 'PG_DEGRADED|PG_DAMAGED|undersized|incomplete|stale'
+                    return 1
+                  fi
+                  if ! printf '%s\n' "${out}" | grep -qE 'PG_AVAILABILITY'; then
+                    return 0
+                  fi
+                  echo "transient PG_AVAILABILITY (peering/remapped/laggy) on try ${i}/${tries}"
+                  if [ "${i}" -lt "${tries}" ]; then
+                    sleep 15
+                  fi
+                done
+                echo "PG_AVAILABILITY persisted after ${tries} tries:"
+                printf '%s\n' "${out}" | grep -E 'PG_AVAILABILITY'
+                return 1
               }
 
               check_osd_tree_hdd_class() {

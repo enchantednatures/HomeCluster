@@ -91,7 +91,12 @@ At very large crash backlogs, `ceph crash archive-all` can fail with `Error EIO`
 ### Maintenance notes
 
 - Job names are versioned (`*-v1`) because Flux cannot mutate a completed or flux-managed Job's immutable spec in place. To re-run, add a new versioned Job (for example `rook-ceph-crash-archive-v2`) rather than editing the existing one.
-- `ttlSecondsAfterFinished: 86400` keeps completed Jobs for one day for log inspection, then garbage-collects them.
+- These one-shot Jobs deliberately have **no `ttlSecondsAfterFinished`**. With a TTL, Kubernetes garbage-collects the completed Job after the TTL expires, Flux then sees the resource as absent from the cluster and re-creates and re-runs it from git. For the reclass Job that is a destructive CRUSH migration, so an unintended re-run is unsafe. Keeping the completed Job object means Flux always observes it as present and `Complete`, and never re-runs it.
+- To intentionally re-run a one-shot Job, delete the Job object and let Flux recreate it:
+  ```bash
+  kubectl -n rook-ceph delete job/<job-name>
+  ```
+  The reclass Job (`rook-ceph-reclass-v1`) is guarded and exits 0 without mutating anything if the migration is already applied, so re-creating it is safe.
 - Rerunning archive and prune is idempotent. Both are no-ops on an empty crash list.
 
 ## 4. The `rook` mgr module is disabled
@@ -231,6 +236,8 @@ kubectl -n rook-ceph logs job/rook-ceph-endstate-verify-v1
 
 A passing run ends with `RESULT: PASS (all checks passed)`. A failing run ends with `RESULT: FAIL` and lists the failed checks with their observed output.
 
+This Job also has no `ttlSecondsAfterFinished`, so a completed run persists and Flux does not re-create it (see section 3). The `no PG degradation` check retries up to 6 times with 15 seconds between tries, so a transient `peering`/`remapped`/`laggy` sample cannot produce a false failure; `undersized`, `incomplete`, `stale`, and `PG_DAMAGED` still fail immediately.
+
 ### What the Job asserts
 
 - `ceph health --format=json` status is `HEALTH_WARN`.
@@ -243,7 +250,7 @@ A passing run ends with `RESULT: PASS (all checks passed)`. A failing run ends w
 - Unarchived crash count is 0 (`ceph crash ls-new --format=json` has length 0).
 - `osd.4` to `osd.7` sit under `default~hdd`; `osd.3` and `osd.8` under `default~ssd` in `ceph osd crush tree --show-shadow`.
 - Both pool rules take `default~hdd` and resolve to a canonical `ceph-blockpool-*` rule.
-- `ceph health detail` does not contain `PG_DEGRADED`, `PG_AVAILABILITY`, or `PG_DAMAGED`.
+- `ceph health detail` shows no PG degradation. A transient `PG_AVAILABILITY` (`peering`/`remapped`/`laggy`) is retried up to 6 times with 15s between tries and passes on the first clean sample; persistent `PG_AVAILABILITY`, or any `undersized`/`incomplete`/`stale`/`PG_DEGRADED`/`PG_DAMAGED`, fails.
 - `ceph osd tree` shows `osd.4` to `osd.7` with class `hdd`.
 
 ### Accepted-warning note

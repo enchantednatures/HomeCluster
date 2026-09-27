@@ -26,7 +26,8 @@ metadata:
     app.kubernetes.io/component: maintenance
 spec:
   backoffLimit: 0
-  ttlSecondsAfterFinished: 86400
+  # No finished-Job TTL: this destructive one-shot MUST persist Complete
+  # so Flux does not see it as absent and re-create/re-run the CRUSH migration.
   activeDeadlineSeconds: 3600
   template:
     metadata:
@@ -67,6 +68,25 @@ spec:
               [client.admin]
               keyring = ${KEYRING_FILE}
               EOF
+
+              # Idempotency guard: this is a one-shot migration. If it has already
+              # been applied (osd.4-7 class hdd AND both pools already on
+              # default~hdd), exit 0 WITHOUT mutating anything. Flux re-creates
+              # this Job after any TTL deletion, so a re-run MUST be a no-op.
+              already_done=true
+              for OSD in 4 5 6 7; do
+                [ "$(ceph osd crush get-device-class "$OSD")" = "hdd" ] || already_done=false
+              done
+              for P in ceph-blockpool-ssd ceph-blockpool-nvme; do
+                rule=$(ceph osd pool get "$P" crush_rule | awk -F': ' '{print $2}')
+                ceph osd crush rule dump "$rule" --format=json \
+                  | jq -e '[.steps[]?.item_name] | index("default~hdd") != null' >/dev/null \
+                  || already_done=false
+              done
+              if [ "${already_done}" = "true" ]; then
+                echo "reclass already applied (osd.4-7 hdd, pools on default~hdd); nothing to do"
+                exit 0
+              fi
 
               # --- gate: tolerates pre-existing active+clean+laggy / +remapped,
               #     fails on real degradation. Baseline health is HEALTH_WARN with
@@ -135,13 +155,16 @@ spec:
               ceph osd crush get-device-class 7
               gate 180
 
-              # --- 4. soak, then promote canonical rule names. After ~3 min clean, the
-              #     original `${P}` (default~ssd) rule is unused -> safe to rm. Rename
-              #     `${P}-hdd` to the canonical `${P}`; if rename is unsupported, create
-              #     the canonical rule, repoint the pool, and drop the temporary rule.
+              # --- 4. quick clean-gate, then promote canonical rule names. `gate`
+              #     returns on the FIRST clean iteration (no fixed sleep), so this
+              #     is a fast confirmation that the re-home settled, NOT a timed
+              #     soak. Once clean, the original `${P}` (default~ssd) rule is
+              #     unused -> safe to rm. Rename `${P}-hdd` to the canonical `${P}`;
+              #     if rename is unsupported, create the canonical rule, repoint the
+              #     pool, and drop the temporary rule.
               for P in ceph-blockpool-ssd ceph-blockpool-nvme; do
-                echo "=== soak + finalize $P ==="
-                gate 36                      # ~3 min soak
+                echo "=== clean-gate + finalize $P ==="
+                gate 36                      # returns on first clean sample (not a 3 min soak)
                 ceph osd crush rule rm "$P"  # original ssd rule, now unused
                 if ceph osd crush rule rename "${P}-hdd" "$P" 2>/dev/null; then
                   echo "renamed ${P}-hdd -> ${P}"
