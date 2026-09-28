@@ -1,0 +1,48 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: set-dns-ndots
+  annotations:
+    policies.kyverno.io/title: Set DNS ndots for Pods
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: low
+    kyverno.io/kyverno-version: 1.19.1
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Sets dnsConfig.options.ndots to 2 on Pods. The cluster default is ndots:5,
+      which makes the resolver try each search domain before the absolute name.
+      A four-dot name such as loki-index-gateway.monitoring.svc.cluster.local is
+      therefore preceded by several useless NXDOMAIN lookups, accounting for
+      roughly two thirds of all DNS queries served by CoreDNS. ndots:2 still
+      resolves bare and single-dot names via the search path while answering
+      fully-qualified names on the first attempt. Pods that set their own
+      dnsConfig options keep them, as the patch only merges in ndots.
+spec:
+  rules:
+    - name: set-ndots
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - kyverno-system
+                - flux-system
+                - istio-system
+      mutate:
+        patchStrategicMerge:
+          spec:
+            dnsConfig:
+              options:
+                - name: ndots
+                  value: "2"
