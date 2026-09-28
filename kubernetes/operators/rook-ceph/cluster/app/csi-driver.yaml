@@ -6,6 +6,8 @@ metadata:
   name: rook-ceph.rbd.csi.ceph.com
   namespace: rook-ceph
 spec:
+  deployCsiAddons: true
+  enableFencing: true
   fsGroupPolicy: File
   controllerPlugin:
     tolerations:

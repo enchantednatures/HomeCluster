@@ -5,4 +5,5 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./operator/ks.yaml
+  - ./csi-addons/ks.yaml
   - ./cluster/ks.yaml

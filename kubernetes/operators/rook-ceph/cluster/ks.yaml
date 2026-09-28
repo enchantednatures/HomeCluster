@@ -16,6 +16,7 @@ spec:
       app.kubernetes.io/name: *app
   dependsOn:
     - name: rook-ceph-operator
+    - name: csi-addons
   path: ./kubernetes/operators/rook-ceph/cluster/app
   prune: true # TEMP: prune required to remove the CephCluster CR for the clean rebuild; revert to false after
   sourceRef:
