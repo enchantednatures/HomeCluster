@@ -56,6 +56,10 @@ spec:
     # Loki configuration
     loki:
       auth_enabled: false
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "2"
       commonConfig:
         path_prefix: /var/loki
         replication_factor: 1
