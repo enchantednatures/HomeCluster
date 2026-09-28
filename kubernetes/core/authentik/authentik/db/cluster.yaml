@@ -61,17 +61,25 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: authentik-v1
+        serverName: authentik-v16
   bootstrap:
-    initdb:
+    # Restore pre-wipe data from the last complete base backup in the v15
+    # archive (20260918T100002), replaying WALs through ~2026-09-20T02:12Z.
+    # Every base backup taken after the 2026-09-24 fresh bootstrap is
+    # incomplete (backup.info only, no data.tar) and no WALs were archived,
+    # so this is the newest recoverable state.
+    recovery:
+      source: authentik-v15
+      recoveryTarget:
+        backupID: "20260918T100002"
       database: authentik
       owner: authentik
       secret:
         name: authentik-db-user
   externalClusters:
-    - name: authentik-v9
+    - name: authentik-v15
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: minio-store
-          serverName: authentik-v9
+          serverName: authentik-v15
