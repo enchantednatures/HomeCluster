@@ -49,7 +49,6 @@ parameters:
   csi.storage.k8s.io/fstype: ext4
   # Performance optimization
   mapOptions: "krbd:rxbounce"
-  unmapOptions: "krbd:rxbounce"
 allowVolumeExpansion: true
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
@@ -114,7 +113,6 @@ parameters:
   csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
   csi.storage.k8s.io/fstype: ext4
   mapOptions: "krbd:rxbounce"
-  unmapOptions: "krbd:rxbounce"
 allowVolumeExpansion: true
 reclaimPolicy: Retain # CRITICAL: Prevents accidental data deletion
 volumeBindingMode: Immediate
