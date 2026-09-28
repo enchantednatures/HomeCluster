@@ -61,7 +61,7 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: authentik-v15
+        serverName: authentik-v1
   bootstrap:
     initdb:
       database: authentik
@@ -69,9 +69,9 @@ spec:
       secret:
         name: authentik-db-user
   externalClusters:
-    - name: authentik-v12
+    - name: authentik-v9
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
           barmanObjectName: minio-store
-          serverName: authentik-v12
+          serverName: authentik-v9
