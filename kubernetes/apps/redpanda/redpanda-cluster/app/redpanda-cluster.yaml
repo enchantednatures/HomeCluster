@@ -22,12 +22,12 @@ spec:
       enabled: false
 
     statefulset:
-      replicas: 3
+      replicas: 1
 
     storage:
       persistentVolume:
         enabled: true
-        size: 20Gi
+        size: 10Gi
         storageClass: ceph-block
 
     resources:
