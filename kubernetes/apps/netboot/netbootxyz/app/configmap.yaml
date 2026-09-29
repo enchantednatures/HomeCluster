@@ -12,3 +12,43 @@ data:
     #!ipxe
     echo Booting Talos v1.14.1 via Sidero Image Factory...
     chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # ctrl-01 (bc:24:11:2e:c8:01)
+  MAC-bc24112ec801.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (ctrl-01)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # work-00 (bc:24:11:2e:08:00)
+  MAC-bc24112e0800.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (work-00)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # work-01 (bc:24:11:2e:08:01)
+  MAC-bc24112e0801.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (work-01)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # work-02 (bc:24:11:2e:08:02)
+  MAC-bc24112e0802.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (work-02)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # work-03 (bc:24:11:2e:08:03)
+  MAC-bc24112e0803.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (work-03)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # melusine eno1 (0c:c4:7a:64:63:e2)
+  MAC-0cc47a6463e2.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (melusine eno1)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # melusine eno2 (0c:c4:7a:64:63:e3)
+  MAC-0cc47a6463e3.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (melusine eno2)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell
+  # unraid-worker (52:54:00:89:79:7f)
+  MAC-52540089797f.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory (unraid-worker)...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell

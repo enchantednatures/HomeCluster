@@ -16,6 +16,21 @@ data:
     dhcp-range=192.168.1.1,proxy,255.255.255.0
     dhcp-host=b1:0e:97:50:29:f1
     dhcp-host=0c:c4:7a:64:67:3e
+    # ctrl-01
+    dhcp-host=bc:24:11:2e:c8:01
+    # work-00
+    dhcp-host=bc:24:11:2e:08:00
+    # work-01
+    dhcp-host=bc:24:11:2e:08:01
+    # work-02
+    dhcp-host=bc:24:11:2e:08:02
+    # work-03
+    dhcp-host=bc:24:11:2e:08:03
+    # melusine
+    dhcp-host=0c:c4:7a:64:63:e2
+    dhcp-host=0c:c4:7a:64:63:e3
+    # unraid-worker
+    dhcp-host=52:54:00:89:79:7f
     dhcp-ignore=tag:!known
     dhcp-no-override
     dhcp-vendorclass=BIOS,PXEClient:Arch:00000
