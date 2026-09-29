@@ -58,6 +58,8 @@ spec:
                 mkdir -p /config/menus
                 wget -q -O /config/menus/netboot.xyz.kpxe https://boot.netboot.xyz/ipxe/netboot.xyz.kpxe
                 wget -q -O /config/menus/netboot.xyz.efi https://boot.netboot.xyz/ipxe/netboot.xyz.efi
+                cp -f /mac-scripts/*.ipxe /config/menus/
+                chown 1000:1000 /config/menus/MAC-*.ipxe
             resources:
               requests:
                 cpu: 10m
@@ -123,5 +125,5 @@ spec:
         type: configMap
         name: netbootxyz-mac-scripts
         globalMounts:
-          - path: /config/menus/MAC-0cc47a64673e.ipxe
-            subPath: MAC-0cc47a64673e.ipxe
+          - path: /mac-scripts
+            readOnly: true
