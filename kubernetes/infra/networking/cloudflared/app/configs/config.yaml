@@ -2,8 +2,6 @@
 originRequest:
   http2Origin: true
 ingress:
-  - hostname: console.${SECRET_DOMAIN}
-    service: http://console.redpanda.svc.cluster.local:8080
   - hostname: postgres.${SECRET_DOMAIN}
     service: tcp://postgres-db-pooler-rw.postgres.svc.cluster.local:5432
   - hostname: ${SECRET_DOMAIN}
