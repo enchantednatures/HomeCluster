@@ -118,7 +118,7 @@ spec:
         existingClaim: netbootxyz-assets
         globalMounts:
           - path: /assets
-      macScripts:
+      mac-scripts:
         enabled: true
         type: configMap
         name: netbootxyz-mac-scripts
