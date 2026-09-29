@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: netbootxyz-mac-scripts
+  namespace: netboot
+data:
+  # netboot.xyz auto-loads MAC-<mac>.ipxe from the TFTP root before showing its menu.
+  # 0c:c4:7a:64:67:3e -> Talos v1.14.1 (schematic f52e9305...)
+  MAC-0cc47a64673e.ipxe: |
+    #!ipxe
+    echo Booting Talos v1.14.1 via Sidero Image Factory...
+    chain --autofree https://pxe.factory.talos.dev/pxe/f52e9305fc2f3e66ac5053f142993501cbef6ef6d6da800bd0c1d1f6de3197a0/v1.14.1/metal-amd64 || shell

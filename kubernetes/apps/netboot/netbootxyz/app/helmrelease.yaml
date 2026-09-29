@@ -118,3 +118,10 @@ spec:
         existingClaim: netbootxyz-assets
         globalMounts:
           - path: /assets
+      macScripts:
+        enabled: true
+        type: configMap
+        name: netbootxyz-mac-scripts
+        globalMounts:
+          - path: /config/menus/MAC-0cc47a64673e.ipxe
+            subPath: MAC-0cc47a64673e.ipxe

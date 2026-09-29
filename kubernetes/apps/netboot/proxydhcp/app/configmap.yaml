@@ -15,6 +15,7 @@ data:
     bind-interfaces
     dhcp-range=192.168.1.1,proxy,255.255.255.0
     dhcp-host=b1:0e:97:50:29:f1
+    dhcp-host=0c:c4:7a:64:67:3e
     dhcp-ignore=tag:!known
     dhcp-no-override
     dhcp-vendorclass=BIOS,PXEClient:Arch:00000
