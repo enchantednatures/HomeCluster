@@ -38,15 +38,20 @@ spec:
   # radosgw-admin (dashboard topic/notification APIs, toolbox) must resolve the
   # object store's real zone. Without this it defaults to the stale, empty
   # "default" zone and the dashboard cannot read back notification destinations.
+  # rgw_restore_max_objs shrinks Tentacle's unconditional Cloud-Restore FIFO
+  # init: with the default 32 shards every radosgw-admin call does ~64 serial
+  # OSD round-trips and can blow the dashboard's hardcoded 10s subprocess limit.
   cephConfig:
     client:
       rgw_realm: ceph-objectstore
       rgw_zonegroup: ceph-objectstore
       rgw_zone: ceph-objectstore
+      rgw_restore_max_objs: "1"
     mgr:
       rgw_realm: ceph-objectstore
       rgw_zonegroup: ceph-objectstore
       rgw_zone: ceph-objectstore
+      rgw_restore_max_objs: "1"
   network:
     connections:
       encryption:
