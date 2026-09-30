@@ -35,6 +35,18 @@ spec:
     prometheusEndpoint: http://prometheus-operated.monitoring.svc.cluster.local:9090
   monitoring:
     enabled: true
+  # radosgw-admin (dashboard topic/notification APIs, toolbox) must resolve the
+  # object store's real zone. Without this it defaults to the stale, empty
+  # "default" zone and the dashboard cannot read back notification destinations.
+  cephConfig:
+    client:
+      rgw_realm: ceph-objectstore
+      rgw_zonegroup: ceph-objectstore
+      rgw_zone: ceph-objectstore
+    mgr:
+      rgw_realm: ceph-objectstore
+      rgw_zonegroup: ceph-objectstore
+      rgw_zone: ceph-objectstore
   network:
     connections:
       encryption:
