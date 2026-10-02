@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/mutatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
 metadata:
   name: set-dns-ndots
   annotations:
@@ -22,27 +22,33 @@ metadata:
       fully-qualified names on the first attempt. Pods that set their own
       dnsConfig options keep them, as the patch only merges in ndots.
 spec:
-  rules:
-    - name: set-ndots
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-      exclude:
-        any:
-          - resources:
-              namespaces:
-                - kube-system
-                - kube-public
-                - kube-node-lease
-                - kyverno-system
-                - flux-system
-                - istio-system
-      mutate:
-        patchStrategicMerge:
-          spec:
-            dnsConfig:
-              options:
-                - name: ndots
-                  value: "2"
+  failurePolicy: Ignore
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - kyverno-system
+            - flux-system
+            - istio-system
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          has(object.spec.dnsConfig)
+            ? [JSONPatch{op: "add", path: "/spec/dnsConfig/options", value: [{"name": "ndots", "value": "2"}]}]
+            : [JSONPatch{op: "add", path: "/spec/dnsConfig", value: {"options": [{"name": "ndots", "value": "2"}]}}]

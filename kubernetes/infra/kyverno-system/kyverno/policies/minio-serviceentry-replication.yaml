@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/generatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
 metadata:
   name: replicate-minio-serviceentry
   annotations:
@@ -19,37 +19,36 @@ metadata:
       ServiceEntry, pods in ambient mode cannot reach MinIO as it is treated
       as an external service outside the mesh.
 spec:
-  background: true
-  rules:
-    - name: generate-minio-serviceentry
-      match:
-        any:
-          - resources:
-              kinds:
-                - Namespace
-      exclude:
-        any:
-          - resources:
-              names:
-                - kube-system
-                - kube-public
-                - kube-node-lease
-                - kyverno-system
-                - flux-system
-                - istio-system
-                - istio-ingress
-                - rook-ceph
-                - monitoring
-                - knative-*
-                - cnpg-system
-                - networking
-      generate:
-        synchronize: true
-        apiVersion: networking.istio.io/v1beta1
-        kind: ServiceEntry
-        name: minio-service-access
-        namespace: "{{request.object.metadata.name}}"
-        data:
+  evaluation:
+    synchronize:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - namespaces
+  matchConditions:
+    - name: exclude-namespaces
+      expression: >-
+        !(object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease', 'kyverno-system',
+        'flux-system', 'istio-system', 'istio-ingress', 'rook-ceph', 'monitoring', 'cnpg-system',
+        'networking']) &&
+        !object.metadata.name.startsWith('knative-')
+  generate:
+    - template:
+        interpolate: cel
+        value: |
+          apiVersion: networking.istio.io/v1beta1
+          kind: ServiceEntry
+          metadata:
+            name: minio-service-access
+            namespace: (( object.metadata.name ))
           spec:
             hosts:
               - minio-service.networking.svc.cluster.local

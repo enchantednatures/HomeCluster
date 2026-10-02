@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/validatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: require-pod-resources
   annotations:
@@ -20,19 +20,28 @@ metadata:
       This policy validates that all containers have something specified for memory and CPU
       requests and memory limits.
 spec:
-  validationFailureAction: enforce
-  background: true
-  rules:
-    - name: validate-resources
-      match:
-        any:
-        - resources:
-            kinds:
-            - Pod
-      exclude:
-        any:
-        - resources:
-            namespaces:
+  failurePolicy: Ignore
+  validationActions:
+    - Deny
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
             - kube-system
             - medik8s-system
             - kyverno-system
@@ -56,22 +65,29 @@ spec:
             - redpanda
             - default
             - rook-ceph
-      validate:
-        message: "Resource requests and limits are required"
-        pattern:
-          spec:
-            containers:
-            - name: "*"
-              resources:
-                requests:
-                  memory: "?*"
-                  cpu: "?*"
-                limits:
-                  memory: "?*"
+  autogen:
+    podControllers:
+      controllers:
+        - daemonsets
+        - deployments
+        - jobs
+        - statefulsets
+        - replicasets
+        - cronjobs
+  validations:
+    - message: "Resource requests and limits are required"
+      expression: >-
+        object.spec.containers.all(c,
+          has(c.resources) &&
+          has(c.resources.requests) &&
+          has(c.resources.requests.memory) && c.resources.requests.memory != "" &&
+          has(c.resources.requests.cpu) && c.resources.requests.cpu != "" &&
+          has(c.resources.limits) &&
+          has(c.resources.limits.memory) && c.resources.limits.memory != "")
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/validatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: disallow-latest-tag
   annotations:
@@ -88,19 +104,28 @@ metadata:
       a specific version of an application Pod. This policy validates that the image
       specifies a tag and that it is not called `latest`.
 spec:
-  validationFailureAction: enforce
-  background: true
-  rules:
-    - name: require-image-tag
-      match:
-        any:
-        - resources:
-            kinds:
-            - Pod
-      exclude:
-        any:
-        - resources:
-            namespaces:
+  failurePolicy: Ignore
+  validationActions:
+    - Deny
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
             - kube-system
             - kyverno-system
             - flux-system
@@ -111,13 +136,18 @@ spec:
             - cdi
             - vms
             - redpanda
-      validate:
-        message: "An image tag is required and it cannot be 'latest'"
-        pattern:
-          spec:
-            containers:
-            - name: "*"
-              image: "!*:latest | !*:*latest*"
-            =(initContainers):
-            - name: "*"
-              image: "!*:latest | !*:*latest*"
+  autogen:
+    podControllers:
+      controllers:
+        - daemonsets
+        - deployments
+        - jobs
+        - statefulsets
+        - replicasets
+        - cronjobs
+  validations:
+    - message: "An image tag is required and it cannot be 'latest'"
+      expression: >-
+        object.spec.containers.all(c, has(c.image) && !c.image.endsWith(":latest")) &&
+        (!has(object.spec.initContainers) ||
+         object.spec.initContainers.all(c, has(c.image) && !c.image.endsWith(":latest")))

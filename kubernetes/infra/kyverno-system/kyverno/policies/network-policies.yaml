@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/generatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
 metadata:
   name: add-default-network-policy
   annotations:
@@ -18,66 +18,42 @@ metadata:
       communications. This policy will create a new NetworkPolicy resource whenever
       a new Namespace is created which denies all traffic.
 spec:
-  background: false
-  rules:
-    - name: default-deny
-      match:
-        any:
-        - resources:
-            kinds:
-            - Namespace
-      exclude:
-        any:
-        - resources:
-            names:
-            - kube-system
-            - kube-public
-            - kube-node-lease
-            - kyverno-system
-            - flux-system
-            - istio-system
-            - istio-ingress
-            - rook-ceph
-            - knative-*
-            - monitoring
-            - kubevirt
-            - cdi
-            - vms
-            - cnpg-system
-            - harbor
-            - market-data
-            - postgres
-            - authentik
-            - atuin
-            - kafka
-            - redpanda
-            - elastic
-            - networking
-            - cert-manager
-            - actions-runner-system
-            - arangodb
-            - dragonflydb
-            - home-system
-            - immich
-            - irc
-            - keda
-            - observability
-            - rabbitmq-operator
-            - tekton-pipelines
-            - tekton-pipelines-resolvers
-            - telepresence
-            - local-path-storage
-            - cilium-secrets
-            - default
-      generate:
-        synchronize: true
-        apiVersion: networking.k8s.io/v1
-        kind: NetworkPolicy
-        name: default-deny
-        namespace: "{{request.object.metadata.name}}"
-        data:
+  evaluation:
+    synchronize:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - namespaces
+  matchConditions:
+    - name: exclude-namespaces
+      expression: >-
+        !(object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease', 'kyverno-system',
+        'flux-system', 'istio-system', 'istio-ingress', 'rook-ceph', 'monitoring', 'kubevirt', 'cdi',
+        'vms', 'cnpg-system', 'harbor', 'market-data', 'postgres', 'authentik', 'atuin', 'kafka',
+        'redpanda', 'elastic', 'networking', 'cert-manager', 'actions-runner-system', 'arangodb',
+        'dragonflydb', 'home-system', 'immich', 'irc', 'keda', 'observability', 'rabbitmq-operator',
+        'tekton-pipelines', 'tekton-pipelines-resolvers', 'telepresence', 'local-path-storage',
+        'cilium-secrets', 'default']) &&
+        !object.metadata.name.startsWith('knative-')
+  generate:
+    - template:
+        interpolate: cel
+        value: |
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          metadata:
+            name: default-deny
+            namespace: (( object.metadata.name ))
           spec:
             podSelector: {}
             policyTypes:
-            - Ingress
-            - Egress
+              - Ingress
+              - Egress

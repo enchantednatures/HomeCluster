@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/generatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
 metadata:
   name: replicate-cnpg-object-store
   annotations:
@@ -18,33 +18,30 @@ metadata:
       backup configuration for CloudNative-PG clusters without per-namespace
       ObjectStore management.
 spec:
-  background: true
-  rules:
-    - name: generate-cnpg-object-store
-      match:
-        any:
-          - resources:
-              kinds:
-                - Namespace
-      exclude:
-        any:
-          - resources:
-              names:
-                - kube-system
-                - kube-public
-                - kube-node-lease
-                - kyverno-system
-                - flux-system
-                - istio-system
-                - rook-ceph
-                - monitoring
-                - knative-*
-      generate:
-        synchronize: true
-        apiVersion: barmancloud.cnpg.io/v1
-        kind: ObjectStore
-        name: minio-store
-        namespace: "{{request.object.metadata.name}}"
-        clone:
-          namespace: postgres
-          name: minio-store
+  evaluation:
+    synchronize:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - namespaces
+  matchConditions:
+    - name: exclude-namespaces
+      expression: >-
+        !(object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease', 'kyverno-system',
+        'flux-system', 'istio-system', 'rook-ceph', 'monitoring']) &&
+        !object.metadata.name.startsWith('knative-')
+  variables:
+    - name: nsName
+      expression: object.metadata.name
+    - name: source
+      expression: resource.Get("barmancloud.cnpg.io/v1", "objectstores", "postgres", "minio-store")
+  generate:
+    - expression: generator.Apply(variables.nsName, [variables.source])

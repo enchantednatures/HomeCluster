@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/mutatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
 metadata:
   name: dragonfly-disable-istio-sidecar
   annotations:
@@ -17,15 +17,22 @@ metadata:
       in-memory replication. This policy mutates all Dragonfly resources to
       inject spec.annotations that disables the Istio sidecar on managed pods.
 spec:
-  rules:
-    - name: inject-istio-sidecar-disable
-      match:
-        any:
-          - resources:
-              kinds:
-                - dragonflydb.io/v1alpha1/Dragonfly
-      mutate:
-        patchStrategicMerge:
-          spec:
-            annotations:
-              sidecar.istio.io/inject: "false"
+  failurePolicy: Ignore
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - dragonflydb.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - dragonflies
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          has(object.spec.annotations)
+            ? [JSONPatch{op: "add", path: "/spec/annotations/" + jsonpatch.escapeKey("sidecar.istio.io/inject"), value: "false"}]
+            : [JSONPatch{op: "add", path: "/spec/annotations", value: {"sidecar.istio.io/inject": "false"}}]

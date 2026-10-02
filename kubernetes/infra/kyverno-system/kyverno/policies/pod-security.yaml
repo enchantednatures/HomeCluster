@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/validatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
 metadata:
   name: disallow-privileged-containers
   annotations:
@@ -17,19 +17,28 @@ metadata:
       restrictions, and do not offer any security. They should be used exclusively for
       system containers. This policy ensures privileged containers are not allowed.
 spec:
-  validationFailureAction: enforce
-  background: true
-  rules:
-    - name: check-privileged
-      match:
-        any:
-        - resources:
-            kinds:
-            - Pod
-      exclude:
-        any:
-        - resources:
-            namespaces:
+  failurePolicy: Ignore
+  validationActions:
+    - Deny
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - pods
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
             - kube-system
             - kyverno-system
             - rook-ceph
@@ -44,49 +53,29 @@ spec:
             - redpanda
             - default
             - monitoring
-      validate:
-        message: "Containers must run as non-root user"
-        pattern:
-          spec:
-            =(securityContext):
-              =(runAsNonRoot): "true"
-            containers:
-            - name: "*"
-              =(securityContext):
-                =(runAsNonRoot): "true"
-    - name: check-init-containers
-      match:
-        any:
-        - resources:
-            kinds:
-            - Pod
-      exclude:
-        any:
-        - resources:
-            namespaces:
-            - kube-system
-            - kyverno-system
-            - rook-ceph
-            - istio-system
-            - atuin
-            - authentik
-            - harbor
-            - immich
-            - kellnr
-            - open-webui
-            - postgres
-            - redpanda
-            - default
-            - monitoring
-      preconditions:
-        all:
-        - key: "{{ request.object.spec.initContainers[] || '' }}"
-          operator: AnyNotIn
-          value: [""]
-      validate:
-        message: "Init containers must run as non-root user"
-        foreach:
-        - list: "request.object.spec.initContainers"
-          pattern:
-            =(securityContext):
-              =(runAsNonRoot): "true"
+  autogen:
+    podControllers:
+      controllers:
+        - daemonsets
+        - deployments
+        - jobs
+        - statefulsets
+        - replicasets
+        - cronjobs
+  validations:
+    - message: "Containers must run as non-root user"
+      expression: >-
+        (!has(object.spec.securityContext) ||
+         !has(object.spec.securityContext.runAsNonRoot) ||
+         object.spec.securityContext.runAsNonRoot == true) &&
+        object.spec.containers.all(c,
+          !has(c.securityContext) ||
+          !has(c.securityContext.runAsNonRoot) ||
+          c.securityContext.runAsNonRoot == true)
+    - message: "Init containers must run as non-root user"
+      expression: >-
+        !has(object.spec.initContainers) ||
+        object.spec.initContainers.all(c,
+          !has(c.securityContext) ||
+          !has(c.securityContext.runAsNonRoot) ||
+          c.securityContext.runAsNonRoot == true)

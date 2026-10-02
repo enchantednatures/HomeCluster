@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/generatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
 metadata:
   name: replicate-git-push-token
   annotations:
@@ -17,33 +17,44 @@ metadata:
       to all newly created namespaces, ensuring consistent access to git operations
       across the cluster.
 spec:
-  background: false
-  rules:
-    - name: generate-git-push-token
-      match:
-        any:
-          - resources:
-              kinds:
-                - Namespace
-      exclude:
-        any:
-          - resources:
-              names:
-                - kube-system
-                - kube-public
-                - kube-node-lease
-                - kyverno-system
-                - flux-system
-                - istio-system
-                - rook-ceph
-                - monitoring
-                - knative-*
-      generate:
-        synchronize: true
-        apiVersion: v1
-        kind: Secret
-        name: git-ssh-key
-        namespace: "{{request.object.metadata.name}}"
-        clone:
-          namespace: flux-system
-          name: github-deploy-key
+  evaluation:
+    synchronize:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - namespaces
+  matchConditions:
+    - name: exclude-namespaces
+      expression: >-
+        !(object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease', 'kyverno-system',
+        'flux-system', 'istio-system', 'rook-ceph', 'monitoring']) &&
+        !object.metadata.name.startsWith('knative-')
+  variables:
+    - name: nsName
+      expression: object.metadata.name
+    - name: source
+      expression: resource.Get("v1", "secrets", "flux-system", "github-deploy-key")
+    - name: target
+      expression: >-
+        {
+          "apiVersion": variables.source.apiVersion,
+          "kind": variables.source.kind,
+          "metadata": {
+            "name": "git-ssh-key",
+            "namespace": variables.nsName,
+            "labels": variables.source.metadata.?labels.orValue({}),
+            "annotations": variables.source.metadata.?annotations.orValue({})
+          },
+          "type": variables.source.?type.orValue("Opaque"),
+          "data": variables.source.?data.orValue({})
+        }
+  generate:
+    - expression: generator.Apply(variables.nsName, [variables.target])

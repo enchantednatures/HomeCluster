@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/generatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
 metadata:
   name: add-cnpg-network-policy
   annotations:
@@ -18,70 +18,63 @@ metadata:
       that allows CNPG pods to communicate with the Kubernetes API server,
       DNS, the CNPG operator, and other PostgreSQL instances for replication.
 spec:
-  background: false
-  rules:
-    - name: allow-cnpg
-      match:
-        any:
-        - resources:
-            kinds:
-            - Namespace
-      exclude:
-        any:
-        - resources:
-            names:
-            - kube-system
-            - kube-public
-            - kube-node-lease
-            - kyverno-system
-            - flux-system
-            - istio-system
-            - istio-ingress
-            - rook-ceph
-            - knative-*
-            - monitoring
-            - kubevirt
-            - cdi
-            - vms
-            - cnpg-system
-      generate:
-        synchronize: true
-        apiVersion: networking.k8s.io/v1
-        kind: NetworkPolicy
-        name: allow-cnpg
-        namespace: "{{request.object.metadata.name}}"
-        data:
+  evaluation:
+    synchronize:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - namespaces
+  matchConditions:
+    - name: exclude-namespaces
+      expression: >-
+        !(object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease', 'kyverno-system',
+        'flux-system', 'istio-system', 'istio-ingress', 'rook-ceph', 'monitoring', 'kubevirt', 'cdi',
+        'vms', 'cnpg-system']) &&
+        !object.metadata.name.startsWith('knative-')
+  generate:
+    - template:
+        interpolate: cel
+        value: |
+          apiVersion: networking.k8s.io/v1
+          kind: NetworkPolicy
+          metadata:
+            name: allow-cnpg
+            namespace: (( object.metadata.name ))
           spec:
             podSelector:
               matchExpressions:
-              - key: cnpg.io/cluster
-                operator: Exists
+                - key: cnpg.io/cluster
+                  operator: Exists
             policyTypes:
-            - Ingress
-            - Egress
+              - Ingress
+              - Egress
             ingress:
-            # Allow CNPG operator (from cnpg-system) to reach instance manager
-            - from:
-              - namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: cnpg-system
-              ports:
-              - protocol: TCP
-                port: 8000
-            # Allow PostgreSQL replication and client connections within namespace
-            - from:
-              - podSelector: {}
-              ports:
-              - protocol: TCP
-                port: 5432
-            # Allow Prometheus scraping of metrics
-            - from:
-              - namespaceSelector:
-                  matchLabels:
-                    kubernetes.io/metadata.name: monitoring
-              ports:
-              - protocol: TCP
-                port: 9187
+              - from:
+                  - namespaceSelector:
+                      matchLabels:
+                        kubernetes.io/metadata.name: cnpg-system
+                ports:
+                  - protocol: TCP
+                    port: 8000
+              - from:
+                  - podSelector: {}
+                ports:
+                  - protocol: TCP
+                    port: 5432
+              - from:
+                  - namespaceSelector:
+                      matchLabels:
+                        kubernetes.io/metadata.name: monitoring
+                ports:
+                  - protocol: TCP
+                    port: 9187
             egress:
-            # Allow all egress (API server, DNS, MinIO backups, replication, etc.)
-            - {}
+              - {}

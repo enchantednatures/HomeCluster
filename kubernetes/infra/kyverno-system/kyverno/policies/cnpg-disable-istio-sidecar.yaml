@@ -1,7 +1,7 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/v1/clusterpolicy.json
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/mutatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
 metadata:
   name: cnpg-disable-istio-sidecar
   annotations:
@@ -18,16 +18,24 @@ metadata:
       This policy mutates all CNPG Cluster resources to inject
       inheritedMetadata that disables the Istio sidecar on managed pods.
 spec:
-  rules:
-    - name: inject-istio-sidecar-disable
-      match:
-        any:
-          - resources:
-              kinds:
-                - postgresql.cnpg.io/v1/Cluster
-      mutate:
-        patchStrategicMerge:
-          spec:
-            inheritedMetadata:
-              annotations:
-                sidecar.istio.io/inject: "false"
+  failurePolicy: Ignore
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - postgresql.cnpg.io
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - clusters
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          has(object.spec.inheritedMetadata) && has(object.spec.inheritedMetadata.annotations)
+            ? [JSONPatch{op: "add", path: "/spec/inheritedMetadata/annotations/" + jsonpatch.escapeKey("sidecar.istio.io/inject"), value: "false"}]
+            : (has(object.spec.inheritedMetadata)
+                ? [JSONPatch{op: "add", path: "/spec/inheritedMetadata/annotations", value: {"sidecar.istio.io/inject": "false"}}]
+                : [JSONPatch{op: "add", path: "/spec/inheritedMetadata", value: {"annotations": {"sidecar.istio.io/inject": "false"}}}])
