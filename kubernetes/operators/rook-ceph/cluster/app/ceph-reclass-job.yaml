@@ -39,7 +39,7 @@ spec:
       serviceAccountName: rook-ceph-default
       containers:
         - name: ceph-reclass
-          image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+          image: rook/ceph:v1.20.8 # datasource=docker depName=rook/ceph
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
