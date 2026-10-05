@@ -66,6 +66,8 @@ spec:
       type: clusterIP
       tls:
         enabled: false
+    updateStrategy:
+      type: Recreate
     externalURL: https://harbor.${SECRET_DOMAIN}
     internalTLS:
       enabled: false
