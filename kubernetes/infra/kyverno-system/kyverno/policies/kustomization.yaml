@@ -16,3 +16,4 @@ resources:
   - ./minio-serviceentry-replication.yaml
   - ./set-dns-ndots.yaml
   - ./serviceentry-rbac.yaml
+  - ./cnpg-dragonfly-rbac.yaml
