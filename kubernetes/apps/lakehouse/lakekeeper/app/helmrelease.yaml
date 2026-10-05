@@ -63,6 +63,21 @@ spec:
         limits:
           cpu: 500m
           memory: 1Gi
+      dbMigrations:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 512Mi
+      initContainers:
+        checkDb:
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
     serviceAccount:
       automount: true
     service:

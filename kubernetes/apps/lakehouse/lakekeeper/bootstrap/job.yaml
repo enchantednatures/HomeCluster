@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app lakekeeper-bootstrap-v7
+  name: &app lakekeeper-bootstrap-v8
   namespace: lakehouse
 spec:
   backoffLimit: 3
@@ -21,6 +21,12 @@ spec:
       containers:
         - name: bootstrap
           image: nginx:1.31-alpine
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              memory: 128Mi
           envFrom:
             - secretRef:
                 name: lakekeeper-minio-credentials
