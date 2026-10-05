@@ -21,6 +21,9 @@ metadata:
       resolves bare and single-dot names via the search path while answering
       fully-qualified names on the first attempt. Pods that set their own
       dnsConfig options keep them, as the patch only merges in ndots.
+      Mutation is limited to Pod creation because spec.dnsConfig is immutable
+      on existing Pods; mutating UPDATE requests breaks controllers that patch
+      Pod metadata (e.g. CloudNative-PG reconciliation).
 spec:
   failurePolicy: Ignore
   matchConstraints:
@@ -31,7 +34,6 @@ spec:
           - v1
         operations:
           - CREATE
-          - UPDATE
         resources:
           - pods
     namespaceSelector:
