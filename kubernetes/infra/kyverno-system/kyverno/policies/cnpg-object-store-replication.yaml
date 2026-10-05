@@ -19,6 +19,8 @@ metadata:
       ObjectStore management.
 spec:
   evaluation:
+    generateExisting:
+      enabled: true
     synchronize:
       enabled: true
   matchConstraints:

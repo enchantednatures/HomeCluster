@@ -20,6 +20,8 @@ metadata:
       as an external service outside the mesh.
 spec:
   evaluation:
+    generateExisting:
+      enabled: true
     synchronize:
       enabled: true
   matchConstraints:
