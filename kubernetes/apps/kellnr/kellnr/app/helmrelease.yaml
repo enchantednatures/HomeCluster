@@ -7,6 +7,13 @@ metadata:
 spec:
   driftDetection:
     mode: enabled
+    ignore:
+      # kellnr rewrites the admin secret at runtime.
+      - paths:
+          - /data
+        target:
+          kind: Secret
+          name: kellnr-admin-secret
   maxHistory: 2
   interval: 30m
   chart:
@@ -23,7 +30,7 @@ spec:
   upgrade:
     cleanupOnFail: true
     remediation:
-      strategy: uninstall
+      strategy: rollback
       retries: 3
   uninstall:
     keepHistory: false
