@@ -14,7 +14,7 @@ spec:
   chart:
     spec:
       chart: descheduler
-      version: 0.36.0 # datasource=helm depName=descheduler repository=https://kubernetes-sigs.github.io/descheduler/
+      version: 0.37.0 # datasource=helm depName=descheduler repository=https://kubernetes-sigs.github.io/descheduler/
       sourceRef:
         kind: HelmRepository
         name: descheduler-charts
