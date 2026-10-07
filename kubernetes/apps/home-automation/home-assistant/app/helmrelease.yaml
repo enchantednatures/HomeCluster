@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app home-assistant
+  namespace: home-automation
+spec:
+  driftDetection:
+    mode: enabled
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s/helm
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      home-assistant:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-assistant/home-assistant
+              # datasource=docker depName=ghcr.io/home-assistant/home-assistant
+              tag: 2026.9.4
+            env:
+              TZ: "${TIMEZONE}"
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 8123
+                  periodSeconds: 10
+                  failureThreshold: 30
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 8123
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 8123
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 2Gi
+    service:
+      app:
+        controller: home-assistant
+        ports:
+          http:
+            port: 8123
+            appProtocol: kubernetes.io/ws
+    persistence:
+      config:
+        existingClaim: home-assistant-config
+        globalMounts:
+          - path: /config

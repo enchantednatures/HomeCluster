@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app mosquitto
+  namespace: home-automation
+spec:
+  driftDetection:
+    mode: enabled
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s/helm
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    defaultPodOptions:
+      securityContext:
+        runAsUser: 1883
+        runAsGroup: 1883
+        fsGroup: 1883
+        fsGroupChangePolicy: OnRootMismatch
+    controllers:
+      mosquitto:
+        containers:
+          app:
+            image:
+              repository: docker.io/library/eclipse-mosquitto
+              # datasource=docker depName=docker.io/library/eclipse-mosquitto
+              tag: 2.0.22
+            ports:
+              - name: mqtt
+                containerPort: 1883
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop:
+                  - ALL
+            probes:
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 1883
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 1883
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
+    service:
+      app:
+        controller: mosquitto
+        ports:
+          mqtt:
+            port: 1883
+    persistence:
+      config:
+        type: configMap
+        identifier: config
+        globalMounts:
+          - path: /mosquitto/config/mosquitto.conf
+            subPath: mosquitto.conf
+            readOnly: true
+      data:
+        existingClaim: mosquitto-data
+        globalMounts:
+          - path: /mosquitto/data
+      tmp:
+        type: emptyDir
+        globalMounts:
+          - path: /tmp
+    configMaps:
+      config:
+        data:
+          mosquitto.conf: |
+            per_listener_settings false
+            listener 1883 0.0.0.0
+            allow_anonymous true
+            persistence true
+            persistence_location /mosquitto/data/
+            autosave_interval 60
+            set_tcp_nodelay true
+            log_dest stdout
