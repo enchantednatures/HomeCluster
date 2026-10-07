@@ -8,6 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: *app
     app.kubernetes.io/part-of: loki
+    bucket-notification-loki-chunks-objects: loki-chunks-objects
 spec:
   bucketName: loki-chunks
   storageClassName: ceph-bucket-retain

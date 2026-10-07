@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/v1/cephbuckettopic.json
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBucketTopic
+metadata:
+  name: redpanda-default
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/part-of: loki
+spec:
+  objectStoreName: ceph-objectstore
+  objectStoreNamespace: rook-ceph
+  persistent: true
+  endpoint:
+    kafka:
+      uri: kafka://redpanda-cluster.redpanda.svc.cluster.local:9092
+      ackLevel: broker
+      useSSL: false

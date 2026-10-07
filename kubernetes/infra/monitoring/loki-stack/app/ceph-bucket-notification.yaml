@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/v1/cephbucketnotification.json
+---
+apiVersion: ceph.rook.io/v1
+kind: CephBucketNotification
+metadata:
+  name: loki-chunks-objects
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/part-of: loki
+spec:
+  topic: redpanda-default
+  events:
+    - s3:ObjectCreated:*
