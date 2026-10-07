@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tandoor-static
+  namespace: default
+  labels:
+    app.kubernetes.io/name: tandoor
+    app.kubernetes.io/instance: tandoor
+spec:
+  storageClassName: ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tandoor-media
+  namespace: default
+  labels:
+    app.kubernetes.io/name: tandoor
+    app.kubernetes.io/instance: tandoor
+spec:
+  storageClassName: ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi

@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: tandoor-postgres-superuser
+    namespace: default
+type: kubernetes.io/basic-auth
+stringData:
+    username: ENC[AES256_GCM,data:hIgqQhzT6AI=,iv:IHgJWsBdgSTM2llIIdKv/LKVJ6VufYjTogA5UWwU7AE=,tag:bJvbNBvqDdf3nvhwhvy1NA==,type:str]
+    password: ENC[AES256_GCM,data:LwNDipnhpvdrtMdEDtpjJOPeUV0zdoM32os3tzDibAns9hSOmHIYD+qo8OQ/7wQY,iv:5G0U56liaZLOmTT/eD5YowcvokezQF1vGGt47+CjfY0=,tag:urejmy1tzJR0zi4HvIkR1g==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBjbVphT3VQc3M3dHJOUEVW
+            SS8zRVltdlRKRFFqb0JxbWkyVnk1c1JCamg4Ck10YVJKRkFQYXpFYXk2VStscHpZ
+            bFB5bFY3dW1vMVhsZXlJcW9tK2N3VmcKLS0tIHV2RXg4N2t0SkJuWEd1anhpbmdh
+            RTRyb1k3VnJNMGEyTlkrdnN4VGRVZ00KnYfKQeN/FV52+jhrkdTHv5n+IiAilMTE
+            inV3G7IV4EmWOoQojQz0mJ9y6NrzBZisIqImvLMBJjcJNab78Kf7cw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-07T04:31:12Z"
+    mac: ENC[AES256_GCM,data:SjTicAYIL98BKGBdlGeiNUJGsWpZ+2rbswasZyAwitFnkJWSXv3g+xNBGsTHffNADDxnqI5vFKzfCso02cWrO+ouc7etudmii3ncSlofhkzXec+hT4cCZ569suCc9gTlDiob4MrXXhCg2sASDf4aqAgMkY+i1hqeUurpdlzXywk=,iv:f7WfZAAzGe9+bh/OMU+2Y18IZ49hZcWZ5U7wtW1fOIY=,tag:Tn3e7N3Tal6vRU99sEw0uQ==,type:str]
+    version: 3.13.3

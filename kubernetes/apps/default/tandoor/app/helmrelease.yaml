@@ -1,0 +1,125 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app tandoor
+spec:
+  driftDetection:
+    mode: enabled
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s/helm
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      tandoor:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/tandoorrecipes/recipes
+              # datasource=docker depName=ghcr.io/tandoorrecipes/recipes
+              tag: 2.6.15
+            env:
+              TANDOOR_PORT: "8080"
+              TZ: ${TIMEZONE}
+              DB_ENGINE: django.db.backends.postgresql
+              POSTGRES_HOST: tandoor-db-pooler-rw.default.svc.cluster.local
+              POSTGRES_PORT: "5432"
+              POSTGRES_DB: tandoor
+              POSTGRES_USER:
+                secretKeyRef:
+                  name: tandoor-db-user
+                  key: username
+              POSTGRES_PASSWORD:
+                secretKeyRef:
+                  name: tandoor-db-user
+                  key: password
+              SECRET_KEY:
+                secretKeyRef:
+                  name: tandoor-secret
+                  key: SECRET_KEY
+              ALLOWED_HOSTS: recipes.${SECRET_DOMAIN}
+              CSRF_TRUSTED_ORIGINS: https://recipes.${SECRET_DOMAIN}
+              ENABLE_SIGNUP: "0"
+              ALLAUTH_TRUSTED_PROXY_COUNT: "2"
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 8080
+                  periodSeconds: 10
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 8080
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: 8080
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+            resources:
+              requests:
+                cpu: 100m
+                memory: 512Mi
+              limits:
+                memory: 1Gi
+            securityContext:
+              allowPrivilegeEscalation: false
+    service:
+      app:
+        controller: *app
+        ports:
+          http:
+            port: 8080
+    persistence:
+      static:
+        enabled: true
+        existingClaim: tandoor-static
+        globalMounts:
+          - path: /opt/recipes/staticfiles
+      media:
+        enabled: true
+        existingClaim: tandoor-media
+        globalMounts:
+          - path: /opt/recipes/mediafiles
+      tmp:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+          - path: /tmp

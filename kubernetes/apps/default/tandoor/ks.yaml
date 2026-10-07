@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app tandoor
+  namespace: flux-system
+spec:
+  targetNamespace: default
+  dependsOn:
+    - name: tandoor-db
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/apps/default/tandoor/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-db tandoor-db
+  namespace: flux-system
+spec:
+  targetNamespace: default
+  dependsOn:
+    - name: cloudnative-pg
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-db
+  path: ./kubernetes/apps/default/tandoor/db
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m

@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: tandoor-db-hunter
+    namespace: default
+type: kubernetes.io/basic-auth
+stringData:
+    username: ENC[AES256_GCM,data:ZX2yGfkg,iv:EIO8RWiWElZX5FagRD/4jawmvXT/4Ld0WNRXO+1iq/A=,tag:nCRvq9g6No8CUUAwjofRNA==,type:str]
+    password: ENC[AES256_GCM,data:EUEkGhqCxGeJxcaXgwLt4p0czLgjq85q1UUzJ1o2/vpei46maZAEdRt019Y66J8q,iv:PrHFdkZj0XICs/KXyLMfzAqEU3tffz/xT3nGnflAPWU=,tag:jRff9QKol+/Z7zDJpkc5eg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA0aWFPSzRJRVpSQnd5WHZ4
+            Y2VOeVNyREViKzlTaUZncEU2dzZIUUQ5NTFNCnJVMFNKQlBFcWN1KzBKRXlOdmo4
+            SXdoRE9tZjNYbGZGaEtWckNodkl4TFUKLS0tIDFHZjIyT1JUN0J1YS9BVCtxTk1C
+            YmlXdHFCZTE1bUo2VjFxcUd3VTBNaWMK0Bhy9/L3Tq1X8zUTw3FqIWUoCPpheNvF
+            trQ/+6WCR/iZYOf6hd7p77CD0fcyCNiK79TA6/MaCSy+VYpI5fxxuw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-07T04:31:12Z"
+    mac: ENC[AES256_GCM,data:gT+5DZ29FQIw8+Ae18YwU+RW/h8xvrjDTWCANJpfKWPgizcpmadQU3mcFNyL5hb0nyLzkUN/6C9hSsE7tXzZGvy4yEFJoaHI3JYvHimXAMmgF+DUABSWFY7k5th34lKg4KePAgilGHZI5JaO6w6HTpuWh1YGhykkvw4JnOk3hkM=,iv:+l0ZFIATRuP/mJZ/VZXEuvbyp2BKqaCEvDafKzM7zVg=,tag:O6Z5KqmMhqrgO/jXZs7iIQ==,type:str]
+    version: 3.13.3
