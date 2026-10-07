@@ -69,6 +69,9 @@ spec:
                   httpGet:
                     path: /
                     port: 8080
+                    httpHeaders:
+                      - name: Host
+                        value: recipes.${SECRET_DOMAIN}
                   periodSeconds: 10
                   failureThreshold: 30
               readiness:
@@ -78,6 +81,9 @@ spec:
                   httpGet:
                     path: /
                     port: 8080
+                    httpHeaders:
+                      - name: Host
+                        value: recipes.${SECRET_DOMAIN}
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
@@ -89,6 +95,9 @@ spec:
                   httpGet:
                     path: /
                     port: 8080
+                    httpHeaders:
+                      - name: Host
+                        value: recipes.${SECRET_DOMAIN}
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
