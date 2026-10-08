@@ -143,7 +143,7 @@ The earlier re-home to `default~hdd` was a correctness fix for the misleading de
 
 The move is forced to `replica 2`. `default~ssd` holds exactly `osd.3` (`melusine`) and `osd.8` (`unraid-worker`), two hosts, so a `failureDomain: host` pool can never satisfy `replica 3`. Both pools therefore run `replicated.size: 2` with `requireSafeReplicaSize: false` and `target_size_ratio: "0.04"`.
 
-Rook v1.20.7 does not re-home an existing pool's CRUSH rule when `spec.deviceClass` changes (the same gap described above). The rule move is performed at runtime by `Job/rook-ceph-rehome-ssd-v1`, which is idempotent: it exits 0 without mutation if both pools already resolve to rules containing `default~ssd`. The old canonical `default~hdd` rules are left in place for rollback (section 8).
+Rook v1.20.7 does not re-home an existing pool's CRUSH rule when `spec.deviceClass` changes (the same gap described above). The rule move is performed at runtime by `Job/rook-ceph-rehome-ssd-v2`, which is idempotent: it exits 0 without mutation if both pools already resolve to rules containing `default~ssd`. The old canonical `default~hdd` rules are left in place for rollback (section 8).
 
 End-state verification now runs through `Job/rook-ceph-endstate-verify-v2`, which asserts the SSD rule and the replica-2 sizing (section 9).
 

@@ -23,7 +23,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rook-ceph-rehome-ssd-v1
+  name: rook-ceph-rehome-ssd-v2
   namespace: rook-ceph
   labels:
     app.kubernetes.io/name: rook-ceph-rehome-ssd
@@ -136,7 +136,7 @@ spec:
                   | [ $n[] | select(.type == "osd")
                         | select((ancestor_names($n; .id) | index("default~ssd")) != null)
                         | .name ]
-                  | sort
+                  | unique
                   | join(",")
                 '
               }
