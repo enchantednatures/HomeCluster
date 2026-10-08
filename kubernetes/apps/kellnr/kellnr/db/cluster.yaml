@@ -17,7 +17,8 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: ceph-block
+    storageClass: ceph-block-ssd
+    resizeInUseVolumes: false
   resources:
     requests:
       memory: "256Mi"

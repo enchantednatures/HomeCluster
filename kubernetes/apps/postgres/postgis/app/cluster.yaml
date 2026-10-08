@@ -16,7 +16,7 @@ spec:
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: ceph-block
+    storageClass: ceph-block-ssd
   enableSuperuserAccess: true
   superuserSecret:
     name: postgis-superuser

@@ -24,7 +24,8 @@ spec:
       memory: 2Gi
   storage:
     size: 20Gi
-    storageClass: ceph-block
+    storageClass: ceph-block-ssd
+    resizeInUseVolumes: false
   enableSuperuserAccess: true
   superuserSecret:
     name: postgres-superuser
