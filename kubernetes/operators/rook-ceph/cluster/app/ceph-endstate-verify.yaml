@@ -41,7 +41,7 @@ spec:
       serviceAccountName: rook-ceph-default
       containers:
         - name: ceph-endstate-verify
-          image: rook/ceph:v1.21.0 # datasource=docker depName=rook/ceph
+          image: rook/ceph:v1.21.0 # pinned: one-shot Job; image bumps fail immutable spec.template
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
