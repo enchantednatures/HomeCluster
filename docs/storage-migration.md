@@ -6,7 +6,7 @@
 |---|---|---|
 | media xarr configs (bazarr/dispatcharr/lidarr/prowlarr/radarr/readarr/sonarr, plex, tautulli, tdarr, hydra, seerr, sabnzbd, recyclarr) | `ceph-block-economy` | bulk, read-mostly, compression-friendly |
 | monitoring (loki/tempo chunks, thanos store) | `ceph-block-economy` | size-first, lz4 offset HDD I/O |
-| CNPG DBs (immich-db, lakekeeper-db, postgres, xarr-db) | `ceph-block` | latency-sensitive, small; native backup/restore (kubectl cnpg backup → bootstrap recovery) |
+| CNPG DBs (all Postgres clusters) | `ceph-block-ssd` | latency-sensitive, small; migrated 2026-10-08, see "CNPG Postgres → ceph-block-ssd" |
 | elastic | `ceph-block` | search I/O; nvme-tier SCs unused in early migration |
 | redpanda | `ceph-block` | kafka-style block storage on replica-3 |
 | kubevirt VM disks + volsync pairs | `ceph-block` | small, latency-sensitive |
@@ -64,8 +64,7 @@ influxdb backup dir (`kubernetes/infra/monitoring/influxdb/backup/`) is today's 
   media **36** (blocked: `kubernetes/apps/media/**` is gone from main; flux runs
   those apps from stale artifact revisions — resolve media-tree source of truth first)
   monitoring 7 — loki/tempo/kube-prom-stack/...; influxdb sts already scaled to 0
-  (good first candidate: no downtime for users), CNPG ~10 DB clusters (use
-  cnpg-native backup → cluster recreate; scp volsync rsync for other PVCs)
+  (good first candidate: no downtime for users)
   elastic 3 / redpanda 3 / vms 3
 
 ### Operational temp setbacks (verify before assuming permanent)
@@ -150,3 +149,46 @@ kubectl get sc | grep ceph
 - 13 commits pushed this session, latest `1be7647d2`
 - volsync pair: kubernetes/infra/monitoring/influxdb/migration/migration-pair.yaml
 - CSI tolerations (live-verified): kubernetes/operators/rook-ceph/cluster/app/csi-driver.yaml
+
+## CNPG Postgres → ceph-block-ssd (2026-10-08)
+
+All CNPG Postgres clusters were moved from `ceph-block` to `ceph-block-ssd`
+(`ceph-blockpool-ssd`, replica 2 across osd.3+osd.8). `gravitino-db` (the
+Gravitino replacement for lakekeeper) sits on `ceph-nvme-block`. Method,
+verified per cluster:
+
+- 3-instance clusters (atuin-db, tandoor-db, harbor-db, kellnr-db): rolling PVC
+  replacement — for each replica delete `pvc/<inst>` + `pod/<inst>`; the
+  operator re-creates the PVC on the new class and rejoins via `pg_basebackup`;
+  then `kubectl cnpg promote` a new-class replica; then rebuild the old primary
+  last. This also rebuilt the previously stuck replicas (harbor-db-1
+  crashloop, kellnr-db-1 recovery stall).
+- Single-instance clusters (postgres-db, authentik-db): commit `instances: 2`,
+  wait for the join with zero replay gap, fail over (delete the primary pod —
+  CNPG v1.30 planned switchover aborts with `Wrong target primary` on these),
+  then commit `instances: 1` and remove the old instance.
+- `immich-db`: rebuilt from scratch (fresh cluster on `ceph-block-ssd` +
+  `pg_dumpall` restore) after its storage was lost. Its database held no user
+  data (only immich's geodata reference tables, restored exactly), so nothing
+  was lost.
+- Out of scope: `postgis-db` (ks commented out, live but unmanaged), the
+  `media` namespace *arr DBs (not in main), and `gravitino-db` (other session).
+
+Gotchas worth remembering for the next storage move:
+
+- PVs created before commit `90136f526` carry `unmapOptions: krbd:rxbounce` in
+  `spec.csi.volumeAttributes`; `rbd unmap` fails with
+  `unknown unmap option 'rxbounce'` and node unstage wedges. `spec` is
+  immutable after creation, so old volumes must be unmapped by hand on their
+  node via the CSI node plugin
+  (`kubectl -n rook-ceph exec <nodeplugin> -c csi-rbdplugin -- rbd unmap ceph-blockpool/<csi-vol>`),
+  otherwise PVC/PV deletion stalls.
+- The attach/detach controller can wedge on volumes whose `VolumeAttachment`
+  is force-deleted: if a pod reports Multi-Attach but no VA exists, create the
+  expected VA manually — its name is deterministic per volume+node and the
+  kubelet error message names it.
+- After each instance rebuild, stale `VolumeAttachment` + `PersistentVolume`
+  objects may need manual cleanup (delete VA, then PV; verify the RBD image is
+  gone with `rbd ls ceph-blockpool`).
+- `kellnr-db` gained a `ScheduledBackup` (it previously only had WAL
+  archiving, with no base backup).
