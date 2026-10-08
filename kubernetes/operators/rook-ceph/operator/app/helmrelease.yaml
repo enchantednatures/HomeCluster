@@ -45,6 +45,12 @@ spec:
     rbacEnable: true
     logLevel: INFO
 
+    # Keep unreferenced CRUSH rules. Rook's CleanupUnusedCrushRules (runs after
+    # mgr startup) deletes rules not referenced by a pool, which would remove
+    # the retained ceph-blockpool-* rollback rules and can race the one-shot
+    # nvme migration Job between rule creation and pool repoint.
+    deleteUnusedCrushRules: false
+
     # Talos-specific configurations
     hostNetwork: false  # Required for Talos
 

@@ -1,0 +1,276 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# One-shot: promote the four worker NVMe OSDs to the `nvme` CRUSH class and
+# re-home ceph-blockpool-nvme onto them.
+#
+# work-00..03 each have a 250GB WD Blue SN570 NVMe passed through to the VM as a
+# whole-disk virtio-scsi LUN (/dev/sdb). Proxmox scsi1 has no ssd=1 flag, so the
+# guest reports rotational=1 and Ceph provisioned osd.4-7 with class `hdd`. The
+# pool named "nvme" therefore ran on `default~ssd` (osd.3 melusine + osd.8
+# unraid-worker) instead of the NVMe drives; this Job fixes that.
+#
+# ORDER IS LOAD-BEARING: the OSDs MUST be reclassed to `nvme` BEFORE the rule is
+# created. Ceph's `osd crush rule create-replicated ... nvme` fails with
+# "device class nvme does not exist" or "root default has no devices with class
+# nvme" unless the class exists AND default~nvme holds at least one OSD
+# (CrushWrapper::add_simple_rule_at). `set-device-class nvme` auto-creates the
+# class and the default~nvme shadow bucket; no explicit class-create is needed.
+#
+# Rook does not re-home this pool for us: pool CRUSH-rule updates on
+# spec.deviceClass changes are gated behind spec.enableCrushUpdates, which is
+# deliberately left unset (leave it unset). The rule move must happen at runtime.
+#
+# Guardrail OSDs are NEVER touched: osd.0-3 (melusine) and osd.8 (unraid-worker).
+# ceph-blockpool-economy (8KiB, rule default~hdd, failureDomain osd) simply
+# remaps onto osd.0-2. ceph-blockpool and all RGW/CephFS/mgr pools use classless
+# `default` rules and do not move. Old canonical rules are retained for rollback
+# (ROOK_DELETE_UNUSED_CRUSH_RULES=false in the operator values).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-reclass-nvme-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-reclass-nvme
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  backoffLimit: 0
+  # No finished-Job TTL: this one-shot MUST persist Complete so Flux does not
+  # see it as absent and re-create/re-run the CRUSH migration.
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-ceph-reclass-nvme
+        app.kubernetes.io/component: maintenance
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      containers:
+        - name: ceph-reclass-nvme
+          image: rook/ceph:v1.21.0 # pinned: one-shot Job; image bumps fail immutable spec.template
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              # Render keyring + ceph.conf (upstream rook toolbox pattern)
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # shellcheck disable=SC2001
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              POOL="ceph-blockpool-nvme"
+              RULE="${POOL}-nvme"
+              OSDS="4 5 6 7"
+
+              # --- 1. Idempotency guard. Exit 0 ONLY when fully applied: all four
+              #     OSDs class nvme AND the pool already resolves to a rule taking
+              #     default~nvme. A partial run must never short-circuit.
+              already_done=true
+              for OSD in ${OSDS}; do
+                class=$(ceph osd crush get-device-class "$OSD" 2>/dev/null || true)
+                [ "${class}" = "nvme" ] || already_done=false
+              done
+              current_rule=$(ceph osd pool get "$POOL" crush_rule | awk -F': ' '{print $2}')
+              if ! ceph osd crush rule dump "$current_rule" --format=json 2>/dev/null \
+                | jq -e '[.steps[]?.item_name] | index("default~nvme") != null' >/dev/null; then
+                already_done=false
+              fi
+              if [ "${already_done}" = "true" ]; then
+                echo "reclass-nvme already applied (osd.4-7 class nvme, ${POOL} on default~nvme); nothing to do"
+                exit 0
+              fi
+
+              # --- 2. PG gate. Hard degradation (PG_DEGRADED, PG_DAMAGED,
+              #     undersized, incomplete, stale) fails immediately: data is at
+              #     risk. Transient PG_AVAILABILITY (peering/remapped/laggy) is
+              #     retried and clears on the first clean sample. A timed-out gate
+              #     returns non-zero and is never masked with `|| true`.
+              gate() {
+                local tries="${1:-120}" i out
+                for i in $(seq 1 "${tries}"); do
+                  out=$(ceph health detail 2>&1)
+                  if printf '%s\n' "${out}" | grep -qE 'PG_DEGRADED|PG_DAMAGED|undersized|incomplete|stale'; then
+                    echo "gate: hard PG degradation:"
+                    printf '%s\n' "${out}" | grep -E 'PG_DEGRADED|PG_DAMAGED|undersized|incomplete|stale'
+                    return 1
+                  fi
+                  if ! printf '%s\n' "${out}" | grep -qE 'PG_AVAILABILITY'; then
+                    echo "gate: OK (no degraded/undersized/incomplete/stale; no transient AVAILABILITY)"
+                    return 0
+                  fi
+                  echo "gate: transient PG_AVAILABILITY (peering/remapped/laggy) try ${i}/${tries}"
+                  sleep 5
+                done
+                echo "gate: TIMEOUT after ${tries} tries:"
+                printf '%s\n' "${out}" | grep -E 'PG_AVAILABILITY'
+                return 1
+              }
+
+              # --- 3. Preflight: every target OSD must be up before mutating.
+              ceph osd tree --format=json | jq -r '.nodes[] | select(.type=="osd") | "\(.name) status=\(.status // "n/a")"'
+              for OSD in ${OSDS}; do
+                status=$(ceph osd tree --format=json | jq -r --arg n "osd.${OSD}" '.nodes[] | select(.name==$n) | (.status // "missing")')
+                if [ "${status}" != "up" ]; then
+                  echo "preflight FAILED: osd.${OSD} status='${status}' (want up)"
+                  exit 1
+                fi
+              done
+
+              # --- 4. Checkpoint + pre-state evidence (base64 crushmap so the
+              #     logs persist a restorable snapshot).
+              ceph osd getcrushmap -o /tmp/crush.checkpoint.bin
+              echo "=== CRUSHMAP_CHECKPOINT_BASE64_BEGIN ==="
+              base64 /tmp/crush.checkpoint.bin
+              echo "=== CRUSHMAP_CHECKPOINT_BASE64_END ==="
+              ceph osd crush tree --show-shadow
+              ceph osd tree
+              ceph osd crush rule dump
+              ceph osd pool ls detail
+
+              # --- 5. Refuse to run against an already-degraded cluster.
+              gate 60
+
+              # --- 6. Reclass osd.4,5,6,7 hdd -> nvme ONE AT A TIME, gated after
+              #     each step. Only ceph-blockpool-economy rides default~hdd; its
+              #     8KiB remaps onto osd.0-2. osd.3/osd.8 remain class ssd.
+              for OSD in ${OSDS}; do
+                current=$(ceph osd crush get-device-class "$OSD" 2>/dev/null || true)
+                if [ "${current}" = "nvme" ]; then
+                  echo "=== osd.${OSD} already class nvme; skipping ==="
+                  continue
+                fi
+                echo "=== reclass osd.${OSD} (${current:-unclassified}) -> nvme ==="
+                ceph osd crush rm-device-class "$OSD"
+                ceph osd crush set-device-class nvme "$OSD"
+                ceph osd crush get-device-class "$OSD"
+                gate 180
+              done
+              ceph osd crush tree --show-shadow
+
+              # --- 7. Preflight: default~nvme must hold exactly osd.4-7 before the
+              #     rule is created (Ceph refuses a class rule with no OSDs under
+              #     the root; the bounded wait lets the shadow bucket materialize).
+              nvme_holders() {
+                ceph osd crush tree --show-shadow --format=json | jq -r '
+                  def parents_of($nodes; $id):
+                    [ $nodes[] | select((.children // []) | index($id) != null) ];
+                  def ancestor_names($nodes; $id):
+                    [ parents_of($nodes; $id)[] as $p
+                      | $p.name, (ancestor_names($nodes; $p.id)[])
+                    ];
+                  . as $r
+                  | ($r.nodes) as $n
+                  | [ $n[] | select(.type == "osd")
+                        | select((ancestor_names($n; .id) | index("default~nvme")) != null)
+                        | .name ]
+                  | unique
+                  | join(",")
+                '
+              }
+              holders_ok=false
+              for i in $(seq 1 40); do
+                holders=$(nvme_holders)
+                echo "preflight try ${i}/40: default~nvme holders=${holders}"
+                if [ "${holders}" = "osd.4,osd.5,osd.6,osd.7" ]; then
+                  holders_ok=true
+                  break
+                fi
+                sleep 5
+              done
+              if [ "${holders_ok}" != "true" ]; then
+                echo "preflight FAILED: default~nvme must hold exactly osd.4,osd.5,osd.6,osd.7 (last: ${holders})"
+                exit 1
+              fi
+
+              # --- 8. Create the nvme rule (idempotent), repoint the pool, gate.
+              #     The old default~ssd and default~hdd rules are left in place for
+              #     rollback.
+              if ceph osd crush rule dump "${RULE}" >/dev/null 2>&1; then
+                echo "rule ${RULE} already exists; reusing it"
+              else
+                ceph osd crush rule create-replicated "${RULE}" default host nvme
+              fi
+              ceph osd crush rule dump | grep -A6 "\"rule_name\": \"${RULE}\""
+              ceph osd pool set "${POOL}" crush_rule "${RULE}"
+              gate 180
+
+              # --- 9. Final verification echo
+              ceph osd crush tree --show-shadow
+              ceph osd tree
+              ceph osd crush rule dump
+              ceph osd pool ls detail
+              ceph -s
+              ceph health detail
+              echo "reclass-nvme complete: osd.4-7 class nvme; ${POOL} -> ${RULE} (default~nvme)"
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5

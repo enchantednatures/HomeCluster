@@ -13,6 +13,7 @@ resources:
   - ./ceph-crash-hygiene.yaml
   - ./ceph-reclass-job.yaml
   - ./ceph-rehome-ssd-job.yaml
+  - ./ceph-reclass-nvme-job.yaml
   - ./ceph-endstate-verify.yaml
   - ./storage-classes.yaml
   - ./storage-classes-enhanced.yaml
