@@ -25,7 +25,7 @@ spec:
       serviceAccountName: rook-ceph-default
       containers:
         - name: ceph-discovery
-          image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+          image: rook/ceph:v1.21.0 # datasource=docker depName=rook/ceph
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
