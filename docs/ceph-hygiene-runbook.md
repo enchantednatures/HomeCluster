@@ -135,7 +135,17 @@ The reclass Job orders the work as: reclass `osd.4`, `osd.5`, `osd.6`, then re-h
 
 ### End state
 
-`osd.4` to `osd.7` are class `hdd`; `osd.3` and `osd.8` remain class `ssd`. Both pools resolve to canonical rules (`ceph-blockpool-ssd`, `ceph-blockpool-nvme`) whose `steps` take `default~hdd`. No degraded, undersized, or stale placement groups.
+`osd.4` to `osd.7` are class `hdd`; `osd.3` and `osd.8` remain class `ssd`. Both `ceph-blockpool-ssd` and `ceph-blockpool-nvme` are now `deviceClass: ssd` at `replica 2` / `min_size 1`, and resolve to the `ceph-blockpool-ssd-ssd` / `ceph-blockpool-nvme-ssd` rules whose `steps` take `default~ssd`. The old canonical rules (`ceph-blockpool-ssd`, `ceph-blockpool-nvme`), which take `default~hdd`, are retained for rollback. No degraded, undersized, or stale placement groups.
+
+### 2026-10-08: reversal - SSD pools re-pinned to the real ssd class
+
+The earlier re-home to `default~hdd` was a correctness fix for the misleading device class, but it left the latency-sensitive tier on rotational media. The media *arr configs and the six CNPG databases need real SSD latency, so `ceph-blockpool-ssd` and `ceph-blockpool-nvme` were repointed from `default~hdd` back to `default~ssd` on 2026-10-08.
+
+The move is forced to `replica 2`. `default~ssd` holds exactly `osd.3` (`melusine`) and `osd.8` (`unraid-worker`), two hosts, so a `failureDomain: host` pool can never satisfy `replica 3`. Both pools therefore run `replicated.size: 2` with `requireSafeReplicaSize: false` and `target_size_ratio: "0.04"`.
+
+Rook v1.20.7 does not re-home an existing pool's CRUSH rule when `spec.deviceClass` changes (the same gap described above). The rule move is performed at runtime by `Job/rook-ceph-rehome-ssd-v1`, which is idempotent: it exits 0 without mutation if both pools already resolve to rules containing `default~ssd`. The old canonical `default~hdd` rules are left in place for rollback (section 8).
+
+End-state verification now runs through `Job/rook-ceph-endstate-verify-v2`, which asserts the SSD rule and the replica-2 sizing (section 9).
 
 ## 6. Flux substitution gotcha (important follow-up)
 
@@ -201,16 +211,14 @@ Revert one OSD at a time and check for degraded placement groups between steps, 
 
 ### Reverting pool rules
 
-The canonical `ceph-blockpool-ssd` rule now takes `default~hdd`. To point the pools back to a `default~ssd` rule:
+The pools currently resolve to the `-ssd` rules (`ceph-blockpool-ssd-ssd`, `ceph-blockpool-nvme-ssd`) that take `default~ssd`. The old canonical rules (`ceph-blockpool-ssd`, `ceph-blockpool-nvme`) were retained for exactly this rollback; they take `default~hdd`. To roll the pools back, repoint them to those retained rules:
 
 ```bash
-ceph osd crush rule create-replicated ceph-blockpool-ssd-ssd default host ssd
-ceph osd pool set ceph-blockpool-ssd crush_rule ceph-blockpool-ssd-ssd
-ceph osd crush rule create-replicated ceph-blockpool-nvme-ssd default host ssd
-ceph osd pool set ceph-blockpool-nvme crush_rule ceph-blockpool-nvme-ssd
+ceph osd pool set ceph-blockpool-ssd crush_rule ceph-blockpool-ssd
+ceph osd pool set ceph-blockpool-nvme crush_rule ceph-blockpool-nvme
 ```
 
-Revert the pools only once `default~ssd` again holds at least three hosts, otherwise the size-3 host-failure-domain pools will degrade.
+Restoring `replicated.size: 3` is a separate decision: do it only once `default~ssd` again holds at least three hosts. With `default~ssd` at just `osd.3` and `osd.8`, a size-3 host-failure-domain pool would degrade permanently, which is why the pools run replica 2 today.
 
 ### setcrushmap caveats
 
@@ -227,11 +235,11 @@ Applying the checkpoint with `ceph osd setcrushmap -i crush.checkpoint.bin` rest
 
 ### Running the end-state Job
 
-`kubernetes/operators/rook-ceph/cluster/app/ceph-endstate-verify.yaml` defines `Job/rook-ceph-endstate-verify-v1`. It runs read-only assertions, prints `PASS:` or `FAIL:` for each check, and exits non-zero if any check fails.
+`kubernetes/operators/rook-ceph/cluster/app/ceph-endstate-verify.yaml` defines `Job/rook-ceph-endstate-verify-v2`. It runs read-only assertions, prints `PASS:` or `FAIL:` for each check, and exits non-zero if any check fails.
 
 ```bash
-kubectl -n rook-ceph wait --for=condition=complete job/rook-ceph-endstate-verify-v1 --timeout=600s
-kubectl -n rook-ceph logs job/rook-ceph-endstate-verify-v1
+kubectl -n rook-ceph wait --for=condition=complete job/rook-ceph-endstate-verify-v2 --timeout=600s
+kubectl -n rook-ceph logs job/rook-ceph-endstate-verify-v2
 ```
 
 A passing run ends with `RESULT: PASS (all checks passed)`. A failing run ends with `RESULT: FAIL` and lists the failed checks with their observed output.
@@ -249,7 +257,8 @@ This Job also has no `ttlSecondsAfterFinished`, so a completed run persists and 
 - `ceph mgr module ls` does not list `rook` as enabled.
 - Unarchived crash count is 0 (`ceph crash ls-new --format=json` has length 0).
 - `osd.4` to `osd.7` sit under `default~hdd`; `osd.3` and `osd.8` under `default~ssd` in `ceph osd crush tree --show-shadow`.
-- Both pool rules take `default~hdd` and resolve to a canonical `ceph-blockpool-*` rule.
+- Both pool rules take `default~ssd` and resolve to a canonical `ceph-blockpool-*` rule (the `ceph-blockpool-ssd-ssd` / `ceph-blockpool-nvme-ssd` rules; the old `default~hdd` rules are retained for rollback, section 8).
+- Both pools show `size 2` and `min_size 1` (the two-host SSD constraint makes replica 3 impossible).
 - `ceph health detail` shows no PG degradation. A transient `PG_AVAILABILITY` (`peering`/`remapped`/`laggy`) is retried up to 6 times with 15s between tries and passes on the first clean sample; persistent `PG_AVAILABILITY`, or any `undersized`/`incomplete`/`stale`/`PG_DEGRADED`/`PG_DAMAGED`, fails.
 - `ceph osd tree` shows `osd.4` to `osd.7` with class `hdd`.
 

@@ -12,13 +12,13 @@ metadata:
 spec:
   failureDomain: host
   replicated:
-    size: 3
-    requireSafeReplicaSize: true
-  deviceClass: hdd
+    size: 2
+    requireSafeReplicaSize: false
+  deviceClass: ssd
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
     pg_autoscale_mode: "on"
-    target_size_ratio: "0.3"  # Reserve 30% of cluster capacity for this pool
+    target_size_ratio: "0.04"  # Reserve 30% of cluster capacity for this pool
   quotas:
     maxBytes: 536870912000  # 500Gi in bytes - Adjust based on your cluster capacity
   statusCheck:
@@ -127,13 +127,13 @@ metadata:
 spec:
   failureDomain: host
   replicated:
-    size: 3
-    requireSafeReplicaSize: true
-  deviceClass: hdd
+    size: 2
+    requireSafeReplicaSize: false
+  deviceClass: ssd
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
     pg_autoscale_mode: "on"
-    target_size_ratio: "0.4"  # Reserve 40% of NVMe capacity for this pool
+    target_size_ratio: "0.04"  # Reserve 40% of NVMe capacity for this pool
   statusCheck:
     mirror:
       disabled: false

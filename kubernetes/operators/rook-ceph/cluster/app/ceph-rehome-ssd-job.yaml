@@ -1,0 +1,255 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# One-shot pool re-home back onto the real SSD class. Task 3 re-pins
+# ceph-blockpool-ssd / ceph-blockpool-nvme to spec.deviceClass=ssd at replica 2,
+# but Rook v1.20.7 does NOT re-home an existing CephBlockPool's CRUSH rule when
+# spec.deviceClass changes (verified live), so the rule move must be done at
+# runtime. This Job creates a `default~ssd` rule per pool, repoints the pool, and
+# gates on PG health after each step.
+#
+# ORDER IS LOAD-BEARING:
+#   1. idempotency guard  - if both pools already resolve to a `default~ssd` rule,
+#                           exit 0 with NO mutation.
+#   2. preflight          - wait for Rook to reconcile both pools to size 2 and for
+#                           `default~ssd` to hold exactly osd.3+osd.8 (the only two
+#                           SSD hosts). Refuse to mutate until that is true.
+#   3. pre-mutation gate  - refuse to run against a degraded cluster.
+#   4. ceph-blockpool-ssd then ceph-blockpool-nvme: create the pool's `-ssd` rule
+#      if absent, repoint crush_rule, gate.
+#
+# Old canonical rules (`ceph-blockpool-ssd`, `ceph-blockpool-nvme`) are NEVER
+# deleted - they remain for rollback. No OSD is reclassed and osd.3/osd.8 classes
+# are NEVER touched: `default~ssd` must keep holding exactly osd.3+osd.8.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-rehome-ssd-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-rehome-ssd
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  backoffLimit: 0
+  # No finished-Job TTL: this one-shot MUST persist Complete so Flux does not see
+  # it as absent and re-create/re-run the CRUSH pool move.
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-ceph-rehome-ssd
+        app.kubernetes.io/component: maintenance
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      containers:
+        - name: ceph-rehome-ssd
+          image: rook/ceph:v1.20.7 # datasource=docker depName=rook/ceph
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              # Render keyring + ceph.conf (upstream rook toolbox pattern)
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # shellcheck disable=SC2001
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              POOLS="ceph-blockpool-ssd ceph-blockpool-nvme"
+
+              # --- 1. Idempotency guard (FIRST, before any mutation). Resolve each
+              #     pool's current crush_rule and inspect that rule's steps; if BOTH
+              #     pools already take a rule whose steps include `default~ssd`, the
+              #     re-home has been applied and this re-run is a no-op.
+              already_done=true
+              for P in ${POOLS}; do
+                rule=$(ceph osd pool get "$P" crush_rule | awk -F': ' '{print $2}')
+                if ! ceph osd crush rule dump "$rule" --format=json \
+                  | jq -e '[.steps[]?.item_name] | index("default~ssd") != null' >/dev/null; then
+                  already_done=false
+                fi
+              done
+              if [ "${already_done}" = "true" ]; then
+                echo "rehome already applied; nothing to do"
+                exit 0
+              fi
+
+              # --- 2. PG gate. A timed-out gate MUST return non-zero (never mask
+              #     with `|| true`). Transient PG_AVAILABILITY (peering/remapped/
+              #     laggy) is retried with a bounded tries/sleep loop and clears on
+              #     the first clean sample. Hard degradation - PG_DEGRADED,
+              #     PG_DAMAGED, undersized, incomplete, stale - is NEVER retried
+              #     away; it fails immediately.
+              gate() {
+                local tries="${1:-120}" i out
+                for i in $(seq 1 "${tries}"); do
+                  out=$(ceph health detail 2>&1)
+                  if printf '%s\n' "${out}" | grep -qE 'PG_DEGRADED|PG_DAMAGED|undersized|incomplete|stale'; then
+                    echo "gate: hard PG degradation:"
+                    printf '%s\n' "${out}" | grep -E 'PG_DEGRADED|PG_DAMAGED|undersized|incomplete|stale'
+                    return 1
+                  fi
+                  if ! printf '%s\n' "${out}" | grep -qE 'PG_AVAILABILITY'; then
+                    echo "gate: OK (no degraded/undersized/incomplete/stale; no transient AVAILABILITY)"
+                    return 0
+                  fi
+                  echo "gate: transient PG_AVAILABILITY (peering/remapped/laggy) try ${i}/${tries}"
+                  sleep 5
+                done
+                echo "gate: TIMEOUT after ${tries} tries:"
+                printf '%s\n' "${out}" | grep -E 'PG_AVAILABILITY'
+                return 1
+              }
+
+              # --- osd.3+osd.8 are the only SSD hosts. Return the sorted, comma-
+              #     joined list of OSD names that live under `default~ssd` in the
+              #     shadow tree; preflight below requires exactly "osd.3,osd.8".
+              ssd_holders() {
+                ceph osd crush tree --show-shadow --format=json | jq -r '
+                  def parents_of($nodes; $id):
+                    [ $nodes[] | select((.children // []) | index($id) != null) ];
+                  def ancestor_names($nodes; $id):
+                    [ parents_of($nodes; $id)[] as $p
+                      | $p.name, (ancestor_names($nodes; $p.id)[])
+                    ];
+                  . as $r
+                  | ($r.nodes) as $n
+                  | [ $n[] | select(.type == "osd")
+                        | select((ancestor_names($n; .id) | index("default~ssd")) != null)
+                        | .name ]
+                  | sort
+                  | join(",")
+                '
+              }
+
+              # --- 3. Preflight with bounded retry (10 min, ~15s interval). Wait
+              #     until BOTH pools report size 2 AND `default~ssd` holds exactly
+              #     osd.3+osd.8. This waits for Rook to reconcile the CephBlockPool
+              #     CR size change from task 3; this Job does NOT change sizes.
+              echo "=== preflight: size==2 and default~ssd == osd.3+osd.8 (up to 10m) ==="
+              preflight_ok=false
+              for i in $(seq 1 40); do
+                sizes_ok=true
+                for P in ${POOLS}; do
+                  size=$(ceph osd pool get "$P" size | awk -F': ' '{print $2}')
+                  [ "$size" = "2" ] || sizes_ok=false
+                done
+                holders=$(ssd_holders)
+                echo "preflight try ${i}/40: sizes_ok=${sizes_ok} default~ssd holders=${holders}"
+                if [ "${sizes_ok}" = "true" ] && [ "${holders}" = "osd.3,osd.8" ]; then
+                  preflight_ok=true
+                  break
+                fi
+                sleep 15
+              done
+              if [ "${preflight_ok}" != "true" ]; then
+                echo "preflight FAILED: both pools must be size 2 and default~ssd must hold exactly osd.3+osd.8"
+                echo "last observed pool sizes:"
+                for P in ${POOLS}; do
+                  ceph osd pool get "$P" size
+                done
+                echo "last observed default~ssd holders: $(ssd_holders)"
+                exit 1
+              fi
+
+              # --- 4. pre-state evidence + refuse to mutate a degraded cluster
+              ceph osd crush tree --show-shadow
+              ceph osd crush rule dump
+              ceph osd pool ls detail
+              gate 120
+
+              # --- 5. per pool: create the `-ssd` rule only if absent, repoint the
+              #     pool, then gate. `default~ssd` holds 2 hosts and size 2 with
+              #     failureDomain host remains satisfiable. Old canonical rules are
+              #     left untouched for rollback.
+              for P in ${POOLS}; do
+                RULE="${P}-ssd"
+                echo "=== re-home ${P} -> ${RULE} (default~ssd) ==="
+                if ceph osd crush rule dump "$RULE" >/dev/null 2>&1; then
+                  echo "rule ${RULE} already exists; reusing it"
+                else
+                  ceph osd crush rule create-replicated "$RULE" default host ssd
+                fi
+                ceph osd pool set "$P" crush_rule "${RULE}"
+                ceph osd crush rule dump | grep -A4 "\"rule_name\": \"${RULE}\""
+                gate 120
+              done
+
+              # --- 6. final verification echo
+              ceph osd crush tree --show-shadow
+              ceph osd tree
+              ceph osd crush rule dump
+              ceph osd pool ls detail
+              ceph -s
+              ceph health detail
+              echo "rehome complete: both pools now on a default~ssd rule (old rules retained)"
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5

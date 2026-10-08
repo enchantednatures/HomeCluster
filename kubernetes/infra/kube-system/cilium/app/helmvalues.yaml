@@ -11,6 +11,7 @@ data:
         name: talos
         id: 1
     kubeProxyReplacement: true
+    mtu: 1500
     bpf-lb-sock-hostns-only: "true"
     cni:
       exclusive: false
