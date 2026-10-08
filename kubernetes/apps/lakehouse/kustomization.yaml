@@ -5,4 +5,5 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./networkpolicy.yaml
+  - ./ciliumnetworkpolicy.yaml
   - ./gravitino/ks.yaml
