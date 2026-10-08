@@ -13,7 +13,7 @@ spec:
       istio.io/dataplane-mode: "none"
   # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
   imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
-  instances: 1
+  instances: 2
   primaryUpdateStrategy: unsupervised
   resources:
     requests:
