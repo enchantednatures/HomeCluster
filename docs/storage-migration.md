@@ -14,13 +14,15 @@
 
 Pools backing these tiers:
 - `ceph-blockpool` — replica 3, host-domain failure, span class (any)
-- `ceph-blockpool-ssd` / `ceph-blockpool-nvme` — replica 3 on `ssd` CRUSH class (the 4 VM NVDemo disks)
+- `ceph-blockpool-ssd` / `ceph-blockpool-nvme` — replica 2 on the `ssd` CRUSH class (`osd.3` melusine + `osd.8` unraid-worker). The work VM disks were reclassified `hdd`, so `default~ssd` holds only two hosts; the history lives in `docs/ceph-hygiene-runbook.md` section 5.
 - `ceph-blockpool-economy` — replica 2, failureDomain `osd`, `hdd` class (melusine's 4 HDDs, ~10 TiB)
 
 ## CRUSH device classes (as provisioned)
 
-- work-00..03 OSDs (QEMU-passed NVMe): `ssd`
+- work-00..03 OSDs (QEMU-passed disks, reclassified): `hdd`
 - melusine OSDs (bare-metal HDD pass-through): `hdd`
+
+`docs/ceph-hygiene-runbook.md` section 5 is authoritative for device classes and the pool re-home history.
 
 If an OSD shows the wrong class:
 `ceph osd crush rm-device-class osd.N; ceph osd crush set-device-class ssd osd.N`
@@ -46,7 +48,7 @@ influxdb backup dir (`kubernetes/infra/monitoring/influxdb/backup/`) is today's 
 
 ### Done + verified live
 - Rook-Ceph enabled & healthy: 8 OSDs, 3 mon, 2 mgr, 2 rgw, 13 pools, 11TiB avail, HEALTH_OK
-  - work-00..03 (QEMU-passed NVMe) → deviceClass ssd
+  - work-00..03 (QEMU-passed disks) → deviceClass hdd (reclassified; see `docs/ceph-hygiene-runbook.md` section 5)
   - melusine (bare-metal HDD passthrough) → 4 OSDs, deviceClass hdd (~10TiB)
   - economy pool: replica2, failureDomain osd, hdd class; crush rule ceph-blockpool-economy exists
 - melusine main.tf trimmed to disk0 only; talos config re-applied with disks-patch
