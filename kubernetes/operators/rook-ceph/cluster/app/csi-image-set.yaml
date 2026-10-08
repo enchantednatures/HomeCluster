@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+---
+# CSI image set for the ceph-csi-operator.
+# Referenced by csi-operator-config.yaml (spec.driverSpecDefaults.imageSet.name).
+# Changing this ConfigMap's data alone does NOT trigger a Driver reconcile on
+# ceph-csi-operator v1.1.0 (it only watches OperatorConfig.spec.driverSpecDefaults),
+# so the OperatorConfig must be bumped alongside it to roll the CSI DaemonSets.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ceph-csi-image-set
+  namespace: rook-ceph
+data:
+  addons: ""
+  attacher: ""
+  plugin: quay.io/cephcsi/cephcsi:v3.17.1
+  provisioner: ""
+  registrar: ""
+  resizer: ""
+  snapshotter: ""

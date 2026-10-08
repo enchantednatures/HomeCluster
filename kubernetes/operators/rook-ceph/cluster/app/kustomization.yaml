@@ -6,6 +6,7 @@ resources:
   - ./ceph-cluster.yaml
   - ./csi-driver.yaml
   - ./csi-operator-config.yaml
+  - ./csi-image-set.yaml
   - ./csi-plugin-rbac.yaml
   - ./ceph-toolbox.yaml  # Standalone Deployment - no CephToolbox CRD required
   - ./ceph-discovery-job.yaml
