@@ -5,11 +5,13 @@
 # Versioned name because Flux cannot mutate a completed Job's immutable spec.
 #
 # Accepted end state (see docs/ceph-hygiene-runbook.md):
-#   Storage: ceph-blockpool-ssd and ceph-blockpool-nvme both run on
-#     deviceClass ssd at replica 2 / min_size 1, and both resolve to the
-#     ceph-blockpool-ssd-ssd / ceph-blockpool-nvme-ssd rules, which take
-#     default~ssd (osd.3+osd.8; the 2-host constraint forces replica 2).
-#     The old default~hdd rules are retained for rollback.
+#   Storage: ceph-blockpool-nvme runs on deviceClass nvme at replica 2 /
+#     min_size 1 and resolves to the ceph-blockpool-nvme-nvme rule, which
+#     takes default~nvme (osd.4-7; the 250GB NVMe drives of work-00..03).
+#     ceph-blockpool-ssd runs on deviceClass ssd at replica 2 / min_size 1 and
+#     resolves to ceph-blockpool-ssd-ssd, which takes default~ssd (osd.3+osd.8;
+#     the 2-host constraint forces replica 2).
+#     Old default~hdd rules are retained for rollback.
 #   HEALTH_WARN = AUTH_INSECURE_CLIENT_KEY_TYPE (4, raw/unmuted, kernel-gated)
 #               + AUTH_INSECURE_KEYS_ALLOWED (muted)
 #               + AUTH_INSECURE_KEYS_CREATABLE (muted)
@@ -20,7 +22,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rook-ceph-endstate-verify-v2
+  name: rook-ceph-endstate-verify-v3
   namespace: rook-ceph
   labels:
     app.kubernetes.io/name: rook-ceph-endstate-verify
@@ -168,7 +170,7 @@ spec:
                 [ "${count}" = "0" ]
               }
 
-              # osd.4-7 must sit under default~hdd; osd.3 and osd.8 under
+              # osd.4-7 must sit under default~nvme; osd.3 and osd.8 under
               # default~ssd. JSON ancestor walk is robust to bucket nesting.
               check_crush_shadow_placement() {
                 ceph osd crush tree --show-shadow --format=json | jq -e '
@@ -180,10 +182,10 @@ spec:
                     ];
                   . as $r
                   | ($r.nodes) as $n
-                  | ((ancestor_names($n; 4) | index("default~hdd")) != null)
-                    and ((ancestor_names($n; 5) | index("default~hdd")) != null)
-                    and ((ancestor_names($n; 6) | index("default~hdd")) != null)
-                    and ((ancestor_names($n; 7) | index("default~hdd")) != null)
+                  | ((ancestor_names($n; 4) | index("default~nvme")) != null)
+                    and ((ancestor_names($n; 5) | index("default~nvme")) != null)
+                    and ((ancestor_names($n; 6) | index("default~nvme")) != null)
+                    and ((ancestor_names($n; 7) | index("default~nvme")) != null)
                     and ((ancestor_names($n; 3) | index("default~ssd")) != null)
                     and ((ancestor_names($n; 8) | index("default~ssd")) != null)
                 ' >/dev/null
@@ -204,6 +206,23 @@ spec:
                 esac
                 ceph osd crush rule dump "${rule}" --format=json \
                   | jq -e '[.steps[]?.item_name] | index("default~ssd") != null' >/dev/null
+              }
+
+              # Pool's crush rule name must be a canonical ceph-blockpool-* rule
+              # and that rule must take default~nvme (robust to rule id changes).
+              check_pool_rule_on_nvme() {
+                local pool="$1"
+                local rule
+                rule=$(ceph osd pool get "${pool}" crush_rule | awk -F': ' '{print $2}')
+                case "${rule}" in
+                  ceph-blockpool-*) ;;
+                  *)
+                    echo "pool ${pool} crush_rule='${rule}' is not a ceph-blockpool-* rule"
+                    return 1
+                    ;;
+                esac
+                ceph osd crush rule dump "${rule}" --format=json \
+                  | jq -e '[.steps[]?.item_name] | index("default~nvme") != null' >/dev/null
               }
 
               # Both media pools must be replica 2 / min_size 1 (the 2-host
@@ -250,12 +269,12 @@ spec:
                 return 1
               }
 
-              check_osd_tree_hdd_class() {
+              check_osd_tree_nvme_class() {
                 ceph osd tree | awk '
                   {
                     for (i = 1; i <= NF; i++) {
                       if ($i ~ /^osd\.(4|5|6|7)$/) {
-                        if ($2 != "hdd") {
+                        if ($2 != "nvme") {
                           print "osd " $i " class " $2
                           bad = 1
                         }
@@ -280,13 +299,13 @@ spec:
               check "only accepted health codes present" check_only_accepted_codes
               check "rook mgr module not enabled" check_rook_module_disabled
               check "no unarchived crashes" check_no_unarchived_crashes
-              check "osd.4-7 under default~hdd, osd.3/8 under default~ssd" check_crush_shadow_placement
+              check "osd.4-7 under default~nvme, osd.3/8 under default~ssd" check_crush_shadow_placement
               check "ceph-blockpool-ssd rule takes default~ssd" check_pool_rule_on_ssd ceph-blockpool-ssd
-              check "ceph-blockpool-nvme rule takes default~ssd" check_pool_rule_on_ssd ceph-blockpool-nvme
+              check "ceph-blockpool-nvme rule takes default~nvme" check_pool_rule_on_nvme ceph-blockpool-nvme
               check "ceph-blockpool-ssd size 2, min_size 1" check_pool_size ceph-blockpool-ssd
               check "ceph-blockpool-nvme size 2, min_size 1" check_pool_size ceph-blockpool-nvme
               check "no PG degradation" check_no_pg_degradation
-              check "ceph osd tree shows osd.4-7 class hdd" check_osd_tree_hdd_class
+              check "ceph osd tree shows osd.4-7 class nvme" check_osd_tree_nvme_class
 
               echo "---------------------------------------------"
               if [ "${failures}" -ne 0 ]; then

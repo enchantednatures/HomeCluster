@@ -14,15 +14,17 @@
 
 Pools backing these tiers:
 - `ceph-blockpool` — replica 3, host-domain failure, span class (any)
-- `ceph-blockpool-ssd` / `ceph-blockpool-nvme` — replica 2 on the `ssd` CRUSH class (`osd.3` melusine + `osd.8` unraid-worker). The work VM disks were reclassified `hdd`, so `default~ssd` holds only two hosts; the history lives in `docs/ceph-hygiene-runbook.md` section 5.
+- `ceph-blockpool-ssd` — replica 2 on the `ssd` CRUSH class (`osd.3` melusine + `osd.8` unraid-worker); `default~ssd` holds only two hosts, so replica 3 is impossible. History in `docs/ceph-hygiene-runbook.md` section 5.
+- `ceph-blockpool-nvme` — replica 2 on the `nvme` CRUSH class (`osd.4`-`osd.7`, the 250GB WD Blue SN570 NVMe drives of `work-00..03`). All four OSDs live on one Proxmox host, so it is not HA against PVE host loss. History in `docs/ceph-hygiene-runbook.md` section 10.
 - `ceph-blockpool-economy` — replica 2, failureDomain `osd`, `hdd` class (melusine's 4 HDDs, ~10 TiB)
 
 ## CRUSH device classes (as provisioned)
 
-- work-00..03 OSDs (QEMU-passed disks, reclassified): `hdd`
-- melusine OSDs (bare-metal HDD pass-through): `hdd`
+- work-00..03 OSDs (250GB NVMe passed through as virtio-scsi): `nvme`
+- melusine OSDs: osd.0-2 `hdd` (bare-metal HDD pass-through), osd.3 `ssd` (SATA SSD)
+- unraid-worker OSD (osd.8): `ssd`
 
-`docs/ceph-hygiene-runbook.md` section 5 is authoritative for device classes and the pool re-home history.
+`docs/ceph-hygiene-runbook.md` sections 5 and 10 are authoritative for device classes and the pool re-home history.
 
 If an OSD shows the wrong class:
 `ceph osd crush rm-device-class osd.N; ceph osd crush set-device-class ssd osd.N`

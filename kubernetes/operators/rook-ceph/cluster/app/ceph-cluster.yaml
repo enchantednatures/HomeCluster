@@ -250,34 +250,37 @@ spec:
       bluestoreCacheSizeSsd: "2147483648"  # 2GB cache for SSD
     # Define specific nodes and devices for clean deployment
     nodes:
+      # work-00..03: WD Blue SN570 250GB NVMe passed through as virtio-scsi
+      # (guest reports rotational=1); class nvme is asserted at runtime by
+      # Job/rook-ceph-reclass-nvme-v1.
       - name: "work-00"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: hdd
+          deviceClass: nvme
       - name: "work-01"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: hdd
+          deviceClass: nvme
       - name: "work-02"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: hdd
+          deviceClass: nvme
       - name: "work-03"
         devices:
           - name: "/dev/sdb"
         config:
           storeType: bluestore
           metadataDevice: ""
-          deviceClass: hdd
+          deviceClass: nvme
       - name: "unraid-worker"
         devices:
           - name: "/dev/sda"

@@ -129,7 +129,7 @@ spec:
   replicated:
     size: 2
     requireSafeReplicaSize: false
-  deviceClass: ssd
+  deviceClass: nvme  # osd.4-7: 250GB WD Blue SN570 NVMe passed to work-00..03
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
     pg_autoscale_mode: "on"

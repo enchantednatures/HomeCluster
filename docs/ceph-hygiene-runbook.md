@@ -235,11 +235,11 @@ Applying the checkpoint with `ceph osd setcrushmap -i crush.checkpoint.bin` rest
 
 ### Running the end-state Job
 
-`kubernetes/operators/rook-ceph/cluster/app/ceph-endstate-verify.yaml` defines `Job/rook-ceph-endstate-verify-v2`. It runs read-only assertions, prints `PASS:` or `FAIL:` for each check, and exits non-zero if any check fails.
+`kubernetes/operators/rook-ceph/cluster/app/ceph-endstate-verify.yaml` defines `Job/rook-ceph-endstate-verify-v3`. It runs read-only assertions, prints `PASS:` or `FAIL:` for each check, and exits non-zero if any check fails.
 
 ```bash
-kubectl -n rook-ceph wait --for=condition=complete job/rook-ceph-endstate-verify-v2 --timeout=600s
-kubectl -n rook-ceph logs job/rook-ceph-endstate-verify-v2
+kubectl -n rook-ceph wait --for=condition=complete job/rook-ceph-endstate-verify-v3 --timeout=600s
+kubectl -n rook-ceph logs job/rook-ceph-endstate-verify-v3
 ```
 
 A passing run ends with `RESULT: PASS (all checks passed)`. A failing run ends with `RESULT: FAIL` and lists the failed checks with their observed output.
@@ -256,12 +256,60 @@ This Job also has no `ttlSecondsAfterFinished`, so a completed run persists and 
 - No health code outside {`AUTH_INSECURE_CLIENT_KEY_TYPE`, `AUTH_INSECURE_KEYS_ALLOWED`, `AUTH_INSECURE_KEYS_CREATABLE`, `BLUESTORE_SLOW_OP_ALERT`} is present. The transient `SLOW_OPS` check is tolerated with a comment, see section 1.
 - `ceph mgr module ls` does not list `rook` as enabled.
 - Unarchived crash count is 0 (`ceph crash ls-new --format=json` has length 0).
-- `osd.4` to `osd.7` sit under `default~hdd`; `osd.3` and `osd.8` under `default~ssd` in `ceph osd crush tree --show-shadow`.
-- Both pool rules take `default~ssd` and resolve to a canonical `ceph-blockpool-*` rule (the `ceph-blockpool-ssd-ssd` / `ceph-blockpool-nvme-ssd` rules; the old `default~hdd` rules are retained for rollback, section 8).
-- Both pools show `size 2` and `min_size 1` (the two-host SSD constraint makes replica 3 impossible).
+- `osd.4` to `osd.7` sit under `default~nvme`; `osd.3` and `osd.8` under `default~ssd` in `ceph osd crush tree --show-shadow`.
+- `ceph-blockpool-nvme` takes `default~nvme` (rule `ceph-blockpool-nvme-nvme`) and `ceph-blockpool-ssd` takes `default~ssd` (rule `ceph-blockpool-ssd-ssd`); both resolve to a canonical `ceph-blockpool-*` rule. The old `default~hdd` rules are retained for rollback (section 8).
+- Both pools show `size 2` and `min_size 1` (the two-host SSD constraint makes replica 3 impossible on `default~ssd`; `default~nvme` is held at 2 by choice).
 - `ceph health detail` shows no PG degradation. A transient `PG_AVAILABILITY` (`peering`/`remapped`/`laggy`) is retried up to 6 times with 15s between tries and passes on the first clean sample; persistent `PG_AVAILABILITY`, or any `undersized`/`incomplete`/`stale`/`PG_DEGRADED`/`PG_DAMAGED`, fails.
-- `ceph osd tree` shows `osd.4` to `osd.7` with class `hdd`.
+- `ceph osd tree` shows `osd.4` to `osd.7` with class `nvme`.
 
 ### Accepted-warning note
 
 The verification Job asserts the accepted end state described in section 1, not the plan's original literal "exactly 3 warnings" target. Task 7 returned NO-GO for the slow-op OSD, so `BLUESTORE_SLOW_OP_ALERT` is an accepted fourth code. The only genuinely unresolved warning is `AUTH_INSECURE_CLIENT_KEY_TYPE`, and it is kernel-gated per section 2.
+
+## 10. NVMe tier: worker NVMe drives promoted to the `nvme` class (2026-10-08)
+
+### What was wrong
+
+`work-00` to `work-03` each carry a 250GB WD Blue SN570 NVMe, passed through to
+the VMs as whole-disk virtio-scsi LUNs (`scsi1` in the VM config). Proxmox does
+not set `ssd=1` on that disk, so the guest reports `rotational=1`, and Ceph
+provisioned `osd.4` to `osd.7` with class `hdd`. The pool named
+`ceph-blockpool-nvme` therefore ran on `default~ssd` (`osd.3` melusine +
+`osd.8` unraid-worker), not on the NVMe drives.
+
+### The fix
+
+- `Job/rook-ceph-reclass-nvme-v1` reclassed `osd.4` to `osd.7` from `hdd` to
+  `nvme` one at a time with PG gates, then created `ceph-blockpool-nvme-nvme`
+  (`default~nvme`) and repointed `ceph-blockpool-nvme` onto it.
+- `CephCluster` now declares `deviceClass: nvme` for `work-00..03` and
+  `CephBlockPool/ceph-blockpool-nvme` declares `deviceClass: nvme`. The
+  CephCluster field records the truth; the live class move is done by the Job
+  because Rook only re-homes a pool's CRUSH rule on `spec.deviceClass` changes
+  when `spec.enableCrushUpdates: true` (deliberately unset).
+- End state: `hdd` = osd.0-2, `ssd` = osd.3 + osd.8, `nvme` = osd.4-7.
+  `ceph-blockpool-economy` (rule `default~hdd`, 8KiB) remapped onto osd.0-2;
+  `ceph-blockpool` and all RGW/CephFS/mgr pools use classless `default` rules
+  and did not move.
+
+### Retained rules and rollback
+
+`deleteUnusedCrushRules: false` in the operator HelmRelease keeps Rook's
+`CleanupUnusedCrushRules` from deleting unreferenced rules. Rollback is:
+repoint `ceph-blockpool-nvme` to `ceph-blockpool-nvme-ssd` (and optionally
+reclass osd.4-7 back to `hdd`); the old `ceph-blockpool-nvme` (`default~hdd`)
+canonical rule is also retained.
+
+### Capacity / durability note
+
+`ceph-blockpool-nvme` is replica 2 / min_size 1 on four OSDs that all live on
+the same Proxmox host (`zone pve`), so replica 3 would not protect against PVE
+host loss. Treat it as a single-physical-host performance tier, not permanent
+storage.
+
+### OSD restart check
+
+After the migration, `osd.4` was restarted (pod delete) and the class stayed
+`nvme`: `osd_class_update_on_start` re-asserts a class on start, but Ceph treats
+the resulting `-EBUSY` (class already bound) as success. Re-check
+`ceph osd tree` after any OSD restart.
