@@ -3,8 +3,9 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: lakekeeper
+  name: gravitino
   namespace: flux-system
 spec:
+  type: oci
   interval: 1h
-  url: https://lakekeeper.github.io/lakekeeper-charts/
+  url: oci://registry-1.docker.io/apache

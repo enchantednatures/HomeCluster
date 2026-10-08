@@ -3,49 +3,46 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: &app lakekeeper-db
+  name: gravitino-db
   namespace: lakehouse
   labels:
-    app.kubernetes.io/name: *app
+    app.kubernetes.io/name: gravitino-db
 spec:
   inheritedMetadata:
     labels:
       istio.io/dataplane-mode: "none"
-  # renovate: datasource=docker depName=ghcr.io/tensorchord/cloudnative-vectorchord versioning=redhat
-  imageName: ghcr.io/tensorchord/cloudnative-vectorchord:16.9-0.3.0
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.9-22
   instances: 1
   primaryUpdateStrategy: unsupervised
   storage:
     size: 10Gi
-    storageClass: ceph-block-ssd
-    resizeInUseVolumes: false
+    storageClass: ceph-nvme-block
   resources:
     requests:
       cpu: 500m
       memory: 1Gi
     limits:
       cpu: "2"
-      memory: 4Gi
+      memory: 2Gi
   enableSuperuserAccess: true
   superuserSecret:
-    name: lakekeeper-db-superuser
+    name: gravitino-db-superuser
   postgresql:
     parameters:
-      max_connections: "300"
+      max_connections: "200"
       shared_buffers: 512MB
-    shared_preload_libraries:
-      - vchord.so
   monitoring:
     enablePodMonitor: false
   managed:
     roles:
-      - name: lakekeeper
+      - name: gravitino
         ensure: present
-        comment: Lakekeeper
+        comment: Gravitino
         login: true
         superuser: false
         passwordSecret:
-          name: lakekeeper-db-user
+          name: gravitino-db-user
         inRoles:
           - pg_monitor
           - pg_signal_backend
@@ -54,10 +51,10 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: minio-store
-        serverName: lakekeeper
+        serverName: gravitino-v1
   bootstrap:
     initdb:
-      database: lakekeeper
-      owner: lakekeeper
+      database: gravitino
+      owner: gravitino
       secret:
-        name: lakekeeper-db-user
+        name: gravitino-db-user

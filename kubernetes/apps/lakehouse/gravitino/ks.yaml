@@ -1,0 +1,110 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-db gravitino-db
+  namespace: flux-system
+spec:
+  targetNamespace: lakehouse
+  dependsOn:
+    - name: cloudnative-pg
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-db
+  path: ./kubernetes/apps/lakehouse/gravitino/db
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-schema gravitino-schema
+  namespace: flux-system
+spec:
+  targetNamespace: lakehouse
+  dependsOn:
+    - name: gravitino-db
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-schema
+  path: ./kubernetes/apps/lakehouse/gravitino/schema
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-warehouse gravitino-warehouse
+  namespace: flux-system
+spec:
+  targetNamespace: lakehouse
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-warehouse
+  path: ./kubernetes/apps/lakehouse/gravitino/warehouse
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app gravitino
+  namespace: flux-system
+spec:
+  targetNamespace: lakehouse
+  dependsOn:
+    - name: gravitino-schema
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/apps/lakehouse/gravitino/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 20m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-bootstrap gravitino-bootstrap
+  namespace: flux-system
+spec:
+  targetNamespace: lakehouse
+  dependsOn:
+    - name: gravitino
+    - name: gravitino-warehouse
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-bootstrap
+  path: ./kubernetes/apps/lakehouse/gravitino/bootstrap
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 10m

@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: gravitino-db-user
+    namespace: lakehouse
+type: Opaque
+stringData:
+    username: ENC[AES256_GCM,data:uy426e6Lr7f1,iv:7d9dqvi9QmG1NDb2UTNX22HYq8XKhBcY2d5OmGE5DdQ=,tag:PeBVCV+WWjWaE84SXfK7ew==,type:str]
+    password: ENC[AES256_GCM,data:s2Bm34HD5GyOXY7PS2/z3fiFjKzuFOUx1EMaIoYTpqDc/FYFxRISEyZbCQJg4MJz,iv:RU0LMfGopNqGQY1FqK7aVmG4NdpTwS/k/IFmJER3OSc=,tag:7RNaqy52DovS1N4un6QniQ==,type:str]
+    postgresql-user: ENC[AES256_GCM,data:F7mMFYf9IKOu,iv:pPBcPeW4wOdY/1MbjNV7BxVj7rk3XX8etmb+5FsJEq8=,tag:Kszs9EuzQBUudQJ+TRWcbw==,type:str]
+    postgresql-password: ENC[AES256_GCM,data:crnC2aP40YTzf9MMyPmbI17aTv2LeR7nVmuTQY9DP2wSIn0z1RKhaNg8KRSJ1wB3,iv:1dkANjMS4qQhKR01IuplgxpT0gt/UsZTn3d4FRxbt9U=,tag:732Gv1mVSo+/2L8Wkxy4Sw==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBFemhRdUluMUFuN1p4bUxh
+            QURuNmFjLzFUSVNrbG4zVDFYa3hnYXB3RGhBCjkxdWpBZ1JwUUtPTVkvR1M4enlW
+            RVFhZVNWa2tmL21DMVJQZXF3dmd5Y3cKLS0tIGx1V3MxR1lCb0RSM3dzNDNvWUM5
+            Z0cyanhwVjFwblorQmFQb3FzcG93S0EKJFrSZkuCC78WT82pcXr3vvZZ+ll/gS36
+            xLEWrY7w0z+JxTTpErEqXOxageBwfhTDJxZT1RlXnMFH6mzDuZ/u/g==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-08T19:00:50Z"
+    mac: ENC[AES256_GCM,data:abXPNZOxiJlbKQ64BWln5jwmMrMPUccQFgNEf7nRwzMzchWKkTc5gUmBuIYWLlQ5MME6QB/ZYCjFwDdKbU9pEy8uQQY2QgzGy4UNmOuH3O6uYhODTj/pVGNIoOKsS4xUPcZe2BhNlKCF6L2BN26PHzLQYuDGypDoxgliMzyPEnE=,iv:DOWjMYGhszUroVWkpbWLU+TAFnw9ZKeAnfSKX+hEJIU=,tag:KYgKpPLQT7u1NBf6mIGp/g==,type:str]
+    version: 3.13.3

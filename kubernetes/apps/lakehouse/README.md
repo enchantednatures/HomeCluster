@@ -1,75 +1,100 @@
 # Lakehouse Stack
 
-Trino + Lakekeeper (Iceberg REST catalog) + CloudNative-PG + MinIO, deployed via Flux in the `lakehouse` namespace.
+Apache Gravitino (Iceberg REST catalog + REST API/UI) + CloudNative-PG + Rook-Ceph RGW, deployed via Flux in the `lakehouse` namespace.
 
 ## Components
 
 | Component | Source | Notes |
 |---|---|---|
-| Lakekeeper | Helm chart 0.12.0 (`lakekeeper` repo) | Iceberg REST catalog, k8s-SA auth enabled, authz backend `allowall` |
-| Lakekeeper DB | CNPG cluster `lakekeeper-db` | 1 instance, openebs-hostpath, barman backups to `minio-store` |
-| Bootstrap Job | `lakekeeper/bootstrap/` | Bootstraps server + creates warehouse `lakehouse` |
-| Trino | Helm chart 1.42.2 (`trino` repo) | Coordinator-only (`server.workers: 0`), iceberg REST catalog |
+| Apache Gravitino | Official OCI Helm chart `gravitino-helm` 1.3.11 (image `apache/gravitino:1.3.1`) | REST API + Web UI on 8090, auxiliary Iceberg REST service on 9001 |
+| Gravitino DB | CNPG cluster `gravitino-db` | 1 instance, PostgreSQL 16 (`ghcr.io/cloudnative-pg/postgresql:16.9-22`), storage class `ceph-nvme-block`, barman WAL/backups to `minio-store`, nightly `ScheduledBackup` at 03:00 |
+| Warehouse bucket | Rook-Ceph RGW bucket `lakehouse-warehouse` | Provisioned declaratively by ObjectBucketClaim `lakehouse-warehouse` (storage class `ceph-bucket-retain`); scoped credentials live in the OBC-generated Secret/ConfigMap of the same name |
+| Schema job | `gravitino-schema-v1` Job | Waits for the DB, creates schemas `gravitino` (entity store) and `lakehouse` (Iceberg JDBC catalog), applies the versioned DDL copied from `/opt/gravitino/scripts/postgresql/schema-<version>-postgresql.sql` |
+| Bootstrap job | `gravitino-bootstrap-v1` Job | Creates metalake `lakehouse` and catalog `lakehouse` (provider `lakehouse-iceberg`, JDBC backend, warehouse `s3://lakehouse-warehouse/`, S3 endpoint from the OBC ConfigMap) via the Gravitino REST API. Idempotent (GET-before-POST; tolerates 409) |
 
-## Manual MinIO bucket + user setup
+## Architecture
 
-The warehouse bucket and credentials are expected to exist in MinIO before the bootstrap Job runs. Using `mc` from any machine with MinIO admin access (endpoint `http://192.168.1.241:9768`):
+The auxiliary Iceberg REST service runs embedded in the Gravitino server (`auxService.names: iceberg-rest`) with `catalog-config-provider: dynamic-config-provider`, metalake `lakehouse`, and default catalog `lakehouse`. Catalogs created through the Gravitino API are auto-registered in the IRC and their S3 properties passed through, so no S3 config lives in the Helm values.
 
-```sh
-mc alias set home http://192.168.1.241:9768 <ROOT_USER> <ROOT_PASSWORD>
-mc mb home/lakehouse-warehouse
-# dedicated bucket-scoped user (hardening follow-up — current creds are the shared pg-backup-secret keys)
-mc admin user add home lakehouse-ro <random-password>
-mc admin policy attach home readwrite --user lakehouse-ro
+In-cluster endpoints:
+
+| Service | URL |
+|---|---|
+| Iceberg REST (IRC) | `http://gravitino.lakehouse.svc.cluster.local:9001/iceberg` |
+| Gravitino API/UI | `http://gravitino.lakehouse.svc.cluster.local:8090` |
+
+Tailscale ingresses expose both: `gravitino` (API/UI, 8090) and `gravitino-iceberg` (IRC, 9001).
+
+Postgres credentials are held in secret `gravitino-db-user` (SOPS-encrypted at `kubernetes/apps/lakehouse/gravitino/db/db-user.sops.yaml`) and consumed by the HelmRelease via `valuesFrom` with a `targetPath`. One caveat from the upstream chart: the JDBC password still materializes in the rendered ConfigMap `gravitino-gravitino-helm` in-cluster, because the chart has no Secret-reference support yet (apache/gravitino PR #11268). That's acceptable for the homelab and tracked upstream.
+
+Flux Kustomization dependency graph:
+
+```
+gravitino-db ──► gravitino-schema ──► gravitino (app)
+gravitino-warehouse ──► gravitino-bootstrap (depends on gravitino + gravitino-warehouse)
 ```
 
-Credentials are stored in `kubernetes/flux/vars/cluster-secrets.sops.yaml` as `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` and substituted into both the bootstrap Job and the Trino catalog properties at the Flux layer.
+## Security
 
-## Bootstrap re-run procedure
+Gravitino runs with the `simple` authenticator, which means anonymous access. Both the admin API/UI (the `gravitino` Tailscale host, 8090) and the Iceberg REST service (`gravitino-iceberg`, 9001) are reachable by any device on the tailnet. The tailnet is the trust boundary here: anyone on it can create and drop metalakes, catalogs, and tables.
 
-The bootstrap Job (`lakekeeper-bootstrap-v7`) is idempotent: it tolerates `400 CatalogAlreadyBootstrapped` on server bootstrap and `409` on warehouse creation.
+Before widening exposure beyond the tailnet, enable OAuth/OIDC on the Gravitino server (Authentik is already available in this cluster) and configure the Iceberg REST clients to match.
 
-To re-run:
+The Postgres JDBC password is stored SOPS-encrypted in git and injected via the HelmRelease `valuesFrom`, but the upstream chart still renders it into the ConfigMap (upstream PR #11268). Acceptable for a homelab, tracked upstream.
 
-1. Bump the Job name suffix in `kubernetes/apps/lakehouse/lakekeeper/bootstrap/job.yaml` (`lakekeeper-bootstrap-v7` → `v8`, etc.) — Jobs are immutable, a new name is required.
-2. Commit + push; Flux recreates the Job. (Deleting the old Job alone also works — Flux recreates it from git — but the name must still change if the spec changed.)
-3. Verify: `kubectl -n lakehouse get job lakekeeper-bootstrap-v8` → `Complete`.
+## Operations
 
-## Authentication wiring (Trino → Lakekeeper)
+### Bootstrap / schema re-run
 
-Lakekeeper runs with `LAKEKEEPER__ENABLE_KUBERNETES_AUTHENTICATION=true` (k8s ServiceAccount tokens validated via TokenReview; no audience requirement). Trino 480 supports only a static bearer token for the Iceberg REST catalog (`iceberg.rest-catalog.oauth2.token` — there is no token-file property).
+Jobs are immutable. To re-run either one, bump the `-v1` suffix in `gravitino/schema/job.yaml` or `gravitino/bootstrap/job.yaml`, commit, and push. Flux recreates the Job with the new name. Verify with `kubectl -n lakehouse get job`.
 
-Wiring:
+### Known upstream caveats
 
-1. A 1-year bound token for the `lakekeeper` ServiceAccount (the bootstrap admin) is stored SOPS-encrypted in `kubernetes/flux/vars/cluster-secrets.sops.yaml` as `LAKEKEEPER_SA_TOKEN`.
-2. `kubernetes/apps/lakehouse/trino/app/helmrelease.yaml` sets `iceberg.rest-catalog.security=OAUTH2` + `iceberg.rest-catalog.oauth2.token=${LAKEKEEPER_SA_TOKEN}` (token refresh disabled — Lakekeeper does not issue tokens).
+- No automatic schema initialization for an external Postgres (#9013 / #11099). Handled here by the schema Job.
+- The chart no longer touches the postgres schema when `postgresql.enabled=false`, which avoids a CNPG incompatibility (#11696).
+- Chart/image path changed in 1.3.0 (#11267). Do not run pre-1.3.0 images with this chart.
 
-**Token rotation (expires ~1 year after 2026-09-10):**
+### Durability and backups
 
-```sh
-kubectl -n lakehouse create token lakekeeper --duration=8760h
-# decrypt cluster-secrets.sops.yaml, replace LAKEKEEPER_SA_TOKEN, re-encrypt (make sops-encrypt), commit, push
-```
+Only the Gravitino entity-store Postgres is backed up: a nightly `ScheduledBackup` plus barman WAL to `minio-store`. Backups accumulate with no retention policy configured on the shared `minio-store` ObjectStore.
 
-Hardening follow-ups: dedicated Trino ServiceAccount + Lakekeeper permission grants instead of the admin SA; bucket-scoped MinIO user; MinIO STS enablement for vended credentials.
+The warehouse bucket `lakehouse-warehouse` (Iceberg data and metadata) has no backup or versioning. The `ceph-bucket-retain` storage class only prevents bucket deletion when the ObjectBucketClaim is removed; it is not data-loss protection. Accepted RPO for warehouse data is currently zero (no copy exists).
+
+OBC edge case: the bucket name is fixed and the storage class is Retain, so deleting and re-creating the ObjectBucketClaim can fail with "bucket already exists" until the retained bucket is manually removed or the claim is reconciled.
+
+### Migration note
+
+Lakekeeper, Trino, and the MinIO warehouse credentials were removed from this repo. Catalog metadata was NOT migrated (fresh start). The old MinIO bucket is left untouched; the new warehouse bucket is on Ceph RGW.
 
 ## Troubleshooting
 
-**Trino 401 MissingAuthorizationHeader on `/catalog/v1/config`** — Trino is not sending a bearer token. Check the live catalog config: `kubectl -n lakehouse get cm trino-catalog -o jsonpath='{.data.lakekeeper\.properties}'` must contain `oauth2.token=eyJ...`. If it shows `${LAKEKEEPER_SA_TOKEN}` unresolved, the key is missing from `cluster-secrets` or the token expired.
+**Helm chart won't pull the OCI chart.** Check the HelmRepository `gravitino` in `flux-system`:
 
-**Bootstrap migration race** — Lakekeeper runs DB migrations on startup; the bootstrap Job retries (checkDb + retries) until the server is ready. If the Job fails with connection errors, check `kubectl -n lakehouse logs deploy/lakekeeper` for migration progress and let Flux retry the Job.
+```sh
+flux -n flux-system get helmrepository gravitino
+```
 
-**MinIO STS unavailable** — `AssumeRole` returns `InvalidParameterValue` (STS disabled on this MinIO). Vended credentials are disabled (`vended-credentials-enabled=false`, `sts-enabled=false`); static access keys are used in the Trino catalog properties. If STS is enabled later, switch the warehouse storage profile and Trino to vended credentials.
+If it isn't Ready, the OCI URL or the chart tag is wrong; the URL points at `oci://registry-1.docker.io/apache` and Flux appends the chart name `gravitino-helm`.
 
-**ServiceEntry / ambient mesh** — `lakehouse` is Istio ambient (`istio.io/dataplane-mode: ambient`). The Kyverno policy `minio-serviceentry-replication` auto-creates the `minio-service-access` ServiceEntry; verify with `kubectl -n lakehouse get serviceentry`. The trino-coordinator pod is mesh-excluded (`istio.io/dataplane-mode: none` label) because the melusine ztunnel crash-loops on ambient kubelet probes.
+**Schema job failing or pending.** Check the Job logs and the DB cluster:
 
-**Rolling update stuck Pending** — the coordinator runs with node affinity to `work-0*`; a surge pod may fail scheduling while the old pod holds resources. Deleting the old pod (`kubectl -n lakehouse delete pod <old-coordinator>`) lets the rollout proceed.
+```sh
+kubectl -n lakehouse logs job/gravitino-schema-v1
+kubectl -n lakehouse get cluster gravitino-db
+```
+
+If the CNPG cluster isn't ready, the schema Job stays pending waiting for the database. Fix cluster readiness first, then bump the Job suffix to re-run.
 
 ## Verification one-liners
 
 ```sh
-flux get kustomizations -A | grep -E 'lakekeeper|trino'      # 4x Ready=True
-flux get helmreleases -A | grep -E 'lakekeeper|trino'        # 2x Ready=True
-kubectl -n lakehouse exec deploy/trino-coordinator -- trino --execute "SHOW CATALOGS"
-kubectl -n lakehouse exec deploy/trino-coordinator -- trino --execute "SELECT * FROM lakekeeper.canary.t"
+flux get kustomizations -A | grep gravitino         # 5x Ready=True
+flux get helmreleases -A | grep gravitino           # Ready=True
+kubectl -n lakehouse get objectbucketclaim lakehouse-warehouse
+kubectl -n lakehouse get job gravitino-schema-v1 gravitino-bootstrap-v1
+kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- http://gravitino.lakehouse.svc.cluster.local:8090/health/ready
+kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- -H 'Accept: application/vnd.gravitino.v1+json' http://gravitino.lakehouse.svc.cluster.local:8090/api/metalakes
+kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- -H 'Accept: application/vnd.gravitino.v1+json' http://gravitino.lakehouse.svc.cluster.local:8090/api/metalakes/lakehouse/catalogs
 ```
+
+Note: `exec` into the `gravitino` pod will usually fail because the image is a JDK image without `curl`. Use the Tailscale endpoint or the `kubectl run ... curlimages/curl` form above instead.

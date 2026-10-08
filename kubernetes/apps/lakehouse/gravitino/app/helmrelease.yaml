@@ -1,0 +1,101 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: gravitino
+  namespace: lakehouse
+spec:
+  driftDetection:
+    mode: enabled
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: gravitino-helm
+      version: 1.3.11 # datasource=helm depName=gravitino-helm repository=oci://registry-1.docker.io/apache
+      sourceRef:
+        kind: HelmRepository
+        name: gravitino
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  valuesFrom:
+    - kind: Secret
+      name: gravitino-db-user
+      valuesKey: postgresql-user
+      targetPath: entity.jdbcUser
+    - kind: Secret
+      name: gravitino-db-user
+      valuesKey: postgresql-password
+      targetPath: entity.jdbcPassword
+  values:
+    image:
+      tag: 1.3.1 # datasource=docker depName=apache/gravitino
+    mysql:
+      enabled: false
+    postgresql:
+      enabled: false
+    entity:
+      jdbcUrl: jdbc:postgresql://gravitino-db-rw.lakehouse.svc.cluster.local:5432/gravitino?currentSchema=gravitino
+      jdbcDriver: org.postgresql.Driver
+      maxConnections: "50"
+    auxService:
+      names: iceberg-rest
+    icebergRest:
+      catalogConfigProvider: dynamic-config-provider
+      dynamicConfigProvider:
+        metalake: lakehouse
+        defaultCatalogName: lakehouse
+    service:
+      type: ClusterIP
+      port: 8090
+      targetPort: 8090
+    extraExposePorts:
+      - port: 9001
+        protocol: TCP
+        name: http1
+        targetPort: 9001
+    replicas: 1
+    podLabels:
+      istio.io/dataplane-mode: none
+    readinessProbe:
+      httpGet:
+        path: /health/ready
+        port: http
+      initialDelaySeconds: 30
+      timeoutSeconds: 5
+    livenessProbe:
+      httpGet:
+        path: /health/live
+        port: http
+      initialDelaySeconds: 30
+      timeoutSeconds: 5
+    podSecurityContext:
+      runAsNonRoot: true
+      fsGroup: 1000
+    resources:
+      requests:
+        cpu: 250m
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 3Gi
+    initResources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+    env:
+      - name: GRAVITINO_MEM
+        value: "-Xms1g -Xmx1g -XX:MaxMetaspaceSize=512m"

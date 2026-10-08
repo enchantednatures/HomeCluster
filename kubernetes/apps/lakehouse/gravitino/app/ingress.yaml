@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/ingress_v1.json
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app gravitino-tailscale
+  namespace: lakehouse
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+  annotations:
+    tailscale.com/hostname: gravitino
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: gravitino
+      port:
+        number: 8090
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app-iceberg gravitino-iceberg-tailscale
+  namespace: lakehouse
+  labels:
+    app.kubernetes.io/name: *app-iceberg
+    app.kubernetes.io/instance: *app-iceberg
+  annotations:
+    tailscale.com/hostname: gravitino-iceberg
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: gravitino
+      port:
+        number: 9001

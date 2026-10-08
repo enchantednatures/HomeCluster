@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: gravitino-db-superuser
+    namespace: lakehouse
+type: Opaque
+stringData:
+    username: ENC[AES256_GCM,data:A6yOodF5bPI=,iv:a6BPmjS0S1QqfDuwGU+p6WLfh/zKIomtBfyu1WYSCQM=,tag:pc/5SjCj85s3ak3rcfg8Lw==,type:str]
+    password: ENC[AES256_GCM,data:i10NBRkfqO4TYqhjsjZrI51Cb/c5NP63yMvu4MKUS8iCJsENIqSskt9A9eaiEDIU,iv:1uSux3gMZnH2j0ANkEWj+4s7ukr8tTPtnPvHJqN/IFk=,tag:9H1OGm46YA1ESaRmTlSbKg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBKYXlVb1RpZ212SWZQQWNG
+            T0JENTVqZmhMK2JNZmZRZVVHd3VrT2dIU3lNClhPNWtBNjNkN1h2aEFMaEczUElT
+            WXgvNUxPWHZxUmRBZ3pnY3JuMXhJOTQKLS0tIHlXcGVaVU15VzlIOEZ4REdlazFq
+            YkkwVHRsRUY4Z1JZU3c5bFhTMW1pN1EKo0BmyOMGDF5mRzw0cuBwb52FyglnW1Qy
+            bAaXUg0YmswDD8a2GYQqFOLaRJMGSJp1ub7LTa363HzKkvkOKkSLZQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-08T19:00:50Z"
+    mac: ENC[AES256_GCM,data:cWbaV1kay0biZz+KyyMNgPsnBajmbQq4meoKPVI9B3VMIi6cSa0swQb3fs/zfQ2esNDzeJFujjuFxQIEYNFDZs9SoDSOpcpy1YSwSTIZV0vlj9OD8SAETWXyfKkP3lFtI+d51bL9+PUD7qtCUdNUMQqC3kA3Xo4vxhGCIyP76OI=,iv:S3VxF6iG1kFaxxFF2sFr1zAIg2MTydAnaNxrS0oe+88=,tag:YPUcqK2AMSzK1tA9kEurpg==,type:str]
+    version: 3.13.3

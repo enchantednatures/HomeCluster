@@ -3,11 +3,11 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: lakekeeper-db-backup
+  name: gravitino-db-backup
   namespace: lakehouse
 spec:
   cluster:
-    name: lakekeeper-db
+    name: gravitino-db
   schedule: "0 3 * * *"
   backupOwnerReference: self
   method: plugin
@@ -15,4 +15,4 @@ spec:
     name: barman-cloud.cloudnative-pg.io
     parameters:
       barmanObjectName: minio-store
-      serverName: lakekeeper
+      serverName: gravitino-v1
