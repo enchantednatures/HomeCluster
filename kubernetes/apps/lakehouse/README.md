@@ -10,7 +10,7 @@ Apache Gravitino (Iceberg REST catalog + REST API/UI) + CloudNative-PG + Rook-Ce
 | Gravitino DB | CNPG cluster `gravitino-db` | 1 instance, PostgreSQL 16 (`ghcr.io/cloudnative-pg/postgresql:16.9-22`), storage class `ceph-nvme-block`, barman WAL/backups to `minio-store`, nightly `ScheduledBackup` at 03:00 |
 | Warehouse bucket | Rook-Ceph RGW bucket `lakehouse-warehouse` | Provisioned declaratively by ObjectBucketClaim `lakehouse-warehouse` (storage class `ceph-bucket-retain`); scoped credentials live in the OBC-generated Secret/ConfigMap of the same name |
 | Schema job | `gravitino-schema-v1` Job | Waits for the DB, creates schemas `gravitino` (entity store) and `lakehouse` (Iceberg JDBC catalog), applies the versioned DDL copied from `/opt/gravitino/scripts/postgresql/schema-<version>-postgresql.sql` |
-| Bootstrap job | `gravitino-bootstrap-v1` Job | Creates metalake `lakehouse` and catalog `lakehouse` (provider `lakehouse-iceberg`, JDBC backend, warehouse `s3://lakehouse-warehouse/`, S3 endpoint from the OBC ConfigMap) via the Gravitino REST API. Idempotent (GET-before-POST; tolerates 409) |
+| Bootstrap job | `gravitino-bootstrap-v2` Job | Creates metalake `lakehouse` and catalog `lakehouse` (provider `lakehouse-iceberg`, JDBC backend, warehouse `s3://lakehouse-warehouse/`, S3 endpoint from the OBC ConfigMap) via the Gravitino REST API. Idempotent (GET-before-POST; tolerates 409) |
 
 ## Architecture
 
@@ -91,7 +91,7 @@ If the CNPG cluster isn't ready, the schema Job stays pending waiting for the da
 flux get kustomizations -A | grep gravitino         # 5x Ready=True
 flux get helmreleases -A | grep gravitino           # Ready=True
 kubectl -n lakehouse get objectbucketclaim lakehouse-warehouse
-kubectl -n lakehouse get job gravitino-schema-v1 gravitino-bootstrap-v1
+kubectl -n lakehouse get job gravitino-schema-v1 gravitino-bootstrap-v2
 kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- http://gravitino.lakehouse.svc.cluster.local:8090/health/ready
 kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- -H 'Accept: application/vnd.gravitino.v1+json' http://gravitino.lakehouse.svc.cluster.local:8090/api/metalakes
 kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- -H 'Accept: application/vnd.gravitino.v1+json' http://gravitino.lakehouse.svc.cluster.local:8090/api/metalakes/lakehouse/catalogs

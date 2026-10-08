@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app gravitino-bootstrap-v1
+  name: &app gravitino-bootstrap-v2
   namespace: lakehouse
 spec:
   backoffLimit: 6
