@@ -27,7 +27,7 @@ spec:
       serviceAccountName: rook-ceph-default
       containers:
         - name: ceph-crash-hygiene
-          image: rook/ceph:v1.21.0 # datasource=docker depName=rook/ceph
+          image: rook/ceph:v1.20.7 # pinned: completed one-shot Job; image bumps fail immutable spec.template - to re-run, add a new versioned Job
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
