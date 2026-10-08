@@ -72,6 +72,11 @@ spec:
       enableCSIHostNetwork: false  # Talos doesn't support hostNetwork for CSI
       kubeletDirPath: /var/lib/kubelet
       logLevel: 1
+      # Pin the cephcsi plugin image: v3.18.1 requires x86-64-v3 and crashes on
+      # melusine/unraid-worker (older CPUs); v3.17.1 is the last known-good image.
+      cephcsi:
+        repository: quay.io/cephcsi/cephcsi
+        tag: v3.17.1
 
       # CSI plugin tolerations
       pluginTolerations:
