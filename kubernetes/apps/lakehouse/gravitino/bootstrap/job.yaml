@@ -142,6 +142,8 @@ spec:
                   key: postgresql-password
           securityContext:
             runAsNonRoot: true
+            runAsUser: 100
+            runAsGroup: 101
           resources:
             requests:
               cpu: 50m
