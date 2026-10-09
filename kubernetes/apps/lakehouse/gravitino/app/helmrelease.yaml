@@ -49,7 +49,7 @@ spec:
         clientId: gravitino
         authority: https://auth.${SECRET_DOMAIN}/application/o/gravitino/
         scope: "openid profile email"
-        jwksUri: http://authentik-server.authentik.svc.cluster.local/application/o/gravitino/jwks/
+        jwksUri: file:///etc/gravitino/jwks/jwks.json
         tokenPath: ""
         tokenValidatorClass: org.apache.gravitino.server.authentication.JwksTokenValidator
         serviceAudience: gravitino
@@ -65,6 +65,14 @@ spec:
       jdbcUrl: jdbc:postgresql://gravitino-db-rw.lakehouse.svc.cluster.local:5432/gravitino?currentSchema=gravitino
       jdbcDriver: org.postgresql.Driver
       maxConnections: "50"
+    extraVolumes:
+      - name: gravitino-jwks
+        secret:
+          secretName: gravitino-jwks
+    extraVolumeMounts:
+      - name: gravitino-jwks
+        mountPath: /etc/gravitino/jwks
+        readOnly: true
     auxService:
       names: iceberg-rest
     icebergRest:
