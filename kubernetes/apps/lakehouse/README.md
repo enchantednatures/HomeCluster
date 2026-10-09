@@ -27,6 +27,8 @@ Tailscale ingresses expose both: `gravitino` (API/UI, 8090) and `gravitino-icebe
 
 Postgres credentials are held in secret `gravitino-db-user` (SOPS-encrypted at `kubernetes/apps/lakehouse/gravitino/db/db-user.sops.yaml`) and consumed by the HelmRelease via `valuesFrom` with a `targetPath`. One caveat from the upstream chart: the JDBC password still materializes in the rendered ConfigMap `gravitino-gravitino-helm` in-cluster, because the chart has no Secret-reference support yet (apache/gravitino PR #11268). That's acceptable for the homelab and tracked upstream.
 
+The server fetches JWKS and the bootstrap Job fetches tokens via the in-cluster service URL (`http://authentik-server.authentik.svc.cluster.local/...`), because the split-DNS internal HTTPS path for `auth.${SECRET_DOMAIN}` currently serves an expired certificate; the public `authority` is still used for the browser flow and issuer validation.
+
 Flux Kustomization dependency graph:
 
 ```
@@ -54,7 +56,7 @@ Jobs are immutable. To re-run either one, bump its version suffix (`-v1` in `gra
 
 Gravitino 1.3.1 treats metalakes created before authorization was enabled as ownerless, so authorization is rolled out in two phases:
 
-1. **Phase 1 (current).** `additionalConfigItems` sets `gravitino.authorization.impl` to `org.gravitino.server.authorization.PassThroughAuthorizer`, which does not enforce authorization. The bootstrap Job creates the `akadmin` and `gravitino-service` users, the `Gravitino Admins` group, and assigns that group as the metalake owner, so ownership is recorded while requests are still permitted.
+1. **Phase 1 (current).** `additionalConfigItems` sets `gravitino.authorization.impl` to `org.apache.gravitino.server.authorization.PassThroughAuthorizer`, which does not enforce authorization. The bootstrap Job creates the `akadmin` and `gravitino-service` users, the `Gravitino Admins` group, and assigns that group as the metalake owner, so ownership is recorded while requests are still permitted.
 2. **Phase 2 (enforce).** Once ownership is in place, remove the `additionalConfigItems` block from `kubernetes/apps/lakehouse/gravitino/app/helmrelease.yaml` so Gravitino falls back to its default authorizer and starts enforcing. Bump the bootstrap Job `-vN` suffix if the migration needs replaying.
 
 The service account's app-password lives in the SOPS-encrypted Secret `gravitino-oidc` in the `lakehouse` namespace; the same value is embedded in the Authentik blueprint `blueprint-gravitino.sops.yaml` (token `gravitino-service-token`).
@@ -110,7 +112,11 @@ The API now requires a bearer token. Fetch a machine-to-machine token with the `
 
 ```sh
 APP_PASSWORD="$(kubectl -n lakehouse get secret gravitino-oidc -o jsonpath='{.data.app-password}' | base64 -d)"
-TOKEN="$(curl -sS -X POST 'https://auth.${SECRET_DOMAIN}/application/o/token/' \
+# Run from inside the cluster: the public token endpoint is currently affected by an
+# Authentik token-issuance latency that can exceed the Cloudflare tunnel timeout (504).
+TOKEN="$(curl -sS -X POST 'http://authentik-server.authentik.svc.cluster.local/application/o/token/' \
+  -H 'Host: auth.${SECRET_DOMAIN}' \
+  -H 'X-Forwarded-Proto: https' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   --data-urlencode 'grant_type=client_credentials' \
   --data-urlencode 'client_id=gravitino' \

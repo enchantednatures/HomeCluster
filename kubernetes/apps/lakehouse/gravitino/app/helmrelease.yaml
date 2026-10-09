@@ -51,7 +51,7 @@ spec:
         clientId: gravitino
         authority: https://auth.${SECRET_DOMAIN}/application/o/gravitino/
         scope: "openid profile email"
-        jwksUri: https://auth.${SECRET_DOMAIN}/application/o/gravitino/jwks/
+        jwksUri: http://authentik-server.authentik.svc.cluster.local/application/o/gravitino/jwks/
         tokenPath: ""
         tokenValidatorClass: org.apache.gravitino.server.authentication.JwksTokenValidator
         serviceAudience: gravitino

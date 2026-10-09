@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app gravitino-bootstrap-v3
+  name: &app gravitino-bootstrap-v4
   namespace: lakehouse
 spec:
   backoffLimit: 6
@@ -56,6 +56,8 @@ spec:
                 fi
                 RESP="$(curl -sS -X POST "$${OIDC_TOKEN_URL}" \
                   -H 'Content-Type: application/x-www-form-urlencoded' \
+                  -H 'Host: auth.${SECRET_DOMAIN}' \
+                  -H 'X-Forwarded-Proto: https' \
                   --data-urlencode 'grant_type=client_credentials' \
                   --data-urlencode "client_id=$${OIDC_CLIENT_ID}" \
                   --data-urlencode "username=$${OIDC_USERNAME}" \
@@ -282,7 +284,7 @@ spec:
                   name: gravitino-db-user
                   key: postgresql-password
             - name: OIDC_TOKEN_URL
-              value: https://auth.${SECRET_DOMAIN}/application/o/token/
+              value: http://authentik-server.authentik.svc.cluster.local/application/o/token/
             - name: OIDC_CLIENT_ID
               value: gravitino
             - name: OIDC_USERNAME
