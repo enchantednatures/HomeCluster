@@ -44,7 +44,7 @@ spec:
       enable: true
       serviceAdmins: "akadmin,gravitino-service"
     additionalConfigItems:
-      gravitino.authorization.impl: org.gravitino.server.authorization.PassThroughAuthorizer
+      gravitino.authorization.impl: org.apache.gravitino.server.authorization.PassThroughAuthorizer
     authenticator:
       oauth:
         provider: oidc
