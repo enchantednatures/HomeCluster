@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: gravitino-oidc
+    namespace: lakehouse
+type: Opaque
+stringData:
+    app-password: ENC[AES256_GCM,data:pm6GmKWXb8Dd+GQlhuerLgpwjRQS1m7J/3NIzzz0I7DI3VmspQbpL56wq15Hiv9V,iv:DFt+AXPSCuwdl+TYDHyrQY9UNmz84I5G/dJ4/zylwO8=,tag:FWwkPWyZCGB9s7yc1RC5CQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBQcEJ6M0ZlQXo1c2I3Mllu
+            Y2xwQWp5alZ1cFk2c0FjanJuSllsV3ZJOGlNCmZDeUJ3TlFFeW9hM1RpaVdkUFJ6
+            bmg0ZFlOZmF5d242b2YvNUtFMDkrNW8KLS0tIGN3ZnlvdkhleUdLR2VaUjB1SExp
+            V0xrVXdmdFpydmlSbzFWL2dLa3ZIdmsKIFLt3fnn9n9v2jYAzZ34knO4fYu6VwSG
+            gnoVjzbziHrB4AM9csODlfT0SRyhPB5GUljGZY9T2YE2/So5Nspm7A==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-08T21:12:17Z"
+    mac: ENC[AES256_GCM,data:tuUNHEMqjRXKQkKKWXIc0vaTRP6l+IxYts5EMlsYupReizIJPZTUMebBLIHd1Nbx+iws1GdIQ2uQgsT9qijdhnsoErv5mbgvxAYFgvWr8gIo2G0m6bbT3bxkKseml9Jq2+yeEflQlg9dBpP6KbzMWM7UfBL/xkt/FaS1dzJvtqM=,iv:tO5mD1IPdJf7Ac6bBct1xam8aBmynupEKjT9Puw16pk=,tag:sSclvenOODoNumL/FGQ9Fg==,type:str]
+    version: 3.13.3

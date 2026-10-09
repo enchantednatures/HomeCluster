@@ -96,6 +96,7 @@ spec:
   dependsOn:
     - name: gravitino
     - name: gravitino-warehouse
+    - name: authentik
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app-bootstrap
@@ -107,4 +108,4 @@ spec:
   wait: true
   interval: 30m
   retryInterval: 1m
-  timeout: 10m
+  timeout: 20m

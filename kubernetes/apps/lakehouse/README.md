@@ -10,7 +10,7 @@ Apache Gravitino (Iceberg REST catalog + REST API/UI) + CloudNative-PG + Rook-Ce
 | Gravitino DB | CNPG cluster `gravitino-db` | 1 instance, PostgreSQL 16 (`ghcr.io/cloudnative-pg/postgresql:16.9-22`), storage class `ceph-nvme-block`, barman WAL/backups to `minio-store`, nightly `ScheduledBackup` at 03:00 |
 | Warehouse bucket | Rook-Ceph RGW bucket `lakehouse-warehouse` | Provisioned declaratively by ObjectBucketClaim `lakehouse-warehouse` (storage class `ceph-bucket-retain`); scoped credentials live in the OBC-generated Secret/ConfigMap of the same name |
 | Schema job | `gravitino-schema-v1` Job | Waits for the DB, creates schemas `gravitino` (entity store) and `lakehouse` (Iceberg JDBC catalog), applies the versioned DDL copied from `/opt/gravitino/scripts/postgresql/schema-<version>-postgresql.sql` |
-| Bootstrap job | `gravitino-bootstrap-v2` Job | Creates metalake `lakehouse` and catalog `lakehouse` (provider `lakehouse-iceberg`, JDBC backend, warehouse `s3://lakehouse-warehouse/`, S3 endpoint from the OBC ConfigMap) via the Gravitino REST API. Idempotent (GET-before-POST; tolerates 409) |
+| Bootstrap job | `gravitino-bootstrap-v3` Job | Authenticates to Gravitino via Authentik OIDC, then performs the phase-1 RBAC migration (creates users `akadmin`/`gravitino-service`, group `Gravitino Admins`, and assigns the group as metalake owner) and creates metalake `lakehouse` and catalog `lakehouse` (provider `lakehouse-iceberg`, JDBC backend, warehouse `s3://lakehouse-warehouse/`, S3 endpoint from the OBC ConfigMap) via the Gravitino REST API. Idempotent (GET-before-POST; tolerates 409) |
 
 ## Architecture
 
@@ -36,9 +36,11 @@ gravitino-warehouse ──► gravitino-bootstrap (depends on gravitino + gravit
 
 ## Security
 
-Gravitino runs with the `simple` authenticator, which means anonymous access. Both the admin API/UI (the `gravitino` Tailscale host, 8090) and the Iceberg REST service (`gravitino-iceberg`, 9001) are reachable by any device on the tailnet. The tailnet is the trust boundary here: anyone on it can create and drop metalakes, catalogs, and tables.
+Gravitino authenticates via Authentik OIDC (issuer `https://auth.${SECRET_DOMAIN}/application/o/gravitino/`, provider `gravitino`, public client). The web UI (the `gravitino` Tailscale host, 8090) redirects to Authentik for login; service-to-service callers use the OAuth2 client credentials grant with the `gravitino-service` service account's app-password. Anonymous access is disabled.
 
-Before widening exposure beyond the tailnet, enable OAuth/OIDC on the Gravitino server (Authentik is already available in this cluster) and configure the Iceberg REST clients to match.
+RBAC (`authorization.enable: true`) is active with service admins `akadmin,gravitino-service`. The `Gravitino Admins` group owns the metalake and is the group used to grant access. See Operations for the two-phase migration the bootstrap Job performs.
+
+The Tailscale hosts still front both services: `gravitino` (API/UI, 8090) and `gravitino-iceberg` (IRC, 9001). OIDC protects the Gravitino server, so the trust boundary is now Authentik rather than the tailnet.
 
 The Postgres JDBC password is stored SOPS-encrypted in git and injected via the HelmRelease `valuesFrom`, but the upstream chart still renders it into the ConfigMap (upstream PR #11268). Acceptable for a homelab, tracked upstream.
 
@@ -46,7 +48,16 @@ The Postgres JDBC password is stored SOPS-encrypted in git and injected via the 
 
 ### Bootstrap / schema re-run
 
-Jobs are immutable. To re-run either one, bump the `-v1` suffix in `gravitino/schema/job.yaml` or `gravitino/bootstrap/job.yaml`, commit, and push. Flux recreates the Job with the new name. Verify with `kubectl -n lakehouse get job`.
+Jobs are immutable. To re-run either one, bump its version suffix (`-v1` in `gravitino/schema/job.yaml`, `-v3` in `gravitino/bootstrap/job.yaml`), commit, and push. Flux recreates the Job with the new name. Verify with `kubectl -n lakehouse get job`.
+
+### RBAC migration (two phases)
+
+Gravitino 1.3.1 treats metalakes created before authorization was enabled as ownerless, so authorization is rolled out in two phases:
+
+1. **Phase 1 (current).** `additionalConfigItems` sets `gravitino.authorization.impl` to `org.gravitino.server.authorization.PassThroughAuthorizer`, which does not enforce authorization. The bootstrap Job creates the `akadmin` and `gravitino-service` users, the `Gravitino Admins` group, and assigns that group as the metalake owner, so ownership is recorded while requests are still permitted.
+2. **Phase 2 (enforce).** Once ownership is in place, remove the `additionalConfigItems` block from `kubernetes/apps/lakehouse/gravitino/app/helmrelease.yaml` so Gravitino falls back to its default authorizer and starts enforcing. Bump the bootstrap Job `-vN` suffix if the migration needs replaying.
+
+The service account's app-password lives in the SOPS-encrypted Secret `gravitino-oidc` in the `lakehouse` namespace; the same value is embedded in the Authentik blueprint `blueprint-gravitino.sops.yaml` (token `gravitino-service-token`).
 
 ### Known upstream caveats
 
@@ -91,10 +102,30 @@ If the CNPG cluster isn't ready, the schema Job stays pending waiting for the da
 flux get kustomizations -A | grep gravitino         # 5x Ready=True
 flux get helmreleases -A | grep gravitino           # Ready=True
 kubectl -n lakehouse get objectbucketclaim lakehouse-warehouse
-kubectl -n lakehouse get job gravitino-schema-v1 gravitino-bootstrap-v2
+kubectl -n lakehouse get job gravitino-schema-v1 gravitino-bootstrap-v3
 kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- http://gravitino.lakehouse.svc.cluster.local:8090/health/ready
-kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- -H 'Accept: application/vnd.gravitino.v1+json' http://gravitino.lakehouse.svc.cluster.local:8090/api/metalakes
-kubectl run curl --rm -it --image=curlimages/curl:8.22.0 -n lakehouse -- -H 'Accept: application/vnd.gravitino.v1+json' http://gravitino.lakehouse.svc.cluster.local:8090/api/metalakes/lakehouse/catalogs
 ```
+
+The API now requires a bearer token. Fetch a machine-to-machine token with the `gravitino-service` service account; the app-password lives in the `gravitino-oidc` Secret:
+
+```sh
+APP_PASSWORD="$(kubectl -n lakehouse get secret gravitino-oidc -o jsonpath='{.data.app-password}' | base64 -d)"
+TOKEN="$(curl -sS -X POST 'https://auth.${SECRET_DOMAIN}/application/o/token/' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode 'grant_type=client_credentials' \
+  --data-urlencode 'client_id=gravitino' \
+  --data-urlencode 'username=gravitino-service' \
+  --data-urlencode "password=$APP_PASSWORD" \
+  --data-urlencode 'scope=openid profile email' | sed -nE 's/.*"access_token"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p')"
+```
+
+Then call the API with it:
+
+```sh
+curl -sS -H 'Accept: application/vnd.gravitino.v1+json' -H "Authorization: Bearer $TOKEN" https://lakehouse-gravitino-tailscale-ingress.rya-bebop.ts.net/api/metalakes
+curl -sS -H 'Accept: application/vnd.gravitino.v1+json' -H "Authorization: Bearer $TOKEN" https://lakehouse-gravitino-tailscale-ingress.rya-bebop.ts.net/api/metalakes/lakehouse/catalogs
+```
+
+The Iceberg REST service is OIDC-protected too, so the IRC clients (Spark, PyIceberg, etc.) need OAuth2 client credentials configured against the `gravitino` provider (`client_id` `gravitino`, username `gravitino-service`, app-password from the `gravitino-oidc` Secret) to obtain tokens for `https://lakehouse-gravitino-iceberg-tailscale-ingress.rya-bebop.ts.net/iceberg`.
 
 Note: `exec` into the `gravitino` pod will usually fail because the image is a JDK image without `curl`. Use the Tailscale endpoint or the `kubectl run ... curlimages/curl` form above instead.

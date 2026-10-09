@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: &app gravitino-bootstrap-v2
+  name: &app gravitino-bootstrap-v3
   namespace: lakehouse
 spec:
   backoffLimit: 6
@@ -44,15 +44,41 @@ spec:
                 sleep 5
               done
 
-              ACCEPT='Accept: application/vnd.gravitino.v1+json'
+              TOKEN=""
+              RESP=""
+              i=0
+              until [ -n "$${TOKEN}" ]; do
+                i=$((i + 1))
+                if [ "$i" -gt 60 ]; then
+                  echo "failed to obtain OIDC token after 5m" >&2
+                  echo "last token response: $(printf '%s' "$${RESP}" | cut -c1-500)" >&2
+                  exit 1
+                fi
+                RESP="$(curl -sS -X POST "$${OIDC_TOKEN_URL}" \
+                  -H 'Content-Type: application/x-www-form-urlencoded' \
+                  --data-urlencode 'grant_type=client_credentials' \
+                  --data-urlencode "client_id=$${OIDC_CLIENT_ID}" \
+                  --data-urlencode "username=$${OIDC_USERNAME}" \
+                  --data-urlencode "password=$${OIDC_APP_PASSWORD}" \
+                  --data-urlencode 'scope=openid profile email' || true)"
+                TOKEN="$(printf '%s' "$${RESP}" | sed -nE 's/.*"access_token"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p')"
+                if [ -z "$${TOKEN}" ]; then
+                  sleep 5
+                fi
+              done
+              echo "obtained OIDC access token"
 
-              curl -fsS -H "$${ACCEPT}" "$${API}/api/metalakes" -o /tmp/metalakes.json
+              ACCEPT='Accept: application/vnd.gravitino.v1+json'
+              AUTH="Authorization: Bearer $${TOKEN}"
+
+              curl -fsS -H "$${ACCEPT}" -H "$${AUTH}" "$${API}/api/metalakes" -o /tmp/metalakes.json
               if grep -q 'lakehouse' /tmp/metalakes.json; then
                 echo "metalake lakehouse already exists"
               else
                 HTTP_CODE="$(curl -sS -o /tmp/metalake-resp.json -w '%{http_code}' \
                   -X POST \
                   -H "$${ACCEPT}" \
+                  -H "$${AUTH}" \
                   -H 'Content-Type: application/json' \
                   --data '{"name":"lakehouse","comment":"HomeCluster lakehouse metalake","properties":{}}' \
                   "$${API}/api/metalakes")"
@@ -76,7 +102,121 @@ spec:
                 esac
               fi
 
-              curl -fsS -H "$${ACCEPT}" "$${API}/api/metalakes/lakehouse/catalogs" -o /tmp/catalogs.json
+              for NAME in akadmin gravitino-service; do
+                curl -fsS -H "$${ACCEPT}" -H "$${AUTH}" "$${API}/api/metalakes/lakehouse/users" -o /tmp/users.json
+                if grep -q "$${NAME}" /tmp/users.json; then
+                  echo "user $${NAME} already exists"
+                  continue
+                fi
+                HTTP_CODE="$(curl -sS -o /tmp/user-resp.json -w '%{http_code}' \
+                  -X POST \
+                  -H "$${ACCEPT}" \
+                  -H "$${AUTH}" \
+                  -H 'Content-Type: application/json' \
+                  --data "{\"name\":\"$${NAME}\"}" \
+                  "$${API}/api/metalakes/lakehouse/users")"
+                echo "user $${NAME} create status: $${HTTP_CODE}"
+                case "$${HTTP_CODE}" in
+                  200|201)
+                    if ! grep -Eq '"code"[[:space:]]*:[[:space:]]*0' /tmp/user-resp.json; then
+                      echo "user $${NAME} creation returned a non-zero code" >&2
+                      cat /tmp/user-resp.json >&2
+                      exit 1
+                    fi
+                    ;;
+                  409)
+                    echo "user $${NAME} already exists"
+                    ;;
+                  *)
+                    echo "user $${NAME} creation failed" >&2
+                    cat /tmp/user-resp.json >&2
+                    exit 1
+                    ;;
+                esac
+              done
+
+              curl -fsS -H "$${ACCEPT}" -H "$${AUTH}" "$${API}/api/metalakes/lakehouse/groups" -o /tmp/groups.json
+              if grep -q 'Gravitino Admins' /tmp/groups.json; then
+                echo "group Gravitino Admins already exists"
+              else
+                HTTP_CODE="$(curl -sS -o /tmp/group-resp.json -w '%{http_code}' \
+                  -X POST \
+                  -H "$${ACCEPT}" \
+                  -H "$${AUTH}" \
+                  -H 'Content-Type: application/json' \
+                  --data '{"name":"Gravitino Admins"}' \
+                  "$${API}/api/metalakes/lakehouse/groups")"
+                echo "group create status: $${HTTP_CODE}"
+                case "$${HTTP_CODE}" in
+                  200|201)
+                    if ! grep -Eq '"code"[[:space:]]*:[[:space:]]*0' /tmp/group-resp.json; then
+                      echo "group creation returned a non-zero code" >&2
+                      cat /tmp/group-resp.json >&2
+                      exit 1
+                    fi
+                    ;;
+                  409)
+                    echo "group already exists"
+                    ;;
+                  *)
+                    echo "group creation failed" >&2
+                    cat /tmp/group-resp.json >&2
+                    exit 1
+                    ;;
+                esac
+              fi
+
+              OWNER_SET=""
+              OWNER_CODE="$(curl -sS -o /tmp/owners.json -w '%{http_code}' \
+                -H "$${ACCEPT}" \
+                -H "$${AUTH}" \
+                "$${API}/api/metalakes/lakehouse/owners/metalake/lakehouse")"
+              echo "owner query status: $${OWNER_CODE}"
+              case "$${OWNER_CODE}" in
+                200)
+                  if grep -q 'Gravitino Admins' /tmp/owners.json; then
+                    echo "metalake owner Gravitino Admins already set"
+                    OWNER_SET=1
+                  fi
+                  ;;
+                404)
+                  echo "metalake has no owner yet"
+                  ;;
+                *)
+                  echo "owner query failed" >&2
+                  cat /tmp/owners.json >&2
+                  exit 1
+                  ;;
+              esac
+              if [ -z "$${OWNER_SET}" ]; then
+                HTTP_CODE="$(curl -sS -o /tmp/owner-resp.json -w '%{http_code}' \
+                  -X PUT \
+                  -H "$${ACCEPT}" \
+                  -H "$${AUTH}" \
+                  -H 'Content-Type: application/json' \
+                  --data '{"name":"Gravitino Admins","type":"GROUP"}' \
+                  "$${API}/api/metalakes/lakehouse/owners/metalake/lakehouse")"
+                echo "owner set status: $${HTTP_CODE}"
+                case "$${HTTP_CODE}" in
+                  200|201)
+                    if ! grep -Eq '"code"[[:space:]]*:[[:space:]]*0' /tmp/owner-resp.json; then
+                      echo "owner assignment returned a non-zero code" >&2
+                      cat /tmp/owner-resp.json >&2
+                      exit 1
+                    fi
+                    ;;
+                  409)
+                    echo "owner already set"
+                    ;;
+                  *)
+                    echo "owner assignment failed" >&2
+                    cat /tmp/owner-resp.json >&2
+                    exit 1
+                    ;;
+                esac
+              fi
+
+              curl -fsS -H "$${ACCEPT}" -H "$${AUTH}" "$${API}/api/metalakes/lakehouse/catalogs" -o /tmp/catalogs.json
               if grep -q 'lakehouse' /tmp/catalogs.json; then
                 echo "catalog lakehouse already exists"
                 exit 0
@@ -108,6 +248,7 @@ spec:
               HTTP_CODE="$(curl -sS -o /tmp/catalog-resp.json -w '%{http_code}' \
                 -X POST \
                 -H "$${ACCEPT}" \
+                -H "$${AUTH}" \
                 -H 'Content-Type: application/json' \
                 --data @/tmp/catalog.json \
                 "$${API}/api/metalakes/lakehouse/catalogs")"
@@ -140,6 +281,17 @@ spec:
                 secretKeyRef:
                   name: gravitino-db-user
                   key: postgresql-password
+            - name: OIDC_TOKEN_URL
+              value: https://auth.${SECRET_DOMAIN}/application/o/token/
+            - name: OIDC_CLIENT_ID
+              value: gravitino
+            - name: OIDC_USERNAME
+              value: gravitino-service
+            - name: OIDC_APP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gravitino-oidc
+                  key: app-password
           securityContext:
             runAsNonRoot: true
             runAsUser: 100

@@ -39,6 +39,24 @@ spec:
       valuesKey: postgresql-password
       targetPath: entity.jdbcPassword
   values:
+    authenticators: oauth
+    authorization:
+      enable: true
+      serviceAdmins: "akadmin,gravitino-service"
+    additionalConfigItems:
+      gravitino.authorization.impl: org.gravitino.server.authorization.PassThroughAuthorizer
+    authenticator:
+      oauth:
+        provider: oidc
+        clientId: gravitino
+        authority: https://auth.${SECRET_DOMAIN}/application/o/gravitino/
+        scope: "openid profile email"
+        jwksUri: https://auth.${SECRET_DOMAIN}/application/o/gravitino/jwks/
+        tokenPath: ""
+        tokenValidatorClass: org.apache.gravitino.server.authentication.JwksTokenValidator
+        serviceAudience: gravitino
+        principalFields: "preferred_username,sub"
+        groupsFields: "groups"
     image:
       tag: 1.3.1 # datasource=docker depName=apache/gravitino
     mysql:

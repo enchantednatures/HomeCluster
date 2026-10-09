@@ -10,3 +10,4 @@ resources:
   - ./virtualservice-outpost.yaml
   - ./outpost-serviceentry.yaml
   - ./blueprint-netboot.yaml
+  - ./blueprint-gravitino.sops.yaml
