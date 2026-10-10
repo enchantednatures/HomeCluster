@@ -5,4 +5,3 @@ kind: Kustomization
 resources:
   - ./virtualservice.yaml
   - ./auth-policy.yaml
-  - ./request-authentication.yaml

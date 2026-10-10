@@ -6,5 +6,4 @@ resources:
   - ./ingressgateway.yaml
   - ./auth-policy.yaml
   - ./certificate.yaml
-  - ./request-authentication.yaml
   - ./gateway.yaml
