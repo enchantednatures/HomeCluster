@@ -13,7 +13,19 @@ resources:
   # - https://raw.githubusercontent.com/knative-extensions/monitoring/main/config/eventing-kafka-monitors.yaml
   # - https://github.com/knative/eventing/releases/download/knative-v1.16.1/eventing-core.yaml
   # - https://github.com/knative-extensions/eventing-istio/releases/download/knative-v1.16.0/eventing-istio.yaml
-# Enables eventing-kafka KEDA autoscaling CLUSTER-WIDE (all KafkaSources/Triggers/Subscriptions); bounds come from config-kafka-autoscaler. Disable per cluster by reverting this file.
+# eventing-kafka data-plane hardening + autoscaler de-fanging (D4 F1+F2).
+#
+# CLUSTER-WIDE effect: these patches apply to every KafkaSource / Trigger / Subscription
+# on the broker, in every namespace, because the two ConfigMaps are global:
+#   * config-kafka-source-data-plane -> consumer socket/session timeout budgets
+#     (request/default.api 2000->30000ms, session 10000->45000ms,
+#      heartbeat 3000->10000ms). Slower failure detection: brief node/network blips
+#     no longer abort the coordinator handshake or fence group members mid-rebalance.
+#   * config-kafka-autoscaler -> KEDA bounds for all KEDA-autoscaled consumers:
+#     cooldown-period 30->300, polling-interval 10->30, lag-threshold 100->300,
+#     class=keda.autoscaling.knative.dev, max-scale=16, min-scale=0. This damps the
+#     scale-down churn that repeatedly aborted in-flight rebalances.
+# Disable per cluster by reverting this file (opt-out).
 patches:
   - target:
       version: v1
@@ -28,6 +40,19 @@ patches:
         namespace: knative-eventing
       data:
         controller-autoscaler-keda: enabled
+  # Full replacement of the consumer properties value. JSON6902 (replace) is used
+  # instead of a strategic-merge block scalar because kustomize strips a trailing
+  # newline from strategic-merge data values; this keeps the value byte-identical
+  # to the pre-change ConfigMap apart from the four timeout lines.
+  - target:
+      version: v1
+      kind: ConfigMap
+      name: config-kafka-source-data-plane
+      namespace: knative-eventing
+    patch: |-
+      - op: replace
+        path: /data/config-kafka-source-consumer.properties
+        value: "cloudevent.invalid.transformer.enabled=true\ncloudevent.invalid.kind.plural=kafkasources\nkey.deserializer=org.apache.kafka.common.serialization.StringDeserializer\nvalue.deserializer=io.cloudevents.kafka.CloudEventDeserializer\nfetch.min.bytes=1\nheartbeat.interval.ms=10000\nmax.partition.fetch.bytes=65536\nsession.timeout.ms=45000\n# ssl.key.password=\n# ssl.keystore.location=\n# ssl.keystore.password=\n# ssl.truststore.location=\n# ssl.truststore.password=\nallow.auto.create.topics=true\nauto.offset.reset=earliest\nclient.dns.lookup=use_all_dns_ips\nconnections.max.idle.ms=540000\ndefault.api.timeout.ms=30000\nenable.auto.commit=false\nexclude.internal.topics=true\nfetch.max.bytes=52428800\nisolation.level=read_committed\nmax.poll.interval.ms=300000\nmax.poll.records=50\npartition.assignment.strategy=org.apache.kafka.clients.consumer.StickyAssignor\nreceive.buffer.bytes=65536\nrequest.timeout.ms=30000\n# sasl.client.callback.handler.class=\n# sasl.jaas.config=\n# sasl.kerberos.service.name=\n# sasl.login.callback.handler.class\n# sasl.login.class\n# sasl.mechanism\nsecurity.protocol=PLAINTEXT\nsend.buffer.bytes=131072\n# ssl.enabled.protocols=\n# ssl.keystore.type=\n# ssl.protocol=\n# ssl.provider=\nauto.commit.interval.ms=5000\ncheck.crcs=true\n# client.rack=\nfetch.max.wait.ms=500\n# interceptor.classes=\nmetadata.max.age.ms=600000\n# metrics.reporters=\n# metrics.num.samples=\n# metrics.recording.level=INFO\n# metrics.sample.window.ms=\nreconnect.backoff.max.ms=1000\nretry.backoff.ms=100\n# sasl.kerberos.kinit.cmd=\n# sasl.kerberos.min.time.before.relogin=\n# sasl.kerberos.ticket.renew.jitter=\n# sasl.login.refresh.buffer.seconds=\n# sasl.login.refresh.min.period.seconds=\n# sasl.login.refresh.window.factor\n# sasl.login.refresh.window.jitter\n# security.providers\n# ssl.cipher.suites\n# ssl.endpoint.identification.algorithm\n# ssl.keymanager.algorithm\n# ssl.secure.random.implementation\n# ssl.trustmanager.algorithm\n"
   - target:
       version: v1
       kind: ConfigMap
@@ -40,4 +65,9 @@ patches:
         name: config-kafka-autoscaler
         namespace: knative-eventing
       data:
+        class: keda.autoscaling.knative.dev
+        cooldown-period: "300"
+        lag-threshold: "300"
         max-scale: "16"
+        min-scale: "0"
+        polling-interval: "30"
