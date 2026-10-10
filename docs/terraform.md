@@ -5,7 +5,6 @@
 - [Overview](#overview)
 - [Terraform Architecture](#terraform-architecture)
 - [Authentik Configuration](#authentik-configuration)
-- [Harbor Configuration](#harbor-configuration)
 - [Provider Configuration](#provider-configuration)
 - [Resource Management](#resource-management)
 - [Security Considerations](#security-considerations)
@@ -13,11 +12,10 @@
 
 ## Overview
 
-This repository uses **OpenTofu** (a Terraform‑compatible tool) to provision and manage external infrastructure components that integrate with the Kubernetes cluster. The primary focus is on configuring identity providers, container registries, and other external services that support the cluster ecosystem.
+This repository uses **OpenTofu** (a Terraform‑compatible tool) to provision and manage external infrastructure components that integrate with the Kubernetes cluster. The primary focus is on configuring identity providers and other external services that support the cluster ecosystem.
 
 **Key Components**:
 - **Authentik**: Identity and access management configuration
-- **Harbor**: Container registry setup and integration
 - **Provider Configurations**: External service integrations
 
 ## Terraform Architecture
@@ -30,13 +28,6 @@ graph TB
             GROUPS[User Groups]
             PROVIDERS[OAuth Providers]
             APPLICATIONS[Applications]
-        end
-
-        subgraph "Container Registry"
-            HARBOR[Harbor Configuration]
-            PROJECTS[Harbor Projects]
-            USERS[Harbor Users]
-            POLICIES[Security Policies]
         end
 
         subgraph "External Integrations"
@@ -52,10 +43,6 @@ graph TB
     PROVIDERS --> GRAFANA_OAUTH
     PROVIDERS --> MINIO_OAUTH
     PROVIDERS --> FORWARD_AUTH
-
-    HARBOR --> PROJECTS
-    HARBOR --> USERS
-    HARBOR --> POLICIES
 ```
 
 ## Authentik Configuration
@@ -182,29 +169,6 @@ resource "authentik_outpost" "istio_forward_auth" {
 }
 ```
 
-## Harbor Configuration
-
-### Directory Structure
-```
-provision/terraform/harbor/
-└── providers.tf      # Harbor provider configuration
-```
-
-### Harbor Integration
-Harbor serves as the enterprise container registry with:
-
-**Features**:
-- **Image Scanning**: Vulnerability assessment
-- **Access Control**: Role-based permissions
-- **Replication**: Multi-registry synchronization
-- **Webhook Integration**: CI/CD pipeline triggers
-
-**Integration Points**:
-- **Authentik SSO**: Single sign-on authentication
-- **Kubernetes**: Image pull secrets
-- **CI/CD Pipelines**: Automated image builds
-- **Security Scanning**: Automated vulnerability checks
-
 ## Provider Configuration
 
 ### Authentik Provider
@@ -223,26 +187,6 @@ terraform {
 provider "authentik" {
   url   = var.authentik_url
   token = var.authentik_token
-}
-```
-
-### Harbor Provider
-**File**: `harbor/providers.tf`
-
-```hcl
-terraform {
-  required_providers {
-    harbor = {
-      source  = "goharbor/harbor"
-      version = "~> 3.10.0"
-    }
-  }
-}
-
-provider "harbor" {
-  url      = var.harbor_url
-  username = var.harbor_username
-  password = var.harbor_password
 }
 ```
 

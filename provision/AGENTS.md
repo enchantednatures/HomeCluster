@@ -19,7 +19,6 @@ provision/
 | Task | Location |
 |------|----------|
 | Add Authentik app | `terraform/authentik/<app>.tf` |
-| Harbor provider | `terraform/harbor/` |
 
 ## Conventions
 
