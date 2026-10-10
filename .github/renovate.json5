@@ -66,6 +66,16 @@
   packageRules: [
     {
       description: [
+        'Freeze images in completed Rook one-shot Job manifests: Job spec.template is immutable, so an image bump makes server-side apply fail ("field is immutable") and blocks the rook-ceph-cluster Kustomization plus all dependents. To re-run one, add a new versioned Job file - the ceph-*-job.yaml glob freezes it automatically.',
+      ],
+      matchFileNames: [
+        'kubernetes/operators/rook-ceph/cluster/app/ceph-*-job.yaml',
+        'kubernetes/operators/rook-ceph/cluster/app/ceph-endstate-verify.yaml',
+      ],
+      enabled: false,
+    },
+    {
+      description: [
         'Auto merge Github Actions',
       ],
       matchManagers: [
