@@ -3,3 +3,4 @@
 resources:
   - ./github-auth-secret.sops.yaml
   - ./helmrelease.yaml
+  - ./porygon-runner.yaml
