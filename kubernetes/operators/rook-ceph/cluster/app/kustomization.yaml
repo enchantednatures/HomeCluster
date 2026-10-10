@@ -11,6 +11,7 @@ resources:
   - ./rbd-stash-repair.yaml
   - ./ceph-toolbox.yaml  # Standalone Deployment - no CephToolbox CRD required
   - ./ceph-discovery-job.yaml
+  - ./ceph-crash-archive-job.yaml  # one-shot Job split from ceph-crash-hygiene.yaml so Renovate only manages the CronJob file
   - ./ceph-crash-hygiene.yaml
   - ./ceph-reclass-job.yaml
   - ./ceph-rehome-ssd-job.yaml
