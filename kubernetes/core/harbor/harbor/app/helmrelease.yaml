@@ -129,6 +129,11 @@ spec:
         password: harbor_registry_password
       middleware:
         enabled: false
+      # Return relative Location headers on blob uploads. The registry sits
+      # behind a TLS-terminating chain (Cloudflare tunnel -> envoy -> nginx)
+      # that reaches it over plain HTTP, so absolute Location headers would be
+      # generated with http:// and break docker push ("unknown blob").
+      relativeurls: true
     chartmuseum:
       enabled: true
       replicas: 1
