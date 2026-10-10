@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/objectbucket.io/v1alpha1/objectbucketclaim.json
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: &app thanos
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/part-of: thanos
+spec:
+  bucketName: thanos
+  storageClassName: ceph-bucket-retain

@@ -17,6 +17,8 @@ spec:
       app.kubernetes.io/component: store
   template:
     metadata:
+      annotations:
+        reloader.stakater.com/auto: "true"
       labels:
         app.kubernetes.io/name: thanos
         app.kubernetes.io/component: store

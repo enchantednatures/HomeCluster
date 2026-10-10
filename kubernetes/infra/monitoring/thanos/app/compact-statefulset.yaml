@@ -18,6 +18,8 @@ spec:
       app.kubernetes.io/component: compact
   template:
     metadata:
+      annotations:
+        reloader.stakater.com/auto: "true"
       labels:
         app.kubernetes.io/name: thanos
         app.kubernetes.io/component: compact
