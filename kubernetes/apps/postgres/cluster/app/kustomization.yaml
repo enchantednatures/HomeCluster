@@ -14,3 +14,5 @@ resources:
   - superusersecret.sops.yaml
   - db-hunter.sops.yaml
   - spanner-db-user.sops.yaml
+  - ./minio-sync.yaml
+  - ./rclone-config.sops.yaml

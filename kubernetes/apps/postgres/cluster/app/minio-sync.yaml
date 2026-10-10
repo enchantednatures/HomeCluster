@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ceph-to-r2
+  namespace: postgres
+spec:
+  schedule: "*/15 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: rclone
+              image: rclone/rclone:latest
+              args:
+                - sync
+                - minio:cloudnative-pg
+                - rustfs:cloudnative-pg
+                - --config=/config/rclone.conf
+                - --transfers=16
+                - --checksum
+                - --fast-list
+              volumeMounts:
+                - name: config
+                  mountPath: /config
+          volumes:
+            - name: config
+              secret:
+                secretName: rclone-config

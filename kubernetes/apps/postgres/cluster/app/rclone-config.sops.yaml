@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: rclone-config
+    namespace: postgres
+stringData:
+    rclone.conf: ENC[AES256_GCM,data:K2Ht+4FCTNXIIi6+lgOUdqTfmksv4tSKurMNpyNW6W5ki4w2VjhVZoK0ZcxFxxENFUvZOqnrzXxM1k0WF2CENihp+9dv3D+AWhz0iADs9mPCqj9M7Dg1v5uioHAqD6OrbPXE47tbHHA7P9DFQdEJs1yQziAjvnjhsDJGNn6Sa+4s4mnQ9yi/JV3enjVTYOWzfEroupCrQtQzDdi6v8BOUdtGS75kszClBuNYPIpLgonIgozy7s+lg8sgdCEWkn1ll3jvyrojfRoyuERmw2mRZs/bOspRemA3Z3uqr3jmMjMxoX8DQ3s6nUYf3qPl2e+fvansxtevrL7Mr4nZw42e28KqYmmeaS//ft2SIQdXwBT3fYxWJpdTLa07jGA/mZ5Cvy9ktjO76g4sdnxoidvFM81lvftLk72ZQqVPLuioKX17Rhrvg/EiaDifkNNBvL06cNLExm7WYyWJuZvmIUA0neW8k7iUA/bhSHWy4rYm3rWSyFustwwOS7sXXhll6bikE/E6CDs8bo2+e8hsbrEZ/0aaPMzviplXEZOr89wfd7hLkGvK2AaUEgC9KfAJfwFvjNXJIq9Qg9dnI4Jid8yK42/0FzHp1cEGt8i+0/zh,iv:za/trx1nuU8/+K+oRN1fsq2lwmExPklIv+UtGfWllls=,tag:iNkHL9MV4m57lXv18vICng==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCdThjYTFXL2FGYWV1UFA0
+            bHAwVnpmRGdRWERzUlpwRlUwNDhXWm9paFQ4CjBQR1UxVS9LZndSM0VXblViUVUy
+            a1hUWGpQS1JiWFRSVnJsRFlUU1VkSzQKLS0tIHZqRi9ud3ZhTDhCMm9VTHlHMmw4
+            ck8reTZKeWpnOWRrOUh3TlRESFk4bmcK4R//iAOFiatizU5FioBXl1fmZRhc6Dy3
+            wkZw836pVNR1RGQf1BtG8K09befOlsjXDfSLrJO0jO3M9dQiGijTXA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-10T18:47:56Z"
+    mac: ENC[AES256_GCM,data:9za8/hpil7Hyhk7CaVoffUEM4twauBAlpy15xkmsaLYKPf3MhhGcWda5vKkSdCiL/sWnz/m91PGk+n7XIC2dCI/NQmayNjyE3nztCLJ/7rNE4Dzo/zsjKRJtyCGTAFT03N9GsocvRq7uMZCJw/w6UzhttH+yLzwic71x7g6H8Wk=,iv:yOw5LMqvyethmvJE8wVT043zCLiu4+O9/eqR7t4UbtE=,tag:eXcODbeMOO4vjiMANBI6wQ==,type:str]
+    version: 3.13.3
