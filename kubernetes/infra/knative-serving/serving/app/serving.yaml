@@ -28,7 +28,9 @@ spec:
     istio:
       # Points to your custom Istio gateway service in istio-ingress namespace
       gateway.knative-serving.knative-ingress-gateway: "istio-ingressgateway.istio-ingress.svc.cluster.local"
-      local-gateway.knative-serving.cluster-local-gateway: "knative-local-gateway.knative-serving.svc.cluster.local"
+      # Service lives in istio-ingress so its selector can match the gateway pods
+      # (cross-namespace selectors never match); name must match the Gateway CR.
+      local-gateway.knative-serving.knative-local-gateway: "knative-local-gateway.istio-ingress.svc.cluster.local"
     features:
       queueproxy.resource-defaults: "enabled"
     autoscaler:
