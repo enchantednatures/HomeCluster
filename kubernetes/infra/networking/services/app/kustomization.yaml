@@ -7,3 +7,6 @@ resources:
   - ./minio-service.service.yaml
   - ./pve.service.yaml
   - ./minio-service.endpoints.yaml
+  - ./rustfs-service.endpoints.yaml
+  - ./rustfs-service.service.yaml
+  - ./rustfs-ui.service.yaml

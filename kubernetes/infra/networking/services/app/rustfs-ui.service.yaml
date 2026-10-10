@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/service.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustfs-ui
+  namespace: networking
+spec:
+  type: ExternalName
+  ports:
+    - port: 9001
+  externalName: 192.168.1.241

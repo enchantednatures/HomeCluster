@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/service.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rustfs-service
+  namespace: networking
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
