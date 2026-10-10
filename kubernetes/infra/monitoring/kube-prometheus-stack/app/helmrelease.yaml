@@ -168,6 +168,12 @@ spec:
         retentionSize: 8GB
         replicas: 2
         disableCompaction: true
+        resources:
+          requests:
+            cpu: 200m
+            memory: 1Gi
+          limits:
+            memory: 4Gi
         affinity:
           nodeAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
