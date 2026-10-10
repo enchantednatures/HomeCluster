@@ -3,17 +3,17 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: authentik-blueprint-porygon-console
+  name: authentik-blueprint-istio-forward-auth
   namespace: authentik
   labels:
     authentik_blueprint: "true"
 data:
-  porygon-console.yaml: |
+  istio-forward-auth.yaml: |
     ---
     # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
     version: 1
     metadata:
-      name: porygon-console
+      name: istio-forward-auth
       labels:
         blueprints.goauthentik.io/instantiate: "true"
     entries:
@@ -38,8 +38,29 @@ data:
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, porygon-console-proxy-provider]]
           launch_url: https://porygon-console.${SECRET_DOMAIN}
 
+      - model: authentik_providers_proxy.proxyprovider
+        state: present
+        identifiers:
+          name: tekton-dashboard-proxy-provider
+        attrs:
+          name: tekton-dashboard-proxy-provider
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+          mode: forward_single
+          external_host: https://tekton.${SECRET_DOMAIN}
+
+      - model: authentik_core.application
+        state: present
+        identifiers:
+          slug: tekton-dashboard
+        attrs:
+          name: Tekton Dashboard
+          slug: tekton-dashboard
+          provider: !Find [authentik_providers_proxy.proxyprovider, [name, tekton-dashboard-proxy-provider]]
+          launch_url: https://tekton.${SECRET_DOMAIN}
+
       # Shared istio forward-auth outpost. This blueprint owns the outpost
-      # declaration (kept self-contained so the provider above resolves in the
+      # declaration (kept self-contained so the providers above resolve in the
       # same transaction); every provider app served by it must stay listed.
       - model: authentik_outposts.outpost
         state: present
@@ -52,6 +73,7 @@ data:
           providers:
             - !Find [authentik_providers_proxy.proxyprovider, [name, netboot-proxy-provider]]
             - !Find [authentik_providers_proxy.proxyprovider, [name, porygon-console-proxy-provider]]
+            - !Find [authentik_providers_proxy.proxyprovider, [name, tekton-dashboard-proxy-provider]]
           config:
             authentik_host: https://auth.${SECRET_DOMAIN}/
             authentik_host_insecure: true

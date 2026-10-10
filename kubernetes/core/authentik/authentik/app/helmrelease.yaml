@@ -143,7 +143,7 @@ spec:
     blueprints:
       configMaps:
         - authentik-blueprint-netboot-forward-auth
-        - authentik-blueprint-porygon-console
+        - authentik-blueprint-istio-forward-auth
       secrets:
         - authentik-blueprint-gravitino
       # Trust proxy headers for HTTPS detection

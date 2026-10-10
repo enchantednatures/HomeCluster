@@ -11,6 +11,16 @@ spec:
   gateways:
     - istio-ingress/external-gateway
   http:
+    # authentik forward-auth endpoints/static assets on the app host must reach
+    # the outpost directly; the gateway ext_authz check handles the rest.
+    - match:
+        - uri:
+            prefix: /outpost.goauthentik.io
+      route:
+        - destination:
+            host: ak-outpost-istio-forward-auth.authentik.svc.cluster.local
+            port:
+              number: 9000
     - match:
         - uri:
             prefix: /
