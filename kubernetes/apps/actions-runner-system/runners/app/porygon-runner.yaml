@@ -54,6 +54,11 @@ spec:
       namespace: actions-runner-system
     template:
       spec:
+        # actions-runner image runs as uid 1001; the work PVC must be
+        # group-writable or the runner cannot create /home/runner/_work/_tool.
+        securityContext:
+          fsGroup: 1001
+          fsGroupChangePolicy: OnRootMismatch
         containers:
           - name: runner
             image: ghcr.io/actions/actions-runner:2.338.0
