@@ -20,16 +20,10 @@ resources:
   - ./storage-classes-enhanced.yaml
   - ./ceph-filesystem.yaml
   - ./ceph-object-store.yaml
-  - ./ceph-objectstore-ssd.yaml
-  - ./ceph-objectstore-nvme.yaml
   # - ./virtual-service.yaml  # Temporarily disabled due to Istio validation issues
   # - ./istio-config-enhanced.yaml  # Temporarily disabled due to schema issues
   - ./ceph-object-store-secret.sops.yaml
-  - ./harbor-rgw-keys.sops.yaml
-  - ./kellnr-rgw-keys.sops.yaml
   - ./ceph-objectstore-admin-user.yaml
-  - ./ceph-objectstore-user-harbor.yaml
-  - ./ceph-objectstore-user-kellnr.yaml
   - ./grafana-dashboard-configmap.yaml
   - ./ceph-dashboard-grafana.yaml
   # - ./network-policies-enhanced.yaml  # Temporarily disabled due to port range validation
