@@ -13,21 +13,3 @@ spec:
         protocol: HTTP
       hosts:
         - "*"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: knative-local-gateway
-  namespace: istio-ingress
-  labels:
-    app.kubernetes.io/name: knative-local-gateway
-    serving.knative.dev/release: devel
-spec:
-  type: ClusterIP
-  ports:
-    - name: http2
-      port: 80
-      targetPort: 8081
-      protocol: TCP
-  selector:
-    istio: gateway
