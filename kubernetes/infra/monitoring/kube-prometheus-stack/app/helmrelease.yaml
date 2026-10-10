@@ -183,7 +183,7 @@ spec:
               storageClassName: ceph-block
               resources:
                 requests:
-                  storage: 10Gi
+                  storage: 20Gi
         tolerations:
           - effect: NoSchedule
             key: node-role.kubernetes.io/control-plane
