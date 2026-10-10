@@ -8,5 +8,6 @@ resources:
   - ./dragonfly.yaml
   - ./harbor-postgres.sops.yaml
   - ./harbor-rgw-credentials.sops.yaml
+  - ./harbor-oidc.sops.yaml
   - ./object-bucket-claim.yaml
   - ./virtualservice.yaml

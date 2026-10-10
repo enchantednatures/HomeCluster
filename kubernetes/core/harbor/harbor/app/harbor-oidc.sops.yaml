@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: harbor-oidc
+    namespace: harbor
+type: Opaque
+stringData:
+    client-id: ENC[AES256_GCM,data:GrIBXQpC,iv:tB0HJW+K/BJVfdDoqLXtSXHckoxccW1QazM6lb4mXbM=,tag:GWnVctJ61LKI7kdmzsro1Q==,type:str]
+    client-secret: ENC[AES256_GCM,data:atxfeP017oxg/UaxNy03pf+iINiMKlABrnF5tFXeFk3DkRu48Me81qnMlmmLHYo1q+ivyj7pUPqqzcPy3d+YEQ8ptidXLHh6QHvKu8T8jG4BwdGwQBEUtnDREg94HB+D7rD3dkumnvrwgF2W4nIDmo9Le+WEJxpjGgkLfsjB51w=,iv:aVpW4IuWaEIIXaegBGVrd076fy7mKaTBQGkXhMPaTPY=,tag:41UtIQwF1+50p7JSnq5eHA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBJM0I1bzdWajNUYkhJR2c0
+            T0QvU3A2K2VxeEJMK0VTczA0bHF3Um5KSWc0Cjlzd2VGU2ZSa2dNTGozdU8wKzdL
+            azYvU0FjOW1hVnlqa3BEVGpyQWdDMVkKLS0tIGdPSklsRG5HV3BHT25LbHdaQ2lC
+            TGpRbituZ3JNTkpHeFhIUVZVTWExLzQK2Axyilka+I9qcq+9YVcj5CQD5ljodfUj
+            57BYXd5ZhOqdE6Spl/qQAGpUr/44n5O9DxiZ/nQWCwfrebL+EXeQlw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-10T17:09:36Z"
+    mac: ENC[AES256_GCM,data:66B5coP40B4bncxw4+qndV+oGSA6gp4qq3LwQzKTZfGorUc71OnXV+qSSZvSGayyyhayDgX2059prxu/LA89WplGitpGRV/9EhkuNs6V3n+Uf1aSTHk2V+LwlNkpoFDagIlfB9lU/0aATXPNETuDNotOjOftmwx8vSrQEIKt0Hg=,iv:ybnBHpaPLT26HB9LkfKSyWUydWlwYybapq50SZ04qB8=,tag:QLhQI1cKth8uv7c4kNwH8g==,type:str]
+    version: 3.13.3
