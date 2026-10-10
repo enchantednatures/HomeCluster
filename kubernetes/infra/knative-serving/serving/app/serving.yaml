@@ -20,7 +20,9 @@ spec:
           istio: gateway
   config:
     network:
-      ingress-class: "istio" # Matches your IngressClass name
+      # Must be net-istio's exact class name; the shorthand "istio" makes its
+      # Ingress annotation filter reject every object (nothing reconciles).
+      ingress-class: "istio.ingress.networking.knative.dev"
     logging:
       loglevel.controller: "info"
       loglevel.autoscaler: "info"
