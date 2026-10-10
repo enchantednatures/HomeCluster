@@ -41,3 +41,4 @@ patches:
         namespace: knative-eventing
       data:
         max-scale: "16"
+        min-scale: "1"
