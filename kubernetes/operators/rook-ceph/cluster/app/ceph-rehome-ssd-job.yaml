@@ -44,7 +44,7 @@ spec:
       serviceAccountName: rook-ceph-default
       containers:
         - name: ceph-rehome-ssd
-          image: rook/ceph:v1.21.0 # pinned: one-shot Job; image bumps fail immutable spec.template
+          image: rook/ceph:v1.20.7 # pinned: completed one-shot Job; reverted to the image actually run (v1.20.7); image bumps fail immutable spec.template
           imagePullPolicy: IfNotPresent
           command:
             - /bin/bash
