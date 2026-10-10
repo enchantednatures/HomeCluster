@@ -13,7 +13,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: rclone
-              image: rclone/rclone:latest
+              image: rclone/rclone:sha-4f19e9c
               args:
                 - sync
                 - minio:cloudnative-pg
