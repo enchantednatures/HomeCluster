@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/objectbucket.io/v1alpha1/objectbucketclaim.json
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: kellnr-crates
+  namespace: kellnr
+  labels:
+    app.kubernetes.io/name: kellnr
+    app.kubernetes.io/part-of: kellnr
+spec:
+  bucketName: kellnr-crates
+  storageClassName: ceph-bucket-nvme-retain
+  additionalConfig:
+    bucketOwner: kellnr
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: kellnr-cratesio
+  namespace: kellnr
+  labels:
+    app.kubernetes.io/name: kellnr
+    app.kubernetes.io/part-of: kellnr
+spec:
+  bucketName: kellnr-cratesio
+  storageClassName: ceph-bucket-nvme-retain
+  additionalConfig:
+    bucketOwner: kellnr
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: kellnr-toolchain
+  namespace: kellnr
+  labels:
+    app.kubernetes.io/name: kellnr
+    app.kubernetes.io/part-of: kellnr
+spec:
+  bucketName: kellnr-toolchain
+  storageClassName: ceph-bucket-nvme-retain
+  additionalConfig:
+    bucketOwner: kellnr

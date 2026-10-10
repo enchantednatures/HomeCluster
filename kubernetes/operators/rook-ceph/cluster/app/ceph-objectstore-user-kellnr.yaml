@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  name: kellnr
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: kellnr
+    app.kubernetes.io/instance: ceph-objectstore-nvme
+    app.kubernetes.io/component: object-storage
+spec:
+  store: ceph-objectstore-nvme
+  displayName: "Kellnr registry user"
+  keys:
+    - accessKeyRef:
+        name: kellnr-rgw-keys
+        key: access-key
+      secretKeyRef:
+        name: kellnr-rgw-keys
+        key: secret-key

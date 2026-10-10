@@ -9,6 +9,7 @@ spec:
   targetNamespace: kellnr
   dependsOn:
     - name: kellnr-db
+    - name: rook-ceph-cluster
   commonMetadata:
     labels:
       app.kubernetes.io/name: *app

@@ -44,6 +44,7 @@ spec:
     pspEnable: false
     rbacEnable: true
     logLevel: INFO
+    obcAllowAdditionalConfigFields: "maxObjects,maxSize,bucketOwner"
 
     # Keep unreferenced CRUSH rules. Rook's CleanupUnusedCrushRules (runs after
     # mgr startup) deletes rules not referenced by a pool, which would remove

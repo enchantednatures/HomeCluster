@@ -15,3 +15,4 @@ resources:
   - ./set-dns-ndots.yaml
   - ./serviceentry-rbac.yaml
   - ./cnpg-dragonfly-rbac.yaml
+  - ./obc-bucket-owner-guardrail.yaml

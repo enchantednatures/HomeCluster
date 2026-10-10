@@ -74,7 +74,7 @@ spec:
           key: password
       s3:
         enabled: true
-        endpoint: http://minio-service.networking.svc.cluster.local:9768
+        endpoint: http://rook-ceph-rgw-ceph-objectstore-nvme.rook-ceph.svc.cluster.local:80
         region: us-east-1
         allowHttp: true
         crates_bucket: kellnr-crates

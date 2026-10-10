@@ -9,3 +9,4 @@ resources:
   - ./kellnr-admin-secret.sops.yaml
   - ./kellnr-oauth2-secret.sops.yaml
   - ./virtualservice.yaml
+  - ./object-bucket-claims.yaml

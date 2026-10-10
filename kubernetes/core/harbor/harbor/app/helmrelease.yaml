@@ -85,13 +85,13 @@ spec:
       # trivy:
       #   size: 5Gi
       imageChartStorage:
-        disableredirect: false
+        disableredirect: true
         type: s3
         s3:
-          existingSecret: harbor-minio-credentials
+          existingSecret: harbor-rgw-credentials
           region: us-east-1
           bucket: harbor-registry
-          regionendpoint: http://192.168.1.241:9768
+          regionendpoint: http://rook-ceph-rgw-ceph-objectstore-ssd.rook-ceph.svc.cluster.local:80
           forcepathstyle: true
           v4auth: true
     harborAdminPassword: Harbor12345

@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/validatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: restrict-obc-bucket-owner
+  annotations:
+    policies.kyverno.io/title: Restrict OBC Bucket Owner
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: ObjectBucketClaim
+    policies.kyverno.io/description: >-
+      The Rook operator's ROOK_OBC_ALLOW_ADDITIONAL_CONFIG_FIELDS setting is
+      globally extended with bucketOwner so Git-managed ObjectBucketClaims in the
+      harbor and kellnr namespaces can reuse pre-created Ceph users. Without this
+      guardrail any principal able to create an ObjectBucketClaim could request
+      another user's credentials or re-link an existing bucket. This policy denies
+      spec.additionalConfig.bucketOwner in every namespace except harbor and kellnr.
+spec:
+  failurePolicy: Ignore
+  validationActions:
+    - Deny
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - objectbucket.io
+        apiVersions:
+          - v1alpha1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - objectbucketclaims
+  validations:
+    - message: "OBC additionalConfig.bucketOwner is restricted to the harbor and kellnr namespaces"
+      expression: >-
+        !has(object.spec.additionalConfig) ||
+        !('bucketOwner' in object.spec.additionalConfig) ||
+        object.metadata.namespace in ['harbor', 'kellnr']

@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: kellnr-rgw-keys
+    namespace: rook-ceph
+type: Opaque
+stringData:
+    access-key: ENC[AES256_GCM,data:iwRw5YeEANaLAqPAYbaPfB9rPlM=,iv:mtMoRPBTi9HKVCMUCLSyvZgik3GQDLbR0u6FmlE3WgM=,tag:S+Oa+Q2GRNNDpO9rY5/wGA==,type:str]
+    secret-key: ENC[AES256_GCM,data:L0beJU7eYGFSv8PgCzGJejEd0uc=,iv:b9UttQewLV2P80EWyNQPLrVlGCITQ2y1/Q2ANwb8A3g=,tag:rcL9oBsK0ltoCnSYJk9gTg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBodDUzY2JtYTczWjB4dDJx
+            SkhNNG5KeWUxTklRVUg1YUR5bXB2ZXdRS0dFCktZRTRSSWZhTUhZKytLM25iN0w2
+            bUlxekRzbXRVbXJ6VGlteVpLdi9aVUEKLS0tIG9lMDNhcVA0VC94dEhtZ0MxSTZx
+            Sm15RmpLQ0pYbitiNytzTjNvOTZ5RFkKUHyDYCVnDf9ZeLPfzWGnK8qwyByM/bqh
+            bpKlhuRQnH2Na71Y72MOIW4MDsof8dzf90UJJK81LkYKRbIlr9bOig==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-10T15:39:24Z"
+    mac: ENC[AES256_GCM,data:IPgNAurbHuwED6PhP7OxKVi31NyvEUo8TlYTPWrcetSjD9B4qIhJk/9yBwZJMP6rQo2GNvUF9+ceC9lbBrFIZlBGwQ7uwmuOKtq1SlHAP0fJd17a44QTAsfOegG+2kaGr/NVQMrggCLhn4BkAUsz74wddPlLcmWS8o3vgRbAQVk=,iv:4ytri60BRtI6uixbiVg0uflWBUbQ4cpbw4XSzu6kpJo=,tag:5HUoYbdOBgc1lm2vShbpGQ==,type:str]
+    version: 3.13.3

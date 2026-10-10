@@ -118,3 +118,37 @@ reclaimPolicy: Retain # CRITICAL: Prevents accidental data deletion
 volumeBindingMode: Immediate
 mountOptions:
   - discard
+---
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-bucket-ssd-retain
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: rook-ceph.ceph.rook.io/bucket
+parameters:
+  objectStoreName: ceph-objectstore-ssd
+  objectStoreNamespace: rook-ceph
+  region: us-east-1
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ceph-bucket-nvme-retain
+  labels:
+    app.kubernetes.io/part-of: rook-ceph
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "false"
+provisioner: rook-ceph.ceph.rook.io/bucket
+parameters:
+  objectStoreName: ceph-objectstore-nvme
+  objectStoreNamespace: rook-ceph
+  region: us-east-1
+reclaimPolicy: Retain
+volumeBindingMode: Immediate

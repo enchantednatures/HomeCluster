@@ -8,6 +8,7 @@ metadata:
 spec:
   dependsOn:
     - name: csi-driver-nfs
+    - name: rook-ceph-cluster
   targetNamespace: harbor
   commonMetadata:
     labels:

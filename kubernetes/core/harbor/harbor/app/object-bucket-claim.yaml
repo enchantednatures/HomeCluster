@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/objectbucket.io/v1alpha1/objectbucketclaim.json
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: &app harbor-registry
+  namespace: harbor
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/part-of: harbor
+    app.kubernetes.io/component: registry
+spec:
+  bucketName: harbor-registry
+  storageClassName: ceph-bucket-ssd-retain
+  additionalConfig:
+    bucketOwner: harbor

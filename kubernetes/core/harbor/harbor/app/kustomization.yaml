@@ -7,5 +7,6 @@ resources:
   - ./config-map.yaml
   - ./dragonfly.yaml
   - ./harbor-postgres.sops.yaml
-  - ./harbor-minio-credentials.sops.yaml
+  - ./harbor-rgw-credentials.sops.yaml
+  - ./object-bucket-claim.yaml
   - ./virtualservice.yaml

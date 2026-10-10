@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStoreUser
+metadata:
+  name: harbor
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: harbor
+    app.kubernetes.io/instance: ceph-objectstore-ssd
+    app.kubernetes.io/component: object-storage
+spec:
+  store: ceph-objectstore-ssd
+  displayName: "Harbor registry user"
+  keys:
+    - accessKeyRef:
+        name: harbor-rgw-keys
+        key: access-key
+      secretKeyRef:
+        name: harbor-rgw-keys
+        key: secret-key

@@ -47,3 +47,37 @@ spec:
     matchLabels:
       app: rook-ceph-rgw
       rook_object_store: ceph-objectstore
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policy/v1/poddisruptionbudget.json
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: rook-ceph-rgw-ssd
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-rgw
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: rook-ceph-rgw
+      rook_object_store: ceph-objectstore-ssd
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policy/v1/poddisruptionbudget.json
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: rook-ceph-rgw-nvme
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-rgw
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: rook-ceph-rgw
+      rook_object_store: ceph-objectstore-nvme

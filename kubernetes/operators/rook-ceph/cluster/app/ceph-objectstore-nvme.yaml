@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/ceph.rook.io/v1/cephobjectstore.json
+apiVersion: ceph.rook.io/v1
+kind: CephObjectStore
+metadata:
+  name: ceph-objectstore-nvme
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-objectstore-nvme
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: object-storage
+spec:
+  # Metadata pool settings
+  metadataPool:
+    failureDomain: host
+    deviceClass: nvme
+    replicated:
+      size: 2
+      requireSafeReplicaSize: false
+    parameters:
+      compression_mode: aggressive
+      compression_algorithm: snappy
+      pg_autoscale_mode: "on"
+    application: rgw
+  # Data pool settings
+  dataPool:
+    failureDomain: host
+    deviceClass: nvme
+    replicated:
+      size: 2
+      requireSafeReplicaSize: false
+    parameters:
+      compression_mode: aggressive
+      compression_algorithm: snappy
+      pg_autoscale_mode: "on"
+    application: rgw
+  # Preserve pools on deletion for data safety
+  preservePoolsOnDelete: true
+  # Gateway configuration
+  gateway:
+    instances: 2
+    port: 80
+    # SSL configuration - commented for internal access
+    # securePort: 443
+    # sslCertificateRef: rook-ceph-rgw-cert
+
+    # Resource configuration
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+
+    # High priority for critical storage service
+    priorityClassName: system-cluster-critical
+
+    # Placement configuration for Talos
+    placement:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/arch
+                  operator: In
+                  values:
+                    - amd64
+                - key: node-role.kubernetes.io/worker
+                  operator: Exists
+      # Pod anti-affinity for HA
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: rook-ceph-rgw
+                  rook_object_store: ceph-objectstore-nvme
+              topologyKey: kubernetes.io/hostname
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+
+  # Hosting configuration for Istio service mesh
+  # dnsNames intentionally omitted: this Kustomization has Flux envsubst disabled
+  # (toolbox scripts contain shell variables), so ${SECRET_DOMAIN} cannot be
+  # substituted and fails DNS-1123 validation. External access is handled by
+  # the (currently disabled) virtual-service.yaml instead.
+  hosting:
+    advertiseEndpoint:
+      dnsName: rook-ceph-rgw-ceph-objectstore-nvme.rook-ceph.svc.cluster.local
+      port: 80
+      useTls: false
