@@ -13,3 +13,31 @@ resources:
   # - https://raw.githubusercontent.com/knative-extensions/monitoring/main/config/eventing-kafka-monitors.yaml
   # - https://github.com/knative/eventing/releases/download/knative-v1.16.1/eventing-core.yaml
   # - https://github.com/knative-extensions/eventing-istio/releases/download/knative-v1.16.0/eventing-istio.yaml
+# Enables eventing-kafka KEDA autoscaling CLUSTER-WIDE (all KafkaSources/Triggers/Subscriptions); bounds come from config-kafka-autoscaler. Disable per cluster by reverting this file.
+patches:
+  - target:
+      version: v1
+      kind: ConfigMap
+      name: config-kafka-features
+      namespace: knative-eventing
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: config-kafka-features
+        namespace: knative-eventing
+      data:
+        controller-autoscaler-keda: enabled
+  - target:
+      version: v1
+      kind: ConfigMap
+      name: config-kafka-autoscaler
+      namespace: knative-eventing
+    patch: |-
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: config-kafka-autoscaler
+        namespace: knative-eventing
+      data:
+        max-scale: "16"
