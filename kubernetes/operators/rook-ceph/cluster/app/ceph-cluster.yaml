@@ -52,6 +52,15 @@ spec:
       rgw_zonegroup: ceph-objectstore
       rgw_zone: ceph-objectstore
       rgw_restore_max_objs: "1"
+    client.rgw:
+      # TEMPORARY workaround for the Ceph 20.2.4 SigV4 regression (tracker
+      # #79674, introduced by the CVE-2026-54330 hardening): RGW rejects
+      # requests whose Content-Type is not in SignedHeaders, and minio-go's
+      # streaming signer (Thanos) never signs Content-Type, so single
+      # (non-multipart) PUTs fail with anonymous 403s. Remove once Ceph is
+      # upgraded past the fix (PR #71192 / backport #71364) or Thanos ships
+      # a minio-go with the upstream fix (PR #2301, unreleased as of 2026-10-10).
+      rgw_sigv4_insecure: "true"
   network:
     connections:
       encryption:
