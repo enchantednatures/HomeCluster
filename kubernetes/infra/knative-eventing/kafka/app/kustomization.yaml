@@ -27,7 +27,7 @@ patches:
         name: config-kafka-features
         namespace: knative-eventing
       data:
-        controller-autoscaler-keda: enabled
+        controller-autoscaler-keda: disabled
   - target:
       version: v1
       kind: ConfigMap
