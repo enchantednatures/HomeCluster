@@ -13,7 +13,7 @@ spec:
   chart:
     spec:
       chart: immich
-      version: 0.13.2 # datasource=helm depName=immich repository=oci://ghcr.io/immich-app/immich-charts
+      version: 0.13.4 # datasource=helm depName=immich repository=oci://ghcr.io/immich-app/immich-charts
       sourceRef:
         kind: HelmRepository
         name: immich
