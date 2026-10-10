@@ -54,6 +54,7 @@ spec:
             - vms
             - actions-runner-system
             - porygon
+            - knative-eventing
             - kafka
             - networking
             - atuin
