@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/virtualservice_v1.json
+---
+# Public S3 endpoint for the default object store (ceph-objectstore)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rook-rgw-default
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-rgw-default
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  hosts:
+    - s3.${SECRET_DOMAIN}
+    - rgw.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local
+            port:
+              number: 80
+      timeout: 300s  # 5 minutes for large object transfers
+      retries:
+        attempts: 3
+        perTryTimeout: 60s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+            x-forwarded-port: "443"
+---
+# Public S3 endpoint for the SSD object store (ceph-objectstore-ssd)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rook-rgw-ssd
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-rgw-ssd
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  hosts:
+    - s3-ssd.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: rook-ceph-rgw-ceph-objectstore-ssd.rook-ceph.svc.cluster.local
+            port:
+              number: 80
+      timeout: 300s  # 5 minutes for large object transfers
+      retries:
+        attempts: 3
+        perTryTimeout: 60s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+            x-forwarded-port: "443"
+---
+# Public S3 endpoint for the NVMe object store (ceph-objectstore-nvme)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: rook-rgw-nvme
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-rgw-nvme
+    app.kubernetes.io/component: object-storage
+    app.kubernetes.io/part-of: rook-ceph
+spec:
+  hosts:
+    - s3-nvme.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: rook-ceph-rgw-ceph-objectstore-nvme.rook-ceph.svc.cluster.local
+            port:
+              number: 80
+      timeout: 300s  # 5 minutes for large object transfers
+      retries:
+        attempts: 3
+        perTryTimeout: 60s
+        retryOn: 5xx,reset,connect-failure,refused-stream
+      headers:
+        request:
+          add:
+            x-forwarded-proto: https
+            x-forwarded-port: "443"

@@ -22,8 +22,8 @@ resources:
   - ./ceph-object-store.yaml
   - ./ceph-objectstore-ssd.yaml
   - ./ceph-objectstore-nvme.yaml
-  # - ./virtual-service.yaml  # Temporarily disabled due to Istio validation issues
-  # - ./istio-config-enhanced.yaml  # Temporarily disabled due to schema issues
+  # - ./virtual-service.yaml  # Superseded by ../exposure/virtual-service.yaml (envsubst disabled in this Kustomization)
+  # - ./istio-config-enhanced.yaml  # Superseded by ../exposure/virtual-service.yaml (schema errors + stray fault injection)
   - ./ceph-object-store-secret.sops.yaml
   - ./harbor-rgw-keys.sops.yaml
   - ./kellnr-rgw-keys.sops.yaml

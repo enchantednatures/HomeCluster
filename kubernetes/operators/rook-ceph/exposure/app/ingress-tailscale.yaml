@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/ingress_v1.json
+---
+# Tailscale (private) S3 endpoint for the default object store
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app rook-rgw-default-tailscale
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+  annotations:
+    tailscale.com/hostname: ceph-s3
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - ceph-s3.rya-bebop.ts.net
+  rules:
+    - host: ceph-s3.rya-bebop.ts.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rook-ceph-rgw-ceph-objectstore
+                port:
+                  number: 80
+---
+# Tailscale (private) S3 endpoint for the SSD object store
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app rook-rgw-ssd-tailscale
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+  annotations:
+    tailscale.com/hostname: ceph-s3-ssd
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - ceph-s3-ssd.rya-bebop.ts.net
+  rules:
+    - host: ceph-s3-ssd.rya-bebop.ts.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rook-ceph-rgw-ceph-objectstore-ssd
+                port:
+                  number: 80
+---
+# Tailscale (private) S3 endpoint for the NVMe object store
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: &app rook-rgw-nvme-tailscale
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: *app
+    app.kubernetes.io/instance: *app
+  annotations:
+    tailscale.com/hostname: ceph-s3-nvme
+spec:
+  ingressClassName: tailscale
+  tls:
+    - hosts:
+        - ceph-s3-nvme.rya-bebop.ts.net
+  rules:
+    - host: ceph-s3-nvme.rya-bebop.ts.net
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: rook-ceph-rgw-ceph-objectstore-nvme
+                port:
+                  number: 80
