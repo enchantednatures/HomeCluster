@@ -53,6 +53,7 @@ spec:
             - cdi
             - vms
             - actions-runner-system
+            - porygon
             - kafka
             - networking
             - atuin
