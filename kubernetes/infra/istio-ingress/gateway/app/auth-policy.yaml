@@ -21,3 +21,6 @@ spec:
               - tekton.${SECRET_DOMAIN}
               - tekton.${SECRET_DOMAIN}:443
               - tekton.${SECRET_DOMAIN}:80
+              - porygon-console.${SECRET_DOMAIN}
+              - porygon-console.${SECRET_DOMAIN}:443
+              - porygon-console.${SECRET_DOMAIN}:80

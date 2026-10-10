@@ -10,4 +10,5 @@ resources:
   - ./virtualservice-outpost.yaml
   - ./outpost-serviceentry.yaml
   - ./blueprint-netboot.yaml
+  - ./blueprint-porygon-console.yaml
   - ./blueprint-gravitino.sops.yaml
