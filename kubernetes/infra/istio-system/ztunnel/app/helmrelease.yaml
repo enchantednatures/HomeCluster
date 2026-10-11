@@ -37,13 +37,13 @@ spec:
     keepHistory: false
   values:
     logLevel: info
+    # No limits (Istio guidance): CPU limits throttle a shared node proxy and a
+    # memory limit risks a cluster-wide ztunnel OOM outage. Requests stay low
+    # so the DaemonSet remains schedulable on CPU-saturated nodes.
     resources:
       requests:
         cpu: 100m
         memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 512Mi
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
