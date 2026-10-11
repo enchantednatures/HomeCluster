@@ -16,3 +16,4 @@ resources:
   - spanner-db-user.sops.yaml
   - ./minio-sync.yaml
   - ./rclone-config.sops.yaml
+  - ./pg-rustfs-backup-secret.sops.yaml

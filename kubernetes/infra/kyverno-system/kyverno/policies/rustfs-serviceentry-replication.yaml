@@ -1,0 +1,62 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/generatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: GeneratingPolicy
+metadata:
+  name: replicate-rustfs-serviceentry
+  annotations:
+    policies.kyverno.io/title: Replicate rustfs ServiceEntry
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: ServiceEntry
+    policies.kyverno.io/description: >-
+      This policy replicates a RustFS Istio ServiceEntry into all namespaces,
+      enabling cross-namespace access to the RustFS object storage service
+      running in the networking namespace with Istio ambient mode. Without this
+      ServiceEntry, pods in ambient mode cannot reach RustFS as it is treated
+      as an external service outside the mesh.
+spec:
+  evaluation:
+    generateExisting:
+      enabled: true
+    synchronize:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - namespaces
+  matchConditions:
+    - name: exclude-namespaces
+      expression: >-
+        !(object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease', 'kyverno-system',
+        'flux-system', 'istio-system', 'istio-ingress', 'rook-ceph', 'monitoring', 'cnpg-system',
+        'networking']) &&
+        !object.metadata.name.startsWith('knative-')
+  generate:
+    - template:
+        interpolate: cel
+        value: |
+          apiVersion: networking.istio.io/v1beta1
+          kind: ServiceEntry
+          metadata:
+            name: rustfs-service-access
+            namespace: (( object.metadata.name ))
+          spec:
+            hosts:
+              - rustfs-service.networking.svc.cluster.local
+            ports:
+              - number: 9768
+                name: rustfs-api
+                protocol: HTTP
+            location: MESH_EXTERNAL
+            resolution: DNS
