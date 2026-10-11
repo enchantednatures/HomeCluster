@@ -26,5 +26,8 @@ spec:
               number: 80
       retries:
         attempts: 3
-        perTryTimeout: 2s
-        retryOn: gateway-error,connect-failure,refused-stream
+        # Must exceed authentik's slowest responses (observed up to ~8s) or the
+        # gateway cancels attempts mid-flow and surfaces 504s. Retries stay
+        # connection-level only so auth requests are never replayed.
+        perTryTimeout: 30s
+        retryOn: connect-failure,refused-stream
