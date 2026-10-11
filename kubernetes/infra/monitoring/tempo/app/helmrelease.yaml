@@ -43,7 +43,7 @@ spec:
         backend: s3
         s3:
           bucket: tempo
-          endpoint: http://rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local:80
+          endpoint: rook-ceph-rgw-ceph-objectstore.rook-ceph.svc.cluster.local:80
           region: us-east-1
           insecure: true
           forcepathstyle: true
