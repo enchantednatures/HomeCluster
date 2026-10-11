@@ -42,9 +42,7 @@ This repository contains the complete infrastructure-as-code for a production-gr
 │   ├── terraform/          # OpenTofu/Terraform configs for Proxmox VMs
 │   └── certs/              # Certificate files
 ├── scripts/                # Utility and automation scripts
-├── .taskfiles/             # Task runner modules
-├── docs/                   # Extended documentation
-└── specs/                  # Feature specification documents
+└── docs/                   # Extended documentation
 ```
 
 ### Deployment Layers
