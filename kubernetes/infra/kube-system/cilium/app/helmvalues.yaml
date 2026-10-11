@@ -64,10 +64,12 @@ data:
                 memory: 128Mi
     # Roll out cilium agent pods automatically when ConfigMap is updated.
     rollOutCiliumPods: true
+    # Raised from 1000m/1Gi: melusine's agent sat at 950Mi and 1 CPU caps
+    # burst capacity under hubble + pod churn.
     resources:
         limits:
-            cpu: 1000m
-            memory: 1Gi
+            cpu: 2000m
+            memory: 2Gi
         requests:
             cpu: 200m
             memory: 512Mi
