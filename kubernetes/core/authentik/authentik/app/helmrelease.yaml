@@ -80,6 +80,27 @@ spec:
     server:
       ingress:
         enabled: false
+      # CPU-based autoscaling: 2-10 replicas targeting 50% of the CPU request
+      # set below. HPA utilization is computed against requests, so the request
+      # must stay realistic for the target to be meaningful.
+      autoscaling:
+        enabled: true
+        minReplicas: 2
+        maxReplicas: 10
+        targetCPUUtilizationPercentage: 50
+        behavior:
+          scaleUp:
+            stabilizationWindowSeconds: 0
+            policies:
+              - type: Pods
+                value: 2
+                periodSeconds: 60
+          scaleDown:
+            stabilizationWindowSeconds: 300
+            policies:
+              - type: Pods
+                value: 1
+                periodSeconds: 120
       # Startup probe budget raised: initial boot on a fresh DB runs ~1000 Django
       # migrations (10+ min). Default 60x10s kills the pod mid-migration, which
       # leaks an idle-in-transaction pgbouncer connection holding Django's
@@ -97,7 +118,8 @@ spec:
           readOnly: true
       resources:
         requests:
-          cpu: 15m
+          # Keep in sync with server.autoscaling: 50% target == 100m CPU.
+          cpu: 200m
           memory: 476M
         limits:
           cpu: "2"
