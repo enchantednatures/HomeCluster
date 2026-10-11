@@ -85,6 +85,10 @@ data:
         enabled: true
     gatewayAPI:
         enabled: true
+    # Maglev for the L2-announced VIPs; DSR/hybrid deliberately not enabled
+    # (re-adds encap/IP-option overhead on the cross-node path).
+    loadBalancer:
+        algorithm: maglev
     hubble:
         enabled: true
         relay:
