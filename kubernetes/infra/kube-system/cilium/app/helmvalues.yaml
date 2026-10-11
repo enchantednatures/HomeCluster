@@ -11,7 +11,19 @@ data:
         name: talos
         id: 1
     kubeProxyReplacement: true
+    # Keep MTU pinned at 1500: melusine's tailscale0 interface poisons Cilium's
+    # per-node auto-detection (1280 vs 1500 = cross-node PMTUD blackhole), see
+    # PRs #1484/#1485; 1500 matches the flat L2 underlay.
     MTU: 1500
+    # Native routing on a flat L2: no vxlan encap, pod MTU true 1500 end-to-end.
+    # Masquerading intentionally stays iptables-based because Istio ambient
+    # forbids bpf.masquerade; host routing is pinned to legacy for the same
+    # reason (eBPF host routing requires bpf.masquerade).
+    routingMode: native
+    autoDirectNodeRoutes: true
+    ipv4NativeRoutingCIDR: 10.244.0.0/16
+    bpf:
+        hostLegacyRouting: true
     bpf-lb-sock-hostns-only: "true"
     cni:
       exclusive: false
