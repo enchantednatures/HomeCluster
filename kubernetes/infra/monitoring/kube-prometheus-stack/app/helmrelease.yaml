@@ -171,11 +171,12 @@ spec:
         resources:
           requests:
             cpu: 200m
-            memory: 1Gi
+            memory: 2Gi
           limits:
             memory: 4Gi
         affinity:
           nodeAffinity:
+            # Keep Prometheus off the control-plane node (ctrl-01) and melusine.
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
                 - matchExpressions:
@@ -183,6 +184,20 @@ spec:
                       operator: NotIn
                       values:
                         - melusine
+                        - ctrl-01
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - prometheus
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values:
+                        - kube-prometheus-stack
+                topologyKey: kubernetes.io/hostname
         storageSpec:
           volumeClaimTemplate:
             spec:
