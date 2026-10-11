@@ -76,3 +76,27 @@ patches:
         max-scale: "16"
         min-scale: "0"
         polling-interval: "30"
+  # kafka-webhook-eventing's pod informer lists every pod in the cluster; under load its
+  # cache sync runs ~20s and the default liveness budget (20s initial + 3x1s failures)
+  # kills the process before it can write its TLS certs, leaving the webhook in
+  # CrashLoopBackOff. Raise the failure budget to 60 (kill at ~80s) so cert generation
+  # always wins the race.
+  - target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: kafka-webhook-eventing
+      namespace: knative-eventing
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: kafka-webhook-eventing
+        namespace: knative-eventing
+      spec:
+        template:
+          spec:
+            containers:
+              - name: kafka-webhook-eventing
+                livenessProbe:
+                  failureThreshold: 60
