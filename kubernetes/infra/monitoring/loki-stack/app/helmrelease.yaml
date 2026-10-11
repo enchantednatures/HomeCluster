@@ -74,7 +74,7 @@ spec:
         deletion_mode: disabled
         # Promtail labelmaps all pod labels into Loki streams; istio-injected pods
         # exceed the default limit of 15 and get rejected with HTTP 400.
-        max_label_names_per_series: 30
+        max_label_names_per_series: 40
       ingester:
         chunk_encoding: snappy
       querier:
