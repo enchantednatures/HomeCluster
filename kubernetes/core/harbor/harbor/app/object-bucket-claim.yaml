@@ -3,7 +3,8 @@
 apiVersion: objectbucket.io/v1alpha1
 kind: ObjectBucketClaim
 metadata:
-  name: &app harbor-registry
+  # NB: name must not collide with the chart-owned harbor-registry Secret/ConfigMap.
+  name: &app harbor-registry-bucket
   namespace: harbor
   labels:
     app.kubernetes.io/name: *app
