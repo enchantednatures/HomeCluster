@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s/job-v1.json
+---
+# Jobs are immutable: to re-run this one-shot, bump the version suffix (`-v1` -> `-v2`),
+# commit, and push (lakehouse versioned-job convention). This creates the ERPNext
+# Social Login Key that enables Authentik OIDC SSO on the live site.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: erpnext-sso-v1
+  namespace: erpnext
+  labels:
+    app.kubernetes.io/name: erpnext
+    app.kubernetes.io/instance: erpnext
+    app.kubernetes.io/version: "v16.50.0"
+    app.kubernetes.io/component: sso
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccountName: erpnext
+      securityContext:
+        runAsNonRoot: true
+        supplementalGroups:
+          - 1000
+      containers:
+        - name: sso
+          image: "frappe/erpnext:v16.50.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - bash
+            - -c
+          args:
+            - |
+              set -o errexit -o pipefail
+
+              echo "Waiting for site $${SITE_NAME} to be ready...";
+              i=0
+              until bench --site "$${SITE_NAME}" list-apps >/dev/null 2>&1; do
+                i=$((i + 1))
+                if [ "$i" -gt 120 ]; then
+                  echo "site $${SITE_NAME} not ready after 10m" >&2
+                  exit 1
+                fi
+                sleep 5
+              done
+              echo "site $${SITE_NAME} is ready";
+
+              KWARGS="$(printf '{"doctype": "Social Login Key", "enable_social_login": 1, "social_login_provider": "Custom", "provider_name": "authentik", "client_id": "%s", "client_secret": "%s", "icon": "", "base_url": "https://auth.%s", "custom_base_url": 1, "authorize_url": "/application/o/authorize/", "access_token_url": "/application/o/token/", "redirect_url": "/api/method/frappe.integrations.oauth2_logins.custom/authentik", "api_endpoint": "/application/o/userinfo/", "auth_url_data": "{\\"response_type\\": \\"code\\", \\"scope\\": \\"openid email profile\\"}", "user_id_property": "sub", "sign_ups": "Allow"}' "$${CLIENT_ID}" "$${CLIENT_SECRET}" "$${DOMAIN}")"
+
+              bench --site "$${SITE_NAME}" execute frappe.client.insert --kwargs "$${KWARGS}";
+          env:
+            - name: "SITE_NAME"
+              value: "erpnext.${SECRET_DOMAIN}"
+            - name: "DOMAIN"
+              value: "${SECRET_DOMAIN}"
+            - name: "CLIENT_ID"
+              valueFrom:
+                secretKeyRef:
+                  name: erpnext-oidc
+                  key: client-id
+            - name: "CLIENT_SECRET"
+              valueFrom:
+                secretKeyRef:
+                  name: erpnext-oidc
+                  key: client-secret
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - name: sites-dir
+              mountPath: /home/frappe/frappe-bench/sites
+            - name: logs
+              mountPath: /home/frappe/frappe-bench/logs
+      volumes:
+        - name: sites-dir
+          persistentVolumeClaim:
+            claimName: erpnext-sites
+            readOnly: false
+        - name: logs
+          emptyDir: {}

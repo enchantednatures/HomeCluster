@@ -9,3 +9,4 @@ resources:
   - ./erpnext/ks.yaml
   - ./erpnext/setup/ks.yaml
   - ./erpnext/backup/ks.yaml
+  - ./erpnext/sso/ks.yaml
