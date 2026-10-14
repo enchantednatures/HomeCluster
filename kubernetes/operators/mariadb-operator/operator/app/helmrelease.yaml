@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mariadb-operator
+  namespace: mariadb-operator
+spec:
+  dependsOn:
+    - name: mariadb-operator-crds
+  driftDetection:
+    mode: enabled
+    ignore:
+      # cert-manager injects caBundle into the ValidatingWebhookConfiguration at
+      # runtime (annotation cert-manager.io/inject-ca-from), so the live object
+      # never matches the Helm-rendered manifest. Mirrors the CloudNative-PG
+      # HelmRelease drift-ignore pattern.
+      - paths:
+          - /webhooks
+        target:
+          group: admissionregistration.k8s.io
+          kind: ValidatingWebhookConfiguration
+  interval: 15m
+  chart:
+    spec:
+      chart: mariadb-operator
+      version: 26.10.1 # datasource=helm depName=mariadb-operator repository=https://mariadb-operator.github.io/mariadb-operator
+      sourceRef:
+        kind: HelmRepository
+        name: mariadb-operator
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    crds:
+      enabled: false
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+    certController:
+      enabled: false
+    # The chart's controller container resources live under the top-level
+    # `resources` key (NOT `operator.resources`); verified with
+    # `helm show values mariadb-operator/mariadb-operator --version 26.10.1`.
+    # Without this the controller container renders with no resources and Kyverno
+    # "require-pod-resources" would deny the pod.
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    webhook:
+      cert:
+        certManager:
+          enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 128Mi

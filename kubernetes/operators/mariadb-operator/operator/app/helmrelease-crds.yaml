@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mariadb-operator-crds
+  namespace: mariadb-operator
+spec:
+  driftDetection:
+    mode: enabled
+  interval: 15m
+  chart:
+    spec:
+      chart: mariadb-operator-crds
+      version: 26.10.1 # datasource=helm depName=mariadb-operator-crds repository=https://mariadb-operator.github.io/mariadb-operator
+      sourceRef:
+        kind: HelmRepository
+        name: mariadb-operator
+        namespace: flux-system
+      interval: 15m
+  maxHistory: 2
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false

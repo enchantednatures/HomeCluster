@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/v1/networkpolicy.json
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-mariadb-operator-egress
+  namespace: mariadb-operator
+spec:
+  # Selects both the controller (app.kubernetes.io/name=mariadb-operator) and the
+  # webhook (app.kubernetes.io/name=mariadb-operator-webhook) pods: both carry
+  # app.kubernetes.io/instance=mariadb-operator. The Kyverno
+  # "add-default-network-policy" GeneratingPolicy adds a default-deny to this
+  # namespace, so both pods need explicit allow rules.
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: mariadb-operator
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.10/32
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+    - to:
+        - ipBlock:
+            cidr: 10.96.0.1/32
+      ports:
+        - protocol: TCP
+          port: 443
+    - to:
+        - ipBlock:
+            cidr: 192.168.1.0/24
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 6443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-mariadb-operator-metrics-ingress
+  namespace: mariadb-operator
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/instance: mariadb-operator
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        # Controller and webhook containers both expose metrics on 8080
+        # (`--metrics-addr=:8080`), verified via
+        # `helm template mariadb-operator mariadb-operator/mariadb-operator --version 26.10.1`.
+        - protocol: TCP
+          port: 8080

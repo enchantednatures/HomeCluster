@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumnetworkpolicy_v2.json
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-mariadb-operator-apiserver
+  namespace: mariadb-operator
+spec:
+  # Selects both the controller and the webhook pods (both carry
+  # app.kubernetes.io/instance=mariadb-operator). The webhook pod's name label is
+  # mariadb-operator-webhook, so the instance label is used to make the ingress
+  # rule below actually apply to the admission webhook endpoint.
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/instance: mariadb-operator
+  egress:
+    - toEntities:
+        - host
+        - remote-node
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "6443"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+  ingress:
+    # Admission webhook port. The Kyverno "add-default-network-policy"
+    # GeneratingPolicy creates a default-deny NetworkPolicy for this namespace;
+    # without this ingress rule the API server's admission webhook calls
+    # (ValidatingWebhookConfiguration failurePolicy: Fail) would be blocked.
+    # Port 9443 is the chart's `webhook.port` value, verified via
+    # `helm template mariadb-operator mariadb-operator/mariadb-operator --version 26.10.1`.
+    - fromEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "9443"
+              protocol: TCP
