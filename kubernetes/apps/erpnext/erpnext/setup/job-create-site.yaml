@@ -43,7 +43,7 @@ spec:
               echo "sites/common_site_config.json found";
 
               echo "Waiting for database to be reachable...";
-              wait-for-it -t 180 $(DB_HOST):$(DB_PORT);
+              wait-for-it -t 180 $${DB_HOST}:$${DB_PORT};
               echo "Database is reachable.";
           env:
             - name: "DB_HOST"
@@ -75,7 +75,7 @@ spec:
           - >
             set -x;
 
-            bench_output=$(bench new-site ${SITE_NAME} --no-mariadb-socket --db-type=${DB_TYPE} --db-host=${DB_HOST} --db-port=${DB_PORT} --admin-password=${ADMIN_PASSWORD} --mariadb-root-username=${DB_ROOT_USER} --mariadb-root-password=${DB_ROOT_PASSWORD} --install-app=erpnext | tee /dev/stderr);
+            bench_output=$(bench new-site $${SITE_NAME} --no-mariadb-socket --db-type=$${DB_TYPE} --db-host=$${DB_HOST} --db-port=$${DB_PORT} --admin-password=$${ADMIN_PASSWORD} --mariadb-root-username=$${DB_ROOT_USER} --mariadb-root-password=$${DB_ROOT_PASSWORD} --install-app=erpnext | tee /dev/stderr);
 
             bench_exit_status=$?;
 
