@@ -31,3 +31,12 @@ spec:
     innodb_buffer_pool_size=512M
   metrics:
     enabled: true
+    exporter:
+      # Kyverno require-pod-resources denies the resource-less exporter pod in this namespace.
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 200m
+          memory: 128Mi

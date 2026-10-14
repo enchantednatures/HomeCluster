@@ -12,6 +12,14 @@ spec:
   schedule:
     cron: "15 1 * * *"
   maxRetention: 720h
+  # Kyverno require-pod-resources denies resource-less backup job pods in this namespace.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
   storage:
     s3:
       bucket: cloudnative-pg
