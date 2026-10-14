@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s.mariadb.com/mariadb_v1alpha1.json
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: erpnext-db
+  namespace: erpnext
+spec:
+  rootPasswordSecretKeyRef:
+    name: erpnext-db-root
+    key: password
+    generate: false
+  port: 3306
+  storage:
+    size: 20Gi
+    storageClassName: ceph-block-ssd
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+  myCnf: |
+    [mysqld]
+    skip-character-set-client-handshake
+    skip-innodb-read-only-compressed
+    character-set-server=utf8mb4
+    collation-server=utf8mb4_unicode_ci
+    max_allowed_packet=256M
+    innodb_buffer_pool_size=512M
+  metrics:
+    enabled: true
