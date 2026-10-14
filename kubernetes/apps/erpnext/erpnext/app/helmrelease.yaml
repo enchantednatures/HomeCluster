@@ -54,9 +54,37 @@ spec:
     postgresql:
       enabled: false
     valkey-cache:
-      enabled: false
+      enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 128Mi
+      initResources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 128Mi
     valkey-queue:
-      enabled: false
+      enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 128Mi
+      initResources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 128Mi
     dragonfly-cache:
       enabled: false
     dragonfly-queue:
@@ -65,9 +93,6 @@ spec:
       enabled: false
     redis-queue:
       enabled: false
-    externalRedis:
-      cache: redis://dragonfly.erpnext.svc.cluster.local:6379
-      queue: redis://dragonfly.erpnext.svc.cluster.local:6379
     persistence:
       worker:
         enabled: true
