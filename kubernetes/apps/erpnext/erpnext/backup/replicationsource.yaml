@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: erpnext-backup
+  namespace: erpnext
+spec:
+  sourcePVC: erpnext-sites
+  trigger:
+    # Run backup daily at 2:40 AM (staggered against other VolSync schedules)
+    schedule: "40 2 * * *"
+  restic:
+    # The secret containing S3/restic credentials
+    repository: erpnext-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    copyMethod: Direct
+    # Retain policy - keep last 7 daily, 4 weekly, 12 monthly snapshots
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    # Prune removes unreferenced data from the repository
+    pruneIntervalDays: 7
+    # Storage for the mover pod (temporary, during backup)
+    storageClassName: ceph-block
+    # Cache for faster incremental backups
+    cacheStorageClassName: ceph-block
+    cacheCapacity: 10Gi
+    # ERPNext runs as uid 1000; site files are world-readable
+    # (755 dirs / 644 files) - no moverSecurityContext override needed
+    # (mover default uid 65532 can read)
+    # Per-app label for mover pod identification/debugging
+    moverPodLabels:
+      app: volsync-erpnext-backup

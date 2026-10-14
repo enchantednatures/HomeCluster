@@ -8,3 +8,4 @@ resources:
   - ./ciliumnetworkpolicy.yaml
   - ./erpnext/ks.yaml
   - ./erpnext/setup/ks.yaml
+  - ./erpnext/backup/ks.yaml
