@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/virtualservice_v1.json
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: erpnext
+  namespace: erpnext
+spec:
+  hosts:
+    - erpnext.${SECRET_DOMAIN}
+  gateways:
+    - istio-ingress/external-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /
+      # No route timeout: websocket-safe for socket.io. The Istio 1.30 CRD rejects
+      # `0s` (CEL: duration >= 1ms) and documents the field default as disabled,
+      # so omitting it is the correct way to disable the request timeout.
+      route:
+        - destination:
+            host: erpnext.erpnext.svc.cluster.local
+            port:
+              number: 8080
