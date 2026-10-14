@@ -10,10 +10,19 @@
 # document fields. The v1 payload supplied the fields at the top level, so Frappe raised
 # `TypeError: insert() got an unexpected keyword argument 'doctype'` and the pod exited 1.
 # v2 wraps the payload in a single `doc` key: `--kwargs '{"doc": {...}}'`.
+#
+# v3 fix: the authorize hop returned HTTP 400 from Authentik because the site's
+# `host_name` was unset, so Frappe built `redirect_uri` from the request as
+# `http://erpnext.<domain>/...` while the Authentik blueprint registers the callback
+# with **https** and `matching_mode: strict`. v3 runs
+# `bench set-config host_name https://erpnext.<domain>` (the plan's documented
+# contingency) so the OAuth `redirect_uri` is emitted with https and matches the
+# registered strict URI. v3 also makes the Social Login Key insert idempotent
+# (guarded by `frappe.db.exists`) so re-runs do not fail on the duplicate record.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-sso-v2
+  name: erpnext-sso-v3
   namespace: erpnext
   labels:
     app.kubernetes.io/name: erpnext
@@ -53,9 +62,18 @@ spec:
               done
               echo "site $${SITE_NAME} is ready";
 
-              KWARGS="$(printf '{"doc": {"doctype": "Social Login Key", "enable_social_login": 1, "social_login_provider": "Custom", "provider_name": "authentik", "client_id": "%s", "client_secret": "%s", "icon": "", "base_url": "https://auth.%s", "custom_base_url": 1, "authorize_url": "/application/o/authorize/", "access_token_url": "/application/o/token/", "redirect_url": "/api/method/frappe.integrations.oauth2_logins.custom/authentik", "api_endpoint": "/application/o/userinfo/", "auth_url_data": "{\\"response_type\\": \\"code\\", \\"scope\\": \\"openid email profile\\"}", "user_id_property": "sub", "sign_ups": "Allow"}}' "$${CLIENT_ID}" "$${CLIENT_SECRET}" "$${DOMAIN}")"
+              # v3: set the public host so Frappe builds the OAuth redirect_uri with https
+              # (Authentik registers the https URI with strict matching; the unset default is
+              # http, which fails the authorize hop with 400 redirect_uri mismatch).
+              bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}";
 
-              bench --site "$${SITE_NAME}" execute frappe.client.insert --kwargs "$${KWARGS}";
+              KEY_EXISTS="$(bench --site "$${SITE_NAME}" execute frappe.db.exists --kwargs '{"dt": "Social Login Key", "dn": "authentik"}' 2>/dev/null || true)" || true
+              if [ -n "$${KEY_EXISTS}" ]; then
+                echo "Social Login Key 'authentik' already exists; skipping insert";
+              else
+                KWARGS="$(printf '{"doc": {"doctype": "Social Login Key", "enable_social_login": 1, "social_login_provider": "Custom", "provider_name": "authentik", "client_id": "%s", "client_secret": "%s", "icon": "", "base_url": "https://auth.%s", "custom_base_url": 1, "authorize_url": "/application/o/authorize/", "access_token_url": "/application/o/token/", "redirect_url": "/api/method/frappe.integrations.oauth2_logins.custom/authentik", "api_endpoint": "/application/o/userinfo/", "auth_url_data": "{\\"response_type\\": \\"code\\", \\"scope\\": \\"openid email profile\\"}", "user_id_property": "sub", "sign_ups": "Allow"}}' "$${CLIENT_ID}" "$${CLIENT_SECRET}" "$${DOMAIN}")"
+                bench --site "$${SITE_NAME}" execute frappe.client.insert --kwargs "$${KWARGS}";
+              fi
           env:
             - name: "SITE_NAME"
               value: "erpnext.${SECRET_DOMAIN}"
