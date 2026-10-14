@@ -1,0 +1,192 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: erpnext
+  namespace: erpnext
+spec:
+  driftDetection:
+    mode: enabled
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: erpnext
+      version: 8.0.84 # datasource=helm depName=erpnext repository=https://helm.erpnext.com
+      sourceRef:
+        kind: HelmRepository
+        name: frappe
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    image:
+      repository: frappe/erpnext
+      tag: v16.50.0
+      pullPolicy: IfNotPresent
+    dbHost: erpnext-db.erpnext.svc.cluster.local
+    dbPort: "3306"
+    dbRootUser: root
+    dbExistingSecret: erpnext-db-root
+    dbExistingSecretPasswordKey: password
+    dbRds: true
+    # Disable every bundled DB/cache subchart that chart 8.0.84 ships.
+    mariadb-sts:
+      enabled: false
+    mariadb-subchart:
+      enabled: false
+    mariadb:
+      enabled: false
+    postgresql-sts:
+      enabled: false
+    postgresql-subchart:
+      enabled: false
+    postgresql:
+      enabled: false
+    valkey-cache:
+      enabled: false
+    valkey-queue:
+      enabled: false
+    dragonfly-cache:
+      enabled: false
+    dragonfly-queue:
+      enabled: false
+    redis-cache:
+      enabled: false
+    redis-queue:
+      enabled: false
+    externalRedis:
+      cache: redis://dragonfly.erpnext.svc.cluster.local:6379
+      queue: redis://dragonfly.erpnext.svc.cluster.local:6379
+    persistence:
+      worker:
+        enabled: true
+        existingClaim: erpnext-sites
+    nginx:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+      service:
+        port: 8080
+      environment:
+        frappeSiteNameHeader: "$host"
+    worker:
+      gunicorn:
+        resources:
+          requests:
+            cpu: 250m
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+      default:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      short:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      long:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      scheduler:
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+    socketio:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+    ingress:
+      enabled: false
+    httproute:
+      enabled: false
+    jobs:
+      configure:
+        enabled: true
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      createSite:
+        enabled: false
+        siteName: erpnext.${SECRET_DOMAIN}
+        dbType: mariadb
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      migrate:
+        enabled: false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      backup:
+        enabled: false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+      volumePermissions:
+        enabled: false
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+  valuesFrom:
+    - kind: Secret
+      name: erpnext-secret
+      valuesKey: admin-password
+      targetPath: jobs.createSite.adminPassword
