@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: erpnext-db-root
+    namespace: erpnext
+type: Opaque
+stringData:
+    password: ENC[AES256_GCM,data:TNryfLNDWZ31531ZeaW0lFcur3ibCaofd8m/ghtf0T05nsydedWkMpABUAc=,iv:CRqbFI7TU7UB5cfRPMbnwZfc78aTR+PsUouI0WPBQbs=,tag:gawjhSO3jjohAlX0YurHoQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBzeDVmMW5ESDRsOFdwTTlZ
+            Vk5rMzBnMnJBUXNlOGZXdDBsdGR3ejB4T1FZCmJKSnB2QzFrVWY0OWxyM3hvV3Nq
+            VHRoY3RFaDIySXJYZHlEb3BFRll5MmsKLS0tIDhZOUJoTkYvOGhnUW5ZckFURzhH
+            eGJMT3Z6TzRsbUJ2aG9pcEJuazdIcnMKGPeSNz1ccSSDhTO0FtubjZaeRPQjLfnd
+            lguDG5p+W+8TQEBO9fOR6qnt2I8unIJntqENK/CZjNKTGC7tN4oPzw==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-14T04:16:41Z"
+    mac: ENC[AES256_GCM,data:mOLMFCXynwspiVKryhjRADuUGijQR7jNK39ebJmLFPpVub9Z96qwseGqxeJ9Oj5IE6MOtlULyACjys47LgpRRZdNLryGhAG7XzwWm8v+ABl0QwYYlvs5k5VvfpJDZA4ulrLQKF0d3GkiJSOXlYQcunlDSV9bA/WwhIRIkRIV/As=,iv:j8+jgpLnPwko+XyJSsJRwD8kBw5WhFAll2xVANs7VWs=,tag:Tmp8ZdAB3kyoqtfIC4bVew==,type:str]
+    version: 3.13.3
