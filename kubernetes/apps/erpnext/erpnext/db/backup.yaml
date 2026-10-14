@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s.mariadb.com/backup_v1alpha1.json
+---
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: Backup
+metadata:
+  name: erpnext-db-backup
+  namespace: erpnext
+spec:
+  mariaDbRef:
+    name: erpnext-db
+    waitForIt: true
+  schedule:
+    cron: "15 1 * * *"
+  maxRetention: 720h
+  storage:
+    s3:
+      bucket: cloudnative-pg
+      prefix: erpnext
+      endpoint: minio-service.networking.svc.cluster.local:9768
+      region: us-east-1
+      accessKeyIdSecretKeyRef:
+        name: pg-backup-secret
+        key: aws-access-key-id
+      secretAccessKeySecretKeyRef:
+        name: pg-backup-secret
+        key: aws-secret-access-key
