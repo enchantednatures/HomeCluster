@@ -45,6 +45,15 @@ spec:
           port: 443
         - protocol: TCP
           port: 6443
+    # Managed MariaDB instances live in application namespaces (erpnext); the
+    # controller connects for bootstrap/health/user-management and backup orchestration.
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: erpnext
+      ports:
+        - protocol: TCP
+          port: 3306
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
