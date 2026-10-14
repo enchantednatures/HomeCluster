@@ -1,0 +1,139 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s/job-v1.json
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: erpnext-create-site-v1
+  namespace: erpnext
+  labels:
+    helm.sh/chart: erpnext-8.0.84
+    app.kubernetes.io/name: erpnext
+    app.kubernetes.io/instance: erpnext
+    app.kubernetes.io/version: "v16.50.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: erpnext
+      securityContext:
+        supplementalGroups:
+        - 1000
+      initContainers:
+        - name: validate-config
+          image: "frappe/erpnext:v16.50.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - bash
+            - -c
+          args:
+            - >
+              export start=`date +%s`;
+              until [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".db_host // empty"` ]] && \
+                [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_cache // empty"` ]] && \
+                [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_queue // empty"` ]];
+              do
+                echo "Waiting for sites/common_site_config.json to be created";
+                sleep 5;
+                if (( `date +%s`-start > 600 )); then
+                  echo "could not find sites/common_site_config.json with required keys";
+                  exit 1
+                fi
+              done;
+              echo "sites/common_site_config.json found";
+
+              echo "Waiting for database to be reachable...";
+              wait-for-it -t 180 $(DB_HOST):$(DB_PORT);
+              echo "Database is reachable.";
+          env:
+            - name: "DB_HOST"
+              value: "erpnext-db.erpnext.svc.cluster.local"
+            - name: "DB_PORT"
+              value: "3306"
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          securityContext:
+            capabilities:
+              add:
+              - CAP_CHOWN
+          volumeMounts:
+            - name: sites-dir
+              mountPath: /home/frappe/frappe-bench/sites
+      containers:
+      - name: create-site
+        image: "frappe/erpnext:v16.50.0"
+        imagePullPolicy: IfNotPresent
+        command:
+          - bash
+          - -c
+        args:
+          - >
+            set -x;
+
+            bench_output=$(bench new-site ${SITE_NAME} --no-mariadb-socket --db-type=${DB_TYPE} --db-host=${DB_HOST} --db-port=${DB_PORT} --admin-password=${ADMIN_PASSWORD} --mariadb-root-username=${DB_ROOT_USER} --mariadb-root-password=${DB_ROOT_PASSWORD} --install-app=erpnext | tee /dev/stderr);
+
+            bench_exit_status=$?;
+
+            if [ $bench_exit_status -ne 0 ]; then
+                # Don't consider the case "site already exists" an error.
+                if [[ $bench_output == *"already exists"* ]]; then
+                    echo "Site already exists, continuing...";
+                else
+                    echo "An error occurred in bench new-site: $bench_output"
+                    exit $bench_exit_status;
+                fi
+            fi
+
+            set -e;
+
+            rm -f currentsite.txt
+        env:
+          - name: "SITE_NAME"
+            value: "erpnext.${SECRET_DOMAIN}"
+          - name: "DB_TYPE"
+            value: mariadb
+          - name: DB_HOST
+            value: "erpnext-db.erpnext.svc.cluster.local"
+          - name: "DB_PORT"
+            value: "3306"
+          - name: "DB_ROOT_USER"
+            value: "root"
+          - name: "DB_ROOT_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: erpnext-db-root
+          - name: "ADMIN_PASSWORD"
+            valueFrom:
+              secretKeyRef:
+                name: erpnext-secret
+                key: admin-password
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+        securityContext:
+          capabilities:
+            add:
+            - CAP_CHOWN
+        volumeMounts:
+          - name: sites-dir
+            mountPath: /home/frappe/frappe-bench/sites
+          - name: logs
+            mountPath: /home/frappe/frappe-bench/logs
+      restartPolicy: Never
+      volumes:
+        - name: sites-dir
+          persistentVolumeClaim:
+            claimName: erpnext-sites
+            readOnly: false
+        - name: logs
+          emptyDir: {}

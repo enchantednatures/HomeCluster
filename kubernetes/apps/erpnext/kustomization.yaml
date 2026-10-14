@@ -7,3 +7,4 @@ resources:
   - ./networkpolicy.yaml
   - ./ciliumnetworkpolicy.yaml
   - ./erpnext/ks.yaml
+  - ./erpnext/setup/ks.yaml
