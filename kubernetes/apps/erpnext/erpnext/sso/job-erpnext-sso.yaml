@@ -1,12 +1,19 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s/job-v1.json
 ---
-# Jobs are immutable: to re-run this one-shot, bump the version suffix (`-v1` -> `-v2`),
+# Jobs are immutable: to re-run this one-shot, bump the version suffix (`-v2` -> `-v3`),
 # commit, and push (lakehouse versioned-job convention). This creates the ERPNext
 # Social Login Key that enables Authentik OIDC SSO on the live site.
+#
+# v2 fix: `bench execute frappe.client.insert` passes keyword args straight to the
+# whitelisted method, and `frappe.client.insert` takes a single `doc` argument
+# (`def insert(doc: str | dict[str, Any] | None = None)` -> `insert_doc(doc)`), not flat
+# document fields. The v1 payload supplied the fields at the top level, so Frappe raised
+# `TypeError: insert() got an unexpected keyword argument 'doctype'` and the pod exited 1.
+# v2 wraps the payload in a single `doc` key: `--kwargs '{"doc": {...}}'`.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-sso-v1
+  name: erpnext-sso-v2
   namespace: erpnext
   labels:
     app.kubernetes.io/name: erpnext
@@ -46,7 +53,7 @@ spec:
               done
               echo "site $${SITE_NAME} is ready";
 
-              KWARGS="$(printf '{"doctype": "Social Login Key", "enable_social_login": 1, "social_login_provider": "Custom", "provider_name": "authentik", "client_id": "%s", "client_secret": "%s", "icon": "", "base_url": "https://auth.%s", "custom_base_url": 1, "authorize_url": "/application/o/authorize/", "access_token_url": "/application/o/token/", "redirect_url": "/api/method/frappe.integrations.oauth2_logins.custom/authentik", "api_endpoint": "/application/o/userinfo/", "auth_url_data": "{\\"response_type\\": \\"code\\", \\"scope\\": \\"openid email profile\\"}", "user_id_property": "sub", "sign_ups": "Allow"}' "$${CLIENT_ID}" "$${CLIENT_SECRET}" "$${DOMAIN}")"
+              KWARGS="$(printf '{"doc": {"doctype": "Social Login Key", "enable_social_login": 1, "social_login_provider": "Custom", "provider_name": "authentik", "client_id": "%s", "client_secret": "%s", "icon": "", "base_url": "https://auth.%s", "custom_base_url": 1, "authorize_url": "/application/o/authorize/", "access_token_url": "/application/o/token/", "redirect_url": "/api/method/frappe.integrations.oauth2_logins.custom/authentik", "api_endpoint": "/application/o/userinfo/", "auth_url_data": "{\\"response_type\\": \\"code\\", \\"scope\\": \\"openid email profile\\"}", "user_id_property": "sub", "sign_ups": "Allow"}}' "$${CLIENT_ID}" "$${CLIENT_SECRET}" "$${DOMAIN}")"
 
               bench --site "$${SITE_NAME}" execute frappe.client.insert --kwargs "$${KWARGS}";
           env:
