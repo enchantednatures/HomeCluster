@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: erpnext-oidc
+    namespace: erpnext
+type: Opaque
+stringData:
+    client-id: ENC[AES256_GCM,data:zR7U7BoiZA==,iv:3RhlAt17FGlgoRKbQkRHXJo3JBLHbogC0oLFE2jXoZw=,tag:JYS2yZtYcEGtUMh0Zku+dw==,type:str]
+    client-secret: ENC[AES256_GCM,data:3ZR8PiSFDCgpc+L7aIuWTYUn3mA2LxgRbJ3t+afjSDEB3leeOY+93zF5NwM=,iv:xCMCbkE07ZmOXwNjCxs9S6y7FbiZQl5iVV5+L4h64jw=,tag:ZOVCT5l/rFLWFxZ7V0lSug==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBzREpQZUpvRnQzeWNvUjQx
+            c3FjUjhnam1Pc0hqZmdabHJqSXVjYUlZb3pFCkUwcm1iYi9PR2hpREdRbmVNTnEx
+            L1NJVEloMkZpTGE1Y2tUOGtPckNVbDAKLS0tIGlFSlN0NVZaNVZGVnpFN1ZYMStz
+            ZjZHVFplZ2NsZmx5S2VLby9senFQeXcKmtDFvpxvwHubJC6VOsTpkko2tIaLtKqr
+            SvnGD/5OjghUrnlbdpunZFwhJJwrlxomvUDV9QHBYtyO/uURepSMgA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-14T04:48:08Z"
+    mac: ENC[AES256_GCM,data:P3GaZKaEvwcjlTrPSvyM0TlwsvUAZcuraaYr3/HqkV28PreRhecOYpHhMq6zLmTwWoBE0UowXo4WjEq1agr3nCJH9mF/aVjv8ZRs9Z1iEvaikKTOVGlSET5yzA8UVJIrl3JspEGqC0WhsnpuNxZNGkdn18sHzXRODOdXlgLv3Ns=,iv:K9biLj8tcNuE/hxD525mKuBkX3R92/9ck2GsWJVGB6s=,tag:bzFMhQgWh/JclEEAmn33gg==,type:str]
+    version: 3.13.3

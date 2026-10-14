@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: authentik-blueprint-erpnext
+    namespace: authentik
+type: Opaque
+stringData:
+    erpnext.yaml: ENC[AES256_GCM,data:q7djxAhDbZZowI+mZNFeh23QCRnZJpJMgnz3ye1ITH49Jbkw19U9VapuL8gRh5mBKRATo6h9U2u38XDBb6C3llzzcHzqw0JLT7+d0VgbL5WLSuaPc5/PZhYCSGPUWwzOiYwSX7OkDx9N2ocxEa2ESnKuucCCuzmgSQXc54nfWfvsQFGsRJQ5N1vsRgm3iKPnmnrMAMQWyldsY6qxtkvQwktzWNNx/Ehz/89znixZrOF0fZUyHCeIGElqxb0LeQeEy+f7/0tG7S/wfWT6K1/HtjRSMN2l1giRw2EqmP8MgAEjRgVchQQFVO3TF9Jp/cJ6fm3M4qM/ki5kvpY6hU4efsUkRIYVYahjJssHNY503c2szM/8F8MChDybU8ZW7oRm8NhCdoYezdPOXtBvjyiSjJDbei/sx+QHTqimx+32Yn0QVdijyX2ZhFoRHhx1jd569nIrOf12ydOiRK4RhQDk2PrN2O9tBlJaSpMZKRbTut/9fwg6yQLLkIAftqttQ0qoL6oqzUkOj/P4hnX5EhH5lZy1rElffqOmt96Bq/AO6sET++b0tF1bp3d2MMQYCe0An5JAxDUI5r4snuggMy5b+Bq4zqL22D5gwyEyq6a/O/eoNYtimettqkAyDDozwknrVhW5X7UDgeAQdSuY205V/hug+4UOQdSLh7DmuDhQkl8vTPXcgx1dCQHmVYIeBaaIbL3lZU/bwUVstPHKv2mLqW3vT4cPGFHOHlvFHRJRiUWS+5xMyZGnfMIp2nGJ+7Ls1GbdcSpeLMQf2sdlmuqFh+rB9bQl7pf3Tpf2gF7vN+tpnYlR5jjlJpDxT+6tctFGoRuyTKjbZk17lgXolGBMDp+TqJNuJKE/L9eFQUr3EQoqyqpvY0XHPeUGynhSjMy2njL5arL8XvWzRVJo9aUqDg7KSAvkAkuMsLFsAQOapAsurQRmCuqJDi2OVf0qGlhN/gsLtFdIWfV9BZt3wzNCcBMS6zG0LjF3cfFZ7JA/9b9p7iiSePtoav6Vy6HDHfjFfzc5MwkubMgkHhLvrRyJ26o8tCiBmBENT18jCEDP2Cs4lR4bSMqE+0Jh8k6UinHXcke/R1yxtKG4g5QbQ7KmW9vqJamF1Tfb13LDlOiMpBPznsw6SpWNgGZEYABc6+tcDIOnX191UaC1lzdFrAhyDUC70u+0s/8Jr6qXZYusgE1xt10x4RfTxbmkB3d0tVbGEyLChzfNc0avel7Pks7xG4RfGliVUOn83FMQo6SefTZroQoppXYP/bN0gphwteiJ3glD5iD/KSkKKP8nyyGgFaT4kZQL/BqLNo+8jEHDvRutWjiOzdf+1xVTZX0iFYHmojKVJ45LMKwH/jRBWhkV2dplFBGcjkeFvoJpGkoEgSO5lrUuKJckYsL5yfoIEXG2bowamIfYRO0dvGYhoCVvVqsx2nUUAomb6pwS07W+pB2Y4uIbxlTjpcqtGnZj/D31PNhdjjaR47s4DObyGu/2y65EAzAN1qa5ME0vW4F5LNNKCbeM0ztgNEzQw68W/SR145evrNhWeuRbig7u/mh7gjH4RFWUO58iY1kS31K4Qxp+Z8lQXbgzSivNen3L1vIKiJYoSeaMiSnebhVXsocNdVnOEss7JWgbcZ+/d3buS1z5MO9BwpNF8gpsWrsvhlIx05300m0xV4qQ64hOW7sVaMmK3YZ12RoNSIlXWTrZ4u52TbMR4xLb4zCWTnfFqKY7nFH0VDhtOUm/LRNv+S8HSuOS18YXMBBgrR/8OssoGnUjaZ3FiOqvmbU8A609m55+M+brrqYwiNnIgPhNKQgkl7QTXyPhSgdiJwl83xCaT0PqNtMaK0My6TYKW3uUg2UdhvQjTMvQrrkLlxw9vyHKdf3XLI/pNMBFF/qUQp1wiHR5gqSZR4mCJFE+F6uPtsNaFVacB653gmq4m93b/bXYZvaHbF7s0O2wVfES0gFXlbiRWsCO3prNKc8HsnMrqwCTFZKAMo6tfPo32N1v9cDo4CosllmjIAQykrCHAbKqTkV1bjRvEiLE8x3GheJ42Vm+gpjDimVotkM2TGAALM0GaCn+e1OlRw1boHURtlF5l75HJW9LcP34ynZX5r3niG57/Ccg/OEpsFOKeR4VyykhXD0UWOCmS4pcZvMWvLrGFZdr28nupO1WuWru+tcRcrGC2MpoR7ND5TcKa5o23FEr1y4jOxsru+VK+0h+b7SyqHP6kJQ3a9M4yt+fjtqcGX8Go/xnCS7Fb7j2tgC6RuhudpyKY1cWkkvP14i3h53QR/xxnV0hKRgift3lEV3e1Mrna55y16EQWa2mVD/592f7zWvgyafisYxLBysJXHzAoNdaAKkWeGWQVAbImvE5YpPEvqY14zSW0DSBl+PVQDzcUC3Drfw4TmFDN3zxPNWM+m8FbbBcmhBPv6nv6YdJsC87mHZQ5WwcCmQ4a/JHsMsB4cE9cTHjoZzj5pABdJYfsigGJfLdRR5Aed2/LcvcRWghThCP/79pBFTJ7farjHAG1Q8zc3ZJ2IS/ObsDsugWl5YM6j5BpqXrxs/qDDE2RjOwx1cg6imcgVoTg2IaUnk32pt1qLrX6sLvELo=,iv:aa9CU5oIZdLsVrxkTBu0r/1IrR4eKajJhDwBUxy5iCs=,tag:UfMQh5SK+vUCRX457jdV/w==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBVM3V1Y0hrN3BzVEo4bFBq
+            RXNzSG5NTFJGNFJkRnRQSlJLeVNpTnM5MDNBCmt0QVNEMWd0Vmx3U1l3M25lVWZ0
+            LytQVi9MUWhQeGhmRDBpNTU2cCtDZ2MKLS0tIG9ZN25nOEJEbElMSFJucGh4Vmh4
+            L0ZwRHRvVUhNOVMrbVhVeGlhQXFGVGsKCXQaO8IOrf81Wa00UX61j6uv4nOQgcHf
+            RlK7EKjjePL7uFO0YZoeWwlm0HwY6aPamG638fJzQsjbCZNF063UmQ==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-14T04:48:08Z"
+    mac: ENC[AES256_GCM,data:2Ff6xXARHeXZL7Sx3TDGGgYbmCyE5UgMWFegOXaDdokEWV3fhMzbJpOwPBV3Sz4GRG8ZB2pQCInDXJ7cWI1mrNURWMoFv9yDYaGiXs6ktNRBf809HpSFREcS7Ufhx8xc3+gAmJqffLxxzDsko7coPTJkVLUgxYty1Vh11UHf8C4=,iv:V2AKUgOkvtG3mR+cbi77xhwmr+sN7kOaLMjTkqyFHSI=,tag:EdVn+GBYiVz+669PdDdy0w==,type:str]
+    version: 3.13.3

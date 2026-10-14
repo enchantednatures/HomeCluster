@@ -12,3 +12,4 @@ resources:
   - ./blueprint-netboot.yaml
   - ./blueprint-istio-forward-auth.yaml
   - ./blueprint-gravitino.sops.yaml
+  - ./blueprint-erpnext.sops.yaml
