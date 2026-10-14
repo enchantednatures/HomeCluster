@@ -18,3 +18,22 @@ spec:
     destinationPVC: erpnext-sites
     cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
+    # erpnext-sites is RWX, but the cache PVC lands on ceph-block (RBD, RWO-only);
+    # VolSync would derive RWX from the destination PVC, so pin the access mode
+    cacheAccessModes:
+      - ReadWriteOnce
+    # erpnext is not on the Kyverno require-pod-resources namespace exclusion
+    # list, so the mover pod must declare CPU/memory requests and a memory limit
+    moverResources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    # sites volume is owned by uid 1000 and world-readable; restores must write
+    # as the app uid, and fsGroup makes empty/fresh restore targets writable
+    moverSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
