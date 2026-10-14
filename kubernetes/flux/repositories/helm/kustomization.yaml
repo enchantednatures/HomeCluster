@@ -24,6 +24,7 @@ resources:
   - ./external-dns.yaml
   - ./fairwinds.yaml
   - ./flink-charts.yaml
+  - ./frappe.yaml
   - ./fluxcd-community.yaml
   - ./gitea-charts.yaml
   - ./grafana.yaml
@@ -44,6 +45,7 @@ resources:
   - ./kestra-charts.yaml
   - ./kiali.yaml
   - ./kyverno.yaml
+  - ./mariadb-operator.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
   - ./open-telemetry.yaml
