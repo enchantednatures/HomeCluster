@@ -13,7 +13,7 @@ spec:
   chart:
     spec:
       chart: erpnext
-      version: 8.0.86 # datasource=helm depName=erpnext repository=https://helm.erpnext.com
+      version: 8.0.84 # datasource=helm depName=erpnext repository=https://helm.erpnext.com
       sourceRef:
         kind: HelmRepository
         name: frappe
