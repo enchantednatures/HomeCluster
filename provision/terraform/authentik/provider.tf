@@ -30,7 +30,7 @@ terraform {
     }
     minio = {
       source  = "aminueza/minio"
-      version = "3.44.0"
+      version = "3.45.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
