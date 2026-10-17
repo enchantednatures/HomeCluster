@@ -18,7 +18,7 @@ spec:
         runAsNonRoot: true
       containers:
         - name: bootstrap
-          image: curlimages/curl:8.22.0 # datasource=docker depName=curlimages/curl
+          image: curlimages/curl:8.23.0 # datasource=docker depName=curlimages/curl
           command:
             - /bin/sh
             - -c
