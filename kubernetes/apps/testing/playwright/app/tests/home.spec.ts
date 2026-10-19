@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
 
 const BASE_URL =
-  process.env.BASE_URL ?? 'http://immich-server.immich.svc.cluster.local:2283';
+  process.env.BASE_URL ?? 'http://pushgateway.monitoring.svc.cluster.local:9091';
 
-test('home page loads the Immich login form', async ({ page }) => {
+test('pushgateway UI is served', async ({ page }) => {
   await page.goto(BASE_URL, { waitUntil: 'domcontentloaded' });
 
-  await expect(page).toHaveTitle(/Immich/i);
-  await expect(page.locator('input[type="email"]')).toBeVisible();
+  await expect(page).toHaveTitle(/Prometheus Pushgateway/i);
+  await expect(page.getByRole('link', { name: /Pushgateway/i })).toBeVisible();
 });

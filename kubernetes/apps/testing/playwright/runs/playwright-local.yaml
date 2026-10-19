@@ -26,7 +26,7 @@ spec:
               exit ${TEST_EXIT:-0}
           env:
             - name: BASE_URL
-              value: http://immich-server.immich.svc.cluster.local:2283
+              value: http://pushgateway.monitoring.svc.cluster.local:9091
             - name: SUITE
               value: home
             - name: PLAYWRIGHT_JSON_OUTPUT_NAME

@@ -28,7 +28,7 @@ spec:
             - name: SELENIUM_REMOTE_URL
               value: http://selenium-grid-selenium-hub.selenium.svc.cluster.local:4444
             - name: BASE_URL
-              value: http://immich-server.immich.svc.cluster.local:2283
+              value: http://pushgateway.monitoring.svc.cluster.local:9091
             - name: SUITE
               value: home
             - name: PLAYWRIGHT_JSON_OUTPUT_NAME
