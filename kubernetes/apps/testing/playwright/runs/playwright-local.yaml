@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: playwright-local
+  namespace: testing
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 1800
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: playwright
+          image: mcr.microsoft.com/playwright:v1.64.1-noble
+          workingDir: /work
+          command:
+            - bash
+            - -c
+            - |
+              cp -r /tests/. /work/
+              npm ci --no-fund --no-audit
+              npx playwright test || TEST_EXIT=$?
+              node push-metrics.mjs || true
+              exit ${TEST_EXIT:-0}
+          env:
+            - name: BASE_URL
+              value: http://immich-server.immich.svc.cluster.local:2283
+            - name: SUITE
+              value: home
+            - name: PLAYWRIGHT_JSON_OUTPUT_NAME
+              value: /work/results.json
+            - name: PUSHGATEWAY_URL
+              value: http://pushgateway.monitoring.svc.cluster.local:9091
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 2Gi
+          volumeMounts:
+            - name: tests
+              mountPath: /tests
+              readOnly: true
+            - name: work
+              mountPath: /work
+            - name: dshm
+              mountPath: /dev/shm
+      volumes:
+        - name: tests
+          configMap:
+            name: playwright-tests
+            items:
+              - key: package.json
+                path: package.json
+              - key: package-lock.json
+                path: package-lock.json
+              - key: playwright.config.ts
+                path: playwright.config.ts
+              - key: push-metrics.mjs
+                path: push-metrics.mjs
+              - key: home.spec.ts
+                path: tests/home.spec.ts
+        - name: work
+          emptyDir: {}
+        - name: dshm
+          emptyDir:
+            medium: Memory
+            sizeLimit: 1Gi

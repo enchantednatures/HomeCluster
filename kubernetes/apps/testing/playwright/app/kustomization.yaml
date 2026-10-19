@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/kustomization_v1beta1.json
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./dashboard.yaml
+configMapGenerator:
+  - name: playwright-tests
+    files:
+      - package.json
+      - package-lock.json
+      - playwright.config.ts
+      - push-metrics.mjs
+      - tests/home.spec.ts
+    options:
+      disableNameSuffixHash: true
+      annotations:
+        kustomize.toolkit.fluxcd.io/substitute: disabled
