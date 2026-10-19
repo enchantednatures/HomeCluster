@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/grafana/k6-operator/main/config/crd/bases/k6.io_testruns.yaml
+---
+apiVersion: k6.io/v1alpha1
+kind: TestRun
+metadata:
+  name: k6-smoke
+  namespace: testing
+spec:
+  parallelism: 1
+  arguments: "-o experimental-prometheus-rw --tag testid=smoke"
+  script:
+    configMap:
+      name: k6-scripts
+      file: smoke.js
+  runner:
+    env:
+      - name: K6_PROMETHEUS_RW_SERVER_URL
+        value: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
+      - name: K6_PROMETHEUS_RW_TREND_STATS
+        value: "p(95),p(99),avg,min,max"
+      - name: K6_PROMETHEUS_RW_STALE_MARKERS
+        value: "true"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 256Mi
