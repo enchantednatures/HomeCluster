@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/servicemonitor.json
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: selenium-grid
+  namespace: selenium
+  labels:
+    app.kubernetes.io/name: selenium-grid
+    app.kubernetes.io/instance: selenium-grid
+    app.kubernetes.io/component: hub
+spec:
+  namespaceSelector:
+    matchNames:
+      - selenium
+  selector:
+    matchLabels:
+      app: selenium-grid-selenium-hub
+      app.kubernetes.io/instance: selenium-grid
+  endpoints:
+    - port: tcp-metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      path: /metrics
+      scheme: http

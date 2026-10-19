@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: selenium-grid
+  namespace: selenium
+spec:
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: selenium-grid
+      version: 0.62.0 # datasource=helm depName=selenium-grid repository=https://www.selenium.dev/docker-selenium
+      sourceRef:
+        kind: HelmRepository
+        name: selenium
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    monitoring:
+      # Enable the built-in Prometheus exporter on the hub without installing
+      # the chart's bundled kube-prometheus-stack dependency.
+      enabled: false
+      enabledWithExistingAgent: true
+      exporter:
+        port: 9615
+      grafana:
+        dashboards:
+          enabled: false
+      # A ServiceMonitor is supplied as a standalone manifest in this repo.
+      serviceMonitor:
+        enabled: false
+      podMonitor:
+        enabled: false
+    hub:
+      resources:
+        requests:
+          cpu: 250m
+          memory: 512Mi
+        limits:
+          memory: 1Gi
+    chromeNode:
+      enabled: true
+      replicas: 1
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          memory: 2Gi
+    firefoxNode:
+      enabled: true
+      replicas: 1
+      resources:
+        requests:
+          cpu: 500m
+          memory: 1Gi
+        limits:
+          memory: 2Gi
+    edgeNode:
+      enabled: false
+    videoRecorder:
+      enabled: false
+    ingress:
+      enabled: false
+      enableWithController: false
+    autoscaling:
+      enabled: false
+      enableWithExistingKEDA: false
