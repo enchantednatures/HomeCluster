@@ -105,6 +105,14 @@ spec:
             editable: true
             options:
               path: /var/lib/grafana/dashboards/dns
+          - name: loadtesting
+            orgId: 1
+            folder: Load Testing
+            type: file
+            disableDeletion: false
+            editable: true
+            options:
+              path: /var/lib/grafana/dashboards/loadtesting
     datasources:
       datasources.yaml:
         apiVersion: 1
@@ -192,6 +200,11 @@ spec:
         blocky:
           gnetId: 13768 # https://grafana.com/grafana/dashboards/13768-blocky/
           revision: 8
+          datasource: Prometheus
+      loadtesting:
+        k6-prometheus:
+          gnetId: 19665 # https://grafana.com/grafana/dashboards/19665-k6-prometheus/
+          revision: 3
           datasource: Prometheus
       flux:
         flux-cluster:
