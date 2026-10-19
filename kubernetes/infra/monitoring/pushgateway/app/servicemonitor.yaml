@@ -1,0 +1,25 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/v1/servicemonitor.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: pushgateway
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: pushgateway
+    app.kubernetes.io/component: metrics
+    app.kubernetes.io/instance: pushgateway
+spec:
+  namespaceSelector:
+    matchNames:
+      - monitoring
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-pushgateway
+      app.kubernetes.io/instance: pushgateway
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /metrics
+      honorLabels: true
+      scheme: http
