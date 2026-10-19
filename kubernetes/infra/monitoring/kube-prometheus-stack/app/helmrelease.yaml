@@ -164,6 +164,7 @@ spec:
         probeSelectorNilUsesHelmValues: false
         scrapeConfigSelectorNilUsesHelmValues: false
         enableAdminAPI: true
+        enableRemoteWriteReceiver: true
         walCompression: true
         retentionSize: 8GB
         replicas: 2
