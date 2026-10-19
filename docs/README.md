@@ -87,6 +87,7 @@ graph TB
 | [Architecture](architecture.md) | Detailed system architecture and component relationships |
 | [Kubernetes Infrastructure](kubernetes-infrastructure.md) | Infrastructure components and operators |
 | [Kubernetes Applications](kubernetes-applications.md) | Application deployments and configurations |
+| [Application Onboarding](apps/README.md) | Tutorial, how-tos, and reference for adding applications and services |
 | [Flux GitOps](flux-gitops.md) | GitOps workflow and Flux configuration |
 | [Terraform Provisioning](terraform.md) | Infrastructure provisioning with OpenTofu/Terraform |
 | [Deployment Guide](deployment-guide.md) | Complete deployment and configuration instructions |

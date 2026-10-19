@@ -9,6 +9,7 @@ A GitOps-managed Kubernetes home lab running **Talos** on **Proxmox** VMs, provi
 - [Flux GitOps](flux-gitops.md) -- GitOps workflow and configuration
 - [Infrastructure](infrastructure.md) -- Infrastructure components
 - [Applications](kubernetes-applications.md) -- Deployed applications
+- [Application Onboarding](apps/README.md) -- How to add applications and services
 - [Networking](networking.md) -- Network stack and service mesh
 
 ## Current Status

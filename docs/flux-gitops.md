@@ -147,9 +147,9 @@ graph TB
 
 > **Actual dependency chain** (from Flux Kustomization YAML):
 > - **Infrastructure**: no dependencies
-> - **Core**: depends on Infrastructure
+> - **Core**: depends on Infrastructure + `kyverno-policies`
 > - **Operators**: depends on Core + Infrastructure
-> - **Apps**: depends on Core + Infrastructure
+> - **Apps**: depends on Core + Infrastructure + Operators + `kyverno-policies`
 
 ## Deployment Layers
 
@@ -203,7 +203,7 @@ User-facing applications and workloads:
 - Development tools
 - Virtual machines
 
-**Dependencies**: Core and Infrastructure layers must be healthy
+**Dependencies**: Core, Infrastructure, and Operators layers plus `kyverno-policies` must be healthy
 
 ## Secret Management
 
