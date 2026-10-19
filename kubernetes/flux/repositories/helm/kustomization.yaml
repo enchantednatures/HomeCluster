@@ -54,6 +54,7 @@ resources:
   - ./renovate.yaml
   - ./rook-ceph.yaml
   - ./sail-operator.yaml
+  - ./selenium.yaml
   - ./stakater.yaml
   - ./strimzi.yaml
   - ./tailscale-charts.yaml
