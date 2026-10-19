@@ -11,6 +11,12 @@ spec:
   arguments: "-o experimental-prometheus-rw --tag testid=smoke"
   initializer:
     image: grafana/k6:2.3.0
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 128Mi
   script:
     configMap:
       name: k6-scripts
