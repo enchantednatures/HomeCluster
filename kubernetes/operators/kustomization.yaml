@@ -10,6 +10,7 @@ resources:
   - ./elastic
   # - ./flink
   - ./flagger
+  - ./k6-operator
   - ./kubevirt
   - ./mariadb-operator
   - ./medik8s

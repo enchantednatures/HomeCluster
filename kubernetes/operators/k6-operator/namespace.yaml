@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: k6-operator
+  labels:
+    app.kubernetes.io/name: k6-operator
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    istio-injection: disabled
+    goldilocks.fairwinds.com/enabled: "true"
