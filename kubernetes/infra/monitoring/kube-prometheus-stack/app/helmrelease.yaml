@@ -172,24 +172,28 @@ spec:
         # Hardened for slow WAL replay / TSDB block work after a restart: the
         # previous 3s timeout + 5s period killed the container mid-replay.
         # 10s timeout x 10 failures at a 30s period = 5 minutes of grace.
-        livenessProbe:
-          httpGet:
-            path: /app-health/prometheus/livez
-            port: 15020
-            scheme: HTTP
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 10
-          successThreshold: 1
-        readinessProbe:
-          httpGet:
-            path: /app-health/prometheus/readyz
-            port: 15020
-            scheme: HTTP
-          periodSeconds: 30
-          timeoutSeconds: 10
-          failureThreshold: 10
-          successThreshold: 1
+        # The Prometheus CR has no top-level probe fields; patching the
+        # operator-managed container is the supported override.
+        containers:
+          - name: prometheus
+            livenessProbe:
+              httpGet:
+                path: /app-health/prometheus/livez
+                port: 15020
+                scheme: HTTP
+              periodSeconds: 30
+              timeoutSeconds: 10
+              failureThreshold: 10
+              successThreshold: 1
+            readinessProbe:
+              httpGet:
+                path: /app-health/prometheus/readyz
+                port: 15020
+                scheme: HTTP
+              periodSeconds: 30
+              timeoutSeconds: 10
+              failureThreshold: 10
+              successThreshold: 1
         resources:
           requests:
             cpu: 200m
