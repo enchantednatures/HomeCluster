@@ -59,16 +59,20 @@ kubectl -n testing get testrun,jobs,pods
 kubectl -n testing logs job/k6-smoke-1 --tail=40
 ```
 
-Observed timings from the verified re-run:
+Observed timings from two consecutive verified runs with the 30 s profile:
 
-| Step | Observed |
-|---|---|
-| `apply` to `.status.stage=finished` | 19 s |
-| Runner Job `k6-smoke-1` duration | 15 s |
-| Initializer Job `k6-smoke-initializer` duration | 4 s |
+| Step | Run 1 | Run 2 |
+|---|---|---|
+| `apply` to `.status.stage=finished` | 41 s | 41 s |
+| Runner Job `k6-smoke-1` duration | 35 s | 35 s |
+| Initializer Job `k6-smoke-initializer` duration | 4 s | 4 s |
+| Starter Job `k6-smoke-starter` duration | 13 s | 13 s (Complete) |
 
-The stage progresses through `initialization`, `created`, `started`, and finally
-`finished`. If a delete is still pending, the idempotent fallback is:
+The stage progresses through `initialization`, `initialized`, `created`,
+`started`, `stopped` (when the runner finishes while the operator is still
+watching), and finally `finished`. A successful run always ends at `finished`;
+`error` is the failure terminal. If a delete is still pending, the idempotent
+fallback is:
 
 ```bash
 kubectl -n testing wait --for=delete testrun/k6-smoke --timeout=120s
@@ -77,12 +81,28 @@ kubectl -n testing wait --for=delete testrun/k6-smoke --timeout=120s
 Then re-apply. Both deletes in the verified runs completed in one second or less,
 so the fallback never fired.
 
-### The starter Job can end in Error
+If `stage=created` persists for more than 2 minutes while the runner Job is
+already `Complete`, the operator missed the short-lived readiness window. Recover
+by deleting and re-applying the TestRun; do not wait indefinitely and do not
+weaken any policy:
 
-On a short test, `job/k6-smoke-starter` may finish as `Error` with a log line like
-`constant-vus executor 'default' doesn't support pause and resume operations
-after its start`. That Job is the operator's pause helper, and it races a 10 s
-test that has already ended. It is cosmetic and expected.
+```bash
+kubectl -n testing get job k6-smoke-1
+kubectl -n testing delete testrun k6-smoke
+kubectl -n testing apply -f kubernetes/apps/testing/k6/runs/smoke-testrun.yaml
+```
+
+The 30 s profile in this repo makes that race unlikely: the runner now outlives
+the operator's 10 s readiness probe by several probe windows (measured twice at
+41 s end to end, previously 10 s tests stuck at `created`).
+
+### The starter Job can end in Error on very short tests
+
+The starter Job is the operator's pause helper. On a test that ends almost
+immediately it can race the end of the run and finish as `Error` with a log line
+like `constant-vus executor 'default' doesn't support pause and resume operations
+after its start`. With the 30 s profile in this repo it completed normally in
+both verified runs, but treat an occasional starter `Error` as cosmetic.
 
 Check the runner Job, not the starter:
 
@@ -115,14 +135,18 @@ Edit `options` in `kubernetes/apps/testing/k6/app/smoke.js`:
 ```javascript
 export const options = {
   vus: 2,
-  duration: '10s',
+  duration: '30s',
 };
 ```
 
-The current profile is 2 virtual users for 10 seconds, with a GET to `/` and a
-GET to `/contacts.php` per iteration. After an edit, commit and push, reconcile
-the ConfigMap (see [Adding tests](#adding-tests)), then delete and re-apply the
-TestRun so the new script is loaded.
+The current profile is 2 virtual users for 30 seconds, with a GET to `/` and a
+GET to `/contacts.php` per iteration. The 30 s lifetime is deliberate: a 10 s
+test could finish before the operator's 10 s readiness probe observed the runner
+pod, leaving the TestRun at `stage=created`.
+
+After an edit, commit and push, reconcile the ConfigMap (see
+[Adding tests](#adding-tests)), then delete and re-apply the TestRun so the new
+script is loaded.
 
 ## Run the Playwright suite
 
@@ -182,18 +206,32 @@ ConfigMaps labelled `grafana_dashboard: "1"`.
 | `k6 Prometheus` | `k6-prometheus` | `Thanos-NoDedup` (uid `thanos-raw`) | `k6_*` series tagged `testid="smoke"` |
 | `Playwright E2E` | `playwright-e2e` | `Prometheus` (uid `prometheus`, deduped) | Pushgateway gauges for `job="playwright-e2e"` |
 
-### Why k6 uses a separate datasource
+### Why the k6 dashboard uses a separate datasource
 
 k6 writes metrics with remote-write straight to the Prometheus Service. That
-opens a single connection, so all samples land on one Prometheus replica. Thanos
-Query runs with `--query.replica-label=prometheus_replica`, and its default
-replica dedup returns an empty result for series that exist on only one replica.
+opens a single connection, so the samples from a run land on one Prometheus
+replica. Thanos Query runs with `--query.replica-label=prometheus_replica` and
+deduplicates replicas by default.
 
-`Thanos-NoDedup` (uid `thanos-raw`) is the same Thanos endpoint with the custom
-query parameter `dedup=false`. It is non-default and used only by the k6
-dashboard. Do not point the k6 dashboard back at the deduped `Prometheus`
-datasource. Measured during verification: the default query returned an empty
-vector while `dedup=false` returned the expected count.
+Measured behaviour (task-12 and task-21 evidence):
+
+- During a run, both the default deduped `Prometheus` datasource and `dedup=false`
+  return data. The deduped path is not empty for single-replica series while the
+  samples are live.
+- After the run, k6's remote-write stale markers can make the deduped result empty
+  when Thanos keeps the stale replica. The other replica still holds answerable
+  samples, so `dedup=false` keeps answering for about 5 minutes after the markers
+  are written.
+- Persistent history appears only after Prometheus cuts and uploads a block. The
+  measured block cadence on this cluster is roughly 2 to 3 hours.
+
+`Thanos-NoDedup` (uid `thanos-raw`) is the same Thanos endpoint with the query
+parameter `dedup=false`. Use it as the deterministic path for the live window
+right after a run, which is when a fresh result is usually inspected. It is not a
+universal workaround for replica dedup: once a block exists both paths return
+data, and because the replica label is not collapsed a range query can return
+more series than the deduped view. It is non-default and used only by the k6
+dashboard.
 
 The Playwright dashboard is different. Its gauges are scraped from the
 Pushgateway by Prometheus, so both replicas hold them and the normal deduped
@@ -201,13 +239,14 @@ Pushgateway by Prometheus, so both replicas hold them and the normal deduped
 
 ### Live window versus history
 
-k6 series are visible during and immediately after a run, through the Prometheus
-head and the 5 minute staleness lookback. They become reliably queryable as
-history after Prometheus cuts and uploads a block. The measured block cadence on
-this cluster is roughly 2 to 3 hours. During verification, the run was at 23:51Z
-and the newest block on disk ended at 22:00Z, which is consistent with that
-cadence. A query for a just-finished run can therefore be empty on the deduped
-path until a block exists, while `dedup=false` and the live head still answer.
+k6 series are visible during and immediately after a run. The default deduped
+query is reliable while the run is live; after the run the remote-write stale
+markers can make it empty for a few minutes depending on which replica Thanos
+keeps. `thanos-raw` (`dedup=false`) keeps answering from the replica that still
+has samples, for about 5 minutes. Persistent, dedup-safe history appears after
+Prometheus cuts and uploads a block, measured roughly 2 to 3 hours on this
+cluster. Use the k6 dashboard (`thanos-raw`) for live and just-finished results,
+and expect the deduped datasource to fill in once the block has been uploaded.
 
 ## Metric contract
 
@@ -321,14 +360,22 @@ so read the Job logs for the `push-metrics.mjs` output.
 
 Basic authentication is disabled on this cluster; Grafana is OAuth-only, so
 `curl -u admin:password` against the API returns 401 by design. Use the
-provisioning and file evidence instead:
+sidecar and database evidence instead. Dashboards are sidecar-loaded into
+Grafana's runtime folder, not the Helm chart's file-provider path:
 
 ```bash
-kubectl -n monitoring exec deploy/grafana -- sh -c 'ls /var/lib/grafana/dashboards/loadtesting/ && grep -a k6-prometheus /var/lib/grafana/grafana.db >/dev/null && echo present'
+kubectl -n monitoring exec deploy/grafana -- sh -c '
+  ls "/tmp/dashboards/Load Testing/"
+  grep -c thanos-raw "/tmp/dashboards/Load Testing/k6-prometheus.json"
+  grep -a k6-prometheus /var/lib/grafana/grafana.db >/dev/null && echo present
+'
 ```
 
-`k6-prometheus.json` and `playwright.json` should be present, and `present`
-confirms the dashboard is registered in the Grafana database.
+`k6-prometheus.json` and `playwright.json` should both be listed, the
+`thanos-raw` count should be non-zero (the k6 dashboard has no unresolved
+datasource template tokens left), and `present` confirms the dashboard is
+registered in the Grafana database. The old Helm chart file-provider directory
+under `/var/lib/grafana/dashboards/` is intentionally empty; do not look there.
 
 ## Scheduling (not implemented in this repo)
 
