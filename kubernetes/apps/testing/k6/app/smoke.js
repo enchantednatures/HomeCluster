@@ -5,7 +5,7 @@ const BASE_URL = __ENV.BASE_URL || 'https://test.k6.io';
 
 export const options = {
   vus: 2,
-  duration: '10s',
+  duration: '30s',
 };
 
 export default function () {
