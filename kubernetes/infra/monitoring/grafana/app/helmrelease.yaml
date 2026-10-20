@@ -148,6 +148,15 @@ spec:
               manageAlerts: true
               prometheusType: Prometheus
             isDefault: false
+          - name: Thanos-NoDedup
+            type: prometheus
+            uid: thanos-raw
+            access: proxy
+            url: http://thanos-query-frontend.monitoring.svc.cluster.local:9090
+            jsonData:
+              prometheusType: Prometheus
+              customQueryParameters: dedup=false
+            isDefault: false
           - name: Tempo
             type: tempo
             url: http://tempo.monitoring.svc.cluster.local:3100
@@ -200,11 +209,6 @@ spec:
         blocky:
           gnetId: 13768 # https://grafana.com/grafana/dashboards/13768-blocky/
           revision: 8
-          datasource: Prometheus
-      loadtesting:
-        k6-prometheus:
-          gnetId: 19665 # https://grafana.com/grafana/dashboards/19665-k6-prometheus/
-          revision: 3
           datasource: Prometheus
       flux:
         flux-cluster:
