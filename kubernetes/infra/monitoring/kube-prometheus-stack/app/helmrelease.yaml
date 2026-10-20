@@ -172,10 +172,21 @@ spec:
         # Hardened for slow WAL replay / TSDB block work after a restart: the
         # previous 3s timeout + 5s period killed the container mid-replay.
         # 10s timeout x 10 failures at a 30s period = 5 minutes of grace.
+        # The startup probe allows 45 minutes because replaying 128MB WAL
+        # segments on ceph-block can exceed the chart's 15 minute default.
         # The Prometheus CR has no top-level probe fields; patching the
         # operator-managed container is the supported override.
         containers:
           - name: prometheus
+            startupProbe:
+              httpGet:
+                path: /app-health/prometheus/startupz
+                port: 15020
+                scheme: HTTP
+              periodSeconds: 30
+              timeoutSeconds: 10
+              failureThreshold: 90
+              successThreshold: 1
             livenessProbe:
               httpGet:
                 path: /app-health/prometheus/livez
