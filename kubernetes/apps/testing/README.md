@@ -213,25 +213,34 @@ opens a single connection, so the samples from a run land on one Prometheus
 replica. Thanos Query runs with `--query.replica-label=prometheus_replica` and
 deduplicates replicas by default.
 
-Measured behaviour (task-12 and task-21 evidence):
+Measured behaviour (task-12, task-21, and F4 evidence):
 
 - During a run, both the default deduped `Prometheus` datasource and `dedup=false`
-  return data. The deduped path is not empty for single-replica series while the
-  samples are live.
-- After the run, k6's remote-write stale markers can make the deduped result empty
-  when Thanos keeps the stale replica. The other replica still holds answerable
-  samples, so `dedup=false` keeps answering for about 5 minutes after the markers
-  are written.
-- Persistent history appears only after Prometheus cuts and uploads a block. The
-  measured block cadence on this cluster is roughly 2 to 3 hours.
+  return data. Measured at `2026-10-19T23:51:15Z` (epoch `1792453875`):
+  `count(k6_http_reqs_total{testid="smoke"})` was `4` on both paths.
+- After the run, k6's final flush writes stale markers for the series to the
+  connected replica. If that replica is the only copy, an instant query returns
+  empty on BOTH paths as soon as the stale marker is the latest sample:
+  `dedup=false` does not extend an instant-query window. F4 measured both paths
+  empty at `01:07:28Z`, 31 s after the run ended.
+- The raw samples remain available to range queries. At `2026-10-19T23:59:59Z`
+  a `count_over_time(...[10m])` returned data on both paths.
+- Block-backed history returns after Prometheus cuts and uploads a block. With
+  `thanos-store` maxTime at `1792454400000` (`2026-10-20T00:00:00Z`), an instant
+  query at the `2026-10-19T23:51:40Z` run timestamp (`epoch 1792453900`)
+  returned `count(k6_http_reqs_total{testid="smoke"}) = 4` with `dedup=false`.
+  The default deduped path returned empty at that exact timestamp because the
+  stale marker is the latest sample for the merged replica set; at
+  `23:51:15Z`, while real samples were still the newest, both paths returned `4`.
 
 `Thanos-NoDedup` (uid `thanos-raw`) is the same Thanos endpoint with the query
-parameter `dedup=false`. Use it as the deterministic path for the live window
-right after a run, which is when a fresh result is usually inspected. It is not a
-universal workaround for replica dedup: once a block exists both paths return
-data, and because the replica label is not collapsed a range query can return
-more series than the deduped view. It is non-default and used only by the k6
-dashboard.
+parameter `dedup=false`. It is the deterministic choice for the k6 dashboard
+because it avoids replica-selection ambiguity for single-replica remote-write
+series: without dedup the query returns the replica that holds the samples
+instead of collapsing it against stale markers from the peer replica. It is not a
+universal "dedup hides everything" workaround: deduped instant queries still
+work while real samples are the newest, and range queries work on both paths.
+It is non-default and used only by the k6 dashboard.
 
 The Playwright dashboard is different. Its gauges are scraped from the
 Pushgateway by Prometheus, so both replicas hold them and the normal deduped
@@ -239,14 +248,23 @@ Pushgateway by Prometheus, so both replicas hold them and the normal deduped
 
 ### Live window versus history
 
-k6 series are visible during and immediately after a run. The default deduped
-query is reliable while the run is live; after the run the remote-write stale
-markers can make it empty for a few minutes depending on which replica Thanos
-keeps. `thanos-raw` (`dedup=false`) keeps answering from the replica that still
-has samples, for about 5 minutes. Persistent, dedup-safe history appears after
-Prometheus cuts and uploads a block, measured roughly 2 to 3 hours on this
-cluster. Use the k6 dashboard (`thanos-raw`) for live and just-finished results,
-and expect the deduped datasource to fill in once the block has been uploaded.
+During a run, the default deduped query and `thanos-raw` (`dedup=false`) both
+return the k6 series (measured: count `4` on both at `2026-10-19T23:51:15Z`).
+When the run ends, k6's final flush writes stale markers to the replica holding
+the series; if that replica is the only copy, instant queries on both paths
+return empty immediately once the stale marker is the newest sample. Avoid
+treating `dedup=false` as an instant-query extension: it does not add a window.
+
+Raw samples stay queryable with range selectors (for example
+`count_over_time(k6_http_reqs_total{testid="smoke"}[10m])`, verified non-empty
+at `2026-10-19T23:59:59Z`), and block-backed history returns after Prometheus
+cuts and uploads a block (roughly 2 to 3 hours on this cluster). Demonstrated:
+with the uploaded block present (`thanos-store` maxTime `1792454400000`), the
+`2026-10-19T23:51:40Z` run timestamp (`1792453900`) returns count `4` through
+`thanos-raw`; the deduped path returns empty at that instant because dedup
+collapses the series against the newer stale marker. Use the k6 dashboard
+(`thanos-raw`) for live and just-finished results, and use a range query or wait
+for the block-backed history when you need a stable instant answer afterwards.
 
 ## Metric contract
 
