@@ -175,13 +175,15 @@ spec:
         # The startup probe allows 45 minutes because replaying 128MB WAL
         # segments on ceph-block can exceed the chart's 15 minute default.
         # The Prometheus CR has no top-level probe fields; patching the
-        # operator-managed container is the supported override.
+        # operator-managed container is the supported override. Keep the
+        # app-native paths: Istio rewrites these to /app-health/... on the pod,
+        # and pre-rewritten paths bypass the agent and fail with HTTP 400.
         containers:
           - name: prometheus
             startupProbe:
               httpGet:
-                path: /app-health/prometheus/startupz
-                port: 15020
+                path: /-/ready
+                port: http-web
                 scheme: HTTP
               periodSeconds: 30
               timeoutSeconds: 10
@@ -189,8 +191,8 @@ spec:
               successThreshold: 1
             livenessProbe:
               httpGet:
-                path: /app-health/prometheus/livez
-                port: 15020
+                path: /-/healthy
+                port: http-web
                 scheme: HTTP
               periodSeconds: 30
               timeoutSeconds: 10
@@ -198,8 +200,8 @@ spec:
               successThreshold: 1
             readinessProbe:
               httpGet:
-                path: /app-health/prometheus/readyz
-                port: 15020
+                path: /-/ready
+                port: http-web
                 scheme: HTTP
               periodSeconds: 30
               timeoutSeconds: 10
