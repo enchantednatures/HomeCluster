@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationdestination_v1alpha1.json
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: docker-android-restore
+  namespace: android-emulator
+spec:
+  paused: true
+  trigger:
+    manual: ""
+  restic:
+    repository: docker-android-backup-secret
+    copyMethod: Direct
+    moverResources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    destinationPVC: docker-android-data
+    cacheStorageClassName: ceph-block
+    cacheCapacity: 10Gi

@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: docker-android-data
+  namespace: android-emulator
+  labels:
+    app.kubernetes.io/name: docker-android
+    app.kubernetes.io/instance: docker-android
+spec:
+  storageClassName: ceph-block-ssd
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi

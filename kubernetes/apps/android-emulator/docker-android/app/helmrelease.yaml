@@ -1,0 +1,108 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app docker-android
+  namespace: android-emulator
+spec:
+  driftDetection:
+    mode: enabled
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.7.3 # datasource=helm depName=app-template repository=oci://ghcr.io/bjw-s/helm
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    controllers:
+      docker-android:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: budtmo/docker-android
+              # datasource=docker depName=budtmo/docker-android
+              tag: emulator_14.0
+            env:
+              TZ: "${TIMEZONE}"
+              WEB_VNC: "true"
+              EMULATOR_DEVICE: "Samsung Galaxy S10"
+            ports:
+              - name: adb
+                containerPort: 5555
+              - name: http
+                containerPort: 6080
+            securityContext:
+              privileged: true
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 6080
+                  periodSeconds: 10
+                  failureThreshold: 120
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 6080
+                  periodSeconds: 10
+                  failureThreshold: 6
+            resources:
+              requests:
+                cpu: "2"
+                memory: 4Gi
+              limits:
+                memory: 8Gi
+    defaultPodOptions:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
+    service:
+      app:
+        controller: docker-android
+        ports:
+          http:
+            port: 6080
+          adb:
+            port: 5555
+    persistence:
+      data:
+        existingClaim: docker-android-data
+        globalMounts:
+          - path: /home/androidusr/.android
+      kvm:
+        type: hostPath
+        hostPath: /dev/kvm
+        hostPathType: CharDevice
+        globalMounts:
+          - path: /dev/kvm
+      shm:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 2Gi
+        globalMounts:
+          - path: /dev/shm
