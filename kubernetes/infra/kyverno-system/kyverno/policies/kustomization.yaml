@@ -16,3 +16,4 @@ resources:
   - ./serviceentry-rbac.yaml
   - ./cnpg-dragonfly-rbac.yaml
   - ./obc-bucket-owner-guardrail.yaml
+  - ./austin-guardrails.yaml

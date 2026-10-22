@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: austin-ci
+  labels:
+    kustomize.toolkit.fluxcd.io/prune: disabled
+    goldilocks.fairwinds.com/enabled: "true"
+    pod-security.kubernetes.io/enforce: privileged

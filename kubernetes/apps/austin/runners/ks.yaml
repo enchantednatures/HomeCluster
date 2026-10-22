@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: austin-runners
+  namespace: flux-system
+spec:
+  targetNamespace: austin-ci
+  serviceAccountName: austin-flux
+  dependsOn:
+    - name: austin-rbac
+  path: ./kubernetes/apps/austin/runners/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
+  postBuild:
+    substituteFrom:
+      - kind: ConfigMap
+        name: cluster-settings
+      - kind: Secret
+        name: cluster-secrets
+      - kind: ConfigMap
+        name: cluster-settings-user
+      - kind: Secret
+        name: cluster-secrets-user
+  wait: false
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m

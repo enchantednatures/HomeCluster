@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: austin-vm-cloud-init
+    namespace: vms
+    labels:
+        app.kubernetes.io/name: austin-vm-cloud-init
+type: Opaque
+stringData:
+    userData: ENC[AES256_GCM,data:uar6yWtrQ8peQOfp94/eQM41Pf8qO31Z3vX15y1IbwqUOpsjtZHCn0KVHqRRryC5meRGG4+LvU+tDFm57b3y1A3ORJ5Al6SgVYpw4CgGEItxXCJKDljLLSxB9qpwstgYjkrUcbjPwFNMA7RopS2YTqtB5xtg5hUAZ7iMcTfIXx+27031yvLaiN5LmdCariiCmU90LotS+N2ul9xQ1hA5IahWTcPCZznP62ZjB1OgY3bMHA/Ivd+heRvQsXUyETDa0GHCZgZM6LNraf2GhsGP+AZPmcn0wAdRXwK4EtvfLsqAq8Cfvu5BQ0PcAUR6CzK6YhDLiJkVj/OgE0owhNmfan7ZJGGYGLeWtnfFF25PAef4FQpuKm5ZPkF5kFTOCULoZD8CwGO6PJtICbPNtw6f92Zfttsj5c5STM0six6ixvWhoOhe0gbrAGuAfUtEiYY04s57odETZGQFY4+wdJpJzsw7DeyAycM1h6pCXYuuOExnbG3FroRSijPMSHUH18Hn0u/IKamhGjV6SOIBdy0sz9zMoQOXCdEXfF0Zxv1U0jOOG745qGfxNOF1foIg9QcjsuCWDDBGw0i5rAgHHFEhEmi9RjyLBG3jsoJRldAS/VDUUKzS/SjEFpjIuw4On0WyP7O+aTVGnPftIu3FXo509zpiFUGUNcmjyz6bcTsfzMQvMVopq5di4Tuy3HnmOsCe+uFojoqVzLXfdw813PrLRLLmNwHMNAZVkUZbhJVaAfUsBWXT2wb+56TxaXeV8fldqI7J+nznJIzW8DH+J+NYGwNcC9WLGlmJNxJJqz1ZS5kbhX2NHltD8bgfN2hMbcX7tFupEMkLc0mRSmV4quUMtZeX7EBDtppPWVjHokAKDPGqk8H3AYz7ZBXx12QXTAIEMWQLPnhKmt4nm1UqXXzMXimyPbhQRhucGqazdqSTEzDH6URivqTnL97jRJ05UJVnsWzyWfqhem+PwrZuxNboojtx4o3NQjNFAM7uwWESUJ68Qv0xXiAq0q9KTEy9gKS9RAP4rxP8NJ6w0i2Ng2SQrnEVGKqG5HKsIM3NVur3me9v3HY/z9FHdW+YP8muHh+fYeIHF8g0c3QygOW3RGiWD0cXywM4+uoibKa53wUkG/2amClbrdTmPm9tfIdJn1jQwt6U1zZXbSIp+nrV2f+xHtwweCgKSjOQ/x8IvjxeKS7RmXMdtpdZog==,iv:CtT/rKfxk1o88yZmaKCommm2jQryJIpRVNs+RGQB/K0=,tag:6ktpexEnOm6oUXIz8Hz0lg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAvL0d3b3FrV0toWXJUQk1C
+            SXFTM0ZoNG5LQVpnYUZhSk4yMWZzTEVCV1JNClArVWNaZ1FLUGtHN1dkRW55SFZq
+            dDRMWXJUZ3VCbTRpM0VibVVoTEZsUlUKLS0tIHNud1hzaS9nR3JtVElQOWJTcWgv
+            cVl6OU81VHRjeWpCSHBIT215Z2FENmcKPsuqVSVGlPmv1WSMr+xV/kNjuEbrWvVs
+            Dnc8rgOdDqVCiLAez++xwyoxHW+Fgs0zdTSekMwkVdkTCUsus9/SVg==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-22T20:30:44Z"
+    mac: ENC[AES256_GCM,data:YONMVYQfEHmCL8ggvSqaIBH8NNmyt+buPET3xJ742Ne7LFDcz502uDDnMV7TiZ/K5lXMXrULliL5Sbda7POgy2upB8hf8lxp94Q16hZGbkWvZK9vEln9rFbdQtiLrMZ5ohA7+ddNj4skQahRBSXDbRJdhYabONXfbrDr+3Ea4mA=,iv:S5qKt+5B5P3kvBlB03JdwF/6gAeEOmgDo8kUXlW9v/w=,tag:MQiY4j6LgmRTXXqXb9eOwA==,type:str]
+    version: 3.13.3

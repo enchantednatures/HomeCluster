@@ -53,6 +53,7 @@ spec:
             - cdi
             - vms
             - actions-runner-system
+            - austin-ci
             - porygon
             - knative-eventing
             - kafka
@@ -137,6 +138,7 @@ spec:
             - kubevirt
             - cdi
             - vms
+            - austin-ci
             - redpanda
   autogen:
     podControllers:

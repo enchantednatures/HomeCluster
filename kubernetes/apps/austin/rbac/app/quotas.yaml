@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: austin-quota
+  namespace: vms
+spec:
+  hard:
+    count/helmreleases.helm.toolkit.fluxcd.io: "0"
+    count/kustomizations.kustomize.toolkit.fluxcd.io: "0"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: austin-quota
+  namespace: testing
+spec:
+  hard:
+    count/helmreleases.helm.toolkit.fluxcd.io: "0"
+    count/kustomizations.kustomize.toolkit.fluxcd.io: "0"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: austin-quota
+  namespace: austin-ci
+spec:
+  hard:
+    count/kustomizations.kustomize.toolkit.fluxcd.io: "0"

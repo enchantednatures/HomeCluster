@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: austin-ssh-key
+    namespace: vms
+    labels:
+        app.kubernetes.io/name: austin-ssh-key
+type: Opaque
+stringData:
+    key: ENC[AES256_GCM,data:hf5EoXXyqQs4cGiSS7XZeR1QEN2qg58KzxWP8VPC/A86HjW30Wj7mu0VuTN9qBYoCCLrtbdh4kWcSW6Y7yBFr2jwnejxqIVJPFx5o2qtCiTgSTdZIPMeQFNYgxoICNtBCi9GBZSz0Mti,iv:k5K9DYIsZ4Io7diwykztIGWvNqOR3dAeUq55QnFfAWE=,tag:VYs3yMBA9GRVKkuYtTSECA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBQM24wc2xhSHNTVmpkTVNV
+            ZEJsKzZWcjFOYjJBQzhjZWx2dTZjRWRNbzJ3CkJDU1VkOUwwL0hmK2ZGTGpIU01H
+            VzE2emI5Tmlpd29LYkFXUjZsdVVoOTQKLS0tIDA3cEhtNStSS1pzc1RpZXJzOHda
+            TXFCTTF6aUkwdDNHVTBLR2JqOGRkRTgK/FlRyR1nvkrMYtQRUgMxtIKOzEo4DWTh
+            dqe6K2FepXrnOuZKDnBk2f2LHaqJtgts/LklEMtIKHRsqI2gh54njg==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-22T20:23:50Z"
+    mac: ENC[AES256_GCM,data:xc6RKGNhuy8h23gcg3IzU7dTz3/E04sUAtZGfRKX9Ee4vnPCWyS5PyhH2OQtmodRg3+4v+XgzkR3+ZHeNEFVPHsFZTP+F6GBqUQ4gQ8KvmgImry+98NOUzP/AUzsSbuJHf8N43G8fs//xAYlpvQRPQDg1oyZaMlnqvjKa0xmJSg=,iv:i5mpvf89tC2OxujT0NAntHCeuRxU38wMer+z7Mh5Umc=,tag:+mHkcyqaRHeUd0H/gITt2A==,type:str]
+    version: 3.13.3

@@ -1,0 +1,122 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/validatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: austin-ci-helmrelease-guard
+  annotations:
+    policies.kyverno.io/title: Austin CI HelmRelease ServiceAccount Guard
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: HelmRelease
+    policies.kyverno.io/description: >-
+      Flux HelmReleases install charts under the permissions of their
+      spec.serviceAccountName. A HelmRelease using the default helm-controller
+      identity can install cluster-scoped resources, which is equivalent to
+      cluster-admin. This policy requires every HelmRelease in the delegated
+      austin-ci namespace to impersonate the namespace-scoped austin-helm
+      ServiceAccount. It is scoped to austin-ci only so a Kyverno outage cannot
+      block HelmRelease admission anywhere else in the cluster.
+spec:
+  failurePolicy: Fail
+  validationActions:
+    - Deny
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - helm.toolkit.fluxcd.io
+        apiVersions:
+          - v2
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - helmreleases
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - austin-ci
+  validations:
+    - message: "HelmReleases in austin-ci must set spec.serviceAccountName to austin-helm"
+      expression: >-
+        has(object.spec.serviceAccountName) &&
+        object.spec.serviceAccountName == 'austin-helm'
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policies.kyverno.io/v1/validatingpolicy.json
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: austin-kustomization-guard
+  annotations:
+    policies.kyverno.io/title: Austin Flux Kustomization Guard
+    policies.kyverno.io/category: Security
+    policies.kyverno.io/severity: high
+    kyverno.io/kyverno-version: 1.9.0
+    policies.kyverno.io/minversion: 1.6.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: Kustomization
+    policies.kyverno.io/description: >-
+      Flux Kustomizations in flux-system run as cluster-admin. The owner creates
+      the fixed austin-runners and austin-apps Kustomizations; the delegated
+      identity may only update/patch them. This policy locks their spec so an
+      update cannot redirect the path, change the target namespace, or
+      impersonate a different ServiceAccount. matchConditions limits enforcement
+      to those two object names, so every other Kustomization in flux-system is
+      unaffected.
+spec:
+  failurePolicy: Fail
+  validationActions:
+    - Deny
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - kustomize.toolkit.fluxcd.io
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - kustomizations
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - flux-system
+  matchConditions:
+    - name: austin-kustomization-names
+      expression: object.metadata.name in ['austin-runners', 'austin-apps']
+  validations:
+    - message: "Austin Kustomizations must impersonate austin-flux"
+      expression: >-
+        has(object.spec.serviceAccountName) &&
+        object.spec.serviceAccountName == 'austin-flux'
+    - message: "Austin Kustomizations must target the austin-ci namespace"
+      expression: >-
+        has(object.spec.targetNamespace) &&
+        object.spec.targetNamespace == 'austin-ci'
+    - message: "Austin Kustomizations must use their fixed Git path"
+      expression: >-
+        has(object.spec.path) &&
+        object.spec.path == (object.metadata.name == 'austin-runners'
+          ? './kubernetes/apps/austin/runners/app'
+          : './kubernetes/apps/austin/apps/app')
+    - message: "Austin Kustomizations must source from GitRepository flux-system"
+      expression: >-
+        has(object.spec.sourceRef) &&
+        has(object.spec.sourceRef.kind) &&
+        has(object.spec.sourceRef.name) &&
+        object.spec.sourceRef.kind == 'GitRepository' &&
+        object.spec.sourceRef.name == 'flux-system'
