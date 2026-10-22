@@ -38,7 +38,7 @@ spec:
         !(object.metadata.name in ['kube-system', 'kube-public', 'kube-node-lease', 'kyverno-system',
         'flux-system', 'istio-system', 'istio-ingress', 'rook-ceph', 'monitoring', 'kubevirt', 'cdi',
         'vms', 'cnpg-system', 'harbor', 'market-data', 'postgres', 'authentik', 'atuin', 'kafka',
-        'redpanda', 'elastic', 'networking', 'cert-manager', 'actions-runner-system', 'arangodb',
+        'redpanda', 'elastic', 'networking', 'cert-manager', 'actions-runner-system', 'austin-ci', 'arangodb',
         'dragonflydb', 'home-system', 'immich', 'irc', 'keda', 'observability', 'rabbitmq-operator',
         'tekton-pipelines', 'tekton-pipelines-resolvers', 'telepresence', 'local-path-storage',
         'cilium-secrets', 'default']) &&

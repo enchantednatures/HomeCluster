@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/service.json
+apiVersion: v1
+kind: Service
+metadata:
+  name: austin-vm-ssh
+  namespace: vms
+  labels:
+    app.kubernetes.io/name: austin-vm-ssh
+    app.kubernetes.io/instance: austin-vm
+spec:
+  type: ClusterIP
+  selector:
+    kubevirt.io/domain: austin-vm
+  ports:
+    - name: ssh
+      port: 22
+      protocol: TCP
+      targetPort: 22

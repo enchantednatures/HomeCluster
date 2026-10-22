@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.config.k8s.io/kustomization_v1beta1.json
+---
+resources:
+  - ./austin-ssh-key.sops.yaml
+  - ./cloud-init.sops.yaml
+  - ./datavolume.yaml
+  - ./virtualmachine.yaml
+  - ./service.yaml

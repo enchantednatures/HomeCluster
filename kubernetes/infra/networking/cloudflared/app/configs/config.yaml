@@ -6,6 +6,8 @@ ingress:
     service: tcp://postgres-db-pooler-rw.postgres.svc.cluster.local:5432
   - hostname: ${SECRET_DOMAIN}
     service: http://istio-ingressgateway.istio-ingress.svc.cluster.local:80
+  - hostname: austin-vm.${SECRET_DOMAIN}
+    service: tcp://austin-vm-ssh.vms.svc.cluster.local:22
   - hostname: "*.${SECRET_DOMAIN}"
     service: http://istio-ingressgateway.istio-ingress.svc.cluster.local:80
   - service: http_status:404

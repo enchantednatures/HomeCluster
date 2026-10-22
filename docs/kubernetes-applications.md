@@ -326,22 +326,35 @@ Internet Relay Chat server for real-time communication.
 
 KubeVirt-based virtual machine workloads running on Kubernetes.
 
-#### Arch Linux VM
-**Path**: `kubernetes/apps/vms/arch-linux/`
+#### Austin VM
+**Path**: `kubernetes/apps/vms/arch-vm/`
 
-Virtual machine running Arch Linux for development and testing:
+Persistent Arch Linux workstation for Austin, used to build and tune GitHub
+Actions runner scale sets:
 
 **Components**:
-- **DataVolume**: VM disk image storage
-- **VirtualMachine**: VM definition and configuration
-- **Service**: Network access to VM
-- **VirtualService**: Istio routing for VM access
+- **DataVolume**: `austin-vm-root`, 120 GiB on `ceph-block-ssd`
+- **VirtualMachine**: `austin-vm`, 4 vCPU and 8 GiB, Arch Linux `cloudimg`
+- **Service**: `austin-vm-ssh` `ClusterIP` on port 22
+- **Cloudflared ingress**: `austin-vm.${SECRET_DOMAIN}` to
+  `austin-vm-ssh.vms.svc.cluster.local:22`
 
 **Features**:
-- Full Linux environment
-- Persistent storage
-- Network connectivity
-- Remote access capabilities
+- Full Arch Linux toolchain: `git`, `gh`, `kubectl`, `helm`, `flux`, Docker
+- SSH through the existing Cloudflare Tunnel, key-only, no password or root
+  login, and no public SSH port
+- Kubernetes access as `system:serviceaccount:vms:austin`: admin in `vms`,
+  `testing`, and `austin-ci`, read-only in `actions-runner-system`, and
+  `get/update/patch` on the fixed `austin-runners` and `austin-apps`
+  Kustomizations only. Cluster-scoped access is denied.
+- Durable changes go through a PR: runner scale sets in
+  `kubernetes/apps/austin/runners/app`, other HelmReleases in
+  `kubernetes/apps/austin/apps/app`
+- **No VolSync backup**: deleting the DataVolume also deletes the
+  `ceph-block-ssd` volume, and the data is not recoverable
+
+See `kubernetes/apps/vms/README.md` for SSH setup, the RBAC matrix, key and
+token rotation, and cleanup.
 
 ```mermaid
 graph TB
@@ -358,9 +371,8 @@ graph TB
         end
 
         subgraph "Networking"
-            SVC[Service]
-            VS[VirtualService]
-            ISTIO[Istio Gateway]
+            SVC[SSH Service]
+            CF[Cloudflare Tunnel]
         end
     end
 
@@ -369,8 +381,7 @@ graph TB
     DV --> PV
     PV --> STORAGE_CLASS
     VMI --> SVC
-    SVC --> VS
-    VS --> ISTIO
+    SVC --> CF
 ```
 
 ## Application Management
