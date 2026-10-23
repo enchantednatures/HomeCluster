@@ -4,17 +4,21 @@ This is the second fixed Flux path: the Kustomization `austin-apps`
 (`kubernetes/apps/austin/apps/ks.yaml`) applies every manifest in this
 directory into `austin-ci` with `serviceAccountName: austin-flux`.
 
-The directory is intentionally empty (`resources: []`). It exists so the owner
-can approve additional `HelmRelease` objects for `austin-ci` without creating
-another Flux Kustomization. Austin gets `get/update/patch` on the two fixed
-Kustomizations only; he cannot create or delete Kustomizations.
+The directory is intentionally empty (`resources: []`). It exists so additional
+`HelmRelease` objects can be approved for `austin-ci` without creating another
+Flux Kustomization. Austin gets `get/update/patch` on the two fixed
+Kustomizations only; he cannot create or delete Kustomizations. His
+`austin-ci-operator` role allows HelmRelease CRUD and read-only workload
+observation, but no pod create/exec and no Secret read. He can create a Secret
+(for his own GitHub App credential) but cannot read it back.
 
 ## What belongs here
 
 - `HelmRelease` objects for charts that are not GitHub Actions runner scale
-  sets (those go in `../runners/app/` with the `github-auth-secret` copy).
-- Supporting namespaced objects the chart needs, such as a `Secret` copy or a
-  `ConfigMap`, when the chart cannot render them itself.
+  sets (those go in `../runners/app/`).
+- Supporting namespaced objects the chart needs, such as the
+  `github-auth-secret` for your own GitHub App or a `ConfigMap`, when the chart
+  cannot render them itself.
 
 ## Rules
 
@@ -50,6 +54,6 @@ make sops-encrypt
 After the PR merges:
 
 ```sh
-flux reconcile kustomization austin-apps -n flux-system --with-source
+flux reconcile kustomization austin-apps -n flux-system
 kubectl -n austin-ci get helmrelease,pods
 ```

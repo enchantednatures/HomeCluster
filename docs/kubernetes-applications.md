@@ -343,10 +343,15 @@ Actions runner scale sets:
 - Full Arch Linux toolchain: `git`, `gh`, `kubectl`, `helm`, `flux`, Docker
 - SSH through the existing Cloudflare Tunnel, key-only, no password or root
   login, and no public SSH port
-- Kubernetes access as `system:serviceaccount:vms:austin`: admin in `vms`,
-  `testing`, and `austin-ci`, read-only in `actions-runner-system`, and
-  `get/update/patch` on the fixed `austin-runners` and `austin-apps`
-  Kustomizations only. Cluster-scoped access is denied.
+- Kubernetes access as `system:serviceaccount:vms:austin`: read-only in `vms`
+  (KubeVirt/CDI plus workload objects), read-only workloads in `testing`,
+  HelmRelease CRUD with read-only observation and `secrets` create-only in
+  `austin-ci` (no pod create/exec, no Secret read), read-only in
+  `actions-runner-system`, and `get/update/patch` on the fixed
+  `austin-runners` and `austin-apps` Kustomizations only. Cluster-scoped access
+  and GitRepository writes are denied.
+- Austin creates his own GitHub App Secret in `austin-ci`; the owner's
+  `github-auth-secret` is never copied into that namespace.
 - Durable changes go through a PR: runner scale sets in
   `kubernetes/apps/austin/runners/app`, other HelmReleases in
   `kubernetes/apps/austin/apps/app`
