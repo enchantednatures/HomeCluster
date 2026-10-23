@@ -2,14 +2,37 @@
 
 This directory is reconciled by the fixed Flux Kustomization `austin-runners`
 (`kubernetes/apps/austin/runners/ks.yaml`) into the `austin-ci` namespace with
-`serviceAccountName: austin-flux`. It ships one object: the encrypted
-`github-auth-secret`, which is a byte-for-byte copy of
-`kubernetes/apps/actions-runner-system/runners/app/github-auth-secret.sops.yaml`
-with only `metadata.namespace` changed. A `HelmRelease` in `austin-ci` cannot
-reference a Secret in `actions-runner-system`, so the copy is required.
+`serviceAccountName: austin-flux`. It is intentionally empty (`resources: []`)
+and ships no Secret.
 
-Do not edit, decrypt, or re-encrypt the Secret. `make sops-encrypt` is the only
-write path, and the owner rotates the GitHub App credentials.
+Austin owns his own GitHub App. Create the App (or install a dedicated one) for
+the repositories that should receive runners, create the `github-auth-secret`
+in `austin-ci` yourself, and keep it in this repository as a SOPS Secret. The
+owner's `github-auth-secret` in `actions-runner-system` is not copied here, and
+`vms/austin` cannot read Secrets in `austin-ci`.
+
+## Creating your GitHub App secret
+
+1. Create a GitHub App owned by your account (or install a dedicated one) with
+   permission to manage self-hosted runners for the target repositories, then
+   install it.
+2. Create `kubernetes/apps/austin/apps/app/github-auth-secret.sops.yaml`: a
+   `Secret` named `github-auth-secret` in namespace `austin-ci`, type `Opaque`,
+   with exactly these keys:
+
+   | Key | Value |
+   | --- | --- |
+   | `github_app_id` | The App ID |
+   | `github_app_installation_id` | The installation ID |
+   | `github_app_private_key` | The PEM private key for the App |
+
+   Fill in the values, then encrypt before committing. Do not commit plaintext
+   values or paste the private key into a PR, an issue, or chat.
+3. Add the file to `kubernetes/apps/austin/apps/app/kustomization.yaml`, run
+   `make sops-encrypt`, and open a PR.
+4. `austin-ci-operator` can `create` Secrets but cannot read, update, or delete
+   them. Rotate by re-encrypting the SOPS file in a new PR; the `austin-apps`
+   Kustomization applies it with `austin-flux`.
 
 ## Adding a runner scale set
 
@@ -20,9 +43,13 @@ write path, and the owner rotates the GitHub App credentials.
 3. Open a PR. After it merges, reconcile:
 
    ```sh
-   flux reconcile kustomization austin-runners -n flux-system --with-source
+   flux reconcile kustomization austin-runners -n flux-system
    kubectl -n austin-ci get helmrelease,pods
    ```
+
+   Without `--with-source`, Flux uses the last revision fetched by the
+   `flux-system` GitRepository. If the merge is not visible yet, wait for the
+   GitRepository interval or ask the owner to reconcile the source.
 
 The chart is pulled from the owner-managed `OCIRepository/gha-runner-scale-set`
 in `flux-system`, pinned to chart `0.15.0`. The ARC controller itself stays in

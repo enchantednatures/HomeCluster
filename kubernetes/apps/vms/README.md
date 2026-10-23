@@ -98,17 +98,23 @@ not printed in logs.
 
 | Scope | Access | Notes |
 | --- | --- | --- |
-| `vms` | `admin` | Full namespace admin. A quota blocks HelmRelease and Kustomization creation. |
-| `testing` | `admin` | Full namespace admin. The same quota blocks HelmRelease and Kustomization creation. |
-| `austin-ci` | `admin` plus ARC CRUD | Full namespace admin and create/update/delete on `actions.github.com` resources. HelmReleases are allowed here. A quota blocks Kustomization creation. |
+| `vms` | Read-only (`austin-vm-view`) | `get/list/watch` on KubeVirt `virtualmachines`/`virtualmachineinstances`, CDI `datavolumes`, pods, services, endpoints, events, configmaps, PVCs, pod logs, and NetworkPolicies. No pod create/exec, no Secret access. |
+| `testing` | Read-only (`austin-workload-view`) | `get/list/watch` on pods, services, endpoints, events, configmaps, PVCs, pod logs, Deployments/StatefulSets/ReplicaSets/DaemonSets, Jobs/CronJobs, Ingresses, NetworkPolicies, and PodDisruptionBudgets. No pod create/exec, no Secret access. |
+| `austin-ci` | `austin-ci-operator` plus ARC CRUD | Full CRUD on HelmReleases; read-only on Helm sources and workloads; `create` on Secrets only (no read/update/delete). No pod create/exec. `austin-arc-admin` adds CRUD on `actions.github.com` resources. |
 | `actions-runner-system` | Read-only | `view` plus read-only ARC resources. The controller and existing runner scale sets cannot be changed. |
-| `flux-system` | Limited | `get/list/watch` on Kustomizations and GitRepositories. `update/patch` only on `austin-runners`, `austin-apps`, and the `flux-system` GitRepository (for a force reconcile). No `create`, no `delete`, no Secret access. |
+| `flux-system` | Limited | `get/list/watch` on Kustomizations and GitRepositories. `update/patch` only on `austin-runners` and `austin-apps`. No GitRepository write, no `create`, no `delete`, no Secret access. |
 | Cluster-scoped resources | None | `kubectl get nodes`, `kubectl create namespace`, and similar calls return `Forbidden`. |
 
 The cluster-scoped denials are deliberate. `austin-helm` and `austin-flux` are
 namespace-scoped ServiceAccounts, so a chart or Kustomization that tries to
 create a ClusterRole, CRD, or other cluster-scoped object fails at admission or
 apply time.
+
+The ARC controller/chart runtime identities are separate from Austin's own
+ServiceAccount: `austin-flux` (Kustomize controller) and `austin-helm` (the
+ServiceAccount impersonated by every HelmRelease) keep namespace `admin` plus
+`austin-arc-admin` in `austin-ci` because they must create runner pods, exec
+into them, and read chart-provided Secrets. `vms/austin` cannot.
 
 ### Flux workflow
 
@@ -141,10 +147,15 @@ resources.
 After a PR merges, reconcile:
 
 ```sh
-flux reconcile kustomization austin-runners -n flux-system --with-source
-flux reconcile kustomization austin-apps -n flux-system --with-source
+flux reconcile kustomization austin-runners -n flux-system
+flux reconcile kustomization austin-apps -n flux-system
 kubectl -n austin-ci get helmrelease,pods
 ```
+
+Without `--with-source`, Flux applies the revision already fetched by the
+`flux-system` GitRepository. If a just-merged commit is not visible yet, wait for
+the GitRepository interval or ask the owner to reconcile the source; Austin has
+no write access to the GitRepository.
 
 ## Rotating the SSH key
 
@@ -165,7 +176,8 @@ changes. No reboot is needed.
 3. Reconcile the VM:
 
    ```sh
-   flux reconcile kustomization arch-vm -n flux-system --with-source
+   # Austin's ServiceAccount cannot reconcile arch-vm; run this as the cluster owner.
+   flux reconcile kustomization arch-vm -n flux-system
    ```
 
 4. Confirm the guest picked up the key:
@@ -273,6 +285,12 @@ This is a scoped delegation, not cluster-admin, but it is not risk-free.
 - HelmReleases can create privileged pods by design. The `austin-helm`
   ServiceAccount prevents cluster-scoped resources, not privileged namespaced
   workloads.
+- Austin's own `vms/austin` ServiceAccount cannot create pods, exec, or read
+  Secrets anywhere. The node-level trust comes from the `austin-flux`/`austin-helm`
+  runtime identities that install and run the chart, not from Austin's identity.
+- The owner's GitHub App private key is not copied into `austin-ci`. Austin
+  creates and owns a separate GitHub App Secret, so a compromise of his identity
+  does not expose the owner's credential.
 - There is no chart allowlist yet. Every chart added to `austin-ci` needs a
   real review, not just a version bump.
 - The two fixed Kustomizations apply whatever is in their fixed paths. PR

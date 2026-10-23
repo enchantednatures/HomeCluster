@@ -73,5 +73,5 @@ spec:
             name: austin-vm-root
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userDataSecretRef:
+            secretRef:
               name: austin-vm-cloud-init
