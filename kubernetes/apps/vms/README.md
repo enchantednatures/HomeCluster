@@ -12,6 +12,7 @@ runner scale sets without holding cluster-admin.
 | Root disk | 120 GiB `DataVolume` named `austin-vm-root` on `ceph-block-ssd` |
 | Image | Pinned Arch Linux `cloudimg` qcow2 imported by CDI |
 | SSH Service | `austin-vm-ssh.vms.svc.cluster.local:22` (ClusterIP) |
+| Interface MAC | `f2:f2:a1:fe:66:7c`, pinned on the `default` interface |
 | Flux Kustomization | `arch-vm` in `flux-system` (path `./kubernetes/apps/vms/arch-vm/app`) |
 | Kubernetes identity | ServiceAccount `vms/austin`, surfaced as `system:serviceaccount:vms:austin` |
 
@@ -21,6 +22,24 @@ Substitute the real cluster domain wherever it appears in a command you run.
 Access is SSH through the existing Cloudflare Tunnel. There is no public
 Kubernetes API endpoint for this VM, no public SSH port, no password login, and
 no root login. The `austin` user is key-only and gets passwordless `sudo`.
+
+## Stable interface MAC
+
+The `default` interface is pinned to `f2:f2:a1:fe:66:7c` in
+`arch-vm/app/virtualmachine.yaml`. On first boot, cloud-init generated the
+guest file `/etc/systemd/network/10-cloud-init-eth0.network`, which matches on
+`MACAddress=f2:f2:a1:fe:66:7c`. `systemd-networkd` only configures `eth0` when
+the interface MAC matches that unit.
+
+Without the pin, KubeVirt assigns a new random pod MAC to every VMI. After any
+VMI recreation (reboot, node drain, or `kubectl delete vmi`), the guest unit no
+longer matches, `eth0` stays down, and SSH plus the Cloudflare Tunnel route
+break even though the VMI reports `Ready`.
+
+Changing or removing this MAC requires updating or regenerating the guest's
+`/etc/systemd/network/10-cloud-init-eth0.network` (or replacing the MAC match
+with a name match) in the same change. Otherwise SSH and Cloudflare break on the
+next VMI recreation.
 
 ## Prerequisites on Austin's machine
 

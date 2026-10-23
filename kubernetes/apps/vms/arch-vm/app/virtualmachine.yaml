@@ -44,8 +44,12 @@ spec:
               disk:
                 bus: virtio
           interfaces:
+            # The guest's cloud-init-generated /etc/systemd/network/10-cloud-init-eth0.network
+            # matches on MACAddress=f2:f2:a1:fe:66:7c. KubeVirt otherwise assigns a new
+            # random pod MAC on every VMI recreation and the guest network never comes up.
             - name: default
               masquerade: {}
+              macAddress: "f2:f2:a1:fe:66:7c"
           networkInterfaceMultiqueue: true
           rng: {}
         resources:
