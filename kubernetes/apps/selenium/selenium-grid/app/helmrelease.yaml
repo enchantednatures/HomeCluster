@@ -11,7 +11,7 @@ spec:
   chart:
     spec:
       chart: selenium-grid
-      version: 0.62.1 # datasource=helm depName=selenium-grid repository=https://www.selenium.dev/docker-selenium
+      version: 0.62.0 # datasource=helm depName=selenium-grid repository=https://www.selenium.dev/docker-selenium
       sourceRef:
         kind: HelmRepository
         name: selenium
