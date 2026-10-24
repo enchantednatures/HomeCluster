@@ -191,7 +191,7 @@ spec:
           serviceAccountName: volume-snapshot-controller
           containers:
             - name: snapshot-creator
-              image: bitnami/kubectl@sha256:26837860fa038ce221416ee0fd211a0ee300f67e24e88faecca0423088400b99 # digest pin of bitnami/kubectl:latest (version tags removed from the free catalog); satisfies Kyverno disallow-latest-tag
+              image: bitnami/kubectl@sha256:6d9e8ad566a6d2dcb4a7a6120d030bd65bddbcc952246f4b31022834d9be7e02 # digest pin of bitnami/kubectl:latest (version tags removed from the free catalog); satisfies Kyverno disallow-latest-tag
               command:
                 - /bin/bash
                 - -c
