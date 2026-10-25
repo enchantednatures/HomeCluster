@@ -19,7 +19,7 @@ spec:
   chart:
     spec:
       chart: kellnr
-      version: 6.2.1 # datasource=helm depName=kellnr repository=https://kellnr.github.io/helm
+      version: 6.3.2 # datasource=helm depName=kellnr repository=https://kellnr.github.io/helm
       sourceRef:
         kind: HelmRepository
         name: kellnr
