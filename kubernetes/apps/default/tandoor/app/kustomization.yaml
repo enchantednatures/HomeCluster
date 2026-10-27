@@ -7,3 +7,4 @@ resources:
   - ./secret.sops.yaml
   - ./helmrelease.yaml
   - ./virtualservice.yaml
+  - ./destinationrule.yaml

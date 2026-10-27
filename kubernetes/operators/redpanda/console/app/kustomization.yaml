@@ -6,3 +6,4 @@ resources:
   - ./helmrelease.yaml
   - ./networkpolicy.yaml
   - ./virtualservice.yaml
+  - ./destinationrule.yaml

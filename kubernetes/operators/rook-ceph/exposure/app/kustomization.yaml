@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./virtual-service.yaml
   - ./ingress-tailscale.yaml
+  - ./destinationrule.yaml

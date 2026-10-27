@@ -7,3 +7,4 @@ resources:
   - ./pvc.yaml
   - ./virtualservice.yaml
   - ./secret.sops.yaml
+  - ./destinationrule.yaml

@@ -8,5 +8,6 @@ resources:
   - ./helmrelease.yaml
   - ./webhook.sops.yaml
   - ./virtualservice.yaml
+  - ./destinationrule.yaml
   # - https://raw.githubusercontent.com/knative-extensions/monitoring/main/grafana/dashboards.yaml
   # - https://raw.githubusercontent.com/knative/docs/main/docs/serving/observability/metrics/collector.yaml

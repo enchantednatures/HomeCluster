@@ -11,3 +11,4 @@ resources:
   - ./harbor-oidc.sops.yaml
   - ./object-bucket-claim.yaml
   - ./virtualservice.yaml
+  - ./destinationrule.yaml

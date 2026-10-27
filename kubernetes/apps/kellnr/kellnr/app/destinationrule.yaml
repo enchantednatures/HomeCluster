@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/destinationrule_v1.json
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kellnr
+  namespace: kellnr
+spec:
+  host: kellnr.kellnr.svc.cluster.local
+  trafficPolicy:
+    outlierDetection:
+      consecutive5xxErrors: 5
+      consecutiveGatewayErrors: 3
+      interval: 30s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 50

@@ -7,3 +7,4 @@ resources:
   - ./ciliumnetworkpolicy.yaml
   - ./virtualservice.yaml
   - ./ingress.yaml
+  - ./destinationrule.yaml

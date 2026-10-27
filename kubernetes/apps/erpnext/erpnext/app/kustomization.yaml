@@ -8,3 +8,4 @@ resources:
   - ./erpnext-secret.sops.yaml
   - ./virtualservice.yaml
   - ./erpnext-oidc.sops.yaml
+  - ./destinationrule.yaml

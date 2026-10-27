@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.istio.io/destinationrule_v1.json
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: apicurio-registry-app
+  namespace: schema-registry
+spec:
+  host: apicurio-registry-app-service.schema-registry.svc.cluster.local
+  trafficPolicy:
+    outlierDetection:
+      consecutive5xxErrors: 5
+      consecutiveGatewayErrors: 3
+      interval: 30s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 50
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: apicurio-registry-ui
+  namespace: schema-registry
+spec:
+  host: apicurio-registry-ui-service.schema-registry.svc.cluster.local
+  trafficPolicy:
+    outlierDetection:
+      consecutive5xxErrors: 5
+      consecutiveGatewayErrors: 3
+      interval: 30s
+      baseEjectionTime: 60s
+      maxEjectionPercent: 50

@@ -10,3 +10,4 @@ resources:
   - ./kellnr-oauth2-secret.sops.yaml
   - ./virtualservice.yaml
   - ./object-bucket-claims.yaml
+  - ./destinationrule.yaml

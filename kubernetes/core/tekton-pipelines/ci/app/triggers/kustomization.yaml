@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./opentofu-triggers.yaml
   - ./virtualservice.yaml
+  - ./destinationrule.yaml
