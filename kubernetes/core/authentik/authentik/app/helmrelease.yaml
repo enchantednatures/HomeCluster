@@ -80,13 +80,15 @@ spec:
     server:
       ingress:
         enabled: false
-      # CPU-based autoscaling: 2-10 replicas targeting 50% of the CPU request
+      # CPU-based autoscaling: 2-5 replicas targeting 50% of the CPU request
       # set below. HPA utilization is computed against requests, so the request
-      # must stay realistic for the target to be meaningful.
+      # must stay realistic for the target to be meaningful. Keep maxReplicas
+      # aligned with the pooler connection budget in db/pooler.yaml (session
+      # mode pins one Postgres connection per pod client).
       autoscaling:
         enabled: true
         minReplicas: 2
-        maxReplicas: 10
+        maxReplicas: 5
         targetCPUUtilizationPercentage: 50
         behavior:
           scaleUp:

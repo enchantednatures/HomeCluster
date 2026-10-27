@@ -23,9 +23,16 @@ spec:
     poolMode: session
     parameters:
       max_client_conn: "1000"
-      default_pool_size: "25"
+      # Connection budget: every authentik-server pod holds its own client pool
+      # (HPA max 5 replicas) plus the worker. Session mode pins one server
+      # connection per idle client, so the pool must exceed total client demand
+      # or the extra replicas starve with query_wait_timeout and never become
+      # ready. 100 + 10 reserve stays well under Postgres max_connections (300).
+      default_pool_size: "100"
       min_pool_size: "5"
-      reserve_pool_size: "5"
+      reserve_pool_size: "10"
+      # Reclaim backends pinned by clients that went away without disconnecting.
+      client_idle_timeout: "300"
   monitoring:
     enablePodMonitor: false
 ---
@@ -53,5 +60,7 @@ spec:
       default_pool_size: "25"
       min_pool_size: "5"
       reserve_pool_size: "5"
+      # Reclaim backends pinned by clients that went away without disconnecting.
+      client_idle_timeout: "300"
   monitoring:
     enablePodMonitor: false
