@@ -54,7 +54,7 @@ spec:
             command: [/usr/local/bin/atuin-server]
             args: [start]
             probes:
-              liveness: &probes
+              startup:
                 enabled: true
                 custom: true
                 spec:
@@ -63,9 +63,30 @@ spec:
                     port: *port
                   initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
+                  timeoutSeconds: 3
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 3
                   failureThreshold: 3
-              readiness: *probes
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             resources:
               requests:
                 cpu: 10m

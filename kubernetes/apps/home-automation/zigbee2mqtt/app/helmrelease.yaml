@@ -59,18 +59,33 @@ spec:
               # revisit once access can be granted without it.
               privileged: true
             probes:
-              liveness:
+              startup:
                 enabled: true
                 custom: true
                 spec:
                   tcpSocket:
                     port: 8080
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 30
               readiness:
                 enabled: true
                 custom: true
                 spec:
                   tcpSocket:
                     port: 8080
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 8080
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             resources:
               requests:
                 cpu: 10m

@@ -66,7 +66,27 @@ spec:
               CACHE_SLICE_SIZE: 1m
               UPSTREAM_DNS: "1.1.1.1 8.8.8.8"
             probes:
-              liveness: &heartbeat
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /lancache-heartbeat
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /lancache-heartbeat
+                    port: *port
+                  periodSeconds: 15
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              liveness:
                 enabled: true
                 custom: true
                 spec:
@@ -76,7 +96,6 @@ spec:
                   periodSeconds: 60
                   timeoutSeconds: 5
                   failureThreshold: 5
-              readiness: *heartbeat
             resources:
               requests:
                 cpu: 100m
@@ -110,6 +129,34 @@ spec:
               USE_GENERIC_CACHE: "true"
               LANCACHE_IP: 192.168.1.242
               UPSTREAM_DNS: 1.1.1.1
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 53
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 53
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 53
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             resources:
               requests:
                 cpu: 50m

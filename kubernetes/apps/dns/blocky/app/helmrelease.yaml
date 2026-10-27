@@ -64,7 +64,25 @@ spec:
                 containerPort: &http-port 4000
                 protocol: TCP
             probes:
-              liveness: &probe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 53
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: 53
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              liveness:
                 enabled: true
                 custom: true
                 spec:
@@ -73,7 +91,6 @@ spec:
                   periodSeconds: 30
                   timeoutSeconds: 5
                   failureThreshold: 5
-              readiness: *probe
             resources:
               requests:
                 cpu: 25m

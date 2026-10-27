@@ -44,7 +44,7 @@ spec:
             env:
               TZ: America/Los_Angeles
             probes:
-              liveness: &probes
+              startup:
                 enabled: true
                 custom: true
                 spec:
@@ -53,9 +53,30 @@ spec:
                     port: &port 8080
                   initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 1
+                  timeoutSeconds: 3
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 3
                   failureThreshold: 3
-              readiness: *probes
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
             resources:
               requests:
                 cpu: 10m
