@@ -19,6 +19,7 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
+  timeout: 15m
   install:
     remediation:
       retries: 3
@@ -36,6 +37,7 @@ spec:
 
     controllers:
       monolithic:
+        strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
         pod:

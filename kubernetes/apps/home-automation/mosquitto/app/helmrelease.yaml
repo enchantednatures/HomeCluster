@@ -38,6 +38,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
     controllers:
       mosquitto:
+        strategy: Recreate
         containers:
           app:
             image:
