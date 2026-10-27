@@ -186,6 +186,10 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
+      # Do not retry a failed sweep: each retry recomputes the snapshot
+      # timestamp and creates another full set of snapshots.
+      backoffLimit: 0
+      activeDeadlineSeconds: 7200
       template:
         spec:
           serviceAccountName: volume-snapshot-controller
@@ -198,9 +202,20 @@ spec:
                 - |
                   set -euo pipefail
 
-                  SNAPSHOT_DATE=$(date +%Y%m%d-%H%M%S)
+                  SNAPSHOT_DATE=$(date +%Y%m%d)
 
                   echo "Starting automated volume snapshot creation at $(date)"
+
+                  echo "Cleaning up failed snapshots older than 24h..."
+                  CUTOFF_TIME=$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+                  kubectl get volumesnapshot --all-namespaces -o json | \
+                  jq -r --arg cutoff "$CUTOFF_TIME" '.items[] | select((.status.readyToUse // false) == false) | select(.metadata.creationTimestamp < $cutoff) | "\(.metadata.namespace)/\(.metadata.name)"' | \
+                  while IFS='/' read -r namespace snapshot_name; do
+                    if [ -n "$namespace" ] && [ -n "$snapshot_name" ]; then
+                      echo "Deleting failed snapshot: $namespace/$snapshot_name"
+                      kubectl delete volumesnapshot "$snapshot_name" -n "$namespace" --ignore-not-found --wait=false || true
+                    fi
+                  done
 
                   # Find all PVCs using Ceph storage classes
                   for storage_class in ceph-block ceph-block-ssd ceph-block-retain; do
@@ -211,6 +226,11 @@ spec:
                     while IFS='/' read -r namespace pvc_name; do
 
                       if [ -n "$namespace" ] && [ -n "$pvc_name" ]; then
+                        # VolSync mover caches are transient and recreated by the next backup.
+                        if [[ "$pvc_name" == volsync-* ]]; then
+                          continue
+                        fi
+
                         snapshot_name="$pvc_name-snapshot-$SNAPSHOT_DATE"
 
                         echo "Creating snapshot: $snapshot_name for PVC: $namespace/$pvc_name"
@@ -252,7 +272,7 @@ spec:
                   while IFS='/' read -r namespace snapshot_name; do
                     if [ -n "$namespace" ] && [ -n "$snapshot_name" ]; then
                       echo "Deleting old snapshot: $namespace/$snapshot_name"
-                      kubectl delete volumesnapshot "$snapshot_name" -n "$namespace"
+                      kubectl delete volumesnapshot "$snapshot_name" -n "$namespace" --ignore-not-found --wait=false || true
                     fi
                   done
               resources:
