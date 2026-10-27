@@ -75,6 +75,30 @@ spec:
     # Reports controller for policy reports
     reportsController:
       enabled: true
+      rbac:
+        clusterRole:
+          # CRDs referenced by background-scanned CEL policies; Kyverno cannot self-grant RBAC for CRDs.
+          extraResources:
+            - apiGroups:
+                - dragonflydb.io
+              resources:
+                - dragonflies
+            - apiGroups:
+                - helm.toolkit.fluxcd.io
+              resources:
+                - helmreleases
+            - apiGroups:
+                - kustomize.toolkit.fluxcd.io
+              resources:
+                - kustomizations
+            - apiGroups:
+                - objectbucket.io
+              resources:
+                - objectbucketclaims
+            - apiGroups:
+                - postgresql.cnpg.io
+              resources:
+                - clusters
       serviceMonitor:
         enabled: true
       resources:
@@ -128,9 +152,9 @@ spec:
       webhooks:
         namespaceSelector:
           matchExpressions:
-          - key: name
-            operator: NotIn
-            values: [kyverno-system, kube-system, kube-public, kube-node-lease, flux-system]
+            - key: name
+              operator: NotIn
+              values: [kyverno-system, kube-system, kube-public, kube-node-lease, flux-system]
 
     # Network policies
     networkPolicies:
