@@ -6,4 +6,5 @@ resources:
   - ./namespace.yaml
   - ./operator/ks.yaml
   - ./search/ks.yaml
+  - ./search-v8/ks.yaml
   - ./kibana/ks.yaml
