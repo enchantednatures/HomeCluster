@@ -24,7 +24,7 @@ spec:
   chart:
     spec:
       chart: mariadb-operator
-      version: 26.10.1 # datasource=helm depName=mariadb-operator repository=https://mariadb-operator.github.io/mariadb-operator
+      version: 26.10.2 # datasource=helm depName=mariadb-operator repository=https://mariadb-operator.github.io/mariadb-operator
       sourceRef:
         kind: HelmRepository
         name: mariadb-operator
