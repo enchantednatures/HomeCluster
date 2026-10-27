@@ -37,7 +37,7 @@ spec:
             image:
               repository: ghcr.io/tandoorrecipes/recipes
               # datasource=docker depName=ghcr.io/tandoorrecipes/recipes
-              tag: 2.7.1
+              tag: 2.6.15
             env:
               TANDOOR_PORT: "8080"
               TZ: ${TIMEZONE}
