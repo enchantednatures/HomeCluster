@@ -44,6 +44,14 @@ spec:
               - op: add
                 path: /spec/template/metadata/annotations/sidecar.istio.io~1inject
                 value: "false"
+          - target:
+              kind: Deployment
+              name: kellnr
+            patch: |-
+              - op: add
+                path: /spec/strategy
+                value:
+                  type: Recreate
   values:
     secret:
       enabled: true
