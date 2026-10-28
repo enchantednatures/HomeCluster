@@ -22,7 +22,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-sso-v3
+  name: erpnext-sso-v4
   namespace: erpnext
   labels:
     app.kubernetes.io/name: erpnext

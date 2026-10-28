@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-create-site-v2
+  name: erpnext-create-site-v3
   namespace: erpnext
   labels:
     helm.sh/chart: erpnext-8.0.84
