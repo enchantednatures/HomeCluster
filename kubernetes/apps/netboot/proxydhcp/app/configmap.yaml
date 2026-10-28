@@ -17,6 +17,7 @@ data:
     # gateway-1
     dhcp-host=b1:0e:97:50:29:f1
     dhcp-host=0c:c4:7a:64:67:3e
+    dhcp-host=e8:9c:25:2a:40:5e
     # ctrl-01
     dhcp-host=bc:24:11:2e:c8:01
     # work-00
