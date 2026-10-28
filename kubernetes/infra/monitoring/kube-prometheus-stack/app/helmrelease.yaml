@@ -210,9 +210,9 @@ spec:
         resources:
           requests:
             cpu: 200m
-            memory: 2Gi
+            memory: 3Gi
           limits:
-            memory: 4Gi
+            memory: 8Gi
         podAntiAffinity: hard
         affinity:
           nodeAffinity:
