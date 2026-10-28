@@ -10,8 +10,3 @@ metadata:
     kubevirt.io/schedulable: "true"
   annotations:
     node-description: "Bare-metal gaming desktop with KubeVirt GPU passthrough"
-spec:
-  taints:
-    - key: dedicated
-      value: gaming
-      effect: NoSchedule
