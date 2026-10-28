@@ -18,7 +18,7 @@ spec:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-  timeout: 15m
+  timeout: 25m
   install:
     remediation:
       retries: 3
@@ -63,8 +63,11 @@ spec:
                 enabled: true
                 custom: true
                 spec:
-                  tcpSocket:
-                    port: 6080
+                  exec:
+                    command:
+                      - sh
+                      - -c
+                      - adb devices | grep -q emulator-5554
                   periodSeconds: 10
                   failureThreshold: 6
               liveness:
@@ -83,6 +86,11 @@ spec:
               limits:
                 memory: 8Gi
     defaultPodOptions:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      securityContext:
+        fsGroup: 1301
+        fsGroupChangePolicy: OnRootMismatch
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
