@@ -16,7 +16,7 @@ data:
     dhcp-range=192.168.1.1,proxy,255.255.255.0
     dhcp-host=0c:c4:7a:64:67:3e
     # gateway-1
-    dhcp-host=00:0c:6c:0a:69:5a
+    dhcp-host=e8:9c:25:2a:40:5e
     # ctrl-01
     dhcp-host=bc:24:11:2e:c8:01
     # work-00
