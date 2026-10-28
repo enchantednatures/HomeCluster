@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: gaming-vm-root
+  namespace: vms
+  labels:
+    app.kubernetes.io/name: gaming-vm
+    app.kubernetes.io/instance: gaming-vm
+spec:
+  contentType: kubevirt
+  source:
+    blank: {}
+  storage:
+    accessModes:
+      - ReadWriteOnce
+    volumeMode: Filesystem
+    resources:
+      requests:
+        storage: 200Gi
+    storageClassName: ceph-block-ssd
