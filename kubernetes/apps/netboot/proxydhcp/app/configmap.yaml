@@ -14,6 +14,7 @@ data:
     interface=eth0
     bind-interfaces
     dhcp-range=192.168.1.1,proxy,255.255.255.0
+    # gateway-1
     dhcp-host=b1:0e:97:50:29:f1
     dhcp-host=0c:c4:7a:64:67:3e
     # ctrl-01
