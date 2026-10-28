@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./namespace.yaml
   - ./arch-vm/ks.yaml
+  - ./gpu-test/ks.yaml
