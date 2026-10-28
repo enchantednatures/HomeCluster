@@ -82,9 +82,9 @@ spec:
         enabled: false
       # CPU-based autoscaling: 2-5 replicas targeting 50% of the CPU request
       # set below. HPA utilization is computed against requests, so the request
-      # must stay realistic for the target to be meaningful. Keep maxReplicas
-      # aligned with the pooler connection budget in db/pooler.yaml (session
-      # mode pins one Postgres connection per pod client).
+      # must stay realistic for the target to be meaningful. Server pods connect
+      # straight to the CNPG primary (no pooler); Postgres max_connections is
+      # 300, so 5 replicas plus the worker stay well inside budget.
       autoscaling:
         enabled: true
         minReplicas: 2
@@ -105,7 +105,7 @@ spec:
                 periodSeconds: 120
       # Startup probe budget raised: initial boot on a fresh DB runs ~1000 Django
       # migrations (10+ min). Default 60x10s kills the pod mid-migration, which
-      # leaks an idle-in-transaction pgbouncer connection holding Django's
+      # leaks an idle-in-transaction connection holding Django's
       # pg_advisory_lock and deadlocks every subsequent boot.
       startupProbe:
         failureThreshold: 900
@@ -161,7 +161,7 @@ spec:
       outposts:
         docker_image_base: ghcr.io/goauthentik/%(type)s:%(version)s
       postgresql:
-        host: authentik-db-pooler-rw.authentik.svc.cluster.local
+        host: authentik-db-rw.authentik.svc.cluster.local
       redis:
         host: dragonfly.authentik.svc.cluster.local
     blueprints:
