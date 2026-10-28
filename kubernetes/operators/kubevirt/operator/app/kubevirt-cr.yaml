@@ -13,5 +13,19 @@ spec:
         - Snapshot
         - VMExport
         - HotplugVolumes
+        - HostDevices
+    permittedHostDevices:
+      pciHostDevices:
+        - pciVendorSelector: "10DE:2206"
+          resourceName: "nvidia.com/RTX3080"
+        - pciVendorSelector: "10DE:1AEF"
+          resourceName: "nvidia.com/RTX3080_AUDIO"
+  infra:
+    nodePlacement:
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: gaming
+          effect: NoSchedule
   customizeComponents: {}
   imagePullPolicy: IfNotPresent

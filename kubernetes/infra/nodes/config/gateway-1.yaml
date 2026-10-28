@@ -1,0 +1,17 @@
+---
+# Node configuration for the gateway-1 bare-metal gaming desktop.
+apiVersion: v1
+kind: Node
+metadata:
+  name: gateway-1
+  labels:
+    topology.kubernetes.io/zone: external
+    node.kubernetes.io/instance-type: external
+    kubevirt.io/schedulable: "true"
+  annotations:
+    node-description: "Bare-metal gaming desktop with KubeVirt GPU passthrough"
+spec:
+  taints:
+    - key: dedicated
+      value: gaming
+      effect: NoSchedule
