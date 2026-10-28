@@ -6,11 +6,10 @@ metadata:
     namespace: renovate
 type: Opaque
 stringData:
-    RENOVATE_TOKEN: ENC[AES256_GCM,data:kK5NreQLwRDvVp4j0LZkAgw9VXmDpEYSw9dN0vRWdm0KRnjsZuqIQA==,iv:bmHWXmrj6g7ZwTufp+i0AHothdRZzEWBn8gvMAG+4ZU=,tag:YnCzSHZs1bamxc7iSbmInw==,type:str]
+    RENOVATE_TOKEN: ENC[AES256_GCM,data:9UxhXbSZ5XLPB2ePpkF25DwFyGwPFG+wMHSKmbn+7F7NH4mFN2G5Zw==,iv:k9TCjGpH9kHaYUi85XIuAmBV2wzpGBkniUIgEojuUgY=,tag:i0xezu7F5MVkV639zhatiw==,type:str]
 sops:
     age:
-        - recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
-          enc: |
+        - enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
             YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBzU1d5Umd4VE9QZE5ndWJ0
             ajNQV0szMWVxaWl3NzYzZFczNGNra1J0aGdZCnB1cCtiUExSWUJ3Sk1ya2hOdzZi
@@ -18,7 +17,8 @@ sops:
             elJpOWxrZDFSalp2M0o4T25Hd3ZqeDAKMhttzClMiTFPUvcUo7LhdmUfacFoU1Lv
             s0FZchvhbFugXs9Kt/7lt2P4FnE6ZKgQYx/flA+hsEzeHyU6+6o4uA==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2026-03-28T16:37:04Z"
-    mac: ENC[AES256_GCM,data:Glh2Va+mxaWdn4o90+QklTlYLjR/Ru0RBKe9TCzsxetc0qJ9h5J7uPobHZBO4if7cBQaWLw6K+mQfUZcBgrrHSyyuFv4bjBYBr4rs0L1yHlzPWGFUhXE8rDAhvp2iOcnrntsz5+s8bEzhqygICKpPsrFJmis4xnpdUQqJpkloFY=,iv:s1t62Qlwc0MCFQ9qWs/u2wzWY1kFcByQWyLvBz3WTEo=,tag:EmCkyGFH3ybCJqdP2/GBTQ==,type:str]
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
     encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-28T14:12:14Z"
+    mac: ENC[AES256_GCM,data:1MNmftmaD19LENgJqXdYpQJKmS65uS2tht/an8pJtIc6SsSFIcdmnMN2Lg+Omem0SGAEDkDCF8XhPv/dmbQt+K8XHah0jNvrkf1a59pjpQj0DjxZBEHWLnSV/HzvBfnt01lm8amzdzjZv7skMzpMslBu8nCbfqdPmFg9Vf9RhH4=,iv:K6e81m+DGPU78+W6hK8frS2KV7iRg845Fk8RpNPQqho=,tag:oRAQZfA/vG6W+shJviU/8Q==,type:str]
     version: 3.11.0
