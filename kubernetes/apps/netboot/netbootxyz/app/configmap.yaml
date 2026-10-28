@@ -52,12 +52,8 @@ data:
     #!ipxe
     echo Booting Talos v1.13.9 via Sidero Image Factory (unraid-worker)...
     chain --autofree https://pxe.factory.talos.dev/pxe/1e37ccf27ce1b716176726acda9130216bd2d4a311381da7011fdca1bbe941a7/v1.13.9/metal-amd64 || shell
-  # gateway-1 (b1:0e:97:50:29:f1)
-  MAC-b10e975029f1.ipxe: |
-    #!ipxe
-    echo Booting Talos v1.13.9 via Sidero Image Factory (gateway-1)...
-    chain --autofree https://pxe.factory.talos.dev/pxe/1e37ccf27ce1b716176726acda9130216bd2d4a311381da7011fdca1bbe941a7/v1.13.9/metal-amd64 || shell
-  MAC-e89c252a405e.ipxe: |
+  # gateway-1 (00:0c:6c:0a:69:5a)
+  MAC-000c6c0a695a.ipxe: |
     #!ipxe
     echo Booting Talos v1.13.9 via Sidero Image Factory (gateway-1)...
     chain --autofree https://pxe.factory.talos.dev/pxe/1e37ccf27ce1b716176726acda9130216bd2d4a311381da7011fdca1bbe941a7/v1.13.9/metal-amd64 || shell
