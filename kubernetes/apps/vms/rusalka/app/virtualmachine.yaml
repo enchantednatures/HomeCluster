@@ -1,0 +1,94 @@
+---
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: rusalka
+  namespace: vms
+  labels:
+    app.kubernetes.io/name: rusalka
+    app.kubernetes.io/instance: rusalka
+    kubevirt.io/domain: rusalka
+    kubevirt.io/vm: rusalka
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rusalka
+        app.kubernetes.io/instance: rusalka
+        kubevirt.io/domain: rusalka
+        kubevirt.io/vm: rusalka
+    spec:
+      terminationGracePeriodSeconds: 0
+      nodeSelector:
+        kubernetes.io/hostname: gateway-1
+      domain:
+        cpu:
+          cores: 8
+          sockets: 1
+          threads: 1
+        memory:
+          guest: 16Gi
+        machine:
+          type: q35
+        firmware:
+          bootloader:
+            bios: {}
+        features:
+          acpi: {}
+        devices:
+          disks:
+            - name: omarchy-iso
+              cdrom:
+                bus: sata
+              bootOrder: 1
+            - name: rusalka-vm-root
+              disk:
+                bus: virtio
+              bootOrder: 2
+            - name: gaming-vm-root
+              disk:
+                bus: virtio
+          gpus:
+            - deviceName: nvidia.com/RTX3080
+              name: gpu0
+          hostDevices:
+            - deviceName: nvidia.com/RTX3080_AUDIO
+              name: gpu0-audio
+            - deviceName: usb/intel-xhci
+              name: usb0
+          interfaces:
+            - name: default
+              masquerade: {}
+          networkInterfaceMultiqueue: true
+          rng: {}
+        resources:
+          requests:
+            cpu: 4
+            memory: 16Gi
+          limits:
+            cpu: 8
+            memory: 18Gi
+      accessCredentials:
+        - sshPublicKey:
+            source:
+              secret:
+                secretName: austin-ssh-key
+            propagationMethod:
+              qemuGuestAgent:
+                users:
+                  - austin
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rusalka-vm-root
+          dataVolume:
+            name: rusalka-vm-root
+        - name: gaming-vm-root
+          dataVolume:
+            name: gaming-vm-root
+        - name: omarchy-iso
+          dataVolume:
+            name: omarchy-iso
