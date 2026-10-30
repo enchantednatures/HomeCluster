@@ -77,11 +77,3 @@ spec:
         - ports:
             - port: "5432"
               protocol: TCP
-    # Allow egress to austin-vm SSH service
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: vms
-      toPorts:
-        - ports:
-            - port: "22"
-              protocol: TCP

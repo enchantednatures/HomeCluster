@@ -326,40 +326,38 @@ Internet Relay Chat server for real-time communication.
 
 KubeVirt-based virtual machine workloads running on Kubernetes.
 
-#### Austin VM
-**Path**: `kubernetes/apps/vms/arch-vm/`
+#### Rusalka VM
+**Path**: `kubernetes/apps/vms/rusalka/`
 
-Persistent Arch Linux workstation for Austin, used to build and tune GitHub
-Actions runner scale sets:
+Persistent Arch Linux workstation booted from the official Arch cloud image
+under cloud-init, with GPU and USB passthrough on `gateway-1`:
 
 **Components**:
-- **DataVolume**: `austin-vm-root`, 120 GiB on `ceph-block-ssd`
-- **VirtualMachine**: `austin-vm`, 4 vCPU and 8 GiB, Arch Linux `cloudimg`
-- **Service**: `austin-vm-ssh` `ClusterIP` on port 22
-- **Cloudflared ingress**: `austin-vm.${SECRET_DOMAIN}` to
-  `austin-vm-ssh.vms.svc.cluster.local:22`
+- **DataVolume**: `rusalka-root`, 120 GiB on `ceph-block-ssd`, imported from
+  the pinned Arch `cloudimg` qcow2
+- **VirtualMachine**: `rusalka`, 8 vCPU and 16 GiB, BIOS
+  `pc-q35-rhel9.2.0`, stable MAC `f2:5a:1c:9e:00:01`
+- **Passthrough**: RTX 3080, RTX 3080 audio, and Intel XHCI USB controller
+- **Service**: `rusalka-ssh`, Tailscale `LoadBalancer` on port 22 only
 
 **Features**:
-- Full Arch Linux toolchain: `git`, `gh`, `kubectl`, `helm`, `flux`, Docker
-- SSH through the existing Cloudflare Tunnel, key-only, no password or root
-  login, and no public SSH port
-- Kubernetes access as `system:serviceaccount:vms:austin`: read-only in `vms`
-  (KubeVirt/CDI plus workload objects), read-only workloads in `testing`,
-  HelmRelease CRUD with read-only observation and `secrets` create-only in
-  `austin-ci` (no pod create/exec, no Secret read), read-only in
-  `actions-runner-system`, and `get/update/patch` on the fixed
-  `austin-runners` and `austin-apps` Kustomizations only. Cluster-scoped access
-  and GitRepository writes are denied.
-- Austin creates his own GitHub App Secret in `austin-ci`; the owner's
-  `github-auth-secret` is never copied into that namespace.
-- Durable changes go through a PR: runner scale sets in
-  `kubernetes/apps/austin/runners/app`, other HelmReleases in
-  `kubernetes/apps/austin/apps/app`
+- SSH as `hcasten` over Tailscale at `rusalka` /
+  `rusalka.rya-bebop.ts.net`, key-only, with password SSH disabled. Root key
+  login is allowed with `PermitRootLogin prohibit-password`; the root password
+  is disabled.
+- VNC through the KubeVirt subresource with `virtctl vnc`, not a guest port
+  5900 and not a Service port.
+- Cloud-init Secret `rusalka-cloud-init` holds both `userdata` and `userData`.
+  cloud-init runs on first boot only, so key changes need the Secret updated
+  and the VM rebuilt or recreated.
+- No Cloudflared ingress and no public SSH. Access is Tailscale only.
+- Omarchy is installed manually after Arch boots; no desktop is installed
+  automatically.
 - **No VolSync backup**: deleting the DataVolume also deletes the
   `ceph-block-ssd` volume, and the data is not recoverable
 
-See `kubernetes/apps/vms/README.md` for SSH setup, the RBAC matrix, key and
-token rotation, and cleanup.
+See `kubernetes/apps/vms/README.md` for SSH and VNC setup, the cloud-init
+rotation caveat, and the manual Omarchy handoff.
 
 ```mermaid
 graph TB
@@ -377,7 +375,7 @@ graph TB
 
         subgraph "Networking"
             SVC[SSH Service]
-            CF[Cloudflare Tunnel]
+            TS[Tailscale]
         end
     end
 
@@ -386,7 +384,7 @@ graph TB
     DV --> PV
     PV --> STORAGE_CLASS
     VMI --> SVC
-    SVC --> CF
+    SVC --> TS
 ```
 
 ## Application Management

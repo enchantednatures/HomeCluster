@@ -4,12 +4,12 @@ Status: live, pilot-verified 2026-09-09. Every command in this document was exec
 
 ## 1. Overview
 
-VolSync v0.16.0 restic movers back up 7 PVCs to an external MinIO server at `192.168.1.241:9768`, reached in-cluster via the FQDN `minio-service.networking.svc.cluster.local:9768` (selectorless ClusterIP Service + manual Endpoints). The connection is plain HTTP. That is an accepted risk on this LAN: restic credentials transit unencrypted between mover pods and MinIO.
+VolSync v0.16.0 restic movers back up 6 PVCs to an external MinIO server at `192.168.1.241:9768`, reached in-cluster via the FQDN `minio-service.networking.svc.cluster.local:9768` (selectorless ClusterIP Service + manual Endpoints). The connection is plain HTTP. That is an accepted risk on this LAN: restic credentials transit unencrypted between mover pods and MinIO.
 
 Each PVC gets its own restic repository under the `volsync-backups` bucket, path convention `<namespace>-<pvc-name>`. Example (verified in `task-3-restic-repo-format.txt`):
 
 ```
-s3:http://minio-service.networking.svc.cluster.local:9768/volsync-backups/vms-arch-linux-root
+s3:http://minio-service.networking.svc.cluster.local:9768/volsync-backups/gitea-gitea-data
 ```
 
 Retention on every ReplicationSource: 7 daily / 4 weekly / 12 monthly, `pruneIntervalDays: 7`. `copyMethod: Direct` everywhere, which means the mover reads the live volume without a snapshot clone. Backups are therefore crash-consistent, not application-consistent. This is why databases are excluded from VolSync entirely: CNPG, Kafka, Elastic, and ArangoDB use their native backup tooling instead. kellnr-db has WAL archiving only, which is a known gap (see risks).
@@ -18,7 +18,6 @@ Retention on every ReplicationSource: 7 daily / 4 weekly / 12 monthly, `pruneInt
 
 | App | NS | PVC | Schedule (UTC) | Cache | Mover uid |
 |---|---|---|---|---|---|
-| arch-linux VM | vms | arch-linux-root | `0 2 * * *` | 10Gi openebs-hostpath | 107 (qemu) |
 | immich | immich | immich-library-pvc | `20 2 * * *` | 10Gi ceph-block | default |
 | gitea | gitea | gitea-data | `40 2 * * *` | 10Gi ceph-block | 1000 |
 | kellnr | kellnr | kellnr | `0 3 * * *` | 10Gi ceph-block | default |
@@ -26,7 +25,7 @@ Retention on every ReplicationSource: 7 daily / 4 weekly / 12 monthly, `pruneInt
 | home-assistant | home-system | home-assistant-config | `40 3 * * *` | 5Gi ceph-block | default |
 | node-red | home-system | node-red | `0 4 * * *` | 5Gi ceph-block | 1000/150/140 |
 
-ReplicationSource names: `arch-linux-backup`, `immich-backup`, `gitea-backup`, `kellnr-backup`, `influxdb-backup`, `home-assistant-backup`, `node-red-backup`. Each app also has a paused ReplicationDestination named `<app>-restore` for rebuilds.
+ReplicationSource names: `immich-backup`, `gitea-backup`, `kellnr-backup`, `influxdb-backup`, `home-assistant-backup`, `node-red-backup`. Each app also has a paused ReplicationDestination named `<app>-restore` for rebuilds.
 
 kellnr caveat: the `kellnr` PVC holds almost nothing (the pilot backup processed 0 files). Crates live in MinIO `kellnr-*` buckets and the package index lives in the kellnr-db Postgres database. Real kellnr protection is MinIO bucket replication plus a CNPG ScheduledBackup for kellnr-db; both are documented follow-ups.
 
@@ -93,14 +92,14 @@ Restic completed in 4s
 Check the mover Job labels if you need to inspect it (proven, task-3-mover-labels.txt):
 
 ```sh
-kubectl -n vms get job volsync-src-arch-linux-backup --show-labels
+kubectl -n gitea get job volsync-src-gitea-backup --show-labels
 ```
 
 Failure modes seen in the pilot:
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `open disk.img: permission denied` in mover logs | mover uid cannot read PVC files | `restic.moverSecurityContext` matching the app's uid/gid/fsGroup (already set in Git for arch 107, gitea 1000, influxdb 1000, node-red 1000/150/140) |
+| `open disk.img: permission denied` in mover logs | mover uid cannot read PVC files | `restic.moverSecurityContext` matching the app's uid/gid/fsGroup (already set in Git for gitea 1000, influxdb 1000, node-red 1000/150/140) |
 | restic `parsing repository location failed: invalid backend` | placeholder RESTIC_REPOSITORY in the secret | put real values in the secret before triggering (task-6-gitea-roundtrip.log) |
 | Kyverno `require-pod-resources` blocks the mover Job | namespace not in the Kyverno exclusion list | `restic.moverResources` with cpu/memory requests and a memory limit (already set in Git for gitea, home-assistant, node-red) |
 | Mover pod Pending ~15 min, `Too many pods` | unraid-worker at max-pods 110/110; movers are node-pinned to the PV node | wait for a slot to free; FailedScheduling does not consume Job backoffLimit, the Job schedules when capacity appears (task-8-influxdb-backup.log) |
@@ -112,14 +111,14 @@ If a node is disrupted mid-sync (TaintManagerEviction kills the mover pod), the 
 1. Delete the wedged Job (action proven in task-3-restore.log timeline: "deleted wedged job"; Job name pattern `volsync-dst-<rd-name>` per task-8-influxdb-backup.log):
 
 ```sh
-kubectl -n vms delete job volsync-dst-arch-linux-restore
+kubectl -n gitea delete job volsync-dst-gitea-restore
 ```
 2. Re-patch `paused: false` AND a new unique `trigger.manual` together.
 3. The pod reschedules on the PV node and the sync completes.
 
 ## 3. Cluster-rebuild restore procedure
 
-This is the procedure proven end-to-end in task-3-restore.log (arch-linux, openebs-hostpath, 40GiB) and task-6-gitea-roundtrip.log (gitea, ceph-block). One app is walked as the example; repeat per app.
+This is the procedure proven end-to-end in task-6-gitea-roundtrip.log (gitea, ceph-block). One app is walked as the example; repeat per app.
 
 Do NOT delete existing PVCs before restoring. The ReplicationDestination restores INTO the existing empty PVC via `destinationPVC`.
 
@@ -144,7 +143,7 @@ Each RD is committed with `paused: true`. To restore, flip `paused: false` and s
 For urgent rebuilds a temporary kubectl patch is acceptable (proven, task-3-restore.log timeline: "patched paused:false + trigger manual"):
 
 ```sh
-kubectl -n vms patch replicationdestination arch-linux-restore \
+kubectl -n gitea patch replicationdestination gitea-restore \
   --type merge -p '{"spec":{"paused":false,"trigger":{"manual":"restore-pilot-1788966227"}}}'
 ```
 
@@ -155,7 +154,7 @@ CRITICAL GOTCHA (task-3-restore.log): patch `paused` AND `trigger` TOGETHER. If 
 Poll the RD status (VolSync deletes the Job on success). The RD status JSON captured in task-3-restore.log was read the same way as the RS example in section 2:
 
 ```sh
-kubectl -n vms get replicationdestination arch-linux-restore -o json
+kubectl -n gitea get replicationdestination gitea-restore -o json
 ```
 
 Success looks like (task-3-restore.log):
@@ -173,18 +172,7 @@ The RD restic mover restores the LATEST snapshot by default.
 
 ### Step 5: verify data with a busybox Job
 
-Mount the destination PVC in a verification pod and confirm it is non-empty. Exact commands and outputs from task-3-restore.log (openebs-hostpath path):
-
-```
-ls -A /data
-  disk.img
-du -sh /data
-  40.0G /data
-ls -l /data
-  -rw-rw---- 1 107 107 42949672960 Sep  9 14:40 disk.img
-```
-
-And from task-6-gitea-roundtrip.log (ceph-block path):
+Mount the destination PVC in a verification pod and confirm it is non-empty. Exact commands and outputs from task-6-gitea-roundtrip.log (ceph-block path):
 
 ```
 ls -A /data
