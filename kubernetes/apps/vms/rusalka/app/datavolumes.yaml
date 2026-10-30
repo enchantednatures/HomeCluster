@@ -3,51 +3,6 @@
 apiVersion: cdi.kubevirt.io/v1beta1
 kind: DataVolume
 metadata:
-  name: omarchy-iso
-  namespace: vms
-  labels:
-    app.kubernetes.io/name: rusalka
-    app.kubernetes.io/instance: rusalka
-spec:
-  contentType: kubevirt
-  source:
-    http:
-      url: "https://iso.omarchy.org/omarchy-4.0.6.iso"
-  storage:
-    accessModes:
-      - ReadWriteOnce
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: 8Gi
-    storageClassName: ceph-block-ssd
----
-# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
-apiVersion: cdi.kubevirt.io/v1beta1
-kind: DataVolume
-metadata:
-  name: rusalka-vm-root
-  namespace: vms
-  labels:
-    app.kubernetes.io/name: rusalka
-    app.kubernetes.io/instance: rusalka
-spec:
-  contentType: kubevirt
-  source:
-    blank: {}
-  storage:
-    accessModes:
-      - ReadWriteOnce
-    volumeMode: Filesystem
-    resources:
-      requests:
-        storage: 120Gi
-    storageClassName: ceph-block-ssd
----
-# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
-apiVersion: cdi.kubevirt.io/v1beta1
-kind: DataVolume
-metadata:
   name: rusalka-root
   namespace: vms
   labels:
