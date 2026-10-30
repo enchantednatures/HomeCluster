@@ -39,13 +39,14 @@ spec:
           acpi: {}
         devices:
           disks:
+            - name: omarchy-iso
+              cdrom:
+                bus: sata
+              bootOrder: 1
             - name: rusalka-root
               disk:
                 bus: virtio
-              bootOrder: 1
-            - name: cloudinitdisk
-              disk:
-                bus: virtio
+              bootOrder: 2
           gpus:
             - deviceName: nvidia.com/RTX3080
               name: gpu0
@@ -74,10 +75,9 @@ spec:
         - name: default
           pod: {}
       volumes:
+        - name: omarchy-iso
+          dataVolume:
+            name: omarchy-iso
         - name: rusalka-root
           dataVolume:
             name: rusalka-root
-        - name: cloudinitdisk
-          cloudInitNoCloud:
-            secretRef:
-              name: rusalka-cloud-init
