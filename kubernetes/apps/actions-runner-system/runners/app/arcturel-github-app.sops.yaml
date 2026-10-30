@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: arcturel-github-app
+    namespace: actions-runner-system
+    labels:
+        app.kubernetes.io/name: arcturel-github-app
+type: Opaque
+stringData:
+    github_app_id: ENC[AES256_GCM,data:wnxg9H4/HQ==,iv:5euY1PmmTgcXfsUheC+lQiTbhQ2KLu2DY5V0x5dleEI=,tag:VHgAomJwTjFHBg4pIYXqRw==,type:str]
+    github_app_installation_id: ENC[AES256_GCM,data:NrkgcyaaQdvM,iv:2s6Pvkyk1aHxKYRheC9vQAD64ebpcdpiTxizccNzXsQ=,tag:A48KA9syf4e65wdwKKLPMg==,type:str]
+    github_app_private_key: ENC[AES256_GCM,data:cvFhn3P3QVITrs7/Fs+eD49ctNdWILrrPjs2ohCm6a0mSyztWOABeC8XL9IuceFJJ99Qgbi+s6DqDBIr8sNyyer0IqGK6eqXQdpx8AlVwH1jeE0i9iRXC9rUEFFAxM01sbdmR55RWFFJO7KbLe4/m9FcZFith7DQ7N/vaOXUXgIgspI8RKB+Y4fHru0DhZgskJ47tFxSlv51SlyX6wnFjFOlWFocp+LSvEqA1UtUzYUWn+QrHGhkoHcnZLsHjpveOU1y9qmjWGqXdLjXnYaTionDjhpH9DDz9dbhN1U93zl66bvfHA/ByMyqnEsxBV8vtzXbWZ+HcWhbSSNtchvRjmMQ0HantuXK5LrDWNlAS28Pjvb/q3PFVtRTV+1pjConfBzUxd/565Oai5lKqf51rMtDwUvj9zWCxGhCwkKiXn9YU2VD9ZX6IEnA+vuUl/A2UoP2uRaNZJWOXtnERGQXXNfxcTtVm2hebjtDZ/ZGCtHWjoUnRKtzxTerJOtr1QZBoCzewG3LFBY3r/tR4I45zfcnHwkXBAaKXk9AQ/99KpI6flrGjfCwNfENPycbfZWSFjdVeS2WTm3I52O8+pcOmj4HPccynj2O6MiaYJn5/uXaqGwL9v3ZNflbhP8QSwdNUJ6QViFjM8Bu+OaRGiqZ1+tEkR5wWbpOvJa7i9hqmXz4gaxJLjLZAC+7MvZfJ6CBip1ruSTzBLu7sPYrYD2ZsuLOxDeW5DWJYnugPsw8uHDDB/T0qTmwcizvKcIl+C3yUzkA5s82ux9azCWseCt5Tr4ThktuMVth4L3/JxXI6lMaMZWniTC/xKiyEkrRJ/3OP94pdhD2Re1Gwg75/+4zcFk1fjCLknN4l3+rO9C92cEN+I/AxMDlgoCc27RwfiQO9PCdECp0xNLgL02DWY4h3D/bJcmC2+raRhwCxhV/buv7qDgvUr5NuiIogmx88KJN2N5MrlLVgUmgJR888xuPMAGihFThWhD5Iwx1CKu+egT1wqJCiqiEctwO9rKP9yd60FtIpXgo0yx0Wcnr4Qoo5wKzgBS8/DVJNcn9dZ4kbnywBV7OtdyqtCckpP/5HTfBmUcN+kXtkJdPH2mHI93umuYTDrh5UCTs3XBxEcPmNygOxHW6Nqbzh+znZoSXsh7uRB57guN0m55I9OOmiPr49vBaQd8Aen15wVvZfOBmVBrMNumVKyNhV1K03CJpgNVluq3SJ7SIWwtH1VA+wtSpHLwZ4YkZewHB7Dqnj3/dMAX1IW5dcq1OdHtuMgH0INeZL1MJltd516Y5G5RJWTKHNusD//yDG7AgEajYyHRL7/tAMOuYMNd/+IHT6yqv/sJrVup7FvzKSnyKbB+so5mgRyrMqvAsvwAQAuyPCLgnnEgv4rOhsbtyQcUDCt28ypVUQkIGuxID9omw/KRpp6hUC1gXWg/WcauWyd/ybalTZpx7Fpg3QekGtyBK8fg8/m0IHUZHSF44Jm33hfzgc7NYDh+gw9bClN4MI53zkNnsb2hS/wIXgWmm6p+5FLGwbONc9R/E9+Yhfzv2eYgoOK2J7ZYPr+pdiBzNdcbn6tloa3xLKAZOOzFb3qaSIiH/DVndQ/6sbEDWQ2+Vm4EWtQkcPIJRu8csFyAT+UU+QEsCS12BpEpk3FjjxJwCjxLeGaI+4dDQbIXvFw98jxDE3sWulht91+WVLZeac/TzAhWjmSnMCzDzCDutTyre4UDA7llSRbF04Mi90h1HXjcrIb5niH5gNu/plxw8aL3TIUZrQ1uxfqrcbUbUCwI1YrbjrHPTv9r2FvioT/BuLCQQg4MmwkEb9CgBVW6re6WhpugeNZv7NZqUOlGbwgqbUL7GVv2si3Ojyb57b6KWxcN+lV8+jvD70InAalONzuKQRokNlVXju7BLGmiatrgPevY4oDYU281i8IL9PcqO4RvnU/irvubaScFQ8uAybGN5u0026vwZxoHshPkdiXamvfqglMtEm3/WMUkGkdpzLdfer8uUPTjobWcPOId9Ku5Wtuy9O5AXcOgb1gW1+8dYEGMWrThOdu5MBlOIUdlIgQft2Jiw2Y6K+b4wGKEAfdcEldFhHeyyhXsBRPjhNmIHSpqtlO7mdlcwWR1rk+gzR+0aV/Zm+ifpmCywx3d9XHPLrPxOrQJsDbml7Hq6bFr8ZYSx2q82uo/iUy+2MlqWYS4ki8VYKz95V3ZEi19VHXd94D7BEK3KvlW02kRJiclgCA==,iv:/OFH/FX2HvlffHPhpCvMI/Q24xikFzeFuUFeHH02Z0c=,tag:EjgPOX96IPCdVO/hjZsPkQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBQTHdkOGZJcWxwb2hTdHZh
+            Q1g5dWpXYlVEMmlnemFvSDZDOFhxbW1SbGdNCkd4cXlEUHJxQ0dEUlJCMEJlVWtF
+            UU03djNPZUU1NGhFZm1EL0FZK0QyOWMKLS0tIHZGUXMxdGtyUVpOeTNiWlBDSjZY
+            djhldk9CZENheTNjcFVPak9OZDlaV28Kliewy5tMgbdkNZCHmt68rZGXEdccZJIb
+            DWNGb0uvSXw8bAwwy/EiDHkVnQ3l16x44VR/vdA96T1O9wPUiZDP6A==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-10-30T15:58:26Z"
+    mac: ENC[AES256_GCM,data:1vmw9D2HgIX8ySV7nrdd00WuJF+afFhR+tt0h2HB6KKifgEV9fIMyUhdmohhOfQG9sBZ0VybSTb9nn+eMpVe7GFCYVP+d1Ie3VCpt2xosiqorYTdlrRAT28LV2RyVVpi+sLQUDrLfVJiHMpLjCF+SPUrpokj3Y9i0E++sJdau+U=,iv:2wrZs7wCRnwLc1xISN4nM3T4zP8qqmuAaHdevshri1M=,tag:U/bceShWiZdNAYY/Ec8pDQ==,type:str]
+    version: 3.13.3
