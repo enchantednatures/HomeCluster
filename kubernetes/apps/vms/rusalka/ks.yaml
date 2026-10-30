@@ -8,8 +8,6 @@ metadata:
 spec:
   targetNamespace: vms
   dependsOn:
-    - name: arch-vm
-    - name: gaming
     - name: kubevirt-cdi
     - name: kubevirt-operator
     - name: rook-ceph-cluster
