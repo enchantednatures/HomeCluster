@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
   - ./cloud-init-secret.sops.yaml
   - ./datavolumes.yaml
+  - ./virtualmachine.yaml

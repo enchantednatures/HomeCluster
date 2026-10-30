@@ -1,0 +1,83 @@
+---
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: rusalka
+  namespace: vms
+  labels:
+    app.kubernetes.io/name: rusalka
+    app.kubernetes.io/instance: rusalka
+    kubevirt.io/domain: rusalka
+    kubevirt.io/vm: rusalka
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rusalka
+        app.kubernetes.io/instance: rusalka
+        kubevirt.io/domain: rusalka
+        kubevirt.io/vm: rusalka
+    spec:
+      terminationGracePeriodSeconds: 30
+      nodeSelector:
+        kubernetes.io/hostname: gateway-1
+      domain:
+        cpu:
+          cores: 8
+          sockets: 1
+          threads: 1
+        memory:
+          guest: 16Gi
+        machine:
+          type: pc-q35-rhel9.2.0
+        firmware:
+          bootloader:
+            bios: {}
+        features:
+          acpi: {}
+        devices:
+          disks:
+            - name: rusalka-root
+              disk:
+                bus: virtio
+              bootOrder: 1
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          gpus:
+            - deviceName: nvidia.com/RTX3080
+              name: gpu0
+          hostDevices:
+            - deviceName: nvidia.com/RTX3080_AUDIO
+              name: gpu0-audio
+            - deviceName: usb/intel-xhci
+              name: usb0
+          interfaces:
+            # The guest's cloud-init-generated network config matches this stable
+            # MAC. KubeVirt otherwise assigns a new random pod MAC on every VMI
+            # recreation and the guest network never comes up.
+            - name: default
+              masquerade: {}
+              macAddress: "f2:5a:1c:9e:00:01"
+          networkInterfaceMultiqueue: true
+          rng: {}
+        resources:
+          requests:
+            cpu: 4
+            memory: 16Gi
+          limits:
+            cpu: 8
+            memory: 18Gi
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rusalka-root
+          dataVolume:
+            name: rusalka-root
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            secretRef:
+              name: rusalka-cloud-init
