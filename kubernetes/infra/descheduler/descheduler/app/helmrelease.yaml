@@ -80,6 +80,7 @@ spec:
             - name: RemoveFailedPods
               args:
                 reasons:
+                  - Evicted
                   - OutOfcpu
                   - CreateContainerConfigError
                   - CrashLoopBackOff
