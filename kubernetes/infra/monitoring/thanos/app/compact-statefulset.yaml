@@ -46,7 +46,7 @@ spec:
       containers:
         - name: thanos-compact
           # datasource=docker depName=quay.io/thanos/thanos
-          image: quay.io/thanos/thanos:v0.42.4
+          image: quay.io/thanos/thanos:v0.42.5
           args:
             - compact
             - --data-dir=/var/thanos/compact

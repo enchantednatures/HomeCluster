@@ -53,7 +53,7 @@ spec:
       containers:
         - name: thanos-query
           # datasource=docker depName=quay.io/thanos/thanos
-          image: quay.io/thanos/thanos:v0.42.4
+          image: quay.io/thanos/thanos:v0.42.5
           args:
             - query
             - --http-address=0.0.0.0:9090
