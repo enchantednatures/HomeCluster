@@ -17,8 +17,10 @@ spec:
   deviceClass: ssd
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
-    pg_autoscale_mode: "on"
-    target_size_ratio: "0.04"  # Reserve 30% of cluster capacity for this pool
+    pg_num: "16"
+    pgp_num: "16"
+    pg_autoscale_mode: "off"
+    target_size_ratio: "0.04"  # informational only with autoscale off
   quotas:
     maxBytes: 536870912000  # 500Gi in bytes - Adjust based on your cluster capacity
   statusCheck:
@@ -79,8 +81,10 @@ spec:
   parameters:
     compression_mode: aggressive  # Aggressive compression for space savings
     compression_algorithm: lz4    # Fast compression algorithm
-    pg_autoscale_mode: "on"
-    target_size_ratio: "0.2"
+    pg_num: "32"
+    pgp_num: "32"
+    pg_autoscale_mode: "off"
+    target_size_ratio: "0.2"  # informational only with autoscale off
   quotas:
     maxBytes: 1099511627776  # 1Ti in bytes
 ---
@@ -132,8 +136,10 @@ spec:
   deviceClass: nvme  # osd.4-7: 250GB WD Blue SN570 NVMe passed to work-00..03
   parameters:
     compression_mode: "none"  # Disable compression for maximum performance
-    pg_autoscale_mode: "on"
-    target_size_ratio: "0.04"  # Reserve 40% of NVMe capacity for this pool
+    pg_num: "32"
+    pgp_num: "32"
+    pg_autoscale_mode: "off"
+    target_size_ratio: "0.04"  # informational only with autoscale off
   statusCheck:
     mirror:
       disabled: false
