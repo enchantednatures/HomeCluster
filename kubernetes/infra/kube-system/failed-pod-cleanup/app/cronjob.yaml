@@ -1,0 +1,98 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/cronjob.json
+# Reaps pods left in the Failed phase (Evicted, node lost, etc.) so they do not
+# accumulate indefinitely. Job-owned pods are skipped; their Job TTL/backoff owns
+# their lifecycle. Runs hourly and is a no-op when nothing is failed.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: failed-pod-cleanup
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: failed-pod-cleanup
+    app.kubernetes.io/part-of: kube-system
+    app.kubernetes.io/component: maintenance
+spec:
+  schedule: "23 * * * *"
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: failed-pod-cleanup
+            app.kubernetes.io/component: maintenance
+        spec:
+          serviceAccountName: failed-pod-cleanup
+          restartPolicy: OnFailure
+          containers:
+            - name: kubectl
+              image: alpine/kubectl:1.37.1 # datasource=docker depName=alpine/kubectl
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  set -o errexit -o pipefail
+
+                  echo "Listing failed pods..."
+                  failed_pods="$(kubectl get pods --all-namespaces \
+                    --field-selector=status.phase=Failed \
+                    -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name,OWNER:.metadata.ownerReferences[0].kind' \
+                    --no-headers || true)"
+
+                  if [ -z "${failed_pods}" ]; then
+                    echo "No failed pods found."
+                    exit 0
+                  fi
+
+                  printf '%s\n' "${failed_pods}" | while read -r namespace name owner; do
+                    if [ "${owner}" = "Job" ]; then
+                      echo "Skipping ${namespace}/${name}: owned by a Job"
+                      continue
+                    fi
+                    echo "Deleting failed pod ${namespace}/${name} (owner: ${owner})"
+                    kubectl delete pod --namespace "${namespace}" "${name}" --ignore-not-found --wait=false || true
+                  done
+
+                  echo "Failed pod cleanup complete."
+              env:
+                - name: HOME
+                  value: /tmp
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 32Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 65534
+                seccompProfile:
+                  type: RuntimeDefault
+              volumeMounts:
+                - name: tmp
+                  mountPath: /tmp
+          securityContext:
+            fsGroup: 65534
+            runAsGroup: 65534
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          volumes:
+            - name: tmp
+              emptyDir: {}
+---
