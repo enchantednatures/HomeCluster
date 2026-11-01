@@ -33,7 +33,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: kubectl
-              image: alpine/kubectl:1.37.1 # datasource=docker depName=alpine/kubectl
+              image: alpine/kubectl:1.37.2 # datasource=docker depName=alpine/kubectl
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
