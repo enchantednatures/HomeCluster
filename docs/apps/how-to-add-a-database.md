@@ -136,7 +136,7 @@ spec:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: minio-store
+        barmanObjectName: rustfs-store
         serverName: <app>
 ```
 

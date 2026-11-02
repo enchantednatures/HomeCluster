@@ -60,7 +60,7 @@ spec:
     - name: barman-cloud.cloudnative-pg.io
       isWALArchiver: true
       parameters:
-        barmanObjectName: minio-store
+        barmanObjectName: rustfs-store
         serverName: authentik-v16
   bootstrap:
     # Restore pre-wipe data from the last complete base backup in the v15
@@ -81,5 +81,5 @@ spec:
       plugin:
         name: barman-cloud.cloudnative-pg.io
         parameters:
-          barmanObjectName: minio-store
+          barmanObjectName: rustfs-store
           serverName: authentik-v15
