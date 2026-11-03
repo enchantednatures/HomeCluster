@@ -22,5 +22,7 @@ spec:
           resourceName: "nvidia.com/RTX3080_AUDIO"
         - pciVendorSelector: "8086:7A60"
           resourceName: "usb/intel-xhci"
+        - pciVendorSelector: "1B73:1100"
+          resourceName: "usb/fresco-xhci"
   customizeComponents: {}
   imagePullPolicy: IfNotPresent

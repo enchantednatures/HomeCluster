@@ -62,6 +62,8 @@ spec:
               name: gpu0-audio
             - deviceName: usb/intel-xhci
               name: usb0
+            - deviceName: usb/fresco-xhci
+              name: usb1
           interfaces:
             # The guest's cloud-init-generated network config matches this stable
             # MAC. KubeVirt otherwise assigns a new random pod MAC on every VMI
