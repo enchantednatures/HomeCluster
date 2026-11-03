@@ -60,7 +60,7 @@ Two independent schedules protect the two data locations. They are staggered so 
 | Target | Mechanism | Schedule (UTC) | Destination |
 |---|---|---|---|
 | MariaDB rows | mariadb-operator `Backup` CR `erpnext-db-backup` | `15 1 * * *` | `s3://cloudnative-pg/erpnext/` on MinIO, secret `pg-backup-secret` |
-| Site files (`erpnext-sites`) | VolSync `ReplicationSource` `erpnext-backup` | `40 2 * * *` | `s3:http://minio-service.networking.svc.cluster.local:9768/volsync-backups/erpnext-sites`, secret `erpnext-backup-secret` |
+| Site files (`erpnext-sites`) | VolSync `ReplicationSource` `erpnext-backup` | `40 2 * * *` | `s3:http://rustfs-service.networking.svc.cluster.local:9000/volsync-backups/erpnext-sites`, secret `erpnext-backup-secret` |
 
 The MariaDB `Backup` CR is a logical dump. It keeps `maxRetention: 720h` (30 days), writes objects under the `erpnext` prefix of the shared `cloudnative-pg` bucket, and authenticates with the Kyverno-replicated `pg-backup-secret` (`aws-access-key-id` / `aws-secret-access-key`).
 

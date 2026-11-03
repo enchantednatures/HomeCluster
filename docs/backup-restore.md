@@ -1,15 +1,15 @@
-# Backup & Restore Runbook (VolSync → MinIO)
+# Backup & Restore Runbook (VolSync → RustFS)
 
-Status: live, pilot-verified 2026-09-09. Every command in this document was executed during the pilot tasks and is cited to an evidence file under `.sisyphus/evidence/`. Nothing here is untested.
+Status: live. Pilot-verified 2026-09-09 against MinIO; migrated to RustFS on 2026-11-03. Restore commands in this document were executed during the pilot tasks and are cited to an evidence file under `.sisyphus/evidence/`. Restore mechanics are backend-agnostic; only the endpoint in secrets changed.
 
 ## 1. Overview
 
-VolSync v0.16.0 restic movers back up 6 PVCs to an external MinIO server at `192.168.1.241:9768`, reached in-cluster via the FQDN `minio-service.networking.svc.cluster.local:9768` (selectorless ClusterIP Service + manual Endpoints). The connection is plain HTTP. That is an accepted risk on this LAN: restic credentials transit unencrypted between mover pods and MinIO.
+VolSync v0.16.0 restic movers back up 5 PVCs to an external RustFS server at `192.168.1.241:9000`, reached in-cluster via the FQDN `rustfs-service.networking.svc.cluster.local:9000` (selectorless ClusterIP Service + manual Endpoints). RustFS replaces the former MinIO target at `192.168.1.241:9768`. The connection is plain HTTP. That is an accepted risk on this LAN: restic credentials transit unencrypted between mover pods and RustFS.
 
-Each PVC gets its own restic repository under the `volsync-backups` bucket, path convention `<namespace>-<pvc-name>`. Example (verified in `task-3-restic-repo-format.txt`):
+Each PVC gets its own restic repository under the `volsync-backups` bucket, path convention `<namespace>-<pvc-name>`. Example:
 
 ```
-s3:http://minio-service.networking.svc.cluster.local:9768/volsync-backups/gitea-gitea-data
+s3:http://rustfs-service.networking.svc.cluster.local:9000/volsync-backups/docker-android
 ```
 
 Retention on every ReplicationSource: 7 daily / 4 weekly / 12 monthly, `pruneIntervalDays: 7`. `copyMethod: Direct` everywhere, which means the mover reads the live volume without a snapshot clone. Backups are therefore crash-consistent, not application-consistent. This is why databases are excluded from VolSync entirely: CNPG, Kafka, Elastic, and ArangoDB use their native backup tooling instead. kellnr-db has WAL archiving only, which is a known gap (see risks).
@@ -19,13 +19,14 @@ Retention on every ReplicationSource: 7 daily / 4 weekly / 12 monthly, `pruneInt
 | App | NS | PVC | Schedule (UTC) | Cache | Mover uid |
 |---|---|---|---|---|---|
 | immich | immich | immich-library-pvc | `20 2 * * *` | 10Gi ceph-block | default |
-| gitea | gitea | gitea-data | `40 2 * * *` | 10Gi ceph-block | 1000 |
+| erpnext | erpnext | erpnext-sites | `40 2 * * *` | 10Gi ceph-block | default |
+| docker-android | android-emulator | docker-android-data | `50 2 * * *` | 10Gi ceph-block | default |
 | kellnr | kellnr | kellnr | `0 3 * * *` | 10Gi ceph-block | default |
-| influxdb | monitoring | influxdb-influxdb2 | `20 3 * * *` | 10Gi openebs-hostpath | 1000 |
-| home-assistant | home-system | home-assistant-config | `40 3 * * *` | 5Gi ceph-block | default |
-| node-red | home-system | node-red | `0 4 * * *` | 5Gi ceph-block | 1000/150/140 |
+| influxdb | monitoring | influxdb-influxdb2 | `20 3 * * *` | 10Gi ceph-block | 1000 |
 
-ReplicationSource names: `immich-backup`, `gitea-backup`, `kellnr-backup`, `influxdb-backup`, `home-assistant-backup`, `node-red-backup`. Each app also has a paused ReplicationDestination named `<app>-restore` for rebuilds.
+ReplicationSource names: `immich-backup`, `erpnext-backup`, `docker-android-backup`, `kellnr-backup`, `influxdb-backup`. Each app also has a paused ReplicationDestination named `<app>-restore` for rebuilds.
+
+Historical note: the pilot also covered `gitea`, `home-assistant`, and `node-red`, which no longer exist in this repo. Their old repositories still sit in the legacy MinIO `volsync-backups` bucket.
 
 kellnr caveat: the `kellnr` PVC holds almost nothing (the pilot backup processed 0 files). Crates live in MinIO `kellnr-*` buckets and the package index lives in the kellnr-db Postgres database. Real kellnr protection is MinIO bucket replication plus a CNPG ScheduledBackup for kellnr-db; both are documented follow-ups.
 
@@ -77,6 +78,7 @@ After a sync, read `.status.latestMoverStatus.logs`. A successful run looks like
 
 ```
 === Initialize Dir ===
+# pilot run, MinIO-era endpoint (historical)
 created restic repository b54f61ec73 at s3:http://minio-service.networking.svc.cluster.local:9768/volsync-backups/monitoring-influxdb-data
 no parent snapshot found, will read all files
 Added to the repository: 185.723 KiB (6.227 KiB stored)
@@ -92,16 +94,16 @@ Restic completed in 4s
 Check the mover Job labels if you need to inspect it (proven, task-3-mover-labels.txt):
 
 ```sh
-kubectl -n gitea get job volsync-src-gitea-backup --show-labels
+kubectl -n kellnr get job volsync-src-kellnr-backup --show-labels
 ```
 
 Failure modes seen in the pilot:
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| `open disk.img: permission denied` in mover logs | mover uid cannot read PVC files | `restic.moverSecurityContext` matching the app's uid/gid/fsGroup (already set in Git for gitea 1000, influxdb 1000, node-red 1000/150/140) |
+| `open disk.img: permission denied` in mover logs | mover uid cannot read PVC files | `restic.moverSecurityContext` matching the app's uid/gid/fsGroup (set in Git for influxdb 1000) |
 | restic `parsing repository location failed: invalid backend` | placeholder RESTIC_REPOSITORY in the secret | put real values in the secret before triggering (task-6-gitea-roundtrip.log) |
-| Kyverno `require-pod-resources` blocks the mover Job | namespace not in the Kyverno exclusion list | `restic.moverResources` with cpu/memory requests and a memory limit (already set in Git for gitea, home-assistant, node-red) |
+| Kyverno `require-pod-resources` blocks the mover Job | namespace not in the Kyverno exclusion list | `restic.moverResources` with cpu/memory requests and a memory limit (set in Git for erpnext and docker-android) |
 | Mover pod Pending ~15 min, `Too many pods` | unraid-worker at max-pods 110/110; movers are node-pinned to the PV node | wait for a slot to free; FailedScheduling does not consume Job backoffLimit, the Job schedules when capacity appears (task-8-influxdb-backup.log) |
 
 ### Stale restic locks after node disruption
@@ -111,14 +113,14 @@ If a node is disrupted mid-sync (TaintManagerEviction kills the mover pod), the 
 1. Delete the wedged Job (action proven in task-3-restore.log timeline: "deleted wedged job"; Job name pattern `volsync-dst-<rd-name>` per task-8-influxdb-backup.log):
 
 ```sh
-kubectl -n gitea delete job volsync-dst-gitea-restore
+kubectl -n kellnr delete job volsync-dst-kellnr-restore
 ```
 2. Re-patch `paused: false` AND a new unique `trigger.manual` together.
 3. The pod reschedules on the PV node and the sync completes.
 
 ## 3. Cluster-rebuild restore procedure
 
-This is the procedure proven end-to-end in task-6-gitea-roundtrip.log (gitea, ceph-block). One app is walked as the example; repeat per app.
+This is the procedure proven end-to-end in task-6-gitea-roundtrip.log (gitea, ceph-block; now removed from the repo). The walkthrough below uses kellnr; repeat per app.
 
 Do NOT delete existing PVCs before restoring. The ReplicationDestination restores INTO the existing empty PVC via `destinationPVC`.
 
@@ -143,7 +145,7 @@ Each RD is committed with `paused: true`. To restore, flip `paused: false` and s
 For urgent rebuilds a temporary kubectl patch is acceptable (proven, task-3-restore.log timeline: "patched paused:false + trigger manual"):
 
 ```sh
-kubectl -n gitea patch replicationdestination gitea-restore \
+kubectl -n kellnr patch replicationdestination kellnr-restore \
   --type merge -p '{"spec":{"paused":false,"trigger":{"manual":"restore-pilot-1788966227"}}}'
 ```
 
@@ -154,7 +156,7 @@ CRITICAL GOTCHA (task-3-restore.log): patch `paused` AND `trigger` TOGETHER. If 
 Poll the RD status (VolSync deletes the Job on success). The RD status JSON captured in task-3-restore.log was read the same way as the RS example in section 2:
 
 ```sh
-kubectl -n gitea get replicationdestination gitea-restore -o json
+kubectl -n kellnr get replicationdestination kellnr-restore -o json
 ```
 
 Success looks like (task-3-restore.log):
@@ -209,15 +211,15 @@ Each app has one secret at `<app-dir>/backup/*-backup-secret.sops.yaml` (SOPS/Ag
 
 | Key | Value |
 |---|---|
-| AWS_ACCESS_KEY_ID | MinIO access key |
-| AWS_SECRET_ACCESS_KEY | MinIO secret key |
-| RESTIC_REPOSITORY | `s3:http://minio-service.networking.svc.cluster.local:9768/volsync-backups/<ns>-<pvc>` |
+| AWS_ACCESS_KEY_ID | RustFS access key |
+| AWS_SECRET_ACCESS_KEY | RustFS secret key |
+| RESTIC_REPOSITORY | `s3:http://rustfs-service.networking.svc.cluster.local:9000/volsync-backups/<ns>-<pvc>` |
 | RESTIC_PASSWORD | per-repo random password (`openssl rand -base64 32`), generated once |
 
 Verify a live secret value before triggering (proven pattern, task-6 learnings):
 
 ```sh
-kubectl -n gitea get secret gitea-backup-secret -o jsonpath='{.data.RESTIC_REPOSITORY}' | base64 -d
+kubectl -n kellnr get secret kellnr-backup-secret -o jsonpath='{.data.RESTIC_REPOSITORY}' | base64 -d
 ```
 
 SOPS edit flow (proven, task-6-gitea-roundtrip.log): `sops -e /tmp/plain.yaml > target.sops.yaml` FAILS because creation rules match the input path, and the redirect truncates the target first. Correct flow: decrypt the target, edit, copy over the target, then `sops --encrypt --in-place target`.
@@ -226,7 +228,8 @@ Rotation warning: a new RESTIC_PASSWORD means a new restic repository. The passw
 
 ## 5. Known risks
 
-- Plain-HTTP MinIO: restic credentials and data transit unencrypted over the LAN. Accepted risk (task-3-restic-repo-format.txt).
+- Plain-HTTP RustFS: restic credentials and data transit unencrypted over the LAN. Accepted risk (task-3-restic-repo-format.txt).
+- Migration to RustFS creates brand-new, empty restic repositories. The first backup after the switch is a full upload, and the MinIO `volsync-backups` bucket must be kept until a restore from RustFS has been drilled.
 - Crash-consistency: `copyMethod: Direct` reads live volumes with no snapshot/quiesce. Databases (CNPG, Kafka, Elastic, ArangoDB) are excluded from VolSync for this reason and use native backup tooling.
 - kellnr-db gap: WAL archiving only, no ScheduledBackup yet. kellnr PVC backup protects ~nothing (crates are in MinIO buckets, index in Postgres). Follow-ups: MinIO bucket replication for `kellnr-*` buckets + CNPG ScheduledBackup for kellnr-db.
 - Age key is the root of trust: losing it loses every backup (Step 0 warning).

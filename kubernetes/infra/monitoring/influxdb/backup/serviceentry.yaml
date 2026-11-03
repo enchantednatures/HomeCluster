@@ -3,15 +3,15 @@
 apiVersion: networking.istio.io/v1
 kind: ServiceEntry
 metadata:
-  name: minio-service-access
+  name: rustfs-service-access
   namespace: monitoring
 spec:
   hosts:
-    - minio-service.networking.svc.cluster.local
+    - rustfs-service.networking.svc.cluster.local
   location: MESH_EXTERNAL
   ports:
-    - name: minio-api
-      number: 9768
+    - name: rustfs-api
+      number: 9000
       protocol: HTTP
   resolution: DNS
   endpoints:

@@ -55,7 +55,7 @@ spec:
             hosts:
               - rustfs-service.networking.svc.cluster.local
             ports:
-              - number: 9768
+              - number: 9000
                 name: rustfs-api
                 protocol: HTTP
             location: MESH_EXTERNAL
