@@ -17,7 +17,11 @@ spec:
   instances: 1
   type: rw
   pgbouncer:
-    poolMode: transaction
+    # Immich uses session-level pg_advisory_lock for migrations. Under
+    # transaction pooling the lock and its unlock can land on different
+    # server connections, leaking the lock and wedging startup until the
+    # backend is killed. Session mode keeps them on the same connection.
+    poolMode: session
     parameters:
       max_client_conn: "1000"
       default_pool_size: "25"
