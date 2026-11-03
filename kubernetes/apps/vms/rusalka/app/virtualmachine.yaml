@@ -33,8 +33,11 @@ spec:
         machine:
           type: pc-q35-rhel9.2.0
         firmware:
+          # UEFI is required when the passthrough GPU is the only display;
+          # SeaBIOS does not reach the boot device without a VGA device.
           bootloader:
-            bios: {}
+            efi:
+              secureBoot: false
         features:
           acpi: {}
         devices:
