@@ -13,7 +13,7 @@ metadata:
     kyverno.io/kubernetes-version: "1.24"
     policies.kyverno.io/subject: ObjectStore
     policies.kyverno.io/description: >-
-      This policy replicates the minio-store ObjectStore from the postgres
+      This policy replicates the rustfs-store ObjectStore from the postgres
       namespace to all newly created namespaces, providing a consistent barman
       backup configuration for CloudNative-PG clusters without per-namespace
       ObjectStore management.
@@ -44,6 +44,6 @@ spec:
     - name: nsName
       expression: object.metadata.name
     - name: source
-      expression: resource.Get("barmancloud.cnpg.io/v1", "objectstores", "postgres", "minio-store")
+      expression: resource.Get("barmancloud.cnpg.io/v1", "objectstores", "postgres", "rustfs-store")
   generate:
     - expression: generator.Apply(variables.nsName, [variables.source])
