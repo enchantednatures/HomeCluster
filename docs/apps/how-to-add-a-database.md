@@ -7,7 +7,7 @@ This guide attaches a CloudNative-PG managed PostgreSQL database to an applicati
 - The application already exists per [How to Add an Application](how-to-add-an-application.md).
 - The `cloudnative-pg` operator Kustomization is deployed (it is part of the operators layer).
 - Decisions: the cluster name (convention: `<app>-db`), the database name, and the owner role.
-- Optional: an S3-compatible object store if you want the `barman-cloud` plugin to archive backups. The reference apps reference an object store named `minio-store` via `barmanObjectName`.
+- Optional: an S3-compatible object store if you want the `barman-cloud` plugin to archive backups. The reference apps reference an object store named `rustfs-store` via `barmanObjectName`.
 
 ## What gets created
 

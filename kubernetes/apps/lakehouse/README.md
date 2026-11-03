@@ -7,7 +7,7 @@ Apache Gravitino (Iceberg REST catalog + REST API/UI) + CloudNative-PG + Rook-Ce
 | Component | Source | Notes |
 |---|---|---|
 | Apache Gravitino | Official OCI Helm chart `gravitino-helm` 1.3.11 (image `apache/gravitino:1.3.1`) | REST API + Web UI on 8090, auxiliary Iceberg REST service on 9001 |
-| Gravitino DB | CNPG cluster `gravitino-db` | 1 instance, PostgreSQL 16 (`ghcr.io/cloudnative-pg/postgresql:16.9-22`), storage class `ceph-nvme-block`, barman WAL/backups to `minio-store`, nightly `ScheduledBackup` at 03:00 |
+| Gravitino DB | CNPG cluster `gravitino-db` | 1 instance, PostgreSQL 16 (`ghcr.io/cloudnative-pg/postgresql:16.9-22`), storage class `ceph-nvme-block`, barman WAL/backups to `rustfs-store`, nightly `ScheduledBackup` at 03:00 |
 | Warehouse bucket | Rook-Ceph RGW bucket `lakehouse-warehouse` | Provisioned declaratively by ObjectBucketClaim `lakehouse-warehouse` (storage class `ceph-bucket-retain`); scoped credentials live in the OBC-generated Secret/ConfigMap of the same name |
 | Schema job | `gravitino-schema-v1` Job | Waits for the DB, creates schemas `gravitino` (entity store) and `lakehouse` (Iceberg JDBC catalog), applies the versioned DDL copied from `/opt/gravitino/scripts/postgresql/schema-<version>-postgresql.sql` |
 | Bootstrap job | `gravitino-bootstrap-v3` Job | Authenticates to Gravitino via Authentik OIDC, then performs the phase-1 RBAC migration (creates users `akadmin`/`gravitino-service`, group `Gravitino Admins`, and assigns the group as metalake owner) and creates metalake `lakehouse` and catalog `lakehouse` (provider `lakehouse-iceberg`, JDBC backend, warehouse `s3://lakehouse-warehouse/`, S3 endpoint from the OBC ConfigMap) via the Gravitino REST API. Idempotent (GET-before-POST; tolerates 409) |
@@ -69,7 +69,7 @@ The service account's app-password lives in the SOPS-encrypted Secret `gravitino
 
 ### Durability and backups
 
-Only the Gravitino entity-store Postgres is backed up: a nightly `ScheduledBackup` plus barman WAL to `minio-store`. Backups accumulate with no retention policy configured on the shared `minio-store` ObjectStore.
+Only the Gravitino entity-store Postgres is backed up: a nightly `ScheduledBackup` plus barman WAL to `rustfs-store`. Backups accumulate with no retention policy configured on the shared `rustfs-store` ObjectStore.
 
 The warehouse bucket `lakehouse-warehouse` (Iceberg data and metadata) has no backup or versioning. The `ceph-bucket-retain` storage class only prevents bucket deletion when the ObjectBucketClaim is removed; it is not data-loss protection. Accepted RPO for warehouse data is currently zero (no copy exists).
 
