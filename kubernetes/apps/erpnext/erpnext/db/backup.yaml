@@ -24,11 +24,12 @@ spec:
     s3:
       bucket: cloudnative-pg
       prefix: erpnext
-      endpoint: minio-service.networking.svc.cluster.local:9768
+      # RustFS (plain HTTP, same target as the VolSync and CNPG backups)
+      endpoint: rustfs-service.networking.svc.cluster.local:9000
       region: us-east-1
       accessKeyIdSecretKeyRef:
-        name: pg-backup-secret
+        name: pg-rustfs-backup-secret
         key: aws-access-key-id
       secretAccessKeySecretKeyRef:
-        name: pg-backup-secret
+        name: pg-rustfs-backup-secret
         key: aws-secret-access-key

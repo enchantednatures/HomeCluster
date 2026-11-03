@@ -45,7 +45,7 @@ mariadb-operator ─► erpnext-db ─► erpnext ─► erpnext-setup
 
 `erpnext` waits on `erpnext-db`; the three one-shots (`erpnext-setup`, `erpnext-sso`, `erpnext-backup`) each depend on `erpnext`. `erpnext-sso` depends on `erpnext-setup` so the site exists before the Social Login Key is inserted. `erpnext-backup` additionally depends on the `volsync` Kustomization.
 
-The `erpnext` namespace NetworkPolicies are `allow-all` (namespace-wide ingress and egress) plus a Cilium `allow-node-egress` policy for kube-apiserver/host/remote-node on 443 and 6443. The backup bundle adds a pod-scoped `allow-volsync-mover` policy so the restic mover can reach MinIO and DNS. The namespace is not on the Kyverno `require-pod-resources` exclusion list, so every pod, including the one-shot job pods and the VolSync mover, must declare CPU/memory requests and a memory limit.
+The `erpnext` namespace NetworkPolicies are `allow-all` (namespace-wide ingress and egress) plus a Cilium `allow-node-egress` policy for kube-apiserver/host/remote-node on 443 and 6443. The backup bundle adds a pod-scoped `allow-volsync-mover` policy so the restic mover can reach RustFS and DNS. The namespace is not on the Kyverno `require-pod-resources` exclusion list, so every pod, including the one-shot job pods and the VolSync mover, must declare CPU/memory requests and a memory limit.
 
 Secret material is SOPS/Age encrypted in git and never plaintext:
 - `erpnext-db-root` (MariaDB root) at `kubernetes/apps/erpnext/erpnext/db/erpnext-db-root.sops.yaml`
@@ -59,10 +59,10 @@ Two independent schedules protect the two data locations. They are staggered so 
 
 | Target | Mechanism | Schedule (UTC) | Destination |
 |---|---|---|---|
-| MariaDB rows | mariadb-operator `Backup` CR `erpnext-db-backup` | `15 1 * * *` | `s3://cloudnative-pg/erpnext/` on MinIO, secret `pg-backup-secret` |
+| MariaDB rows | mariadb-operator `Backup` CR `erpnext-db-backup` | `15 1 * * *` | `s3://cloudnative-pg/erpnext/` on RustFS, secret `pg-rustfs-backup-secret` |
 | Site files (`erpnext-sites`) | VolSync `ReplicationSource` `erpnext-backup` | `40 2 * * *` | `s3:http://rustfs-service.networking.svc.cluster.local:9000/volsync-backups/erpnext-sites`, secret `erpnext-backup-secret` |
 
-The MariaDB `Backup` CR is a logical dump. It keeps `maxRetention: 720h` (30 days), writes objects under the `erpnext` prefix of the shared `cloudnative-pg` bucket, and authenticates with the Kyverno-replicated `pg-backup-secret` (`aws-access-key-id` / `aws-secret-access-key`).
+The MariaDB `Backup` CR is a logical dump. It keeps `maxRetention: 720h` (30 days), writes objects under the `erpnext` prefix of the shared `cloudnative-pg` bucket, and authenticates with the Kyverno-replicated `pg-rustfs-backup-secret` (`aws-access-key-id` / `aws-secret-access-key`).
 
 The VolSync `ReplicationSource` backs up `erpnext-sites` with `copyMethod: Direct` (crash-consistent, reads the live volume, no snapshot clone). Retention is 7 daily / 4 weekly / 12 monthly, `pruneIntervalDays: 7`. The mover scratch and cache volumes both use `ceph-block` (10Gi cache). A paused `ReplicationDestination` `erpnext-restore` is committed alongside it for the restore drill.
 
@@ -83,12 +83,12 @@ kubectl -n erpnext get replicationsource erpnext-backup -o jsonpath='{.status.la
 kubectl -n erpnext get replicationdestination erpnext-restore
 ```
 
-To confirm the MinIO object the logical dump produced, run an AWS CLI pod with the backup secret (this exact pattern was used in `wave2-verify-backup-recheck.txt`; `minio/mc` was removed from Docker Hub so `amazon/aws-cli` is pinned instead):
+To confirm the RustFS object the logical dump produced, run an AWS CLI pod with the backup secret (this exact pattern was used in `wave2-verify-backup-recheck.txt`; `minio/mc` was removed from Docker Hub so `amazon/aws-cli` is pinned instead):
 
 ```sh
 kubectl -n erpnext run erpnext-backup-objcheck --rm -i --restart=Never \
   --image=amazon/aws-cli:2.32.7 \
-  --overrides='{"spec":{"containers":[{"name":"erpnext-backup-objcheck","image":"amazon/aws-cli:2.32.7","args":["--endpoint-url","http://minio-service.networking.svc.cluster.local:9768","s3","ls","--recursive","s3://cloudnative-pg/erpnext/"],"env":[{"name":"AWS_ACCESS_KEY_ID","valueFrom":{"secretKeyRef":{"name":"pg-backup-secret","key":"aws-access-key-id"}}},{"name":"AWS_SECRET_ACCESS_KEY","valueFrom":{"secretKeyRef":{"name":"pg-backup-secret","key":"aws-secret-access-key"}}}],"resources":{"requests":{"cpu":"100m","memory":"128Mi"},"limits":{"cpu":"500m","memory":"256Mi"}}}]}}'
+  --overrides='{"spec":{"containers":[{"name":"erpnext-backup-objcheck","image":"amazon/aws-cli:2.32.7","args":["--endpoint-url","http://rustfs-service.networking.svc.cluster.local:9000","s3","ls","--recursive","s3://cloudnative-pg/erpnext/"],"env":[{"name":"AWS_ACCESS_KEY_ID","valueFrom":{"secretKeyRef":{"name":"pg-rustfs-backup-secret","key":"aws-access-key-id"}}},{"name":"AWS_SECRET_ACCESS_KEY","valueFrom":{"secretKeyRef":{"name":"pg-rustfs-backup-secret","key":"aws-secret-access-key"}}}],"resources":{"requests":{"cpu":"100m","memory":"128Mi"},"limits":{"cpu":"500m","memory":"256Mi"}}}]}}'
 ```
 
 To list the restic snapshots for the files repository, run a restic pod with the backup secret (this is the repository VolSync writes to). Verified 2026-10-14, it prints the two snapshots and exits 0:
@@ -141,7 +141,7 @@ The mover restores the latest snapshot by default. A new restic password means a
 
 The logical dump is a plain SQL file. To restore it:
 
-1. List the available dumps in MinIO with the AWS CLI pod above and pick a timestamp (`erpnext/backup.2026-10-14T06:15:38Z.sql` format).
+1. List the available dumps in RustFS with the AWS CLI pod above and pick a timestamp (`erpnext/backup.2026-10-14T06:15:38Z.sql` format).
 2. Extract the object and load it into the running MariaDB. Two equivalent routes:
    - `bench --site erpnext.${SECRET_DOMAIN} restore <path-to-sql>` from a pod that mounts the dump, or
    - pipe the file into the `mariadb` client via `kubectl -n erpnext exec erpnext-db-0 -c mariadb -- ...` using the root credentials from the `erpnext-db-root` secret (read the password from the container environment like the charset check does, and never echo it).
