@@ -38,6 +38,10 @@ spec:
         features:
           acpi: {}
         devices:
+          # The RTX 3080 is the workstation's only display. Without this,
+          # KubeVirt attaches an emulated VGA as primary and the GPU scans out
+          # an empty framebuffer, so a monitor on the card stays black.
+          autoattachGraphicsDevice: false
           disks:
             - name: omarchy-iso
               cdrom:
