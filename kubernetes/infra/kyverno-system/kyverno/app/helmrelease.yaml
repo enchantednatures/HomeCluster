@@ -51,12 +51,18 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
+      # The default client-go rate limiter (5 QPS / 10 burst) starves leader
+      # election in this cluster: the controller loses its lease, shuts down,
+      # then fails the next cache sync and exits 1 (crash loop).
+      extraArgs:
+        clientRateLimitQPS: 100
+        clientRateLimitBurst: 200
       resources:
         requests:
-          memory: 64Mi
-          cpu: 100m
+          memory: 256Mi
+          cpu: 200m
         limits:
-          memory: 128Mi
+          memory: 1Gi
           cpu: 1000m
 
     # Cleanup controller for TTL policies
