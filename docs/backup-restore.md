@@ -22,11 +22,14 @@ Retention on every ReplicationSource: 7 daily / 4 weekly / 12 monthly, `pruneInt
 | erpnext | erpnext | erpnext-sites | `40 2 * * *` | 10Gi ceph-block | default |
 | docker-android | android-emulator | docker-android-data | `50 2 * * *` | 10Gi ceph-block | default |
 | kellnr | kellnr | kellnr | `0 3 * * *` | 10Gi ceph-block | default |
+| home-assistant | home-automation | home-assistant-config | `10 3 * * *` | 10Gi ceph-block | 0 |
 | influxdb | monitoring | influxdb-influxdb2 | `20 3 * * *` | 10Gi ceph-block | 1000 |
 
-ReplicationSource names: `immich-backup`, `erpnext-backup`, `docker-android-backup`, `kellnr-backup`, `influxdb-backup`. Each app also has a paused ReplicationDestination named `<app>-restore` for rebuilds.
+ReplicationSource names: `immich-backup`, `erpnext-backup`, `docker-android-backup`, `kellnr-backup`, `home-assistant-backup`, `influxdb-backup`. Each app also has a paused ReplicationDestination named `<app>-restore` for rebuilds.
 
-Historical note: the pilot also covered `gitea`, `home-assistant`, and `node-red`, which no longer exist in this repo. Their old repositories still sit in the legacy MinIO `volsync-backups` bucket.
+Home Assistant caveat: `/config/.storage/auth` is `0600` and Home Assistant runs as root, so the restic mover runs as uid 0. Recorder history lives in the `home-assistant-db` CloudNative-PG cluster and is protected by the barman-cloud plugin, not VolSync.
+
+Historical note: the pilot also covered `gitea` and `node-red`, which no longer exist in this repo. Their old repositories still sit in the legacy MinIO `volsync-backups` bucket. Home Assistant was re-added in 2026-10; its `home-assistant-config` repository starts fresh under RustFS and is unrelated to the stale pilot repo.
 
 kellnr caveat: the `kellnr` PVC holds almost nothing (the pilot backup processed 0 files). Crates live in MinIO `kellnr-*` buckets and the package index lives in the kellnr-db Postgres database. Real kellnr protection is MinIO bucket replication plus a CNPG ScheduledBackup for kellnr-db; both are documented follow-ups.
 

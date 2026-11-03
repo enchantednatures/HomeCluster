@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: home-assistant-db
+  namespace: home-automation
+  labels:
+    app.kubernetes.io/name: home-assistant-db
+spec:
+  inheritedMetadata:
+    labels:
+      istio.io/dataplane-mode: "none"
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
+  instances: 1
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: ceph-block-ssd
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+  postgresql:
+    parameters:
+      max_connections: "100"
+      shared_buffers: 256MB
+  monitoring:
+    enablePodMonitor: false
+  bootstrap:
+    initdb:
+      database: homeassistant
+      owner: homeassistant
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: rustfs-store
+        serverName: home-assistant-v1

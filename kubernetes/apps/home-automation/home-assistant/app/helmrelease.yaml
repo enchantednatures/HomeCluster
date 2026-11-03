@@ -30,6 +30,21 @@ spec:
   uninstall:
     keepHistory: false
   values:
+    defaultPodOptions:
+      # Home Assistant relies on mDNS/SSDP discovery and local LAN broadcasts
+      # for several integrations; host networking preserves that behaviour.
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      # Avoid the Unraid worker: this app is being migrated off the tower.
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: NotIn
+                    values:
+                      - unraid-worker
     controllers:
       home-assistant:
         strategy: Recreate
@@ -40,7 +55,12 @@ spec:
               # datasource=docker depName=ghcr.io/home-assistant/home-assistant
               tag: 2026.10.4
             env:
-              TZ: "${TIMEZONE}"
+              TZ: "America/New_York"
+              RECORDER_DB_URL:
+                valueFrom:
+                  secretKeyRef:
+                    name: home-assistant-db-app
+                    key: fqdn-uri
             probes:
               startup:
                 enabled: true

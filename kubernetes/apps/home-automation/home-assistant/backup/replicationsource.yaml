@@ -1,0 +1,38 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: home-assistant-backup
+  namespace: home-automation
+spec:
+  sourcePVC: home-assistant-config
+  trigger:
+    # Run daily at 3:10 AM (staggered against other VolSync schedules)
+    schedule: "10 3 * * *"
+  restic:
+    repository: home-assistant-backup-secret
+    # Direct copy: mover co-locates on the PV node, crash-consistent, no PVC clone
+    copyMethod: Direct
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    pruneIntervalDays: 7
+    storageClassName: ceph-block
+    cacheStorageClassName: ceph-block
+    cacheCapacity: 10Gi
+    # Home Assistant runs as root and writes .storage/auth as 0600; the
+    # default restic mover uid (65532) cannot read it.
+    moverSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
+    moverResources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 512Mi
+    moverPodLabels:
+      app: volsync-home-assistant-backup

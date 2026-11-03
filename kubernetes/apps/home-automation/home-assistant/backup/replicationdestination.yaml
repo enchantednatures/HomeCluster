@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationdestination_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationDestination
+metadata:
+  name: home-assistant-restore
+  namespace: home-automation
+spec:
+  # Paused by default: Flux reconciles the manifest; trigger manually via
+  # kubectl patch on spec.trigger.manual for restore drills.
+  paused: true
+  trigger:
+    manual: ""
+  restic:
+    repository: home-assistant-backup-secret
+    copyMethod: Direct
+    destinationPVC: home-assistant-config
+    cacheStorageClassName: ceph-block
+    cacheCapacity: 10Gi
+    # Restores root-owned files; Home Assistant itself runs as root.
+    moverSecurityContext:
+      runAsUser: 0
+      runAsGroup: 0
+    moverResources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 512Mi

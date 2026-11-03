@@ -273,7 +273,7 @@ Self-hosted photo and video management platform with AI-powered search and organ
 ### Home Automation
 
 #### Home Assistant
-**Location**: `kubernetes/apps/home-system/home-assistant/`
+**Location**: `kubernetes/apps/home-automation/home-assistant/`
 
 Open-source home automation platform for smart home control and automation.
 
@@ -283,19 +283,12 @@ Open-source home automation platform for smart home control and automation.
 - Energy monitoring
 - Voice assistant integration
 
-#### ESPHome
-**Location**: `kubernetes/apps/home-system/esphome/`
-
-Configuration and management platform for ESP8266/ESP32 IoT devices.
-
-**Features**:
-- YAML-based device configuration
-- OTA firmware updates
-- Native Home Assistant integration
-- Sensor and actuator management
+**Storage**:
+- `/config` on the `home-assistant-config` PVC, backed up daily with VolSync.
+- Recorder history in the `home-assistant-db` CloudNative-PG cluster, backed up daily with the barman-cloud plugin.
 
 #### Node-RED
-**Location**: `kubernetes/apps/home-system/node-red/`
+**Location**: `kubernetes/apps/home-automation/node-red/`
 
 Flow-based automation tool for wiring together hardware devices, APIs, and services.
 
@@ -304,11 +297,6 @@ Flow-based automation tool for wiring together hardware devices, APIs, and servi
 - Extensive node library
 - Home Assistant integration
 - MQTT and HTTP support
-
-#### RabbitMQ
-**Location**: `kubernetes/apps/home-system/home-system-rabbitmq/`
-
-Message broker for home automation event routing between services.
 
 ### InspIRCd Server
 **Location**: `kubernetes/apps/irc/inspircd/`

@@ -8,6 +8,7 @@ metadata:
 spec:
   targetNamespace: home-automation
   dependsOn:
+    - name: home-assistant-db
     - name: rook-ceph-cluster
   commonMetadata:
     labels:
