@@ -8,7 +8,8 @@ metadata:
 spec:
   cluster:
     name: home-assistant-db
-  schedule: "45 3 * * *"
+  # CloudNative-PG cron has a seconds field: 03:45:00 UTC daily.
+  schedule: "0 45 3 * * *"
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:
