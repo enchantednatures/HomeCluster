@@ -7,7 +7,6 @@ resources:
   - ./network-policies.yaml
   - ./cnpg-network-policy.yaml
   - ./resource-limits.yaml
-  - ./pg-backup-secret-replication.yaml
   - ./pg-rustfs-backup-secret-replication.yaml
   - ./cnpg-object-store-replication.yaml
   - ./cnpg-disable-istio-sidecar.yaml
