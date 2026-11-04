@@ -52,7 +52,10 @@ spec:
                     sleep 1
                     driver=$(basename "$(readlink "$dev/driver" 2>/dev/null)" 2>/dev/null)
                   fi
-                  msg="$id driver=${driver:-none}"
+                  if [ -z "$driver" ]; then
+                    driver="none"
+                  fi
+                  msg="$id driver=$driver"
                 done
                 if [ "$msg" != "$last" ]; then
                   log "$msg"
