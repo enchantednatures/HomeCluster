@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/apps/v1/daemonset.json
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: vfio-dock-binder
+  labels:
+    app.kubernetes.io/name: vfio-dock-binder
+    app.kubernetes.io/instance: rusalka
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vfio-dock-binder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vfio-dock-binder
+        app.kubernetes.io/instance: rusalka
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: gateway-1
+      automountServiceAccountToken: false
+      containers:
+        - name: binder
+          image: busybox:1.36
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+          args:
+            # The dock is a Thunderbolt device: it enumerates after the
+            # boot-time PCIDriverRebindConfig has already run, so xhci_hcd
+            # claims the Fresco controller and clears driver_override. Keep
+            # re-binding it to vfio-pci whenever it (re)appears.
+            - |
+              set -u
+              last=""
+              log() { echo "$(date -u +%FT%TZ) $*"; }
+              while true; do
+                msg="absent"
+                for dev in /sys/bus/pci/devices/*; do
+                  [ "$(cat "$dev/vendor" 2>/dev/null)" = "0x1b73" ] || continue
+                  [ "$(cat "$dev/device" 2>/dev/null)" = "0x1100" ] || continue
+                  id=$(basename "$dev")
+                  driver=$(basename "$(readlink "$dev/driver" 2>/dev/null)" 2>/dev/null)
+                  if [ "$driver" != "vfio-pci" ]; then
+                    if [ -n "$driver" ]; then
+                      echo "$id" > "$dev/driver/unbind" 2>/dev/null || true
+                    fi
+                    printf '%s' vfio-pci > "$dev/driver_override" 2>/dev/null || true
+                    echo "$id" > /sys/bus/pci/drivers/vfio-pci/bind 2>/dev/null || true
+                    sleep 1
+                    driver=$(basename "$(readlink "$dev/driver" 2>/dev/null)" 2>/dev/null)
+                  fi
+                  msg="$id driver=${driver:-none}"
+                done
+                if [ "$msg" != "$last" ]; then
+                  log "$msg"
+                  last="$msg"
+                fi
+                sleep 5
+              done
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: sys
+              mountPath: /sys
+      volumes:
+        - name: sys
+          hostPath:
+            path: /sys

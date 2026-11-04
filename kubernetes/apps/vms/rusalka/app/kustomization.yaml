@@ -6,4 +6,5 @@ resources:
   - ./cloud-init-secret.sops.yaml
   - ./datavolumes.yaml
   - ./service.yaml
+  - ./vfio-dock-binder.yaml
   - ./virtualmachine.yaml
