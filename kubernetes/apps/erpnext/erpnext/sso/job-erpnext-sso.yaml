@@ -41,7 +41,7 @@ spec:
           - 1000
       containers:
         - name: sso
-          image: "frappe/erpnext:v16.52.1"
+          image: "frappe/erpnext:v16.53.0"
           imagePullPolicy: IfNotPresent
           command:
             - bash

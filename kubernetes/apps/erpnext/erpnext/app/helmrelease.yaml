@@ -32,7 +32,7 @@ spec:
   values:
     image:
       repository: frappe/erpnext
-      tag: v16.52.1
+      tag: v16.53.0
       pullPolicy: IfNotPresent
     dbHost: erpnext-db.erpnext.svc.cluster.local
     dbPort: "3306"
