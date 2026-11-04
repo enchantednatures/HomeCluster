@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-create-site-v3
+  name: erpnext-create-site-v4
   namespace: erpnext
   labels:
     helm.sh/chart: erpnext-8.0.84
@@ -90,7 +90,15 @@ spec:
             set -x;
             set -o pipefail;
 
-            bench_output=$(bench new-site $${SITE_NAME} --no-mariadb-socket --db-type=$${DB_TYPE} --db-host=$${DB_HOST} --db-port=$${DB_PORT} --admin-password=$${ADMIN_PASSWORD} --mariadb-root-username=$${DB_ROOT_USER} --mariadb-root-password=$${DB_ROOT_PASSWORD} --install-app=erpnext --force | tee /dev/stderr);
+            # This job is versioned (v4) because Job pod templates are immutable.
+            # Never let a re-run touch an existing site: bench new-site --force
+            # would drop and recreate it.
+            if [ -d "/home/frappe/frappe-bench/sites/$${SITE_NAME}" ]; then
+                echo "Site $${SITE_NAME} already exists, skipping creation.";
+                exit 0;
+            fi;
+
+            bench_output=$(bench new-site $${SITE_NAME} --no-mariadb-socket --db-type=$${DB_TYPE} --db-host=$${DB_HOST} --db-port=$${DB_PORT} --admin-password=$${ADMIN_PASSWORD} --mariadb-root-username=$${DB_ROOT_USER} --mariadb-root-password=$${DB_ROOT_PASSWORD} --install-app=erpnext | tee /dev/stderr);
 
             bench_exit_status=$?;
 
