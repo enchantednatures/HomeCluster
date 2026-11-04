@@ -37,7 +37,7 @@ spec:
             image:
               repository: ghcr.io/actualbudget/actual
               # datasource=docker depName=ghcr.io/actualbudget/actual
-              tag: 26.10.0
+              tag: 26.11.0
             env:
               ACTUAL_PORT: "5006"
               TZ: ${TIMEZONE}
