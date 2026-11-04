@@ -46,7 +46,7 @@ spec:
             image:
               repository: ghcr.io/koenkk/zigbee2mqtt
               # datasource=docker depName=ghcr.io/koenkk/zigbee2mqtt
-              tag: 2.14.2
+              tag: 2.14.3
             env:
               ZIGBEE2MQTT_DATA: /config
               ZIGBEE2MQTT_CONFIG_SERIAL_ADAPTER: zstack
