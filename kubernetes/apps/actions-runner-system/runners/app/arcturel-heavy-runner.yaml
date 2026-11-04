@@ -1,0 +1,128 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+#
+# arcturel's heavy pool: Rust builds and database suites of
+# arcturel/arcturel's pull requests (label `arcturel-heavy`). A job wants 16 GiB
+# and 5 CPUs, and starts a Postgres `services:` container on a host port the
+# runner picks, so the runner drives a Docker daemon in the same pod over a
+# shared socket; a published port lands in the pod's network namespace, which
+# is localhost to the runner.
+#
+# containerMode is left unset, and the runner and dind containers written out,
+# so the daemon's resources can be bounded: the chart's `dind` mode renders
+# that sidecar without limits. What that mode would inject is set here by
+# hand (DOCKER_HOST, RUNNER_WAIT_FOR_DOCKER_IN_SECONDS, the shared socket).
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name arcturel-heavy
+  namespace: actions-runner-system
+spec:
+  driftDetection:
+    mode: enabled
+  chartRef:
+    kind: OCIRepository
+    name: gha-runner-scale-set
+    namespace: flux-system
+  interval: 15m
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    nameOverride: *name
+    runnerScaleSetName: arcturel-heavy-marrakesh
+    scaleSetLabels:
+      - arcturel-heavy
+    githubConfigUrl: https://github.com/arcturel
+    githubConfigSecret: arcturel-github-app
+    runnerGroup: arcturel-ci
+    minRunners: 0
+    maxRunners: 2
+    listenerTemplate:
+      spec:
+        containers:
+          - name: listener
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+    controllerServiceAccount:
+      name: actions-runner-controller
+      namespace: actions-runner-system
+    template:
+      spec:
+        securityContext:
+          fsGroup: 1001
+          fsGroupChangePolicy: OnRootMismatch
+        containers:
+          - name: runner
+            image: ghcr.io/actions/actions-runner:2.338.2
+            command:
+              - /home/runner/run.sh
+            env:
+              - name: DOCKER_HOST
+                value: unix:///var/run/docker.sock
+              # The two containers start together; the runner waits for
+              # dockerd before taking a job, or a cold daemon fails the first
+              # job's service container.
+              - name: RUNNER_WAIT_FOR_DOCKER_IN_SECONDS
+                value: "120"
+            resources:
+              requests:
+                cpu: 2000m
+                memory: 12Gi
+              limits:
+                cpu: 5000m
+                memory: 16Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+              - name: dind-sock
+                mountPath: /var/run
+          - name: dind
+            image: docker:28-dind
+            args:
+              - dockerd
+              - --host=unix:///var/run/docker.sock
+              # The runner image's `docker` group.
+              - --group=123
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits:
+                cpu: 2000m
+                memory: 3Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+              - name: dind-sock
+                mountPath: /var/run
+              - name: docker-graph-storage
+                mountPath: /var/lib/docker
+        volumes:
+          - name: work
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  storageClassName: ceph-block
+                  resources:
+                    requests:
+                      storage: 60Gi
+          - name: dind-sock
+            emptyDir: {}
+          - name: docker-graph-storage
+            emptyDir: {}

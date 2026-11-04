@@ -4,3 +4,6 @@ resources:
   - ./github-auth-secret.sops.yaml
   - ./helmrelease.yaml
   - ./porygon-runner.yaml
+  - ./arcturel-github-app.sops.yaml
+  - ./arcturel-light-runner.yaml
+  - ./arcturel-heavy-runner.yaml

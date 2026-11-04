@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
+#
+# arcturel's light pool: lint, tsc/eslint/vite and plan jobs of
+# arcturel/arcturel's pull requests, which route to the label
+# `arcturel-light`. No job here runs a container, so there is no Docker
+# daemon and nothing privileged. Registers in arcturel's `arcturel-ci`
+# runner group with arcturel's own GitHub App (arcturel-github-app).
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name arcturel-light
+  namespace: actions-runner-system
+spec:
+  driftDetection:
+    mode: enabled
+  chartRef:
+    kind: OCIRepository
+    name: gha-runner-scale-set
+    namespace: flux-system
+  interval: 15m
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    nameOverride: *name
+    # The scale set's own name must be unique in the org; the label is what
+    # joins it to the pool arcturel's workflows already route to.
+    runnerScaleSetName: arcturel-light-marrakesh
+    scaleSetLabels:
+      - arcturel-light
+    githubConfigUrl: https://github.com/arcturel
+    githubConfigSecret: arcturel-github-app
+    # The pull-request pools' group. Never a main-only group: those admit
+    # main's credentialed and cache-writing jobs alone.
+    runnerGroup: arcturel-ci
+    minRunners: 0
+    maxRunners: 3
+    listenerTemplate:
+      spec:
+        containers:
+          - name: listener
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+    controllerServiceAccount:
+      name: actions-runner-controller
+      namespace: actions-runner-system
+    template:
+      spec:
+        # The runner image runs as uid 1001; the work volume must be
+        # group-writable for it.
+        securityContext:
+          fsGroup: 1001
+          fsGroupChangePolicy: OnRootMismatch
+        containers:
+          - name: runner
+            image: ghcr.io/actions/actions-runner:2.338.2
+            command:
+              - /home/runner/run.sh
+            resources:
+              requests:
+                cpu: 1000m
+                memory: 2Gi
+              limits:
+                cpu: 4000m
+                memory: 6Gi
+            volumeMounts:
+              - name: work
+                mountPath: /home/runner/_work
+        volumes:
+          - name: work
+            ephemeral:
+              volumeClaimTemplate:
+                spec:
+                  accessModes:
+                    - ReadWriteOnce
+                  storageClassName: ceph-block
+                  resources:
+                    requests:
+                      storage: 20Gi
