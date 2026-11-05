@@ -79,10 +79,11 @@ spec:
         resources:
           requests:
             cpu: 4
-            memory: 16Gi
+            # Track the temporary 12Gi guest above.
+            memory: 12Gi
           limits:
             cpu: 8
-            memory: 18Gi
+            memory: 14Gi
       networks:
         - name: default
           pod: {}
