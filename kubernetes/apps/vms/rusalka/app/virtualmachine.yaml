@@ -29,7 +29,10 @@ spec:
           sockets: 1
           threads: 1
         memory:
-          guest: 16Gi
+          # Temporarily 12Gi: gateway-1 only has ~14Gi of schedulable memory
+          # with the current workload set. Restore to 16Gi after the install
+          # and after freeing node capacity.
+          guest: 12Gi
         machine:
           type: pc-q35-rhel9.2.0
         firmware:
