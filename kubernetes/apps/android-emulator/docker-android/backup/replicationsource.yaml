@@ -12,6 +12,14 @@ spec:
   restic:
     repository: docker-android-backup-secret
     copyMethod: Direct
+    # docker-android runs as uid 1300 / gid 1301 and keeps adbkey (0600)
+    # and avd/running (0700) owner-only. The mover defaults to uid 65532,
+    # which cannot read them and restic exits non-zero forever.
+    moverSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 1300
+      runAsGroup: 1301
+      fsGroup: 1301
     moverResources:
       requests:
         cpu: 100m
