@@ -29,10 +29,10 @@ spec:
           sockets: 1
           threads: 1
         memory:
-          # Temporarily 12Gi: gateway-1 only has ~14Gi of schedulable memory
-          # with the current workload set. Restore to 16Gi after the install
-          # and after freeing node capacity.
-          guest: 12Gi
+          # Temporarily 10Gi: gateway-1 has ~12.9Gi of schedulable memory with
+          # the current workload set, and the launcher adds ~1.3Gi overhead.
+          # Restore to 16Gi after the install and after freeing node capacity.
+          guest: 10Gi
         machine:
           type: pc-q35-rhel9.2.0
         firmware:
@@ -79,11 +79,11 @@ spec:
         resources:
           requests:
             cpu: 4
-            # Track the temporary 12Gi guest above.
-            memory: 12Gi
+            # Track the temporary 10Gi guest above.
+            memory: 10Gi
           limits:
             cpu: 8
-            memory: 14Gi
+            memory: 12Gi
       networks:
         - name: default
           pod: {}
