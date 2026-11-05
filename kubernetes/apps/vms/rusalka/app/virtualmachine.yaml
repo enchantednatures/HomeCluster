@@ -60,17 +60,15 @@ spec:
           gpus:
             - deviceName: nvidia.com/RTX3080
               name: gpu0
+          # The dock's Fresco controller is intentionally detached while
+          # Omarchy is installed: with it present the RTX 3080 moves to guest
+          # bus 0c and its hostdev flaps. Re-add usb/fresco-xhci after the
+          # NVIDIA driver is installed.
           hostDevices:
             - deviceName: nvidia.com/RTX3080_AUDIO
               name: gpu0-audio
             - deviceName: usb/intel-xhci
               name: usb0
-            # The dock's Fresco controller is temporarily detached while
-            # Omarchy is installed: with it present, the RTX 3080 moves to
-            # guest bus 0c and its hostdev flaps. Re-add usb1/fresco-xhci
-            # after the NVIDIA driver is installed.
-            # - deviceName: usb/fresco-xhci
-            #   name: usb1
           interfaces:
             # The guest's cloud-init-generated network config matches this stable
             # MAC. KubeVirt otherwise assigns a new random pod MAC on every VMI
