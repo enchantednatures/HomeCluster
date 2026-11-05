@@ -8,7 +8,7 @@ metadata:
 spec:
   cluster:
     name: authentik-db
-  schedule: "@hourly"
+  schedule: "40 * * * *"
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:

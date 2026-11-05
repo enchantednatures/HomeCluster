@@ -8,7 +8,7 @@ metadata:
 spec:
   cluster:
     name: atuin-db
-  schedule: "@hourly"
+  schedule: "35 * * * *"
   backupOwnerReference: self
   method: plugin
   pluginConfiguration:
