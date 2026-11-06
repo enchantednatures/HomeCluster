@@ -28,19 +28,33 @@ spec:
             - /bin/sh
             - -c
           args:
-            # The dock is a Thunderbolt device: it enumerates after the
-            # boot-time PCIDriverRebindConfig has already run, so xhci_hcd
-            # claims the Fresco controller and clears driver_override. Keep
-            # re-binding it to vfio-pci whenever it (re)appears.
+            # Two host devices are kept on vfio-pci:
+            #   - the Thunderbolt dock's Fresco USB controller, which can
+            #     enumerate after the boot-time rebind controller has run;
+            #   - the Samsung 970 EVO at 0000:01:00.0, dedicated to the VM.
+            # The NVMe is matched by exact address because the identical
+            # 970 EVO at 0000:02:00.0 is the Talos system disk.
             - |
               set -u
               last=""
               log() { echo "$(date -u +%FT%TZ) $*"; }
+              is_target() {
+                dev=$1
+                id=$(basename "$dev")
+                vendor=$(cat "$dev/vendor" 2>/dev/null)
+                device=$(cat "$dev/device" 2>/dev/null)
+                if [ "$vendor" = "0x1b73" ] && [ "$device" = "0x1100" ]; then
+                  return 0
+                fi
+                if [ "$id" = "0000:01:00.0" ] && [ "$vendor" = "0x144d" ] && [ "$device" = "0xa808" ]; then
+                  return 0
+                fi
+                return 1
+              }
               while true; do
-                msg="absent"
+                state=""
                 for dev in /sys/bus/pci/devices/*; do
-                  [ "$(cat "$dev/vendor" 2>/dev/null)" = "0x1b73" ] || continue
-                  [ "$(cat "$dev/device" 2>/dev/null)" = "0x1100" ] || continue
+                  is_target "$dev" || continue
                   id=$(basename "$dev")
                   driver=$(basename "$(readlink "$dev/driver" 2>/dev/null)" 2>/dev/null)
                   if [ "$driver" != "vfio-pci" ]; then
@@ -55,11 +69,14 @@ spec:
                   if [ -z "$driver" ]; then
                     driver="none"
                   fi
-                  msg="$id driver=$driver"
+                  state="$state $id=$driver"
                 done
-                if [ "$msg" != "$last" ]; then
-                  log "$msg"
-                  last="$msg"
+                if [ -z "$state" ]; then
+                  state=" none"
+                fi
+                if [ "$state" != "$last" ]; then
+                  log "targets:$state"
+                  last="$state"
                 fi
                 sleep 5
               done

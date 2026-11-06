@@ -24,5 +24,7 @@ spec:
           resourceName: "usb/intel-xhci"
         - pciVendorSelector: "1B73:1100"
           resourceName: "usb/fresco-xhci"
+        - pciVendorSelector: "144D:A808"
+          resourceName: "nvme/samsung-970"
   customizeComponents: {}
   imagePullPolicy: IfNotPresent

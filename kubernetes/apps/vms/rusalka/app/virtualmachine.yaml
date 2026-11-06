@@ -48,15 +48,9 @@ spec:
           # KubeVirt attaches an emulated VGA as primary and the GPU scans out
           # an empty framebuffer, so a monitor on the card stays black.
           autoattachGraphicsDevice: false
-          disks:
-            - name: omarchy-iso
-              cdrom:
-                bus: sata
-              bootOrder: 1
-            - name: rusalka-root
-              disk:
-                bus: virtio
-              bootOrder: 2
+          # The existing Omarchy install lives on the passed-through Samsung
+          # NVMe, so no KubeVirt disks are attached while we validate it.
+          # Re-add omarchy-iso/rusalka-root from Git history if needed.
           gpus:
             - deviceName: nvidia.com/RTX3080
               name: gpu0
@@ -69,6 +63,8 @@ spec:
               name: gpu0-audio
             - deviceName: usb/intel-xhci
               name: usb0
+            - deviceName: nvme/samsung-970
+              name: nvme0
           interfaces:
             # The guest's cloud-init-generated network config matches this stable
             # MAC. KubeVirt otherwise assigns a new random pod MAC on every VMI
@@ -89,10 +85,3 @@ spec:
       networks:
         - name: default
           pod: {}
-      volumes:
-        - name: omarchy-iso
-          dataVolume:
-            name: omarchy-iso
-        - name: rusalka-root
-          dataVolume:
-            name: rusalka-root
