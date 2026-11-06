@@ -108,3 +108,7 @@ and omitting them yields a token with no scopes and a generic
   creates its limited-privilege `sparky` runtime role on first boot.
 - `config.frontendUrl` is set explicitly because routing is handled by Istio
   rather than the chart's ingress/httpRoute.
+- The VirtualService routes `/api`, `/uploads`, `/health-data`, `/mcp` and the
+  OIDC discovery paths directly to the server. The chart's frontend nginx
+  proxies to its upstream over HTTP/1.0, which SparkyFitness rejects with
+  `426 Upgrade Required`; bypassing nginx for API traffic avoids that.
