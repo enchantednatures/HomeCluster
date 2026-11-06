@@ -8,13 +8,15 @@ metadata:
 spec:
   endpointSelector: {}
   ingress:
-    # Istio external gateway -> frontend
+    # Istio external gateway -> frontend and API server
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: istio-ingress
       toPorts:
         - ports:
             - port: "80"
+              protocol: TCP
+            - port: "3010"
               protocol: TCP
     # frontend nginx -> server (and health checks)
     - fromEndpoints:

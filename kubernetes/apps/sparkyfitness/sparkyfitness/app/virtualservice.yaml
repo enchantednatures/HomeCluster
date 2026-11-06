@@ -11,6 +11,27 @@ spec:
   gateways:
     - istio-ingress/external-gateway
   http:
+    # Send API and MCP traffic straight to the server. The frontend nginx
+    # proxy only speaks HTTP/1.0 to its upstream, which the server rejects
+    # with 426 Upgrade Required.
+    - match:
+        - uri:
+            prefix: /api
+        - uri:
+            prefix: /uploads
+        - uri:
+            prefix: /health-data
+        - uri:
+            prefix: /mcp
+        - uri:
+            prefix: /.well-known/oauth-
+        - uri:
+            exact: /.well-known/openid-configuration
+      route:
+        - destination:
+            host: sparkyfitness-server.sparkyfitness.svc.cluster.local
+            port:
+              number: 3010
     - match:
         - uri:
             prefix: /
