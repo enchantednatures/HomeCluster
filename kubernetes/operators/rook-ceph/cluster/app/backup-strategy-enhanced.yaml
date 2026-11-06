@@ -28,6 +28,12 @@ spec:
             app.kubernetes.io/component: backup
         spec:
           restartPolicy: OnFailure
+          # The rook/ceph image no longer defaults to root, and the backup
+          # PVC is root-owned: without this the job fails with
+          # "mkdir: cannot create directory '/backup/metadata': Permission denied".
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
           serviceAccountName: rook-ceph-cmd-reporter
           containers:
             - name: backup-metadata
@@ -232,12 +238,14 @@ spec:
                     namespace: $namespace
                     labels:
                       backup-date: "$(date +%Y%m%d)"
-                      source-pvc: $pvc_name
                       backup-type: "automated"
                       storage-class: $storage_class
                     annotations:
                       backup.rook.io/created-by: "volume-snapshot-automation"
                       backup.rook.io/created-at: "$(date -Iseconds)"
+                      # Annotation, not a label: label values are capped at 63
+                      # chars and long PVC names abort the whole sweep.
+                      backup.rook.io/source-pvc: $pvc_name
                   spec:
                     volumeSnapshotClassName: ceph-block-snapshot
                     source:
