@@ -51,6 +51,16 @@ spec:
                   echo "Starting comprehensive Ceph metadata backup at $(date)"
                   mkdir -p "$BACKUP_DIR"
 
+                  # Rook no longer ships ceph.conf inside the rook-ceph-mon
+                  # secret. Build the same config the rook-ceph-tools pod uses.
+                  cat > /etc/ceph/ceph.conf <<EOF
+                  [global]
+                  mon_host = $(cat /etc/ceph-mon/mon_host)
+
+                  [client.admin]
+                  keyring = /etc/ceph-keys/keyring
+                  EOF
+
                   # Export cluster maps
                   echo "Exporting monitor map..."
                   ceph mon getmap -o "$BACKUP_DIR/monmap.bin"
@@ -118,6 +128,11 @@ spec:
               volumeMounts:
                 - name: ceph-config
                   mountPath: /etc/ceph
+                - name: ceph-keys
+                  mountPath: /etc/ceph-keys
+                  readOnly: true
+                - name: ceph-mon
+                  mountPath: /etc/ceph-mon
                   readOnly: true
                 - name: backup-storage
                   mountPath: /backup
@@ -130,8 +145,19 @@ spec:
                   memory: 1Gi
           volumes:
             - name: ceph-config
+              emptyDir: {}
+            - name: ceph-keys
               secret:
-                secretName: rook-ceph-mon
+                secretName: rook-ceph-mons-keyring
+                items:
+                  - key: keyring
+                    path: keyring
+            - name: ceph-mon
+              secret:
+                secretName: rook-ceph-config
+                items:
+                  - key: mon_host
+                    path: mon_host
             - name: backup-storage
               persistentVolumeClaim:
                 claimName: ceph-metadata-backup-pvc
