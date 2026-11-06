@@ -1,0 +1,64 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumnetworkpolicy_v2.json
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-sparkyfitness
+  namespace: sparkyfitness
+spec:
+  endpointSelector: {}
+  ingress:
+    # Istio external gateway -> frontend
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: istio-ingress
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+    # frontend nginx -> server (and health checks)
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: sparkyfitness
+      toPorts:
+        - ports:
+            - port: "3010"
+              protocol: TCP
+  egress:
+    # DNS
+    - toEndpoints:
+        - matchLabels:
+            k8s:k8s-app: kube-dns
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    # istiod xDS and workload certificates
+    - toEndpoints:
+        - matchLabels:
+            k8s:app: istiod
+            k8s:io.kubernetes.pod.namespace: istio-system
+      toPorts:
+        - ports:
+            - port: "15012"
+              protocol: TCP
+    # frontend nginx -> server, and app -> CloudNative-PG primary
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: sparkyfitness
+      toPorts:
+        - ports:
+            - port: "3010"
+              protocol: TCP
+            - port: "5432"
+              protocol: TCP
+    # Authentik OIDC discovery/token/userinfo and other HTTPS integrations
+    - toEntities:
+        - world
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

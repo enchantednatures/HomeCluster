@@ -8,5 +8,6 @@ resources:
   - ./appdb-secret.sops.yaml
   - ./oidc-secret.sops.yaml
   - ./helmrelease.yaml
+  - ./ciliumnetworkpolicy.yaml
   - ./virtualservice.yaml
   - ./destinationrule.yaml
