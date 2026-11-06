@@ -55,7 +55,17 @@ spec:
               protocol: TCP
             - port: "5432"
               protocol: TCP
-    # Authentik OIDC discovery/token/userinfo and other HTTPS integrations
+    # Authentik OIDC discovery/token/userinfo (resolves to the in-cluster service)
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: authentik
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "9443"
+              protocol: TCP
+    # Other HTTPS integrations
     - toEntities:
         - world
       toPorts:
