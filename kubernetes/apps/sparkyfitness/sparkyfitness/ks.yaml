@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app sparkyfitness
+  namespace: flux-system
+spec:
+  targetNamespace: sparkyfitness
+  dependsOn:
+    - name: sparkyfitness-db
+    - name: rook-ceph-cluster
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app
+  path: ./kubernetes/apps/sparkyfitness/sparkyfitness/app
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: &app-db sparkyfitness-db
+  namespace: flux-system
+spec:
+  targetNamespace: sparkyfitness
+  dependsOn:
+    - name: cloudnative-pg
+  commonMetadata:
+    labels:
+      app.kubernetes.io/name: *app-db
+  path: ./kubernetes/apps/sparkyfitness/sparkyfitness/db
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  wait: true
+  interval: 30m
+  retryInterval: 1m
+  timeout: 5m

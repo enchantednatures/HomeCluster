@@ -1,0 +1,65 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: sparkyfitness-db
+  namespace: sparkyfitness
+  labels:
+    app.kubernetes.io/name: sparkyfitness-db
+spec:
+  inheritedMetadata:
+    labels:
+      istio.io/dataplane-mode: "none"
+  # renovate: datasource=docker depName=ghcr.io/cloudnative-pg/postgresql versioning=redhat
+  imageName: ghcr.io/cloudnative-pg/postgresql:17.1-1
+  instances: 3
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 10Gi
+    storageClass: ceph-block-ssd
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: sparkyfitness-db-superuser
+  postgresql:
+    parameters:
+      max_connections: "300"
+      shared_buffers: 256MB
+      shared_preload_libraries: pg_stat_statements
+  monitoring:
+    enablePodMonitor: false
+  managed:
+    roles:
+      # The app connects as this DB owner and creates the limited-privilege
+      # "sparky" runtime role on first startup, which requires CREATEROLE.
+      - name: sparky_admin
+        ensure: present
+        comment: SparkyFitness database owner
+        login: true
+        createrole: true
+        passwordSecret:
+          name: sparkyfitness-db-owner
+        inRoles: [pg_monitor]
+  bootstrap:
+    initdb:
+      database: sparkyfitness
+      owner: sparky_admin
+      secret:
+        name: sparkyfitness-db-owner
+      postInitApplicationSQL:
+        - CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+        - CREATE EXTENSION IF NOT EXISTS pgcrypto;
+        - CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: rustfs-store
+        serverName: sparkyfitness-v1

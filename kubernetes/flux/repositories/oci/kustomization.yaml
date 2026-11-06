@@ -9,5 +9,6 @@ resources:
   - ./enchantednatures.yaml
   - ./gravitino.yaml
   - ./prometheus-community.yaml
+  - ./sparkyfitness.yaml
   - ./spegel.yaml
   - ./telepresence.yaml

@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/volsync.backube/replicationsource_v1alpha1.json
+# https://volsync.readthedocs.io/en/stable/usage/restic/index.html
+---
+apiVersion: volsync.backube/v1alpha1
+kind: ReplicationSource
+metadata:
+  name: sparkyfitness-uploads-backup
+  namespace: sparkyfitness
+spec:
+  sourcePVC: sparkyfitness-uploads
+  trigger:
+    # Run backup daily at 3:20 AM (staggered against other VolSync schedules)
+    schedule: "20 3 * * *"
+  restic:
+    repository: sparkyfitness-backup-secret
+    copyMethod: Direct
+    retain:
+      daily: 7
+      weekly: 4
+      monthly: 12
+    pruneIntervalDays: 7
+    storageClassName: ceph-block
+    cacheStorageClassName: ceph-block
+    cacheCapacity: 10Gi
+    moverPodLabels:
+      app: volsync-sparkyfitness-backup
