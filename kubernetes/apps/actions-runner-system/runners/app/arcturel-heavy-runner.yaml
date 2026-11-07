@@ -89,7 +89,7 @@ spec:
               - name: dind-sock
                 mountPath: /var/run
           - name: dind
-            image: docker:28-dind
+            image: docker:29-dind
             args:
               - dockerd
               - --host=unix:///var/run/docker.sock
