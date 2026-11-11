@@ -3,7 +3,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-create-site-v4
+  name: erpnext-create-site-v5
   namespace: erpnext
   labels:
     helm.sh/chart: erpnext-8.0.84
@@ -90,7 +90,7 @@ spec:
             set -x;
             set -o pipefail;
 
-            # This job is versioned (v4) because Job pod templates are immutable.
+            # This job is versioned (v5) because Job pod templates are immutable.
             # Never let a re-run touch an existing site: bench new-site --force
             # would drop and recreate it.
             if [ -d "/home/frappe/frappe-bench/sites/$${SITE_NAME}" ]; then

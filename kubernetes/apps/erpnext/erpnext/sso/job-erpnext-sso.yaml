@@ -19,10 +19,14 @@
 # contingency) so the OAuth `redirect_uri` is emitted with https and matches the
 # registered strict URI. v3 also makes the Social Login Key insert idempotent
 # (guarded by `frappe.db.exists`) so re-runs do not fail on the duplicate record.
+#
+# v7: frappe/erpnext v16.54.0. The image bump changes the pod template, and Job
+# templates are immutable, so the name is versioned again. The insert is idempotent,
+# so re-running it against the live site is a no-op.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-sso-v6
+  name: erpnext-sso-v7
   namespace: erpnext
   labels:
     app.kubernetes.io/name: erpnext
