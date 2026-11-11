@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/dragonflydb.io/dragonfly_v1alpha1.json
+---
+apiVersion: dragonflydb.io/v1alpha1
+kind: Dragonfly
+metadata:
+  name: tandoor-dragonfly
+  namespace: default
+  labels:
+    app.kubernetes.io/name: tandoor
+    app.kubernetes.io/component: cache
+spec:
+  # Cache only (Django CACHES: throttles, allauth rate limits). Two replicas so a
+  # single pod loss does not take the cache away from the app tier.
+  replicas: 2
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

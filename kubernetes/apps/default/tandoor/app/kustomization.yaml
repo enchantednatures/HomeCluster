@@ -6,6 +6,7 @@ resources:
   - ./pvc.yaml
   - ./secret.sops.yaml
   - ./sso.sops.yaml
+  - ./object-bucket-claim.yaml
   - ./helmrelease.yaml
   - ./virtualservice.yaml
   - ./destinationrule.yaml

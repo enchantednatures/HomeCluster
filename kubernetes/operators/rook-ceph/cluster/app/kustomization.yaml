@@ -28,9 +28,11 @@ resources:
   - ./ceph-object-store-secret.sops.yaml
   - ./harbor-rgw-keys.sops.yaml
   - ./kellnr-rgw-keys.sops.yaml
+  - ./tandoor-rgw-keys.sops.yaml
   - ./ceph-objectstore-admin-user.yaml
   - ./ceph-objectstore-user-harbor.yaml
   - ./ceph-objectstore-user-kellnr.yaml
+  - ./ceph-objectstore-user-tandoor.yaml
   - ./grafana-dashboard-configmap.yaml
   - ./ceph-dashboard-grafana.yaml
   # - ./network-policies-enhanced.yaml  # Temporarily disabled due to port range validation

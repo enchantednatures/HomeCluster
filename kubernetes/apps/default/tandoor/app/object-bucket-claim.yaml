@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/objectbucket.io/v1alpha1/objectbucketclaim.json
+---
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: tandoor-media-bucket
+  namespace: default
+  labels:
+    app.kubernetes.io/name: tandoor
+    app.kubernetes.io/part-of: tandoor
+    app.kubernetes.io/component: media
+spec:
+  bucketName: tandoor-media
+  storageClassName: ceph-bucket-retain
+  additionalConfig:
+    bucketOwner: tandoor

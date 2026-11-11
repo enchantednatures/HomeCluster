@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: tandoor-rgw-keys
+    namespace: rook-ceph
+type: Opaque
+stringData:
+    access-key: ENC[AES256_GCM,data:CSQD0Nsu+xlwc+0Q4S5HUDmcsak=,iv:uSaMUrZgcAo8uCQp4Jm49L/HOnsEpfxzfvqzGVwYFbk=,tag:s+URI/+HzE5xs3e6FRea5g==,type:str]
+    secret-key: ENC[AES256_GCM,data:SHcUAQ2HEpZLUcauxdBc4K2kIojhn34UP+EY6WH41jI/XVf6f0HPrA==,iv:UdOd4opAiOngHPRpDJfeSzyvsKhQ06eq2Km40kLfUuY=,tag:0pwWnr9JOD3wKTbJbwQAoA==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB3K3pSNnk1LzBvajZDNzU2
+            OVgxUko5RytpRE9EaWp4YmtXODkzbmJPdm5FClFxUDlMZzVUUlNrVzhKY3JlME8v
+            Zkt5bzM5VHJXZVVOc2Zudno2RnFKZVkKLS0tIEZYT1NRMGpmSnNkUkxsbkFaUXlm
+            aXVGc21BQVB2N1ZybHZhVUVlUXZjOEkKJcRWP/4RGQ+wYHfxiQMMqWxS7l/RccmY
+            9XbftzjllWOyN95CPAKICGVBqpmzcpc7nwBHrVMydOvO4icjwAfKJg==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-11T19:51:36Z"
+    mac: ENC[AES256_GCM,data:GXfvBDzUvTw/kRqG5WUlelyLoTkhJ7irwCLAjKARNkVJulMmzvXWHnXG1PBS3auGN+wFzcrxyAlaf5heFqqLjzsSypn10BCbmGBkGsHqomWF/Ww3W9+W5KEYn4zj5JYSBtuY6EDxA1FvTB1mzGT35+LfVRZsj5LdDwgttFfxE1U=,iv:cDFjbmoVqOzn7XMUxnVO2AL7NiBWpZJ5fT1T0Xbj1sI=,tag:1ea1nbT3sCXat21mCpZUvA==,type:str]
+    version: 3.13.3
