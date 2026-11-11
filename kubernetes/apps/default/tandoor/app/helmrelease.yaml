@@ -60,7 +60,9 @@ spec:
               ALLOWED_HOSTS: recipes.${SECRET_DOMAIN}
               CSRF_TRUSTED_ORIGINS: https://recipes.${SECRET_DOMAIN}
               ENABLE_SIGNUP: "1"
+              ACCOUNT_EMAIL_VERIFICATION: "none"
               SOCIALACCOUNT_ONLY: "1"
+              SOCIALACCOUNT_EMAIL_VERIFICATION: "none"
               SOCIAL_PROVIDERS: allauth.socialaccount.providers.openid_connect
               SOCIALACCOUNT_PROVIDERS:
                 secretKeyRef:
