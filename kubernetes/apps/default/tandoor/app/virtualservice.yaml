@@ -14,6 +14,14 @@ spec:
     - match:
         - uri:
             prefix: /
+      # cloudflared reaches the gateway over plain HTTP, so Envoy stamps
+      # X-Forwarded-Proto: http and Tandoor builds http:// OIDC redirect URIs,
+      # which Authentik rejects (strict https match). Force the scheme here.
+      headers:
+        request:
+          set:
+            X-Forwarded-Proto: https
+            X-Forwarded-Port: "443"
       route:
         - destination:
             host: tandoor.default.svc.cluster.local
