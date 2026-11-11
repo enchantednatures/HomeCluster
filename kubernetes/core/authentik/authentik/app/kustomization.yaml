@@ -11,6 +11,7 @@ resources:
   - ./outpost-serviceentry.yaml
   - ./blueprint-netboot.yaml
   - ./blueprint-istio-forward-auth.yaml
+  - ./blueprint-passkey-login.yaml
   - ./blueprint-gravitino.sops.yaml
   - ./blueprint-erpnext.sops.yaml
   - ./blueprint-tandoor.sops.yaml

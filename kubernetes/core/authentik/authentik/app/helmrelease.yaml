@@ -168,6 +168,7 @@ spec:
       configMaps:
         - authentik-blueprint-netboot-forward-auth
         - authentik-blueprint-istio-forward-auth
+        - authentik-blueprint-passkey-login
       secrets:
         - authentik-blueprint-gravitino
         - authentik-blueprint-erpnext

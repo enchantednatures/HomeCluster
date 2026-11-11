@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-passkey-login
+  namespace: authentik
+  labels:
+    authentik_blueprint: "true"
+data:
+  passkey-login.yaml: |
+    ---
+    # yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+    version: 1
+    metadata:
+      name: passkey-login
+      labels:
+        blueprints.goauthentik.io/instantiate: "true"
+    entries:
+      # Passwordless login: if the identified user has a confirmed WebAuthn
+      # authenticator (passkey, platform authenticator or security key), skip
+      # the password stage and let the authenticator validation stage
+      # authenticate them with the passkey alone.
+      # https://docs.goauthentik.io/add-secure-apps/flows-stages/stages/password/#dynamically-skip-a-password-stage
+      - model: authentik_policies_expression.expressionpolicy
+        state: present
+        identifiers:
+          name: default-authentication-password-skip-if-passkey
+        attrs:
+          name: default-authentication-password-skip-if-passkey
+          expression: |
+            from authentik.stages.authenticator_webauthn.models import WebAuthnDevice
+
+            pending_user = request.context.get("pending_user")
+            if not pending_user:
+                return True
+
+            return not WebAuthnDevice.objects.filter(user=pending_user, confirmed=True).exists()
+
+      # Passkey autofill (WebAuthn conditional UI): offer discoverable passkeys
+      # straight from the browser's autofill/conditional UI on the login form,
+      # so a passkey user can sign in without typing a username or password.
+      # Falls back to the normal identification form when the browser does not
+      # support conditional UI or no discoverable passkey is available.
+      # https://docs.goauthentik.io/add-secure-apps/flows-stages/stages/identification/#passkey-autofill-webauthn-conditional-ui
+      # user_fields is repeated so the serializer's "user fields or sources
+      # required" validation passes on the partial update.
+      - model: authentik_stages_identification.identificationstage
+        state: present
+        identifiers:
+          name: default-authentication-identification
+        attrs:
+          user_fields:
+            - email
+            - username
+          webauthn_stage: !Find [authentik_stages_authenticator_validate.authenticatorvalidatestage, [name, default-authentication-mfa-validation]]
+
+      # The default authentication flow already binds
+      # `default-authentication-flow-password-stage` to the password stage
+      # binding. Switch the binding to `all` so the password stage only runs
+      # when both that policy and the passkey policy pass.
+      - model: authentik_flows.flowstagebinding
+        state: present
+        identifiers:
+          target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+          stage: !Find [authentik_stages_password.passwordstage, [name, default-authentication-password]]
+          order: 20
+        attrs:
+          policy_engine_mode: all
+          re_evaluate_policies: true
+
+      - model: authentik_policies.policybinding
+        state: present
+        identifiers:
+          policy: !Find [authentik_policies_expression.expressionpolicy, [name, default-authentication-password-skip-if-passkey]]
+          target: !Find [authentik_flows.flowstagebinding, [target__slug, default-authentication-flow], [order, 20]]
+          order: 20
+        attrs:
+          # Fail safe: if the policy errors, keep requiring the password.
+          failure_result: true
