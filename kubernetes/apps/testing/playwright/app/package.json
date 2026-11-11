@@ -4,6 +4,6 @@
   "private": true,
   "description": "Playwright end-to-end tests for HomeCluster, run as Kubernetes Jobs",
   "devDependencies": {
-    "@playwright/test": "1.64.1"
+    "@playwright/test": "1.65.0"
   }
 }
