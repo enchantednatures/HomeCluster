@@ -41,9 +41,12 @@ spec:
     resources:
       requests:
         cpu: 10m
-        memory: 128Mi
+        memory: 256Mi
+      # 16 CNPG clusters + 18 Databases: the operator settled at ~500Mi and
+      # OOM-looped against the old 512Mi limit, leaving the webhook with no
+      # endpoints and stalling every *-db Kustomization.
       limits:
-        memory: 512Mi
+        memory: 1Gi
     monitoring:
       podMonitorEnabled: true
       grafanaDashboard:
