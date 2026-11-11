@@ -15,6 +15,12 @@ CloudNative-PG database and Authentik OIDC single sign-on.
 - SSO: Authentik OIDC, issuer `https://auth.${SECRET_DOMAIN}/application/o/tandoor/`
 - Redirect URI: `https://recipes.${SECRET_DOMAIN}/accounts/oidc/authentik/login/callback/`
 
+The callback must be `https://`. cloudflared reaches the Istio gateway over plain
+HTTP, so Envoy stamps `X-Forwarded-Proto: http`; the `tandoor` VirtualService
+overrides it to `https` (same pattern as `authentik`/`influxdb`). Without that
+header Django builds `http://` callback URLs and Authentik rejects them with
+`400 invalid_request` because the blueprint registers a strict https URI.
+
 ## Authentik provisioning (blueprint)
 
 The provider and application are declared in
