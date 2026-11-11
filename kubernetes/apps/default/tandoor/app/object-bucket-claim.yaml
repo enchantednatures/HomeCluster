@@ -12,5 +12,3 @@ metadata:
 spec:
   bucketName: tandoor-media
   storageClassName: ceph-bucket-retain
-  additionalConfig:
-    bucketOwner: tandoor
