@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: authentik-blueprint-tandoor
+    namespace: authentik
+type: Opaque
+stringData:
+    tandoor.yaml: ENC[AES256_GCM,data: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,iv:/4+toz1u7qyvxjdycg/YTSPTzutOiqffMz4/LHll6P4=,tag:0Bs+UvKARhTCc6VRTSpicQ==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBPRVBST2ZFVTVBcXNUNTRH
+            NGY1ZnJJSUZrY1M4aks3T0JKOWlWdy9zSUJvClNUeFR0WkJKU1FWNXVTNlF0cWo1
+            dTVZN3dHTHV3TWZuUThHTWtWbGlsWFUKLS0tIDgvMUpqKzFNUzN6by9UeG1rV0hD
+            MkRJNFNrdlhmQndPQkFHT3BNWk9nVGMKMqcf7imOCSZm/nqoUDm7KnBmxRRVCjOU
+            tlGxEx5jC8gvs6vKHp0haULY4WrWmcGEuCyuceyX6iWmsxFPyHJuPA==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-11T17:18:32Z"
+    mac: ENC[AES256_GCM,data:DH+kPckLOxUaVye46J49drUryoST6jZdvCOQE+fM780IAanfjC3qtQimJ2trf973aG8QonDWEKZnNtmgVRJuGlZJOy5/nCbe2Gu22pgxk31QVgSij9ZrzGGHwZ+U2K80qPQ9RmgwACROyH/XZ7+juuk83ObJqrJ/nOszRZOSzzs=,iv:gyeDXpR7flg7kCo7ytfF+VprZIhLIacWfvf61AopwUg=,tag:ttf39zqb994mQVcVhBWXHw==,type:str]
+    version: 3.13.3

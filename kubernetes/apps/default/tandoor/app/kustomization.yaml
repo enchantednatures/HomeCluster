@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - ./pvc.yaml
   - ./secret.sops.yaml
+  - ./sso.sops.yaml
   - ./helmrelease.yaml
   - ./virtualservice.yaml
   - ./destinationrule.yaml

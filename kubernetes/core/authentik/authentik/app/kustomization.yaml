@@ -13,4 +13,5 @@ resources:
   - ./blueprint-istio-forward-auth.yaml
   - ./blueprint-gravitino.sops.yaml
   - ./blueprint-erpnext.sops.yaml
+  - ./blueprint-tandoor.sops.yaml
   - ./destinationrule.yaml

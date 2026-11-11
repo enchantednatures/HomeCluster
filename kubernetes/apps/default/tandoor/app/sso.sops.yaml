@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+    name: tandoor-sso
+    namespace: default
+type: Opaque
+stringData:
+    SOCIALACCOUNT_PROVIDERS: ENC[AES256_GCM,data:KQcjZOX2B4kzHqBVccpdsgcbslqhksKUr1gWPwjTXYvlIFE6bcexlB9G9GtBjpCc9xLkdQRI9u6UGkqD8L98n+j2XRonbPQREDUTKInNj88U0rWYJlVZgG7flE3iIR9ZT7hMg/fwqQ/sxV2FvBKRa2tLBzKxKxhndPw6xpzSSQ2wkGqhM6z+j6whuuhIBwTsaDxUAJWJO6jzznVd8rDsTuAIyZyNglSWjLxu54GR/Ig56ArysJq1yuo2PlIEI7SgaWobm/gsgHw2oiKCWt+2xxJqOajymBXE1AD8cfYatIB8RRWXKRAk5BV5twh37ECZKllhxf0vWSd4jvJltN+1cdeYG+Y7JOVFWzuSBh5l+EaCvT0LKMDlrj3i7xzBbRg=,iv:XNGEqds9VM0e/JmBIQhDBXEwcxogFr9K2AJOEg8e7Xw=,tag:JGWPYmx5J+NcCldBLLTpcg==,type:str]
+sops:
+    age:
+        - enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA0ZjRXN20xT2w1M0xhQUNQ
+            TzBiVldjbFVFaTZmTFdUVnN2Z1FIMXVpTVhFCmZ2ajJJQWFOOGN5Q3lxUWhkRjBx
+            eHZIeFVpbkl3NTdZOVZNb3QzSFJmR1kKLS0tIDFhY1VkUWRmSnpGSHZMei8zWnlV
+            ZVhodUFyQkdkR3FPT1hBRzlEYkMwbXMKjLQ8YOzROrhlBxAY5THrEmznK8S/Fiew
+            q3LDodbxhjHwAOchxUBngOmcaV+BCG0Tx5VR27t17XkwBYgerZFW/w==
+            -----END AGE ENCRYPTED FILE-----
+          recipient: age10vdnx33zyesr04jeeepdungzmzhj3572pz9ccev3zsj6dxhvz49slagxdv
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-11-11T17:18:32Z"
+    mac: ENC[AES256_GCM,data:V/Wk4W4j9u6qCcOHKhG98zc7ukczJR4CvBpxPueJUnRmdv/GBI7WMrS1fUGDG93bT+VAqHP29jq4lPwYWNG+XNfy4j5S3nMfbZtmJx90o2+yiFEiJ7dovcFLvJWbyHK73obmrVsDVYGRYca7O2abX43C790dlEHXi/TDPuGX/d8=,iv:vlgi6gBYB4P0eq6nmYLWk2PGRRcEA8vkfQPt7KY7j+Q=,tag:XZ1Sx5F9fZSFKtu1VhRehg==,type:str]
+    version: 3.13.3
