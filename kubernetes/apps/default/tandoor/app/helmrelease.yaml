@@ -31,7 +31,20 @@ spec:
   values:
     controllers:
       tandoor:
-        strategy: Recreate
+        replicas: 2
+        strategy: RollingUpdate
+        rollingUpdate:
+          unavailable: "0%"
+          surge: 1
+        pod:
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: tandoor
+                  app.kubernetes.io/component: tandoor
         containers:
           app:
             image:
@@ -71,6 +84,26 @@ spec:
               SOCIALACCOUNT_EMAIL_AUTHENTICATION: "1"
               SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT: "1"
               ALLAUTH_TRUSTED_PROXY_COUNT: "2"
+              REDIS_HOST: tandoor-dragonfly.default.svc.cluster.local
+              REDIS_PORT: "6379"
+              DRF_THROTTLE_RECIPE_URL_IMPORT: 6000/hour
+              S3_ACCESS_KEY:
+                secretKeyRef:
+                  name: tandoor-media-bucket
+                  key: AWS_ACCESS_KEY_ID
+              S3_SECRET_ACCESS_KEY:
+                secretKeyRef:
+                  name: tandoor-media-bucket
+                  key: AWS_SECRET_ACCESS_KEY
+              S3_BUCKET_NAME:
+                configMapKeyRef:
+                  name: tandoor-media-bucket
+                  key: BUCKET_NAME
+              # Sign against the public endpoint: the browser loads presigned
+              # URLs directly, so the signed host must be publicly resolvable.
+              S3_ENDPOINT_URL: https://s3.${SECRET_DOMAIN}
+              S3_REGION_NAME: us-east-1
+              S3_SIGNATURE_VERSION: s3v4
             probes:
               startup:
                 enabled: true
@@ -127,16 +160,13 @@ spec:
           http:
             port: 8080
     persistence:
+      # Static files are collected per-pod at boot; 97MB of emptyDir is cheaper
+      # than a shared RWO volume that blocks a second replica on another node.
       static:
         enabled: true
-        existingClaim: tandoor-static
+        type: emptyDir
         globalMounts:
           - path: /opt/recipes/staticfiles
-      media:
-        enabled: true
-        existingClaim: tandoor-media
-        globalMounts:
-          - path: /opt/recipes/mediafiles
       tmp:
         enabled: true
         type: emptyDir

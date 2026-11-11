@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/policy/poddisruptionbudget_v1.json
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: tandoor
+  namespace: default
+  labels:
+    app.kubernetes.io/name: tandoor
+    app.kubernetes.io/instance: tandoor
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tandoor
+      app.kubernetes.io/instance: tandoor
