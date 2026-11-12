@@ -222,6 +222,23 @@ graph TB
 - **Caching Layer**: DragonflyDB for performance optimization
 - **Persistent Storage**: Volume mounts for file storage
 
+### Ollama
+**Location**: `kubernetes/apps/ollama/`
+
+GPU-backed local LLM server running on the RTX 3080 in `gateway-1`.
+
+**Components**:
+- **Ollama**: `ollama/ollama:0.40.16`, one replica pinned to `gateway-1`
+- **Model volume**: `ollama-models`, 80 GiB on `ceph-block-ssd`
+- **Model**: `gemma3:12b`, loaded 100% on the GPU
+- **GPU stack**: Talos NVIDIA LTS extensions plus NVIDIA GPU Operator with
+  driver and toolkit disabled
+- **Tandoor**: global AI provider `Ollama Gemma 3 12B` using the
+  OpenAI-compatible endpoint
+
+See `docs/gateway-1-nvidia.md` for the Talos image, machine-config changes,
+GPU operator workarounds, and how to hand the GPU back to `rusalka`.
+
 ### SearXNG
 **Location**: `kubernetes/apps/default/searxng/`
 
