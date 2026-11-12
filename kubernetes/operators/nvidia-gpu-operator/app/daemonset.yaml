@@ -36,8 +36,12 @@ spec:
           args:
             - |
               set -eu
-              mkdir -p /opt/bin
+              mkdir -p /opt/bin /run/nvidia/validations
               ln -sf /usr/local/bin/nvidia-smi /opt/bin/nvidia-smi
+              # The device plugin and validator wait for this marker. The
+              # operator's toolkit container normally writes it, but Talos
+              # already supplies the toolkit and CDI stack.
+              touch /run/nvidia/validations/toolkit-ready
               while true; do sleep 3600; done
           resources:
             requests:
@@ -50,8 +54,14 @@ spec:
           volumeMounts:
             - name: opt
               mountPath: /opt
+            - name: validations
+              mountPath: /run/nvidia/validations
       volumes:
         - name: opt
           hostPath:
             path: /opt
             type: Directory
+        - name: validations
+          hostPath:
+            path: /run/nvidia/validations
+            type: DirectoryOrCreate

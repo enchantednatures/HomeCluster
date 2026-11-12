@@ -36,9 +36,11 @@ spec:
     # the Talos root filesystem is read-only.
     driver:
       enabled: false
+    # Talos already provides the userspace toolkit, CDI specs, and the nvidia
+    # runtime class. The operator's toolkit container tries to write under
+    # /etc/containerd, which is read-only on Talos.
     toolkit:
-      enabled: true
-      installDir: /var/lib/nvidia
+      enabled: false
     cdi:
       # Talos containerd has CDI enabled and NRI disabled.
       enabled: true
