@@ -40,8 +40,9 @@ spec:
       enabled: true
       installDir: /var/lib/nvidia
     cdi:
+      # Talos containerd has CDI enabled and NRI disabled.
       enabled: true
-      nriPluginEnabled: true
+      nriPluginEnabled: false
     hostPaths:
       driverInstallDir: /usr/local
     nfd:

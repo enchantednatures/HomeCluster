@@ -1,0 +1,57 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/apps/v1/daemonset.json
+---
+# The GPU Operator's driver validator only searches /usr/bin, /usr/sbin,
+# /bin, /sbin, and /opt/bin for nvidia-smi. The Talos NVIDIA extension installs
+# it under /usr/local/bin, so expose it at /opt/bin (a writable overlay on
+# Talos) for the validator.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-smi-host-shim
+  namespace: gpu-operator
+  labels:
+    app.kubernetes.io/name: nvidia-smi-host-shim
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nvidia-smi-host-shim
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nvidia-smi-host-shim
+    spec:
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: shim
+          image: busybox:1.38
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              set -eu
+              mkdir -p /opt/bin
+              ln -sf /usr/local/bin/nvidia-smi /opt/bin/nvidia-smi
+              while true; do sleep 3600; done
+          resources:
+            requests:
+              cpu: 5m
+              memory: 8Mi
+            limits:
+              memory: 32Mi
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: opt
+              mountPath: /opt
+      volumes:
+        - name: opt
+          hostPath:
+            path: /opt
+            type: Directory
