@@ -57,6 +57,10 @@ spec:
       secrets:
         generate: false
         existingSecret: sparkyfitness-app
+      extraEnv:
+        # Tandoor is reached over the in-cluster service; allow every household
+        # account to add the private URL, not just admins.
+        ALLOW_PRIVATE_NETWORK_FOOD_PROVIDERS: "true"
       appDatabase:
         existingSecret: sparkyfitness-appdb
       persistence:

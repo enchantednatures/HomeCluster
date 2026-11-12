@@ -15,6 +15,8 @@ Authentik OIDC single sign-on.
 - Public URL: `https://recipes.${SECRET_DOMAIN}` (Istio `external-gateway`)
 - Database: `tandoor-db-pooler-rw.default.svc.cluster.local:5432/tandoor`
 - Cache: `tandoor-dragonfly.default.svc.cluster.local:6379` (2 replicas)
+- In-cluster API: `http://tandoor.default.svc.cluster.local:8080`, allowed in
+  `ALLOWED_HOSTS` for the SparkyFitness recipe importer
 - Media: S3 bucket `tandoor-media` on `ceph-objectstore`, via
   `ObjectBucketClaim/tandoor-media-bucket` (endpoint `https://s3.${SECRET_DOMAIN}`)
 - SSO: Authentik OIDC, issuer `https://auth.${SECRET_DOMAIN}/application/o/tandoor/`

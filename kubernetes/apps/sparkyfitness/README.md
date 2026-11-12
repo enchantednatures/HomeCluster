@@ -98,6 +98,24 @@ The scope `property_mappings` are required: the API does not pre-select them,
 and omitting them yields a token with no scopes and a generic
 `invalid_provider` error in SparkyFitness.
 
+## Tandoor integration
+
+Recipe search and import use a per-user Tandoor provider, configured under
+**Settings → Food & Exercise Data Providers → Add New Data Provider**, with
+provider type **Tandoor**:
+
+| Field | Value |
+|-------|-------|
+| App URL | `http://tandoor.default.svc.cluster.local:8080` |
+| API Key | Tandoor access token (`tda_…`) from **Settings → API** (`/api/access-token/`) |
+
+The server reaches Tandoor over the in-cluster service
+(`CiliumNetworkPolicy/allow-sparkyfitness` allows egress to `default/tandoor`
+on `8080`), and Tandoor's `ALLOWED_HOSTS` includes the service DNS name.
+`ALLOW_PRIVATE_NETWORK_FOOD_PROVIDERS=true` lets non-admin accounts use the
+private URL. Imported recipe photos are presigned S3 URLs, so the browser loads
+them from `s3.${SECRET_DOMAIN}` without needing the internal hostname.
+
 ## Notes
 
 - The app strips a trailing slash from the env issuer only when building the

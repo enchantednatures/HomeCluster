@@ -70,7 +70,9 @@ spec:
                 secretKeyRef:
                   name: tandoor-secret
                   key: SECRET_KEY
-              ALLOWED_HOSTS: recipes.${SECRET_DOMAIN}
+              # SparkyFitness imports recipes over the in-cluster service, which
+              # sends the service DNS name as the Host header.
+              ALLOWED_HOSTS: recipes.${SECRET_DOMAIN},tandoor.default.svc.cluster.local
               CSRF_TRUSTED_ORIGINS: https://recipes.${SECRET_DOMAIN}
               ENABLE_SIGNUP: "1"
               ACCOUNT_EMAIL_VERIFICATION: "none"

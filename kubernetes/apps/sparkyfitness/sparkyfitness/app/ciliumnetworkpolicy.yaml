@@ -69,6 +69,15 @@ spec:
               protocol: TCP
             - port: "9443"
               protocol: TCP
+    # Tandoor recipe search/import (in-cluster service)
+    - toEndpoints:
+        - matchLabels:
+            k8s:app.kubernetes.io/name: tandoor
+            k8s:io.kubernetes.pod.namespace: default
+      toPorts:
+        - ports:
+            - port: "8080"
+              protocol: TCP
     # Other HTTPS integrations
     - toEntities:
         - world
