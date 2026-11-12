@@ -48,6 +48,7 @@ resources:
   - ./mariadb-operator.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir-external-provisioner.yaml
+  - ./nvidia.yaml
   - ./open-telemetry.yaml
   - ./piraeus.yaml
   - ./redpanda-charts.yaml

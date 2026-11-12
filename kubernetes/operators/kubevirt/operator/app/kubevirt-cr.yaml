@@ -16,10 +16,8 @@ spec:
         - HostDevices
     permittedHostDevices:
       pciHostDevices:
-        - pciVendorSelector: "10DE:2206"
-          resourceName: "nvidia.com/RTX3080"
-        - pciVendorSelector: "10DE:1AEF"
-          resourceName: "nvidia.com/RTX3080_AUDIO"
+        # The RTX 3080 and its audio function are intentionally not listed.
+        # They are used by the host NVIDIA driver for Ollama instead.
         - pciVendorSelector: "8086:7A60"
           resourceName: "usb/intel-xhci"
         - pciVendorSelector: "1B73:1100"

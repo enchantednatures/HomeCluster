@@ -11,7 +11,10 @@ metadata:
     kubevirt.io/domain: rusalka
     kubevirt.io/vm: rusalka
 spec:
-  runStrategy: Always
+  # The RTX 3080 was moved from this VM to Ollama on the host. Keep the VM
+  # halted until the GPU is handed back; it also has no display device without
+  # the passthrough card.
+  runStrategy: Halted
   template:
     metadata:
       labels:
@@ -36,30 +39,27 @@ spec:
         machine:
           type: pc-q35-rhel9.2.0
         firmware:
-          # UEFI is required when the passthrough GPU is the only display;
-          # SeaBIOS does not reach the boot device without a VGA device.
+          # Keep the existing Arch UEFI boot configuration. With the GPU
+          # removed, VNC uses the emulated display instead of the RTX 3080.
           bootloader:
             efi:
               secureBoot: false
         features:
           acpi: {}
         devices:
-          # The RTX 3080 is the workstation's only display. Without this,
-          # KubeVirt attaches an emulated VGA as primary and the GPU scans out
-          # an empty framebuffer, so a monitor on the card stays black.
-          autoattachGraphicsDevice: false
+          # The RTX 3080 and its audio function now belong to the host Ollama
+          # workload. Restore them here together with the Talos
+          # PCIDriverRebindConfig documents and the KubeVirt permittedHostDevices
+          # entries if the VM should get the GPU back. Until then the VM stays
+          # halted and uses the emulated display when started.
+          autoattachGraphicsDevice: true
           # The existing Omarchy install lives on the passed-through Samsung
           # NVMe, so no KubeVirt disks are attached while we validate it.
           # Re-add omarchy-iso/rusalka-root from Git history if needed.
-          gpus:
-            - deviceName: nvidia.com/RTX3080
-              name: gpu0
           # The dock's Fresco USB controller is passed through. The
           # Thunderbolt bridge itself cannot bind to vfio-pci, so it is left
           # unbound on the host; only the USB controller is assigned.
           hostDevices:
-            - deviceName: nvidia.com/RTX3080_AUDIO
-              name: gpu0-audio
             - deviceName: usb/intel-xhci
               name: usb0
             - deviceName: nvme/samsung-970

@@ -2,8 +2,13 @@
 
 `rusalka` is a persistent Arch Linux workstation running as a KubeVirt
 `VirtualMachine` in the `vms` namespace. It boots the official Arch Linux
-cloud image under cloud-init and keeps the RTX 3080, GPU audio, and Intel XHCI
-USB controller passthrough that only exist on `gateway-1`.
+cloud image under cloud-init and keeps the Intel XHCI USB controller and
+Samsung NVMe passthrough that only exist on `gateway-1`.
+
+The RTX 3080 and its audio function were moved from this VM to the host NVIDIA
+driver for the `ollama` workload. The VM is currently `Halted`; restore the GPU
+passthrough in the VM, KubeVirt `permittedHostDevices`, and Talos
+`PCIDriverRebindConfig` together if it needs the card back.
 
 | Item | Value |
 | --- | --- |
@@ -12,7 +17,7 @@ USB controller passthrough that only exist on `gateway-1`.
 | Root disk | `rusalka-root`, 120 GiB on `ceph-block-ssd`, imported from the pinned Arch `cloudimg` qcow2 |
 | Machine | `pc-q35-rhel9.2.0`, BIOS bootloader |
 | Node | `gateway-1` |
-| Passthrough | RTX 3080 (`nvidia.com/RTX3080`), RTX 3080 audio (`nvidia.com/RTX3080_AUDIO`), Intel XHCI USB (`usb/intel-xhci`) |
+| Passthrough | Intel XHCI USB (`usb/intel-xhci`), Fresco USB (`usb/fresco-xhci`), Samsung 970 NVMe (`nvme/samsung-970`) |
 | Interface MAC | `f2:5a:1c:9e:00:01`, pinned on the `default` interface |
 | SSH Service | `rusalka-ssh`, `LoadBalancer` with `loadBalancerClass: tailscale`, port 22 only |
 | Cloud-init Secret | `rusalka-cloud-init` |

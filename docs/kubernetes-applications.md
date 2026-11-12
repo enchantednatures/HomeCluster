@@ -318,14 +318,15 @@ KubeVirt-based virtual machine workloads running on Kubernetes.
 **Path**: `kubernetes/apps/vms/rusalka/`
 
 Persistent Arch Linux workstation booted from the official Arch cloud image
-under cloud-init, with GPU and USB passthrough on `gateway-1`:
+under cloud-init, with USB and NVMe passthrough on `gateway-1`. The RTX 3080
+was later reclaimed by the host for the Ollama workload, and the VM is halted:
 
 **Components**:
 - **DataVolume**: `rusalka-root`, 120 GiB on `ceph-block-ssd`, imported from
   the pinned Arch `cloudimg` qcow2
 - **VirtualMachine**: `rusalka`, 8 vCPU and 16 GiB, BIOS
   `pc-q35-rhel9.2.0`, stable MAC `f2:5a:1c:9e:00:01`
-- **Passthrough**: RTX 3080, RTX 3080 audio, and Intel XHCI USB controller
+- **Passthrough**: Intel XHCI USB, Fresco USB, and Samsung 970 NVMe
 - **Service**: `rusalka-ssh`, Tailscale `LoadBalancer` on port 22 only
 
 **Features**:

@@ -53,6 +53,7 @@ spec:
             - redpanda
             - default
             - monitoring
+            - gpu-operator
   autogen:
     podControllers:
       controllers:

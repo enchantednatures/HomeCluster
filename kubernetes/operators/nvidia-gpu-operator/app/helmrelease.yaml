@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app gpu-operator
+  namespace: gpu-operator
+spec:
+  driftDetection:
+    mode: enabled
+  maxHistory: 2
+  interval: 30m
+  chart:
+    spec:
+      chart: gpu-operator
+      version: v26.7.2 # datasource=helm depName=gpu-operator repository=https://helm.ngc.nvidia.com/nvidia
+      sourceRef:
+        kind: HelmRepository
+        name: nvidia
+        namespace: flux-system
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  uninstall:
+    keepHistory: false
+  values:
+    # Talos provides the NVIDIA kernel modules and userspace libraries as
+    # system extensions. The operator only manages the container toolkit,
+    # device plugin, and node labels. The toolkit must live on /var because
+    # the Talos root filesystem is read-only.
+    driver:
+      enabled: false
+    toolkit:
+      enabled: true
+      installDir: /var/lib/nvidia
+    cdi:
+      enabled: true
+      nriPluginEnabled: true
+    hostPaths:
+      driverInstallDir: /usr/local
+    nfd:
+      enabled: true
+    # Nothing on this single-GPU node uses MIG or the standalone DCGM engine.
+    mig:
+      strategy: none
+    dcgm:
+      enabled: false

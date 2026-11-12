@@ -14,6 +14,7 @@ resources:
   - ./kubevirt
   - ./mariadb-operator
   - ./medik8s
+  - ./nvidia-gpu-operator
   - ./rabbitmq-operator
   - ./redpanda
   - ./schema-registry

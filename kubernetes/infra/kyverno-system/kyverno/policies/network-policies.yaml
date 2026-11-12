@@ -41,7 +41,7 @@ spec:
         'redpanda', 'elastic', 'networking', 'cert-manager', 'actions-runner-system', 'austin-ci', 'arangodb',
         'dragonflydb', 'home-system', 'immich', 'irc', 'keda', 'observability', 'rabbitmq-operator',
         'tekton-pipelines', 'tekton-pipelines-resolvers', 'telepresence', 'local-path-storage',
-        'cilium-secrets', 'default']) &&
+        'cilium-secrets', 'default', 'ollama', 'gpu-operator']) &&
         !object.metadata.name.startsWith('knative-')
   generate:
     - template:
