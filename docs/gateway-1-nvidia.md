@@ -117,6 +117,12 @@ HelmRelease. A global AI provider named `Ollama Gemma 3 12B` is configured with
 model `openai/gemma3:12b` and API key `ollama`. `GUNICORN_TIMEOUT` is raised to
 180 seconds because AI calls are synchronous.
 
+Image/PDF recipe import was tested end-to-end and parsed ingredients correctly.
+The text-only import prompt is less explicit; Gemma 3 12B may return
+`recipeIngredient` as structured objects, which Tandoor does not parse into
+ingredients. Prefer the image/PDF import path for text recipes, or use a model
+that emits ingredient strings for the text import.
+
 ## Reverting to rusalka
 
 Restore the GPU passthrough in all three places together:
