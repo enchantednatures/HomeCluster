@@ -94,6 +94,8 @@ spec:
               # AI calls are synchronous; Gemma 3 can take longer than the
               # 30s gunicorn default for vision/PDF recipe imports.
               GUNICORN_TIMEOUT: "180"
+              GUNICORN_WORKERS: "5"
+              GUNICORN_THREADS: "2"
               DRF_THROTTLE_RECIPE_URL_IMPORT: 6000/hour
               S3_ACCESS_KEY:
                 secretKeyRef:
@@ -124,8 +126,8 @@ spec:
                       - name: Host
                         value: recipes.${SECRET_DOMAIN}
                   periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 60
               readiness:
                 enabled: true
                 custom: true
@@ -138,8 +140,8 @@ spec:
                         value: recipes.${SECRET_DOMAIN}
                   initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 3
+                  timeoutSeconds: 10
+                  failureThreshold: 6
               liveness:
                 enabled: true
                 custom: true
@@ -152,8 +154,8 @@ spec:
                         value: recipes.${SECRET_DOMAIN}
                   initialDelaySeconds: 0
                   periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 3
+                  timeoutSeconds: 10
+                  failureThreshold: 6
             resources:
               requests:
                 cpu: 100m
