@@ -12,7 +12,7 @@ spec:
   chart:
     spec:
       chart: sparkyfitness
-      version: 1.11.0 # datasource=helm depName=sparkyfitness repository=oci://ghcr.io/codewithcj/charts
+      version: 1.12.1 # datasource=helm depName=sparkyfitness repository=oci://ghcr.io/codewithcj/charts
       sourceRef:
         kind: HelmRepository
         name: sparkyfitness
