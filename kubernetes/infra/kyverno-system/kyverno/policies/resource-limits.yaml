@@ -69,6 +69,7 @@ spec:
             - default
             - rook-ceph
             - gpu-operator
+            - sparkyfitness
   autogen:
     podControllers:
       controllers:
