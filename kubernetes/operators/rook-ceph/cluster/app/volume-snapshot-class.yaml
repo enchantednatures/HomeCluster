@@ -9,7 +9,12 @@ metadata:
   annotations:
     snapshot.storage.kubernetes.io/is-default-class: "true"
 driver: rook-ceph.rbd.csi.ceph.com
-deletionPolicy: Retain  # Keep snapshots even if VolumeSnapshotClass is deleted
+# Delete, not Retain. The daily volume-snapshot CronJob deletes VolumeSnapshots
+# on a retention window; with Retain the VolumeSnapshotContent (and the backing
+# RBD snapshot) survived forever, so the pools grew without bound and took the
+# cluster to HEALTH_ERR. Retaining the Kubernetes object is not a backup:
+# real backups go off-cluster via VolSync/restic.
+deletionPolicy: Delete
 parameters:
   clusterID: rook-ceph
   csi.storage.k8s.io/snapshotter-secret-name: rook-csi-rbd-provisioner

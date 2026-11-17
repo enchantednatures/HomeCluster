@@ -239,7 +239,7 @@ spec:
                   done
 
                   # Find all PVCs using Ceph storage classes
-                  for storage_class in ceph-block ceph-block-ssd ceph-block-retain; do
+                  for storage_class in ceph-block ceph-block-ssd ceph-block-retain ceph-block-economy; do
                     echo "Processing PVCs with storage class: $storage_class"
 
                     kubectl get pvc --all-namespaces -o json | \
@@ -286,9 +286,11 @@ spec:
 
                   echo "Automated snapshot creation completed at $(date)"
 
-                  # Clean up old snapshots (older than 30 days)
+                  # Clean up old snapshots (older than 3 days). Keep this short:
+                  # snapshots live in the same Ceph pools as the volumes, and
+                  # long retention filled the cluster (see docs/ceph-hygiene-runbook.md).
                   echo "Cleaning up old snapshots..."
-                  CUTOFF_DATE=$(date -d '30 days ago' +%Y%m%d)
+                  CUTOFF_DATE=$(date -d '3 days ago' +%Y%m%d)
 
                   kubectl get volumesnapshot --all-namespaces -o json | \
                   jq -r ".items[] | select(.metadata.labels.\"backup-type\"==\"automated\" and .metadata.labels.\"backup-date\" < \"$CUTOFF_DATE\") | \"\(.metadata.namespace)/\(.metadata.name)\"" | \
