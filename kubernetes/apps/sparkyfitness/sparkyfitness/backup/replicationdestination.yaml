@@ -7,14 +7,18 @@ metadata:
   name: sparkyfitness-restore
   namespace: sparkyfitness
 spec:
-  # Paused by default: Flux reconciles the manifest; trigger manually via
-  # kubectl patch on spec.trigger.manual for restore drills
+  # VolSync 0.17 does not honor `paused` for a restic destination, so this
+  # resource restores once on creation. It therefore targets a dedicated
+  # drill PVC instead of the live `sparkyfitness-uploads` volume, which
+  # would otherwise be overwritten by the latest snapshot.
+  # Trigger restore drills by patching spec.trigger.manual.
   paused: true
   trigger:
     manual: ""
   restic:
     repository: sparkyfitness-backup-secret
     copyMethod: Direct
-    destinationPVC: sparkyfitness-uploads
+    destinationPVC: sparkyfitness-uploads-restore
+    capacity: 10Gi
     cacheStorageClassName: ceph-block
     cacheCapacity: 10Gi
