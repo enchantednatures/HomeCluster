@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolume.json
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: lancache-cache-economy
+  labels:
+    app.kubernetes.io/name: lancache
+    app.kubernetes.io/instance: lancache
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Ti
+  claimRef:
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    name: lancache-cache-economy
+    namespace: lancache
+  csi:
+    driver: rook-ceph.rbd.csi.ceph.com
+    fsType: ext4
+    volumeHandle: 0001-0009-rook-ceph-0000000000000001-lancache-cache
+    volumeAttributes:
+      clusterID: rook-ceph
+      imageFeatures: layering
+      imageFormat: "2"
+      imageName: lancache-cache
+      journalPool: ceph-blockpool-economy
+      mapOptions: krbd:rxbounce
+      pool: ceph-blockpool-economy
+      staticVolume: "true"
+      unmapOptions: krbd:rxbounce
+    controllerExpandSecretRef:
+      name: rook-csi-rbd-provisioner
+      namespace: rook-ceph
+    nodeStageSecretRef:
+      name: rook-csi-rbd-node
+      namespace: rook-ceph
+  mountOptions:
+    - discard
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ceph-block-economy
+  volumeMode: Filesystem

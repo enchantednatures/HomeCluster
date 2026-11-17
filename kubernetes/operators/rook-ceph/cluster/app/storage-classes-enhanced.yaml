@@ -86,7 +86,7 @@ spec:
     pg_autoscale_mode: "off"
     target_size_ratio: "0.2"  # informational only with autoscale off
   quotas:
-    maxBytes: 1099511627776  # 1Ti in bytes
+    maxBytes: 3298534883328  # 3TiB - bulk HDD pool for lancache and app migration
 ---
 # yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: storage.k8s.io/v1
