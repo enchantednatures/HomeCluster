@@ -313,3 +313,69 @@ After the migration, `osd.4` was restarted (pod delete) and the class stayed
 `nvme`: `osd_class_update_on_start` re-asserts a class on start, but Ceph treats
 the resulting `-EBUSY` (class already bound) as success. Re-check
 `ceph osd tree` after any OSD restart.
+
+## 12. Volume snapshot retention and orphan reclamation
+
+Verified 2026-11-17.
+
+### Failure mode
+
+`volume-snapshot-automation` in `rook-ceph` snapshots every PVC on the Ceph
+storage classes daily. It deleted `VolumeSnapshot` objects past the retention
+window, but the default `VolumeSnapshotClass` (`ceph-block-snapshot`) used
+`deletionPolicy: Retain`. A deleted `VolumeSnapshot` therefore left its
+`VolumeSnapshotContent` and the backing `csi-snap-*` RBD image in the pool
+forever. At the point this was found, `ceph-blockpool` held 8,991
+`csi-snap-*` images against 59 volumes and 6,450 contents pointed at
+snapshots that no longer existed.
+
+Consequences: the SSD/NVMe OSDs reached 79-95% while the HDD OSDs sat at 5-8%.
+`osd.5` crossed `full_ratio` (0.95), Ceph flagged 23 pools `full`, and every
+CephFS subvolume metadata write began failing with
+`rados: ret=28, No space left on device`. Any pod that had not already mounted
+`erpnext-sites` stayed in `ContainerCreating`.
+
+### Durable fixes (committed)
+
+| Change | File |
+|---|---|
+| Retention 30 days -> 3 days | `kubernetes/operators/rook-ceph/cluster/app/backup-strategy-enhanced.yaml` |
+| Default class `Retain` -> `Delete` | `kubernetes/operators/rook-ceph/cluster/app/volume-snapshot-class.yaml` |
+| `ceph-block-economy` added to the sweep | `backup-strategy-enhanced.yaml` |
+
+Retain-based snapshots are not backups: they share the failure domain of the
+data they protect. Off-cluster copies stay with VolSync/restic to RustFS.
+
+### Reclaiming already-leaked snapshots
+
+1. List contents whose `volumeSnapshotRef` is absent from
+   `kubectl get volumesnapshot -A`.
+2. The RBD image is `csi-snap-<last 5 UUID groups of status.snapshotHandle>`.
+   Delete it with `rbd snap purge` then `rbd rm --no-progress`.
+3. Delete the content: patch `metadata.finalizers` to `[]`, then delete it.
+
+Do not trust `rbd ls` for progress: after `rbd rm` the pool directory can keep
+stale names. Confirm with `rbd info <image>` (returns `(2) No such file or
+directory` when gone).
+
+The images are thin clones, so expect only ~10-30 MiB reclaimed per snapshot.
+Deleting them buys headroom, it does not substitute for capacity.
+
+### Blocklist gotcha
+
+A Ceph blocklist entry can outlive the incident that created it. On
+2026-11-17 a `cidr:192.168.1.148:0/32` entry for `melusine` was set to expire
+in 2029; every CephFS mount from that node failed with
+`rados: ret=-108, Cannot send after transport endpoint shutdown` long after
+the pools had free space. `ceph osd blocklist rm` does not match a `cidr:`
+entry (`<ip> isn't blocklisted`), so the practical recovery is
+`ceph osd blocklist clear`. Prefer clearing over leaving a node isolated.
+
+### Capacity note
+
+Replica 3 with host failure domain means each PG needs three distinct hosts.
+The melusine HDDs can contribute at most one replica per PG, so roughly two
+thirds of `ceph-blockpool` must fit on the 2.2 TiB SSD/NVMe class. Raising
+`full_ratio` to 0.96 restores writes but only buys the difference up to that
+ratio; it is a temporary lever, not capacity. Reduce replica count, add flash
+OSDs, or move bulk PVCs to `ceph-block-economy` to change the arithmetic.
