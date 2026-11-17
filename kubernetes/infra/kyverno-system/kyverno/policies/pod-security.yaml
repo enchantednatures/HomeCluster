@@ -54,6 +54,7 @@ spec:
             - default
             - monitoring
             - gpu-operator
+            - sparkyfitness
   autogen:
     podControllers:
       controllers:
