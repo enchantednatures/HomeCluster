@@ -30,6 +30,19 @@ spec:
       ports:
         - protocol: TCP
           port: 9000
+    # istiod xDS + workload certificates (namespace uses istio sidecar injection)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: istio-system
+          podSelector:
+            matchLabels:
+              app: istiod
+      ports:
+        - protocol: TCP
+          port: 15012
+        - protocol: TCP
+          port: 443
     # DNS: CoreDNS ClusterIP + kube-dns pods (observed IP outside SERVICE_CIDR)
     - to:
         - ipBlock:
