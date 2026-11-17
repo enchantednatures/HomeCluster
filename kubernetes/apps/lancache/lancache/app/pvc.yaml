@@ -10,7 +10,6 @@ metadata:
     app.kubernetes.io/instance: lancache
 spec:
   storageClassName: ceph-block-economy
-  volumeName: lancache-cache-economy
   accessModes:
     - ReadWriteOnce
   resources:
