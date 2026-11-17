@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+# Restore-drill target for the volsync ReplicationDestination. Kept separate
+# from sparkyfitness-uploads so a restore can never overwrite live data.
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sparkyfitness-uploads-restore
+  namespace: sparkyfitness
+  labels:
+    app.kubernetes.io/name: sparkyfitness
+    app.kubernetes.io/instance: sparkyfitness
+spec:
+  storageClassName: ceph-block
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
