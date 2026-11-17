@@ -38,8 +38,7 @@ spec:
 
     controllers:
       monolithic:
-        # Hold the cache offline until the RBD copy to the economy pool finishes.
-        replicas: 0
+        replicas: 1
         strategy: Recreate
         annotations:
           reloader.stakater.com/auto: "true"
