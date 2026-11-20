@@ -10,6 +10,7 @@ spec:
   # Live-verified 2026-09-09: the static influxdb-data PVC (../app/pvc.yaml) is
   # Pending/unbound; the chart-created influxdb-influxdb2 PVC (ceph-block,
   # 50Gi) is the actual data volume mounted by influxdb-influxdb2-0
+  paused: true
   sourcePVC: influxdb-influxdb2
   trigger:
     # Run backup daily at 3:20 AM

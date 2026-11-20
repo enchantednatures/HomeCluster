@@ -7,6 +7,7 @@ metadata:
   name: erpnext-backup
   namespace: erpnext
 spec:
+  paused: true
   sourcePVC: erpnext-sites
   trigger:
     # Run backup daily at 2:40 AM (staggered against other VolSync schedules)

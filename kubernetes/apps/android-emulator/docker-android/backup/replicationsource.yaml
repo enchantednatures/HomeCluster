@@ -6,6 +6,7 @@ metadata:
   name: docker-android-backup
   namespace: android-emulator
 spec:
+  paused: true
   sourcePVC: docker-android-data
   trigger:
     schedule: "50 2 * * *"
