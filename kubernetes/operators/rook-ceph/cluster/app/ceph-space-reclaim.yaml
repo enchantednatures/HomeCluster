@@ -17,7 +17,9 @@
 #   - Deletions are capped per run and throttled with sleep, so this job cannot
 #     hammer an already-degraded cluster.
 #
-# Start with DRY_RUN "true", inspect the Job logs, then flip it to "false".
+# Currently suspended: the first real run (2026-11-20) stalled in rbd trash
+# purge on an already-degraded cluster. Re-enable only after capacity is
+# addressed; the Job remains useful as the durable leak guard.
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -28,6 +30,10 @@ metadata:
     app.kubernetes.io/part-of: rook-ceph
     app.kubernetes.io/component: maintenance
 spec:
+  # Suspended 2026-11-20: the first real run stalled in rbd trash purge and the
+  # cluster was already degraded. Remove this once capacity is addressed and
+  # the slow-op / recovery_toofull warnings have cleared.
+  suspend: true
   schedule: "30 4 * * *"
   timeZone: "UTC"
   concurrencyPolicy: Forbid

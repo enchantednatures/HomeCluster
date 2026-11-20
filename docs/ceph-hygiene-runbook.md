@@ -411,17 +411,19 @@ Safety defaults in the manifest:
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `DRY_RUN` | `"false"` | Deletions enabled on 2026-11-20 after a validated dry run. Set to `"true"` to pause deletions while keeping the inventory. |
+| `suspend` | `true` | CronJob is paused until capacity is addressed. |
+| `DRY_RUN` | `"false"` | Deletions are enabled; keep `"true"` for a safe inventory-only run. |
 | `MIN_AGE_HOURS` | `"24"` | Never touch in-flight snapshots. |
 | `MAX_DELETIONS` | `"25"` | Hard cap per run; the next run resumes. |
 | `SLEEP_SECONDS` | `"5"` | Throttle between actual deletions. |
 | `concurrencyPolicy` | `Forbid` | One run at a time. |
 
 The dry run was validated on 2026-11-20: it found 321 live handles, 1 orphan
-content, and 25 orphan child deletions before hitting the cap. To pause the
-job, set both `DRY_RUN` env values (init container and main container) to
-`"true"` and reconcile Flux. Raise `MAX_DELETIONS` only after the cluster is
-healthy and the slow-op warnings have cleared.
+content, and 25 orphan child deletions before hitting the cap. The first real
+run then stalled in `rbd trash purge` and worsened the already-degraded
+cluster, so it was stopped and the CronJob was suspended. Do not remove
+`suspend: true` until the capacity problem below is fixed and the
+`OSD_BACKFILLFULL` / `PG_RECOVERY_FULL` warnings have cleared.
 
 ### This does not solve capacity
 
