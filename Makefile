@@ -378,6 +378,11 @@ scripts-standardize-namespaces: ## Standardize namespace labels
 	@test -f $(SCRIPTS_DIR)/standardize-namespace-labels.sh || (echo "Script not found at $(SCRIPTS_DIR)/standardize-namespace-labels.sh" && exit 1)
 	@bash $(SCRIPTS_DIR)/standardize-namespace-labels.sh $(ARGS)
 
+.PHONY: scripts-ceph-snapshot-gc
+scripts-ceph-snapshot-gc: ## Inventory or delete orphaned Rook-Ceph CSI snapshots
+	@test -f $(SCRIPTS_DIR)/ceph-snapshot-gc.sh || (echo "Script not found at $(SCRIPTS_DIR)/ceph-snapshot-gc.sh" && exit 1)
+	@bash $(SCRIPTS_DIR)/ceph-snapshot-gc.sh $(ARGS)
+
 # =============================================================================
 # CLUSTER
 # =============================================================================
