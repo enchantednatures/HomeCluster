@@ -402,7 +402,9 @@ degraded cluster; the recurring throttled Job below is the safer path.
 at 04:30 UTC. It:
 
 - Deletes `VolumeSnapshotContent`s whose `VolumeSnapshot` no longer exists.
-- Purges expired RBD trash.
+- Removes expired RBD trash one dependency chain at a time. It deliberately
+  does not call the unbounded `rbd trash purge`, which stalled the first real
+  run.
 - Removes orphan `csi-snap-*` images that are not referenced by a live content,
   are older than `MIN_AGE_HOURS`, and have no clone children.
 - Logs `ceph df` before and after.

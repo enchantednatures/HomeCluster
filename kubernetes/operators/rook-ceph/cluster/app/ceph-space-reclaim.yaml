@@ -220,12 +220,11 @@ spec:
 
                   for pool in ${POOLS}; do
                     echo "=== ${pool}: expired trash ==="
-                    if [ "${DRY_RUN}" = "true" ]; then
-                      echo "[dry-run] expired trash entries: $(/usr/bin/rbd trash ls -p "${pool}" | wc -l)"
-                    else
-                      /usr/bin/rbd trash purge -p "${pool}" --no-progress || \
-                        echo "trash purge incomplete for ${pool} (dependent snapshots remain)"
-                    fi
+                    # Deliberately do NOT call `rbd trash purge` here. It walks
+                    # every expired image without a cap and stalled the first
+                    # real run on the degraded cluster. The first pass below
+                    # removes one dependency chain at a time under MAX_DELETIONS.
+                    echo "expired trash entries: $(/usr/bin/rbd trash ls -p "${pool}" | wc -l)"
 
                     # First pass: children of trashed volumes keep expired trash
                     # entries from being purged. Remove orphan snapshot children,
