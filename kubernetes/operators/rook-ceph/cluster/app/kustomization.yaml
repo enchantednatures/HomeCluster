@@ -41,5 +41,6 @@ resources:
   - ./ingress-tailscale.yaml
   - ./rbac-enhanced.yaml
   - ./backup-strategy-enhanced.yaml
+  - ./ceph-space-reclaim.yaml
   # Sample bucket claim for testing - comment out in production
   # - ./sample-bucket-claim.yaml

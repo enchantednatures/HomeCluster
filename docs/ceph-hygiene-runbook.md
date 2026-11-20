@@ -379,3 +379,69 @@ thirds of `ceph-blockpool` must fit on the 2.2 TiB SSD/NVMe class. Raising
 `full_ratio` to 0.96 restores writes but only buys the difference up to that
 ratio; it is a temporary lever, not capacity. Reduce replica count, add flash
 OSDs, or move bulk PVCs to `ceph-block-economy` to change the arithmetic.
+
+## 13. Automated space reclamation (2026-11-20)
+
+### One-time cleanup performed
+
+The historical `VolumeSnapshotContent` leak was cleaned on 2026-11-20:
+
+- `VolumeSnapshotContent`s dropped from 2,715 to 386, matching the 382 live
+  `VolumeSnapshot`s. This is API-only cleanup and frees no Ceph data.
+- 45 orphan `csi-snap-*` child images and 1 expired trash image were deleted.
+- 92 expired trash images remain. They have snapshot children, so they cannot
+  be purged until the orphan-image GC below removes those children.
+
+The one-time RBD deletion was deliberately stopped after it produced slow ops.
+Deleting thousands of images through `kubectl exec` is too aggressive for a
+degraded cluster; the recurring throttled Job below is the safer path.
+
+### CronJob/ceph-space-reclaim
+
+`kubernetes/operators/rook-ceph/cluster/app/ceph-space-reclaim.yaml` runs daily
+at 04:30 UTC. It:
+
+- Deletes `VolumeSnapshotContent`s whose `VolumeSnapshot` no longer exists.
+- Purges expired RBD trash.
+- Removes orphan `csi-snap-*` images that are not referenced by a live content,
+  are older than `MIN_AGE_HOURS`, and have no clone children.
+- Logs `ceph df` before and after.
+
+Safety defaults in the manifest:
+
+| Setting | Default | Meaning |
+|---|---|---|
+| `DRY_RUN` | `"true"` | Log intended deletions; change to `"false"` after validation. |
+| `MIN_AGE_HOURS` | `"24"` | Never touch in-flight snapshots. |
+| `MAX_DELETIONS` | `"25"` | Hard cap per run; the next run resumes. |
+| `SLEEP_SECONDS` | `"5"` | Throttle between actual deletions. |
+| `concurrencyPolicy` | `Forbid` | One run at a time. |
+
+Validate the dry run before enabling:
+
+```bash
+kubectl -n rook-ceph create job --from=cronjob/ceph-space-reclaim ceph-space-reclaim-dryrun-1
+kubectl -n rook-ceph logs -f job/ceph-space-reclaim-dryrun-1
+```
+
+When the log looks correct, set both `DRY_RUN` env values (init container and
+main container) to `"false"` and reconcile Flux. Raise `MAX_DELETIONS` only
+after the cluster is healthy and the slow-op warnings have cleared.
+
+### This does not solve capacity
+
+At the time of writing `ceph-blockpool` held 651 GiB of live data against a
+tier whose effective ceiling is set by the four 233 GiB `work-*` NVMe OSDs.
+The HDDs have 9.3 TiB free but can only contribute one replica per PG. The
+reclaim Job buys headroom; it does not change the arithmetic. Durable options:
+
+- Move bulk PVCs (`immich-library` 100Gi, `kellnr` 50Gi, `thanos-compact` 50Gi,
+  `influxdb` 2x50Gi, `netbootxyz-assets` 50Gi) to `ceph-block-economy` or a
+  new erasure-coded pool.
+- Add NVMe/SSD OSDs to the `work-*` hosts, or add hosts to the default CRUSH
+  root.
+- Reduce `ceph-blockpool` replica count only as a deliberate durability
+  trade-off. In this topology replica 2 does not increase per-host usable
+  capacity because each host still holds one full copy of its share.
+
+Do not treat `full_ratio` changes as a fix; they only move the cliff.

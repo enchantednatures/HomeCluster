@@ -1,0 +1,367 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/cronjob.json
+# Recurring, throttled reclamation of historical CSI snapshot leaks.
+#
+# Why this exists: volume-snapshot-automation historically used a Retain
+# VolumeSnapshotClass, so deleting a VolumeSnapshot left its
+# VolumeSnapshotContent and backing csi-snap-* RBD image behind. The class is
+# now Delete and the retention window is 3 days, but old leaks remain. See
+# docs/ceph-hygiene-runbook.md sections 12 and 13.
+#
+# Safety rules enforced here:
+#   - Never delete an image referenced by a live VolumeSnapshotContent.
+#   - Never delete an image younger than MIN_AGE_HOURS (in-flight snapshots).
+#   - Never delete an image that still has clone children (restored PVCs).
+#   - Expired trash is purged, but a trash image is kept if any live snapshot
+#     or non-snapshot child still depends on it.
+#   - Deletions are capped per run and throttled with sleep, so this job cannot
+#     hammer an already-degraded cluster.
+#
+# Start with DRY_RUN "true", inspect the Job logs, then flip it to "false".
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ceph-space-reclaim
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-space-reclaim
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  schedule: "30 4 * * *"
+  timeZone: "UTC"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 21600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ceph-space-reclaim
+            app.kubernetes.io/component: maintenance
+        spec:
+          restartPolicy: Never
+          serviceAccountName: volume-snapshot-controller
+          securityContext:
+            fsGroup: 2016
+          initContainers:
+            - name: snapshot-inventory
+              image: bitnami/kubectl@sha256:8f59408f9e896fc8992a0660a56687545bd06751f26531b4a26fca6d5dc7562d # digest pin of bitnami/kubectl:latest; satisfies Kyverno disallow-latest-tag
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -o errexit -o pipefail
+
+                  kubectl get volumesnapshot -A -o json > /work/volumesnapshots.json
+                  kubectl get volumesnapshotcontent -o json > /work/volumesnapshotcontents.json
+
+                  # UUIDs of handles referenced by a VolumeSnapshot that still exists.
+                  jq -r --slurpfile vs /work/volumesnapshots.json '
+                    .items[]
+                    | select(
+                        .spec.volumeSnapshotRef.uid as $uid
+                        | ($vs[0].items | map(.metadata.uid) | index($uid)) != null
+                      )
+                    | .status.snapshotHandle // empty
+                  ' /work/volumesnapshotcontents.json \
+                    | sed 's/.*-//' \
+                    | sort -u > /work/live-handles.txt
+
+                  # Contents whose VolumeSnapshot is gone.
+                  jq -r --slurpfile vs /work/volumesnapshots.json '
+                    .items[]
+                    | select(
+                        .spec.volumeSnapshotRef.uid as $uid
+                        | ($vs[0].items | map(.metadata.uid) | index($uid)) == null
+                      )
+                    | .metadata.name
+                  ' /work/volumesnapshotcontents.json > /work/orphan-contents.txt
+
+                  echo "live snapshot handles: $(wc -l < /work/live-handles.txt)"
+                  echo "orphan VolumeSnapshotContents: $(wc -l < /work/orphan-contents.txt)"
+
+                  if [ "${DRY_RUN}" = "true" ]; then
+                    echo "[dry-run] not deleting orphan VolumeSnapshotContents"
+                    exit 0
+                  fi
+
+                  if [ -s /work/orphan-contents.txt ]; then
+                    xargs -P 8 -I{} bash -c '
+                      content="$1"
+                      kubectl patch volumesnapshotcontent "${content}" \
+                        --type=merge \
+                        -p "{\"metadata\":{\"finalizers\":[]}}" >/dev/null 2>&1 || true
+                      kubectl delete volumesnapshotcontent "${content}" \
+                        --ignore-not-found --wait=false >/dev/null 2>&1 || true
+                    ' _ {} < /work/orphan-contents.txt
+                  fi
+
+                  echo "orphan VolumeSnapshotContents remaining: $(kubectl get volumesnapshotcontent --no-headers 2>/dev/null | wc -l) total"
+              env:
+                - name: DRY_RUN
+                  value: "true"
+                - name: HOME
+                  value: /work
+              volumeMounts:
+                - name: work
+                  mountPath: /work
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsNonRoot: true
+                runAsUser: 1001
+                runAsGroup: 2016
+          containers:
+            - name: reclaim
+              image: rook/ceph:v1.21.2 # datasource=docker depName=rook/ceph
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -o errexit -o pipefail
+
+                  # Render keyring + ceph.conf (upstream rook toolbox pattern)
+                  ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+                  KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+                  CEPH_CONFIG="/etc/ceph/ceph.conf"
+                  KEYRING_FILE="/etc/ceph/keyring"
+
+                  ceph_secret=$(cat "${KEYRING_MOUNT}")
+                  cat <<EOF > "${KEYRING_FILE}"
+                  [${ROOK_CEPH_USERNAME}]
+                  key = ${ceph_secret}
+                  EOF
+
+                  # shellcheck disable=SC2001
+                  mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+                  cat <<EOF > "${CEPH_CONFIG}"
+                  [global]
+                  mon_host = ${mon_endpoints}
+
+                  [client.admin]
+                  keyring = ${KEYRING_FILE}
+                  EOF
+
+                  DRY_RUN="${DRY_RUN:-true}"
+                  MIN_AGE_HOURS="${MIN_AGE_HOURS:-24}"
+                  MAX_DELETIONS="${MAX_DELETIONS:-25}"
+                  SLEEP_SECONDS="${SLEEP_SECONDS:-5}"
+                  POOLS="${POOLS:-ceph-blockpool ceph-blockpool-ssd ceph-blockpool-economy}"
+
+                  deleted=0
+
+                  delete_image() {
+                    local pool="$1"
+                    local image="$2"
+                    local reason="$3"
+                    local out
+                    local rc=0
+
+                    if [ "${deleted}" -ge "${MAX_DELETIONS}" ]; then
+                      return 1
+                    fi
+
+                    # A clone child means a restored PVC still depends on this image.
+                    if [ -n "$(/usr/bin/rbd children -p "${pool}" "${image}" --format json 2>/dev/null | jq -r '.[].image' 2>/dev/null || true)" ]; then
+                      echo "skip ${pool}/${image}: has clone children"
+                      return 0
+                    fi
+
+                    if [ "${DRY_RUN}" = "true" ]; then
+                      echo "[dry-run] would delete ${pool}/${image} (${reason})"
+                      deleted=$((deleted + 1))
+                      return 0
+                    fi
+
+                    out=$(/usr/bin/rbd snap purge -p "${pool}" "${image}" --no-progress 2>&1) || rc=$?
+                    if [ "${rc}" -ne 0 ]; then
+                      echo "skip ${pool}/${image}: snap purge failed: ${out}"
+                      return 0
+                    fi
+
+                    rc=0
+                    out=$(/usr/bin/rbd rm -p "${pool}" "${image}" --no-progress 2>&1) || rc=$?
+                    if [ "${rc}" -eq 0 ]; then
+                      echo "deleted ${pool}/${image} (${reason})"
+                      deleted=$((deleted + 1))
+                      sleep "${SLEEP_SECONDS}"
+                    elif printf '%s' "${out}" | grep -q "No such file"; then
+                      echo "skip ${pool}/${image}: already gone"
+                    else
+                      echo "skip ${pool}/${image}: rm failed: ${out}"
+                    fi
+                    return 0
+                  }
+
+                  echo "=== ceph df before ==="
+                  ceph df
+
+                  for pool in ${POOLS}; do
+                    echo "=== ${pool}: expired trash ==="
+                    if [ "${DRY_RUN}" = "true" ]; then
+                      echo "[dry-run] expired trash entries: $(/usr/bin/rbd trash ls -p "${pool}" | wc -l)"
+                    else
+                      /usr/bin/rbd trash purge -p "${pool}" --no-progress || \
+                        echo "trash purge incomplete for ${pool} (dependent snapshots remain)"
+                    fi
+
+                    # First pass: children of trashed volumes keep expired trash
+                    # entries from being purged. Remove orphan snapshot children,
+                    # then purge the parent only when nothing live depends on it.
+                    while read -r id; do
+                      [ -n "${id}" ] || continue
+                      [ "${deleted}" -ge "${MAX_DELETIONS}" ] && break
+
+                      children=$(/usr/bin/rbd children -p "${pool}" --image-id "${id}" --format json 2>/dev/null | jq -r '.[].image' 2>/dev/null || true)
+                      keep_parent=0
+
+                      for child in ${children}; do
+                        case "${child}" in
+                          csi-snap-*)
+                            uuid="${child#csi-snap-}"
+                            if grep -qx "${uuid}" /work/live-handles.txt; then
+                              echo "keep trash ${pool}/${id}: live snapshot ${child}"
+                              keep_parent=1
+                              continue
+                            fi
+                            if ! delete_image "${pool}" "${child}" "orphan child of trash ${id}"; then
+                              keep_parent=1
+                              break
+                            fi
+                            ;;
+                          *)
+                            echo "keep trash ${pool}/${id}: non-snapshot child ${child}"
+                            keep_parent=1
+                            ;;
+                        esac
+                      done
+
+                      if [ "${keep_parent}" -eq 0 ] && [ "${deleted}" -lt "${MAX_DELETIONS}" ]; then
+                        if [ "${DRY_RUN}" = "true" ]; then
+                          echo "[dry-run] would purge trash ${pool}/${id}"
+                          deleted=$((deleted + 1))
+                        else
+                          /usr/bin/rbd snap purge -p "${pool}" --image-id "${id}" --no-progress >/dev/null 2>&1 || true
+                          if /usr/bin/rbd trash rm -p "${pool}" --image-id "${id}" --no-progress >/dev/null 2>&1; then
+                            echo "purged trash ${pool}/${id}"
+                            sleep "${SLEEP_SECONDS}"
+                          else
+                            echo "skip trash ${pool}/${id}: dependencies remain"
+                          fi
+                        fi
+                      fi
+                    done < <(/usr/bin/rbd trash ls -p "${pool}" | awk '{print $1}')
+
+                    # Second pass: orphan snapshot images of live volumes.
+                    # rbd info filters out stale directory entries left by
+                    # previous rbd rm calls; the age gate protects in-flight
+                    # snapshots.
+                    while read -r image; do
+                      [ -n "${image}" ] || continue
+                      [ "${deleted}" -ge "${MAX_DELETIONS}" ] && break
+
+                      uuid="${image#csi-snap-}"
+                      grep -qx "${uuid}" /work/live-handles.txt && continue
+
+                      info=$(/usr/bin/rbd info -p "${pool}" "${image}" --format json 2>/dev/null) || continue
+                      create_ts=$(printf '%s' "${info}" | jq -r '.create_timestamp // empty' 2>/dev/null || true)
+                      [ -n "${create_ts}" ] || continue
+                      create_epoch=$(date -u -d "${create_ts}" +%s 2>/dev/null || true)
+                      [ -n "${create_epoch}" ] || continue
+
+                      age_hours=$(( ( $(date -u +%s) - create_epoch ) / 3600 ))
+                      [ "${age_hours}" -lt "${MIN_AGE_HOURS}" ] && continue
+
+                      delete_image "${pool}" "${image}" "orphan snapshot age ${age_hours}h"
+                    done < <(/usr/bin/rbd ls -p "${pool}" | grep '^csi-snap-')
+                  done
+
+                  echo "=== ceph df after ==="
+                  ceph df
+                  echo "deletions counted this run: ${deleted} (dry-run=${DRY_RUN})"
+              env:
+                - name: ROOK_CEPH_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: rook-ceph-mon
+                      key: ceph-username
+                - name: DRY_RUN
+                  value: "true"
+                - name: MIN_AGE_HOURS
+                  value: "24"
+                - name: MAX_DELETIONS
+                  value: "25"
+                - name: SLEEP_SECONDS
+                  value: "5"
+                - name: POOLS
+                  value: "ceph-blockpool ceph-blockpool-ssd ceph-blockpool-economy"
+              volumeMounts:
+                - name: ceph-config
+                  mountPath: /etc/ceph
+                - name: mon-endpoint-volume
+                  mountPath: /etc/rook
+                  readOnly: true
+                - name: ceph-admin-secret
+                  mountPath: /var/lib/rook-ceph-mon
+                  readOnly: true
+                - name: work
+                  mountPath: /work
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 512Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop:
+                    - ALL
+                runAsNonRoot: true
+                runAsUser: 2016
+                runAsGroup: 2016
+          volumes:
+            - name: ceph-admin-secret
+              secret:
+                secretName: rook-ceph-mon
+                optional: false
+                items:
+                  - key: ceph-secret
+                    path: secret.keyring
+            - name: mon-endpoint-volume
+              configMap:
+                name: rook-ceph-mon-endpoints
+                items:
+                  - key: data
+                    path: mon-endpoints
+            - name: ceph-config
+              emptyDir: {}
+            - name: work
+              emptyDir: {}
+          tolerations:
+            - key: "node.kubernetes.io/unreachable"
+              operator: "Exists"
+              effect: "NoExecute"
+              tolerationSeconds: 5
+            - key: "node.kubernetes.io/not-ready"
+              operator: "Exists"
+              effect: "NoExecute"
+              tolerationSeconds: 5
