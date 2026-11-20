@@ -105,7 +105,7 @@ spec:
                   echo "orphan VolumeSnapshotContents remaining: $(kubectl get volumesnapshotcontent --no-headers 2>/dev/null | wc -l) total"
               env:
                 - name: DRY_RUN
-                  value: "true"
+                  value: "false"
                 - name: HOME
                   value: /work
               volumeMounts:
@@ -302,7 +302,7 @@ spec:
                       name: rook-ceph-mon
                       key: ceph-username
                 - name: DRY_RUN
-                  value: "true"
+                  value: "false"
                 - name: MIN_AGE_HOURS
                   value: "24"
                 - name: MAX_DELETIONS

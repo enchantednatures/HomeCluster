@@ -411,22 +411,17 @@ Safety defaults in the manifest:
 
 | Setting | Default | Meaning |
 |---|---|---|
-| `DRY_RUN` | `"true"` | Log intended deletions; change to `"false"` after validation. |
+| `DRY_RUN` | `"false"` | Deletions enabled on 2026-11-20 after a validated dry run. Set to `"true"` to pause deletions while keeping the inventory. |
 | `MIN_AGE_HOURS` | `"24"` | Never touch in-flight snapshots. |
 | `MAX_DELETIONS` | `"25"` | Hard cap per run; the next run resumes. |
 | `SLEEP_SECONDS` | `"5"` | Throttle between actual deletions. |
 | `concurrencyPolicy` | `Forbid` | One run at a time. |
 
-Validate the dry run before enabling:
-
-```bash
-kubectl -n rook-ceph create job --from=cronjob/ceph-space-reclaim ceph-space-reclaim-dryrun-1
-kubectl -n rook-ceph logs -f job/ceph-space-reclaim-dryrun-1
-```
-
-When the log looks correct, set both `DRY_RUN` env values (init container and
-main container) to `"false"` and reconcile Flux. Raise `MAX_DELETIONS` only
-after the cluster is healthy and the slow-op warnings have cleared.
+The dry run was validated on 2026-11-20: it found 321 live handles, 1 orphan
+content, and 25 orphan child deletions before hitting the cap. To pause the
+job, set both `DRY_RUN` env values (init container and main container) to
+`"true"` and reconcile Flux. Raise `MAX_DELETIONS` only after the cluster is
+healthy and the slow-op warnings have cleared.
 
 ### This does not solve capacity
 
