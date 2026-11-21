@@ -100,7 +100,11 @@ spec:
     - metadata:
         name: data
       spec:
-        storageClassName: ceph-block
+        # Thanos Compact's data dir is scratch: durable blocks live in the
+        # object store (RustFS/S3) and are re-fetched on demand. Keep this off
+        # the flash tiers; HDD economy is sufficient and reclaims ~47Gi from
+        # the full ceph-blockpool.
+        storageClassName: ceph-block-economy
         accessModes:
           - ReadWriteOnce
         resources:
