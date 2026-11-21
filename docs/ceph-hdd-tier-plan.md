@@ -138,3 +138,24 @@ ceph fs status
 ceph df detail
 kubectl get pvc -A -o custom-columns=NS:.metadata.namespace,NAME:.metadata.name,SC:.spec.storageClassName,SIZE:.spec.resources.requests.storage
 ```
+
+## 2026-11-21: thanos-compact moved to economy
+
+`data-thanos-compact-0` held 46.9 GiB of actual data on `ceph-block`. The
+StatefulSet `volumeClaimTemplate` now uses `ceph-block-economy` (commit
+`acf050a6`), and the scratch volume was recreated.
+
+The old volume had 12 `csi-snap-*` children: 4 current daily snapshots plus 8
+older orphans. The live `VolumeSnapshot`s were deleted, the orphan children
+were removed, and the parent image was purged. Thanos Compact re-synced from
+the object store and resumed compaction on economy.
+
+Result:
+
+- `ceph-blockpool`: 660 GiB / 100% -> 646 GiB / ~93%, max avail 44 GiB.
+- Cluster: `HEALTH_ERR` -> `HEALTH_WARN`.
+- `ceph-blockpool-economy`: ~59 MiB used of 4.5 TiB available.
+
+`thanos-store` remains on `ceph-block` (5Gi claim, ~2Gi used); it is not worth
+the migration risk yet. VolSync is paused; consider pausing the daily
+`volume-snapshot-automation` CronJob too until the cluster is fully clean.
