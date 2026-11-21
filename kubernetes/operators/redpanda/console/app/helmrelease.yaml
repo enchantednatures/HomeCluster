@@ -12,7 +12,7 @@ spec:
   chart:
     spec:
       chart: console
-      version: 3.9.0 # datasource=helm depName=console repository=https://charts.redpanda.com
+      version: 3.15.0 # datasource=helm depName=console repository=https://charts.redpanda.com
       sourceRef:
         kind: HelmRepository
         name: redpanda-charts
