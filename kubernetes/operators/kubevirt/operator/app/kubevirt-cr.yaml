@@ -15,14 +15,6 @@ spec:
         - HotplugVolumes
         - HostDevices
     permittedHostDevices:
-      pciHostDevices:
-        # The RTX 3080 and its audio function are intentionally not listed.
-        # They are used by the host NVIDIA driver for Ollama instead.
-        - pciVendorSelector: "8086:7A60"
-          resourceName: "usb/intel-xhci"
-        - pciVendorSelector: "1B73:1100"
-          resourceName: "usb/fresco-xhci"
-        - pciVendorSelector: "144D:A808"
-          resourceName: "nvme/samsung-970"
+      pciHostDevices: []
   customizeComponents: {}
   imagePullPolicy: IfNotPresent

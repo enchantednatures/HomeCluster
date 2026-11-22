@@ -1,8 +1,9 @@
 # gateway-1 NVIDIA GPU and Ollama
 
 `gateway-1` is the bare-metal gaming desktop. Its RTX 3080 was previously
-passed through to the `rusalka` KubeVirt workstation. It now runs on the host
-and serves the `ollama` workload in Kubernetes.
+passed through to the `rusalka` KubeVirt workstation, which has been removed.
+It now runs on the host and serves the `ollama` workload in Kubernetes; it is
+also used by the native Windows gaming boot.
 
 ## Current layout
 
@@ -123,18 +124,13 @@ The text-only import prompt is less explicit; Gemma 3 12B may return
 ingredients. Prefer the image/PDF import path for text recipes, or use a model
 that emits ingredient strings for the text import.
 
-## Reverting to rusalka
+## Removed: rusalka
 
-Restore the GPU passthrough in all three places together:
-
-1. Re-add `PCIDriverRebindConfig` for `0000:07:00.0` and `0000:07:00.1` to the
-   Talos machine configuration.
-2. Re-add the two RTX 3080 entries to KubeVirt `permittedHostDevices`.
-3. Re-add `gpus` and the GPU audio `hostDevices` to the `rusalka` VM, set
-   `runStrategy: Always`, and remove the Ollama deployment or point it at a
-   different GPU node.
-
-Rusalka and the host NVIDIA driver cannot own the GPU at the same time.
+The `rusalka` VM, its DataVolumes, PVCs, Tailscale service, cloud-init secret,
+and VFIO dock binder have been removed. `gateway-1` no longer exposes the
+Samsung 970 or USB controllers as KubeVirt host devices. Reintroducing the VM
+would require re-adding the host-device entries, the VFIO binder, and the VM
+manifests; there is no Git history for the VM's guest data.
 
 ## Known issue
 

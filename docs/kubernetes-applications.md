@@ -237,7 +237,7 @@ GPU-backed local LLM server running on the RTX 3080 in `gateway-1`.
   OpenAI-compatible endpoint
 
 See `docs/gateway-1-nvidia.md` for the Talos image, machine-config changes,
-GPU operator workarounds, and how to hand the GPU back to `rusalka`.
+and GPU operator workarounds.
 
 ### SearXNG
 **Location**: `kubernetes/apps/default/searxng/`
@@ -329,69 +329,11 @@ Internet Relay Chat server for real-time communication.
 ### Virtual Machines
 **Location**: `kubernetes/apps/vms/`
 
-KubeVirt-based virtual machine workloads running on Kubernetes.
-
-#### Rusalka VM
-**Path**: `kubernetes/apps/vms/rusalka/`
-
-Persistent Arch Linux workstation booted from the official Arch cloud image
-under cloud-init, with USB and NVMe passthrough on `gateway-1`. The RTX 3080
-was later reclaimed by the host for the Ollama workload, and the VM is halted:
-
-**Components**:
-- **DataVolume**: `rusalka-root`, 120 GiB on `ceph-block-ssd`, imported from
-  the pinned Arch `cloudimg` qcow2
-- **VirtualMachine**: `rusalka`, 8 vCPU and 16 GiB, BIOS
-  `pc-q35-rhel9.2.0`, stable MAC `f2:5a:1c:9e:00:01`
-- **Passthrough**: Intel XHCI USB, Fresco USB, and Samsung 970 NVMe
-- **Service**: `rusalka-ssh`, Tailscale `LoadBalancer` on port 22 only
-
-**Features**:
-- SSH as `hcasten` over Tailscale at `rusalka` /
-  `rusalka.rya-bebop.ts.net`, key-only, with password SSH disabled. Root key
-  login is allowed with `PermitRootLogin prohibit-password`; the root password
-  is disabled.
-- VNC through the KubeVirt subresource with `virtctl vnc`, not a guest port
-  5900 and not a Service port.
-- Cloud-init Secret `rusalka-cloud-init` holds both `userdata` and `userData`.
-  cloud-init runs on first boot only, so key changes need the Secret updated
-  and the VM rebuilt or recreated.
-- No Cloudflared ingress and no public SSH. Access is Tailscale only.
-- Omarchy is installed manually after Arch boots; no desktop is installed
-  automatically.
-- **No VolSync backup**: deleting the DataVolume also deletes the
-  `ceph-block-ssd` volume, and the data is not recoverable
-
-See `kubernetes/apps/vms/README.md` for SSH and VNC setup, the cloud-init
-rotation caveat, and the manual Omarchy handoff.
-
-```mermaid
-graph TB
-    subgraph "Virtual Machine Architecture"
-        subgraph "KubeVirt"
-            VM[Virtual Machine]
-            DV[DataVolume]
-            VMI[VM Instance]
-        end
-
-        subgraph "Storage"
-            PV[Persistent Volume]
-            STORAGE_CLASS[Storage Class]
-        end
-
-        subgraph "Networking"
-            SVC[SSH Service]
-            TS[Tailscale]
-        end
-    end
-
-    VM --> VMI
-    VM --> DV
-    DV --> PV
-    PV --> STORAGE_CLASS
-    VMI --> SVC
-    SVC --> TS
-```
+KubeVirt is installed, but there are no VMs currently. The `rusalka` Arch
+workstation was removed; its DataVolumes, PVCs, Tailscale service, cloud-init
+secret, and VFIO dock binder are gone, and `gateway-1` no longer exposes the
+Samsung 970 or USB controllers as KubeVirt host devices. The `vms` namespace
+remains for future KubeVirt workloads.
 
 ## Application Management
 
