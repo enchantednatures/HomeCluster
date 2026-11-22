@@ -10,7 +10,7 @@ spec:
   paused: "false"
   arguments: "-o experimental-prometheus-rw --tag testid=smoke"
   initializer:
-    image: grafana/k6:2.3.0
+    image: grafana/k6:2.4.0
     resources:
       requests:
         cpu: 50m
@@ -22,7 +22,7 @@ spec:
       name: k6-scripts
       file: smoke.js
   runner:
-    image: grafana/k6:2.3.0
+    image: grafana/k6:2.4.0
     env:
       - name: K6_PROMETHEUS_RW_SERVER_URL
         value: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
