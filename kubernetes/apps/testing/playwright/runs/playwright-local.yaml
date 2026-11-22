@@ -13,7 +13,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: playwright
-          image: mcr.microsoft.com/playwright:v1.65.0-noble
+          image: mcr.microsoft.com/playwright:v1.65.1-noble
           workingDir: /work
           command:
             - bash
