@@ -50,7 +50,7 @@ spec:
             image:
               repository: ghcr.io/0xerr0r/blocky
               # datasource=docker depName=0xERR0R/blocky registry=https://ghcr.io
-              tag: v0.35.0@sha256:4839fe25fb0e2bca95821909098520e771434c62625d5f5f18cfeef6c1631c5d
+              tag: v0.37.0@sha256:ebecf90fd303527bda82bbd7f729b8613593c52e770dd722b64d1599dad0b77f
             args:
               - --config
               - /app/config.yml
