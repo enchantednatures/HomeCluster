@@ -43,7 +43,7 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 0
-      activeDeadlineSeconds: 21600
+      activeDeadlineSeconds: 86400
       template:
         metadata:
           labels:
@@ -76,7 +76,11 @@ spec:
                       )
                     | .status.snapshotHandle // empty
                   ' /work/volumesnapshotcontents.json \
-                    | sed 's/.*-//' \
+                    # snapshotHandle ends in the full 36-char snapshot UUID.
+                    # Do NOT use `sed 's/.*-//'`: that truncates at the last
+                    # hyphen and never matches csi-snap-<uuid>, which made the
+                    # old sweep treat live snapshot images as orphans.
+                    | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' \
                     | sort -u > /work/live-handles.txt
 
                   # Contents whose VolumeSnapshot is gone.
@@ -311,9 +315,9 @@ spec:
                 - name: MIN_AGE_HOURS
                   value: "24"
                 - name: MAX_DELETIONS
-                  value: "25"
+                  value: "1000"
                 - name: SLEEP_SECONDS
-                  value: "5"
+                  value: "1"
                 - name: POOLS
                   value: "ceph-blockpool ceph-blockpool-ssd ceph-blockpool-economy"
               volumeMounts:
