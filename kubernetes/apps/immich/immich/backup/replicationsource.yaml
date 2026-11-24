@@ -7,7 +7,6 @@ metadata:
   name: immich-backup
   namespace: immich
 spec:
-  paused: true
   sourcePVC: immich-library-pvc
   trigger:
     # Run backup daily at 2:20 AM (staggered against other VolSync schedules)

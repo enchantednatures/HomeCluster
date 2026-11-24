@@ -7,7 +7,6 @@ metadata:
   name: kellnr-backup
   namespace: kellnr
 spec:
-  paused: true
   sourcePVC: kellnr
   trigger:
     # Run backup daily at 3 AM (staggered against other VolSync schedules)
