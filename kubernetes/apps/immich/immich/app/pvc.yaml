@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: immich
     app.kubernetes.io/instance: immich
 spec:
-  storageClassName: ceph-block
+  storageClassName: ceph-block-economy
   accessModes:
     - ReadWriteOnce
   resources:

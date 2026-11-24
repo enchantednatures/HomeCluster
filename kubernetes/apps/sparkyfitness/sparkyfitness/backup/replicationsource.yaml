@@ -20,7 +20,7 @@ spec:
       monthly: 12
     pruneIntervalDays: 7
     storageClassName: ceph-block
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
     moverPodLabels:
       app: volsync-sparkyfitness-backup

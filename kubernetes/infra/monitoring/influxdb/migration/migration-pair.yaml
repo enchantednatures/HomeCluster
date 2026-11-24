@@ -21,7 +21,7 @@ spec:
     # kubectl logs -n monitoring job/volsync-influxdb-to-ceph-...
     # Set addressConfigured by the destination's shared rsync-tls endpoint once paired
     storageClassName: ceph-block
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
     # influxdb (1000:1000) content ownership
     moverSecurityContext:
@@ -48,7 +48,7 @@ spec:
     # `destinationPVC`: a new PVC influxdb-influxdb2 on ceph-block (see influxdb/app/helmrelease.yaml edit)
     copyMethod: Direct
     storageClassName: ceph-block
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
     moverSecurityContext:
       runAsNonRoot: true

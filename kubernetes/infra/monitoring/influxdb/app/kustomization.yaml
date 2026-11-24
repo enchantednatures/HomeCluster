@@ -9,7 +9,6 @@ resources:
   - ./servicemonitor.yaml
   - ./virtualservice.yaml
   - ./destinationrule.yaml
-  - ./pvc.yaml
   - ./service.yaml
   - ./service-external.yaml
   - ./configmap.yaml

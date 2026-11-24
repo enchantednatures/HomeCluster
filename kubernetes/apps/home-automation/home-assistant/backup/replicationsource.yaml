@@ -21,7 +21,7 @@ spec:
       monthly: 12
     pruneIntervalDays: 7
     storageClassName: ceph-block
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
     # Home Assistant runs as root and writes .storage/auth as 0600; the
     # default restic mover uid (65532) cannot read it.

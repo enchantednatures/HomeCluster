@@ -16,7 +16,7 @@ spec:
     repository: erpnext-backup-secret
     copyMethod: Direct
     destinationPVC: erpnext-sites
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
     # erpnext-sites is RWX, but the cache PVC lands on ceph-block (RBD, RWO-only);
     # VolSync would derive RWX from the destination PVC, so pin the access mode

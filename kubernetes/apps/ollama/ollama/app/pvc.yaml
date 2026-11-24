@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/name: ollama
     app.kubernetes.io/instance: ollama
 spec:
-  storageClassName: ceph-block-ssd
+  storageClassName: ceph-block-economy
   accessModes:
     - ReadWriteOnce
   resources:

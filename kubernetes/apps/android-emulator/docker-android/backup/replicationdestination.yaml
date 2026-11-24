@@ -20,5 +20,5 @@ spec:
         cpu: 500m
         memory: 512Mi
     destinationPVC: docker-android-data
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi

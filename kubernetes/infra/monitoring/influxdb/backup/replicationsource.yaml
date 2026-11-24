@@ -7,9 +7,9 @@ metadata:
   name: influxdb-backup
   namespace: monitoring
 spec:
-  # Live-verified 2026-09-09: the static influxdb-data PVC (../app/pvc.yaml) is
-  # Pending/unbound; the chart-created influxdb-influxdb2 PVC (ceph-block,
-  # 50Gi) is the actual data volume mounted by influxdb-influxdb2-0
+  # The static influxdb-data PVC was removed (never mounted); the chart-created
+  # influxdb-influxdb2 PVC is the actual data volume mounted by
+  # influxdb-influxdb2-0. New volumes are placed on ceph-block-economy.
   sourcePVC: influxdb-influxdb2
   trigger:
     # Run backup daily at 3:20 AM
@@ -30,7 +30,7 @@ spec:
     # requires the mover to schedule on the PV's node
     storageClassName: ceph-block
     # Cache for faster incremental backups
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
     # Mover runs as uid/gid 1000 to read files owned by influxdb (1000:1000)
     moverSecurityContext:

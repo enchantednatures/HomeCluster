@@ -26,7 +26,7 @@ spec:
     # Storage for the mover pod (temporary, during backup)
     storageClassName: ceph-block
     # Cache for faster incremental backups
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
     # erpnext-sites is RWX, but the cache PVC lands on ceph-block (RBD, RWO-only);
     # VolSync would derive RWX from the source PVC, so pin the access mode

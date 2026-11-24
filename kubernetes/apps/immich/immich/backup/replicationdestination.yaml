@@ -16,5 +16,5 @@ spec:
     repository: immich-backup-secret
     copyMethod: Direct
     destinationPVC: immich-library-pvc
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi

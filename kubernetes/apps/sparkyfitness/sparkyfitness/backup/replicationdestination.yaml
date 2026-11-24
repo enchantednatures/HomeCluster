@@ -20,5 +20,5 @@ spec:
     copyMethod: Direct
     destinationPVC: sparkyfitness-uploads-restore
     capacity: 10Gi
-    cacheStorageClassName: ceph-block
+    cacheStorageClassName: ceph-block-economy
     cacheCapacity: 10Gi
