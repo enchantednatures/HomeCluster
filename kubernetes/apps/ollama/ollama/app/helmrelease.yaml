@@ -32,7 +32,7 @@ spec:
   values:
     controllers:
       ollama:
-        replicas: 1
+        replicas: 0
         strategy: Recreate
         pod:
           nodeSelector:
