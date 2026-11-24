@@ -68,6 +68,10 @@ spec:
                   kubectl get volumesnapshotcontent -o json > /work/volumesnapshotcontents.json
 
                   # UUIDs of handles referenced by a VolumeSnapshot that still exists.
+                  # snapshotHandle ends in the full 36-char snapshot UUID; do NOT
+                  # use `sed 's/.*-//'`, which truncates at the last hyphen and
+                  # never matches csi-snap-<uuid> (the old sweep then treated live
+                  # snapshot images as orphans).
                   jq -r --slurpfile vs /work/volumesnapshots.json '
                     .items[]
                     | select(
@@ -76,10 +80,6 @@ spec:
                       )
                     | .status.snapshotHandle // empty
                   ' /work/volumesnapshotcontents.json \
-                    # snapshotHandle ends in the full 36-char snapshot UUID.
-                    # Do NOT use `sed 's/.*-//'`: that truncates at the last
-                    # hyphen and never matches csi-snap-<uuid>, which made the
-                    # old sweep treat live snapshot images as orphans.
                     | grep -oE '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}' \
                     | sort -u > /work/live-handles.txt
 
