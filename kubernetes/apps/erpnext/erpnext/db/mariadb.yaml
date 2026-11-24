@@ -21,6 +21,18 @@ spec:
     limits:
       cpu: "2"
       memory: 2Gi
+  # The operator default (20s delay, 3 failures) kills MariaDB during Aria
+  # crash recovery, which took ~70s after the 2026-11-24 storage incident.
+  # Gate liveness on a startup probe that allows up to five minutes.
+  startupProbe:
+    exec:
+      command:
+        - bash
+        - -c
+        - mariadb -u root -p"$${MARIADB_ROOT_PASSWORD}" -e "SELECT 1;"
+    periodSeconds: 10
+    failureThreshold: 30
+    timeoutSeconds: 5
   myCnf: |
     [mysqld]
     skip-character-set-client-handshake
