@@ -23,15 +23,17 @@
 # v7: frappe/erpnext v16.54.0. The image bump changes the pod template, and Job
 # templates are immutable, so the name is versioned again. The insert is idempotent,
 # so re-running it against the live site is a no-op.
+# v8: frappe/erpnext v16.60.0 (chart 8.0.93). Same immutability bump as v7; the
+# host_name set-config and the idempotent Social Login Key insert are unchanged.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: erpnext-sso-v7
+  name: erpnext-sso-v8
   namespace: erpnext
   labels:
     app.kubernetes.io/name: erpnext
     app.kubernetes.io/instance: erpnext
-    app.kubernetes.io/version: "v16.50.0"
+    app.kubernetes.io/version: "v16.60.0"
     app.kubernetes.io/component: sso
 spec:
   backoffLimit: 0
