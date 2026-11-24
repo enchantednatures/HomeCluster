@@ -6,12 +6,13 @@ ERPNext v16 (Frappe) on MariaDB + Valkey, deployed via Flux in the `erpnext` nam
 
 | Component | Source | Notes |
 |---|---|---|
-| ERPNext | Official Frappe Helm chart `erpnext` 8.0.84 (image `frappe/erpnext:v16.50.0`) | Full bench stack: gunicorn, nginx, socket.io, scheduler, workers default/short/long. All bundled DB/cache subcharts are disabled except Valkey |
+| ERPNext | Official Frappe Helm chart `erpnext` 8.0.93 (image `frappe/erpnext:v16.60.0`) | Full bench stack: gunicorn, nginx, socket.io, scheduler, workers default/short/long. All bundled DB/cache subcharts are disabled except Valkey |
 | MariaDB | mariadb-operator `MariaDB` CR `erpnext-db` | Single instance, MariaDB 12.3.3, `utf8mb4` / `utf8mb4_unicode_ci`, 20Gi on `ceph-block-ssd`, root secret `erpnext-db-root` |
 | Cache / queue | Chart-bundled Valkey subcharts (`valkey-cache`, `valkey-queue`) | `erpnext-valkey-cache` / `erpnext-valkey-queue` on port 6379, passwordless |
 | Sites volume | PVC `erpnext-sites` | 20Gi, `ReadWriteMany`, `ceph-filesystem`. Shared by every app pod and the one-shot jobs |
-| create-site job | `erpnext-create-site-v2` Job | One-shot `bench new-site`. Immutable, bump `-vN` to re-run |
-| SSO job | `erpnext-sso-v3` Job | One-shot: sets the site `host_name`, then creates the Authentik Social Login Key idempotently |
+| create-site job | `erpnext-create-site-v6` Job | One-shot `bench new-site`. Immutable, bump `-vN` to re-run |
+| migrate job | `erpnext-migrate-v1` Job | One-shot `bench migrate` in maintenance mode, required for each image bump. Immutable, bump `-vN` to re-run |
+| SSO job | `erpnext-sso-v8` Job | One-shot: sets the site `host_name`, then creates the Authentik Social Login Key idempotently |
 | Exposer | Istio `VirtualService` `erpnext` | Websocket-safe route (no request timeout) |
 
 ## Architecture
@@ -155,11 +156,11 @@ Upgrading ERPNext means bumping the chart and image, then running the schema mig
 
 1. Take a fresh backup first. Confirm a recent logical dump exists (`kubectl -n erpnext get backup erpnext-db-backup`) and a recent restic snapshot (see the restic listing command in Backups). Do not migrate without a restorable backup.
 2. Bump the versions in `kubernetes/apps/erpnext/erpnext/app/helmrelease.yaml`: `spec.chart.spec.version` (chart `erpnext`) and `spec.values.image.tag` (image `frappe/erpnext`). Renovate opens these as `feat(helm):` / `fix(container):` pull requests.
-3. Run the migration. The chart ships `templates/job-migrate-site.yaml` (gated by `jobs.migrate.enabled`, which stays `false` in the HelmRelease). Render it with `helm template` using the chart version and the values extracted from the HelmRelease, then commit the rendered Job into the existing `kubernetes/apps/erpnext/erpnext/setup/` directory (or a sibling job directory) under a versioned name, for example `erpnext-migrate-v1`, bumping the suffix (`-vN`) for each re-run.
-4. Reconcile and watch: `kubectl -n erpnext get job erpnext-migrate-v1` and `kubectl -n erpnext logs job/erpnext-migrate-v1` show the `bench migrate` progress and any schema errors.
-5. Rollback: app rollback is `git revert` of the version bump plus `flux reconcile kustomization erpnext -n flux-system`. Data rollback is a restore from the backup taken in step 1 (SQL dump plus the files snapshot).
+3. Run the migration. The chart ships `templates/job-migrate-site.yaml` (gated by `jobs.migrate.enabled`, which stays `false` in the HelmRelease). Render it with `helm template` using the chart version and the values extracted from the HelmRelease, then commit the rendered Job into the existing `kubernetes/apps/erpnext/erpnext/setup/` directory under a versioned name, for example `erpnext-migrate-v1`, bumping the suffix (`-vN`) for each re-run. The committed Job pins the new image and runs `set-maintenance-mode on` → `bench migrate` → `set-maintenance-mode off`; `set -o errexit` makes a failed migrate exit non-zero and leave the site in maintenance mode.
+4. Reconcile and watch: `kubectl -n erpnext get job erpnext-migrate-v1` and `kubectl -n erpnext logs job/erpnext-migrate-v1` show the `bench migrate` progress and any schema errors. Also watch the `erpnext` HelmRelease rollout, since the app tier restarts on the new image in parallel.
+5. Rollback: app rollback is `git revert` of the version bump plus `flux reconcile kustomization erpnext -n flux-system`. Data rollback is a restore from the backup taken in step 1 (SQL dump plus the files snapshot). Note a `git revert` restores the old image only; schema changes applied by `migrate` are not reverted, so a data restore is required if the old image is incompatible.
 
-This migrate flow has not been exercised yet in this cluster; it is the documented procedure based on the chart's `job-migrate-site.yaml` template and matches the create-site rendering convention. Treat the first real migration as a drill: do it on a fresh backup and watch the Job logs.
+Renovate also bumps the `frappe/erpnext` tag inside the immutable bootstrap Jobs (`job-create-site.yaml`, `job-erpnext-sso.yaml`). Rename those Jobs (`-vN`) in the same change, or Flux will fail the `erpnext-setup` Kustomization with `spec.template: field is immutable`, which also blocks the migrate Job from being applied. The first migration under this flow is `erpnext-migrate-v1` for chart 8.0.93 / image v16.60.0 (from v16.54.0).
 
 ## SSO
 
@@ -172,7 +173,7 @@ Login flow:
 3. Authentik authenticates the user and redirects back to the registered callback `/api/method/frappe.integrations.oauth2_logins.custom/authentik`.
 4. ERPNext exchanges the code at `/application/o/token/`, reads the userinfo at `/application/o/userinfo/`, and links or creates the local user by the `sub` claim.
 
-The Social Login Key is created by the one-shot `erpnext-sso-v3` Job (`kubernetes/apps/erpnext/erpnext/sso/job-erpnext-sso.yaml`). It waits for the site, sets the site `host_name` to `https://erpnext.${SECRET_DOMAIN}` (so Frappe emits an `https://` `redirect_uri`), then inserts a `Social Login Key` doc with `social_login_provider: Custom`, `provider_name: authentik`, `base_url: https://auth.${SECRET_DOMAIN}`, `custom_base_url: 1`, and `sign_ups: Allow`. It reads `client-id` and `client-secret` from `erpnext-oidc` and skips the insert when the `authentik` key already exists, so re-runs are idempotent.
+The Social Login Key is created by the one-shot `erpnext-sso-v8` Job (`kubernetes/apps/erpnext/erpnext/sso/job-erpnext-sso.yaml`). It waits for the site, sets the site `host_name` to `https://erpnext.${SECRET_DOMAIN}` (so Frappe emits an `https://` `redirect_uri`), then inserts a `Social Login Key` doc with `social_login_provider: Custom`, `provider_name: authentik`, `base_url: https://auth.${SECRET_DOMAIN}`, `custom_base_url: 1`, and `sign_ups: Allow`. It reads `client-id` and `client-secret` from `erpnext-oidc` and skips the insert when the `authentik` key already exists, so re-runs are idempotent.
 
 Admin email linkage caveat: SSO links an Authentik identity to a local ERPNext user by email. The site's first administrator is created by `bench new-site` with the admin password from `erpnext-secret`; until that administrator's email matches the Authentik user's email (or a user is created for the SSO identity), the first SSO login will create or link a separate user rather than logging in as the site administrator. Set the administrator email (or use Authentik's `akadmin` email) before relying on SSO for admin access. Local password login keeps working alongside SSO.
 
@@ -189,7 +190,7 @@ Then reconcile the Authentik and `erpnext` Kustomizations so both copies land to
 
 Disabling SSO: turn `enable_social_login` off, or delete the `Social Login Key` doc for provider `authentik` (for example `bench --site erpnext.${SECRET_DOMAIN} execute frappe.client.delete --kwargs '{"doctype":"Social Login Key","name":"authentik"}'`). Local email/password login is unaffected.
 
-Status (verified 2026-10-14): SSO is ACTIVE. The one-shot `erpnext-sso-v3` Job is `Complete 1/1`, the `authentik` Social Login Key exists, and the login page renders a "Login with authentik" button whose authorize hop returns HTTP 302 into the Authentik flow; local admin login returns HTTP 200. The authorize hop is the SSO health check.
+Status (SSO verified 2026-10-14 with `erpnext-sso-v3`): SSO is ACTIVE. The one-shot SSO Job is `Complete 1/1`, the `authentik` Social Login Key exists, and the login page renders a "Login with authentik" button whose authorize hop returns HTTP 302 into the Authentik flow; local admin login returns HTTP 200. The authorize hop is the SSO health check.
 
 History: v1 failed with `TypeError: insert() got an unexpected keyword argument 'doctype'` because `bench execute frappe.client.insert` expects the document wrapped as `{"doc": {...}}`, not the fields at the top level. v2 corrected the payload but the authorize hop returned HTTP 400 (`invalid, or mismatching redirection URI`) because the site's `host_name` was unset, so Frappe built the `redirect_uri` with an `http://` scheme against the blueprint's strict `https://` registration. v3 bakes in the `host_name` fix and the idempotency guard, so a rebuild is reproducible. Local email/password login keeps working alongside SSO.
 
@@ -226,10 +227,10 @@ kubectl -n erpnext get replicationsource erpnext-backup
 
 ## Caveats
 
-- Jobs are immutable. To re-run `erpnext-create-site-v2` or `erpnext-sso-v3`, bump the version suffix (`-v2` → `-v3`, `-v3` → `-v4`), commit, and push. Flux creates a new Job with the new name; re-applying the identical committed Job is a no-op and will not create a second site.
+- Jobs are immutable. To re-run `erpnext-create-site-v6`, `erpnext-migrate-v1`, or `erpnext-sso-v8`, bump the version suffix (`-v6` → `-v7`, `-v1` → `-v2`, `-v8` → `-v9`), commit, and push. Flux creates a new Job with the new name; re-applying the identical committed Job is a no-op and will not create a second site.
 - After `create-site`, gunicorn does not restart itself (the chart has no pod-template checksum annotation or restart hook). If the site was just created and `/login` unexpectedly returns 404 or 500, restart gunicorn once: `kubectl -n erpnext delete pod -l app.kubernetes.io/name=erpnext-gunicorn`. The ReplicaSet recreates it from the unchanged spec. This is an operational restart only; no manifest change.
 - The Authentik blueprint uses no-delete semantics: removing the blueprint entry does not delete the provider or application in Authentik. Clean those up in the Authentik UI/API if you retire SSO.
-- `host_name`: the `erpnext-sso-v3` Job sets the site `host_name` to `https://erpnext.${SECRET_DOMAIN}` so the authorize hop emits an `https://` `redirect_uri` matching the blueprint's strict registration. If the public URL ever changes, update that value (or run `bench --site erpnext.${SECRET_DOMAIN} set-config host_name https://erpnext.${SECRET_DOMAIN}`) and re-run the SSO Job.
+- `host_name`: the `erpnext-sso-v8` Job sets the site `host_name` to `https://erpnext.${SECRET_DOMAIN}` so the authorize hop emits an `https://` `redirect_uri` matching the blueprint's strict registration. If the public URL ever changes, update that value (or run `bench --site erpnext.${SECRET_DOMAIN} set-config host_name https://erpnext.${SECRET_DOMAIN}`) and re-run the SSO Job.
 - No Prometheus alerting rules were added for ERPNext on purpose. Backup and health visibility is via the status-check commands above, not alerts.
 - `bench execute frappe.db.get_value --doctype ...` (used in the plan's acceptance criteria) is not a valid bench invocation in v16; use a `bench --site ... execute <method> --kwargs '<json>'` form instead.
 - Ceph volumes are not encrypted at rest; accepted for home use.
