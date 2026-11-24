@@ -15,21 +15,3 @@ spec:
   resources:
     requests:
       storage: 80Gi
----
-# Destination for the 2026-11-24 capacity move: ollama models live on the HDD
-# economy tier, which is regenerable and not latency-sensitive like the databases.
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ollama-models-economy
-  namespace: ollama
-  labels:
-    app.kubernetes.io/name: ollama
-    app.kubernetes.io/instance: ollama
-spec:
-  storageClassName: ceph-block-economy
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 80Gi
