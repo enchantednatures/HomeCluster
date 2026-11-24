@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/k8s/job-v1.json
+---
+# One-shot `bench migrate` for the chart 8.0.93 / frappe/erpnext v16.60.0 bump
+# (ERPNext v16.54.0 -> v16.60.0). Rendered from the chart's
+# `templates/job-migrate-site.yaml` with the values from the HelmRelease and
+# `jobs.migrate.enabled=true`.
+#
+# Pinned to melusine: during the 2026-11-24 Ceph incident the CephFS subvolume
+# userid mapping could not be written from nodes that had not already staged the
+# volume. melusine already has erpnext-sites mounted and writable.
+#
+# Jobs are immutable: bump the version suffix (`-vN`) for every re-run/migration.
+# `set -o errexit` is added to the chart's script so a failed migrate leaves the
+# site in maintenance mode instead of reporting Complete.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: erpnext-migrate-v1
+  namespace: erpnext
+  labels:
+    helm.sh/chart: erpnext-8.0.93
+    app.kubernetes.io/name: erpnext
+    app.kubernetes.io/instance: erpnext
+    app.kubernetes.io/version: "v16.60.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: erpnext
+      nodeSelector:
+        kubernetes.io/hostname: melusine
+      securityContext:
+        supplementalGroups:
+          - 1000
+      containers:
+        - name: migrate
+          image: "frappe/erpnext:v16.60.0"
+          imagePullPolicy: IfNotPresent
+          command:
+            - bash
+            - -c
+          args:
+            - >
+              set -o errexit -o pipefail;
+              bench --site $${SITE_NAME} set-maintenance-mode on;
+              bench --site $${SITE_NAME} migrate;
+              bench --site $${SITE_NAME} set-maintenance-mode off;
+          env:
+            - name: "SITE_NAME"
+              value: "erpnext.${SECRET_DOMAIN}"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            capabilities:
+              add:
+                - CAP_CHOWN
+          volumeMounts:
+            - name: sites-dir
+              mountPath: /home/frappe/frappe-bench/sites
+            - name: logs
+              mountPath: /home/frappe/frappe-bench/logs
+      restartPolicy: Never
+      volumes:
+        - name: sites-dir
+          persistentVolumeClaim:
+            claimName: erpnext-sites
+            readOnly: false
+        - name: logs
+          emptyDir: {}
