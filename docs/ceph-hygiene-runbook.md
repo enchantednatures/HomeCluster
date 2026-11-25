@@ -174,6 +174,32 @@ Task 7 investigated this warning in depth. Full detail is in `.sisyphus/evidence
 - The elevated field is `state_aio_wait_lat` (about 11.7 ms, roughly ten times peers), which points at block-device I/O wait on the QEMU virtual disk. The RocksDB sync path is actually the fastest of the sampled OSDs (`submit_sync_latency` about 3.99 ms), so this is not a DB or WAL placement problem.
 - All SMART status checks pass, there is no `DEVICE_HEALTH` warning, BlueFS is 94.3 percent free, and allocator fragmentation is about 0.05 percent.
 
+### Second fault: melusine was blocklisted
+
+Even after the pool was writable the volume would not attach: the CSI node
+plugin returned `rados: ret=-108, Cannot send after transport endpoint
+shutdown`, and `ceph osd blocklist ls` held a three-year entry for the whole
+node plus 23 stale per-session entries for dead pod IPs:
+
+    cidr:192.168.1.148:0/32 2029-11-24T22:17:44
+
+`ceph osd blocklist clear` removed them. (The `rm` subcommand cannot parse the
+`cidr:...:0/32` form on Ceph 20.2.5, so `clear` is the practical route.) After
+that the images mapped and the filesystems mounted `r/w`. A long-lived node
+blocklist makes every RBD volume on that node look read-only, so check
+`ceph osd blocklist ls` before treating `-108` as a storage failure.
+
+### Outcome
+
+`authentik-db-2` recovered through WAL replay and reached "database system is
+ready to accept connections"; both `authentik-server` pods returned 2/2 and
+`/-/health/live/` plus `/-/health/ready/` return 200. `authentik-db-1` did not:
+its PGDATA is from 2026-11-21 on timeline 44 with no valid checkpoint
+(`could not locate a valid checkpoint record at 12D/4D000028`) and the WAL
+restore refuses the primary's newer timeline (45/46). That replica needs a
+re-clone from the primary (delete its PVC and let CNPG rebuild it); the running
+service does not depend on it.
+
 ### Decision
 
 T7b (metadataDevice reprovision) is **NO-GO** and void. The slow OSD is already SSD-backed, so a metadata device would provide no benefit, and `osd.8` is a no-touch guardrail. The only HDDs where a metadata device could theoretically help (`osd.0` to `osd.2`) are also no-touch (`melusine`), and `osd.4` to `osd.7` are not slow.
