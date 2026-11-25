@@ -501,7 +501,7 @@ simultaneous OSD failures.
 At `size 1` CRUSH takes the *first* OSD of the old up set. Eight PGs had
 `up [8,3]`, so they would have re-mapped onto `osd.8` - the OSD holding no copy
 and no space - and stayed `active+remapped+backfill_toofull` permanently.
-`Job/rook-ceph-ssd-single-copy-v1` waits for `size 1`, then pins only the
+`Job/rook-ceph-ssd-single-copy-v2` waits for `size 1`, then pins only the
 mismatched PGs to their acting primary with `ceph osd pg-upmap-items <pgid>
 <acting_primary>`. No data moves. Clean PGs (including the two that legitimately
 live on `osd.8`) are left alone; `osd.8` is expected to fall below
@@ -511,7 +511,7 @@ live on `osd.8`) are left alone; `osd.8` is expected to fall below
 
 1. `flux get kustomizations` - wait for the rook-ceph app to reconcile.
 2. `ceph osd pool get ceph-blockpool-ssd size` -> `1`.
-3. `kubectl -n rook-ceph wait --for=condition=complete job/rook-ceph-ssd-single-copy-v1` and read its log for `single-copy pin complete`.
+3. `kubectl -n rook-ceph wait --for=condition=complete job/rook-ceph-ssd-single-copy-v2` and read its log for `single-copy pin complete`.
 4. Delete the CNPG pods so the volumes are unmounted and remounted `rw`
    (a container restart is not enough - the read-only superblock survives it):
    `kubectl -n authentik delete pod authentik-db-1 authentik-db-2`

@@ -22,7 +22,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: rook-ceph-ssd-single-copy-v1
+  name: rook-ceph-ssd-single-copy-v2
   namespace: rook-ceph
   labels:
     app.kubernetes.io/name: rook-ceph-ssd-single-copy
@@ -96,20 +96,21 @@ spec:
               #     primary back onto the acting primary. That is the OSD that
               #     actually holds the data, so the PG becomes clean with no
               #     backfill. PGs already mapped to their acting primary are
-              #     skipped so no data is moved.
+              #     skipped so no data is moved. pg-upmap-items takes explicit
+              #     from/to OSD pairs, hence carrying up_primary as well.
               pins=$(mktemp)
               ceph pg ls-by-pool "${POOL}" --format=json \
                 | jq -r '.pg_stats[]
                          | select(.acting_primary > 0)
                          | select(.up_primary != .acting_primary)
-                         | "\(.pgid) \(.acting_primary)"' > "${pins}"
+                         | "\(.pgid) \(.up_primary) \(.acting_primary)"' > "${pins}"
 
               if [ ! -s "${pins}" ]; then
                 echo "nothing to pin: every ${POOL} PG already maps to its acting primary"
               else
-                while read -r pgid target; do
-                  echo "pinning ${pgid} -> osd.${target} (pg-upmap-items)"
-                  ceph osd pg-upmap-items "${pgid}" "${target}"
+                while read -r pgid up target; do
+                  echo "pinning ${pgid}: osd.${up} -> osd.${target} (pg-upmap-items)"
+                  ceph osd pg-upmap-items "${pgid}" "${up}" "${target}"
                 done < "${pins}"
               fi
               rm -f "${pins}"
