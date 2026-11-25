@@ -15,6 +15,7 @@ resources:
   - ./ceph-crash-hygiene.yaml
   - ./ceph-reclass-job.yaml
   - ./ceph-rehome-ssd-job.yaml
+  - ./ceph-blockpool-hdd-job.yaml
   - ./ceph-ssd-single-copy-job.yaml
   - ./ceph-reclass-nvme-job.yaml
   - ./ceph-endstate-verify.yaml

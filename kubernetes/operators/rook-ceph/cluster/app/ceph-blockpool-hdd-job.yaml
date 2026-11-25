@@ -1,0 +1,184 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# One-shot CRUSH move for ceph-blockpool -> HDD only.
+#
+# Rook does not re-home an existing CephBlockPool's CRUSH rule when
+# spec.deviceClass/failureDomain changes, so the live pool must be repointed
+# explicitly. The old `ceph-blockpool` rule (take default + host) is retained
+# for rollback; this Job creates `ceph-blockpool-hdd-osd` (take default~hdd +
+# osd) and points the pool at it.
+#
+# ORDER IS LOAD-BEARING:
+#   1. idempotency guard - exit 0 if the pool already resolves to a rule
+#                          that takes default~hdd.
+#   2. preflight          - require at least two hdd OSDs up/in.
+#   3. health gate        - refuse on PG_DAMAGED / incomplete / stale.
+#   4. create rule + set pool crush_rule, size 2, min_size 2.
+#
+# The backfill runs asynchronously after the Job exits. No TTL: a completed
+# Job must persist so Flux does not re-run the move.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ceph-blockpool-hdd-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: ceph-blockpool-hdd
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ceph-blockpool-hdd
+        app.kubernetes.io/component: maintenance
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      nodeSelector:
+        kubernetes.io/hostname: work-01
+      containers:
+        - name: ceph-blockpool-hdd
+          image: rook/ceph:v1.21.2 # datasource=docker depName=rook/ceph
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              POOL="ceph-blockpool"
+              RULE="ceph-blockpool-hdd-osd"
+
+              # 1. Idempotency: any rule that takes default~hdd is already done.
+              current_rule=$(ceph osd pool get "${POOL}" crush_rule | awk -F': ' '{print $2}')
+              if ceph osd crush rule dump "${current_rule}" --format=json 2>/dev/null \
+                | jq -e '[.steps[]?.item_name] | index("default~hdd") != null' >/dev/null; then
+                echo "ceph-blockpool already uses ${current_rule} (default~hdd); nothing to do"
+                ceph osd pool get "${POOL}" size
+                ceph osd pool get "${POOL}" crush_rule
+                exit 0
+              fi
+
+              # 2. Preflight: at least two HDD OSDs up and in.
+              hdd_up=$(ceph osd tree --format=json | jq '
+                [ .nodes[]
+                  | select(.type == "osd")
+                  | select(.device_class == "hdd")
+                  | select(.status == "up")
+                  | select((.reweight // 1) > 0)
+                ] | length')
+              echo "hdd osds up/reweighted: ${hdd_up}"
+              if [ "${hdd_up}" -lt 2 ]; then
+                echo "refusing: need at least 2 usable hdd osds"
+                exit 1
+              fi
+
+              # 3. Refuse hard health hazards; allow the existing degraded /
+              #    backfill_toofull state that this move is meant to resolve.
+              bad=$(ceph health detail 2>&1 | grep -E 'PG_DAMAGED|PG_INCOMPLETE|incomplete|stale' || true)
+              if [ -n "${bad}" ]; then
+                echo "refusing: hard health hazard:"
+                printf '%s\n' "${bad}"
+                exit 1
+              fi
+
+              # 4. Create the HDD-only rule if absent, then repoint the pool.
+              if ceph osd crush rule dump "${RULE}" >/dev/null 2>&1; then
+                echo "rule ${RULE} already exists; reusing it"
+                ceph osd crush rule dump "${RULE}" --format=json \
+                  | jq -e '[.steps[]?.item_name] | index("default~hdd") != null' >/dev/null \
+                  || { echo "refusing: ${RULE} does not take default~hdd"; exit 1; }
+              else
+                ceph osd crush rule create-replicated "${RULE}" default osd hdd
+              fi
+
+              ceph osd pool set "${POOL}" crush_rule "${RULE}"
+              ceph osd pool set "${POOL}" size 2
+              ceph osd pool set "${POOL}" min_size 2
+
+              echo "=== resulting pool ==="
+              ceph osd pool get "${POOL}" size
+              ceph osd pool get "${POOL}" min_size
+              ceph osd pool get "${POOL}" crush_rule
+              ceph osd crush rule dump "${RULE}" --format=json | jq -c '[.steps[]|{op,item_name,type}]'
+              echo "=== cluster ==="
+              ceph -s
+              echo "ceph-blockpool rule move initiated; HDD backfill runs asynchronously"
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5

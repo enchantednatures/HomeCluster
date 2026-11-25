@@ -8,16 +8,18 @@ metadata:
   labels:
     app.kubernetes.io/part-of: rook-ceph
 spec:
-  failureDomain: host
+  # HDD-only default tier. All HDDs currently live on melusine, so this pool
+  # uses failureDomain: osd and accepts node-level risk. The runtime CRUSH
+  # move is performed by Job/ceph-blockpool-hdd-v1 because Rook v1.20.7 does
+  # not re-home an existing pool's rule when spec.deviceClass changes.
+  failureDomain: osd
+  deviceClass: hdd
   replicated:
-    # Two copies across two hosts. Replica 3 was consuming ~640 GiB more than
-    # the cluster can spare: the default ceph-block class is the largest
-    # consumer (53 PVCs) and spans every OSD, so its third copy was also the
-    # main thing filling the ssd/nvme OSDs used by the dedicated fast pools.
+    # Two HDD copies on melusine; replica 3 was consuming ~640 GiB more than
+    # the cluster can spare. The ssd/nvme classes are reserved for their own
+    # pools and no longer receive ceph-blockpool replicas.
     size: 2
     requireSafeReplicaSize: true
-    replicasPerFailureDomain: 1
-    subFailureDomain: osd
   parameters:
     # Manual PG sizing: the pg_autoscaler cannot operate while device-class
     # shadow roots (default~hdd/ssd/nvme) overlap, so PG counts are explicit.
