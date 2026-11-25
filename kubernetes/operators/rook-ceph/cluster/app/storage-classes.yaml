@@ -10,7 +10,11 @@ metadata:
 spec:
   failureDomain: host
   replicated:
-    size: 3
+    # Two copies across two hosts. Replica 3 was consuming ~640 GiB more than
+    # the cluster can spare: the default ceph-block class is the largest
+    # consumer (53 PVCs) and spans every OSD, so its third copy was also the
+    # main thing filling the ssd/nvme OSDs used by the dedicated fast pools.
+    size: 2
     requireSafeReplicaSize: true
     replicasPerFailureDomain: 1
     subFailureDomain: osd

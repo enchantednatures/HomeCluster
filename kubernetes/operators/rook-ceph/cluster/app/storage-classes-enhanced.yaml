@@ -1,5 +1,12 @@
 ---
 # High-performance block pool optimized for SSDs
+#
+# SINGLE COPY BY DESIGN. `default~ssd` only holds osd.3 (447GiB) and osd.8
+# (932GiB). osd.8 is itself ~94% full of *other* pools (ceph-blockpool and the
+# RGW bucket pool), so a second replica can never be placed there and every PG
+# sat `active+undersized+degraded+backfill_toofull` with osd.8 backfillfull.
+# The pool only holds ~354GiB of data, which fits on osd.3 alone. Do not raise
+# this to 2 until the fast OSDs have real headroom.
 # yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
@@ -12,7 +19,7 @@ metadata:
 spec:
   failureDomain: host
   replicated:
-    size: 2
+    size: 1
     requireSafeReplicaSize: false
   deviceClass: ssd
   parameters:
@@ -119,6 +126,10 @@ mountOptions:
   - discard
 ---
 # Ultra-high-performance block pool optimized for NVMe drives
+#
+# SINGLE COPY BY DESIGN, same reason as ceph-blockpool-ssd: the nvme OSDs
+# (osd.4-7, 233GiB each) are ~94% full of ceph-blockpool and RGW data, leaving
+# only a few GiB of pool headroom at size 2. This pool holds <1GiB today.
 # yaml-language-server: $schema=https://kubernetesjsonschema.dev/master-standalone-strict/_definitions.json
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
@@ -131,7 +142,7 @@ metadata:
 spec:
   failureDomain: host
   replicated:
-    size: 2
+    size: 1
     requireSafeReplicaSize: false
   deviceClass: nvme  # osd.4-7: 250GB WD Blue SN570 NVMe passed to work-00..03
   parameters:

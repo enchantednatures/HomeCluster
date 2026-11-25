@@ -258,7 +258,7 @@ This Job also has no `ttlSecondsAfterFinished`, so a completed run persists and 
 - Unarchived crash count is 0 (`ceph crash ls-new --format=json` has length 0).
 - `osd.4` to `osd.7` sit under `default~nvme`; `osd.3` and `osd.8` under `default~ssd` in `ceph osd crush tree --show-shadow`.
 - `ceph-blockpool-nvme` takes `default~nvme` (rule `ceph-blockpool-nvme-nvme`) and `ceph-blockpool-ssd` takes `default~ssd` (rule `ceph-blockpool-ssd-ssd`); both resolve to a canonical `ceph-blockpool-*` rule. The old `default~hdd` rules are retained for rollback (section 8).
-- Both pools show `size 2` and `min_size 1` (the two-host SSD constraint makes replica 3 impossible on `default~ssd`; `default~nvme` is held at 2 by choice).
+- Both media pools show `size 1` and `min_size 1` since the 2026-11-25 single-copy change (section 14); `ceph-blockpool` shows `size 2`. The Job file still asserts the pre-2026-11-25 `size 2` and must be bumped to a `-v4` Job once the cluster is back inside the accepted end state.
 - `ceph health detail` shows no PG degradation. A transient `PG_AVAILABILITY` (`peering`/`remapped`/`laggy`) is retried up to 6 times with 15s between tries and passes on the first clean sample; persistent `PG_AVAILABILITY`, or any `undersized`/`incomplete`/`stale`/`PG_DEGRADED`/`PG_DAMAGED`, fails.
 - `ceph osd tree` shows `osd.4` to `osd.7` with class `nvme`.
 
@@ -444,3 +444,89 @@ reclaim Job buys headroom; it does not change the arithmetic. Durable options:
   capacity because each host still holds one full copy of its share.
 
 Do not treat `full_ratio` changes as a fix; they only move the cliff.
+
+## 14. Single-copy fast tiers (2026-11-25)
+
+### Incident
+
+`authentik-db-1` and `authentik-db-2` crash-looped for 4 days with:
+
+```
+chmod /var/lib/postgresql/data/pgdata: read-only file system
+```
+
+The volume was mounted `rw` but the ext4 superblock had been forced read-only
+after RBD I/O errors (`emergency_ro` in `/proc/mounts`; `ext4_end_bio: I/O
+error` and `rbd: write result -16` in the `unraid-worker` kernel log). Both
+PVCs live on `ceph-block-ssd` -> `ceph-blockpool-ssd`.
+
+### Why the pool could not heal
+
+`default~ssd` contains exactly two OSDs: `osd.3` (447 GiB, melusine) and
+`osd.8` (932 GiB, unraid-worker). At `size 2` every PG needs a slot on both.
+`osd.8` was 93.6% full and flagged `backfillfull`, but almost none of that was
+this pool:
+
+| OSD | `ceph-blockpool` (1) | `rgw.buckets.data` (13) | `ceph-blockpool-ssd` (11) |
+|---|---|---|---|
+| osd.8 | 494.7 GiB | 211.4 GiB | 42.4 GiB |
+| osd.3 | 23.8 GiB | 7.0 GiB | 311.5 GiB |
+| osd.4 | 178.9 GiB | 70.4 GiB | - |
+
+`ceph-blockpool-ssd` only holds ~354 GiB, which fits on `osd.3` alone. The
+second copy had nowhere to go, so 13 of 16 PGs stuck at
+`active+undersized+degraded+remapped+backfill_toofull` with `acting [3]`, and
+the pool reported ~13 GiB of usable space against its 500 GiB quota.
+
+### Decision
+
+The cluster does not have the capacity to keep redundancy on the fast tiers.
+The default `ceph-blockpool` (53 PVCs) is the largest consumer and spans every
+OSD, so its third copy is also what fills the `ssd`/`nvme` OSDs. Replication was
+reduced instead of adding hardware:
+
+| Pool | Before | After | Effect |
+|---|---|---|---|
+| `ceph-blockpool-ssd` | size 2 | **size 1** | PGs stop needing `osd.8`; pool becomes clean on `osd.3` |
+| `ceph-blockpool-nvme` | size 2 | **size 1** | doubles the (tiny) headroom on `osd.4-7` |
+| `ceph-blockpool` | size 3 | **size 2** | frees ~640 GiB raw; usable capacity goes from raw/3 to raw/2 |
+
+`ceph-blockpool` keeps `min_size: 2`, so a single OSD loss on the default pool
+still blocks I/O. That is the price of not keeping a third copy; raise it back
+to 3 before relying on the default pool for anything that must survive two
+simultaneous OSD failures.
+
+### The upmap pin
+
+At `size 1` CRUSH takes the *first* OSD of the old up set. Eight PGs had
+`up [8,3]`, so they would have re-mapped onto `osd.8` - the OSD holding no copy
+and no space - and stayed `active+remapped+backfill_toofull` permanently.
+`Job/rook-ceph-ssd-single-copy-v1` waits for `size 1`, then pins only the
+mismatched PGs to their acting primary with `ceph osd pg-upmap-items <pgid>
+<acting_primary>`. No data moves. Clean PGs (including the two that legitimately
+live on `osd.8`) are left alone; `osd.8` is expected to fall below
+`backfillfull` once the `ceph-blockpool` shrink completes.
+
+### Recovery checklist
+
+1. `flux get kustomizations` - wait for the rook-ceph app to reconcile.
+2. `ceph osd pool get ceph-blockpool-ssd size` -> `1`.
+3. `kubectl -n rook-ceph wait --for=condition=complete job/rook-ceph-ssd-single-copy-v1` and read its log for `single-copy pin complete`.
+4. Delete the CNPG pods so the volumes are unmounted and remounted `rw`
+   (a container restart is not enough - the read-only superblock survives it):
+   `kubectl -n authentik delete pod authentik-db-1 authentik-db-2`
+5. Watch for `database system was not properly shut down; automatic recovery in progress`
+   then `database system is ready to accept connections`. I/O errors during
+   recovery mean the volume needs a filesystem check.
+
+### Follow-ups
+
+- `Job/rook-ceph-endstate-verify-v3` is a completed one-shot and still asserts
+  `size 2` for both media pools. Bump it to a `-v4` Job with `size 1` / `size 2`
+  for `ceph-blockpool`, but only once the cluster is back inside the accepted
+  end state - re-running it mid-recovery produces a permanently Failed Job.
+- Moving `ceph-blockpool` and `ceph-objectstore.rgw.buckets.data` off the
+  `ssd`/`nvme` classes would free ~700 GiB of fast-tier space and is the only
+  route back to redundancy on those tiers. See `docs/ceph-hdd-tier-plan.md`.
+- The section 13 reclaim CronJob stays suspended until
+  `OSD_BACKFILLFULL` / `PG_RECOVERY_FULL` clear.

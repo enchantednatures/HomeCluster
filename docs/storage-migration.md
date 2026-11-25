@@ -13,9 +13,9 @@
 | media bulk assets (plex library, tdarr cache) — later | `ceph-block-economy` (HDD, replica 2) | large sequential, compression |
 
 Pools backing these tiers:
-- `ceph-blockpool` — replica 3, host-domain failure, span class (any)
-- `ceph-blockpool-ssd` — replica 2 on the `ssd` CRUSH class (`osd.3` melusine + `osd.8` unraid-worker); `default~ssd` holds only two hosts, so replica 3 is impossible. History in `docs/ceph-hygiene-runbook.md` section 5.
-- `ceph-blockpool-nvme` — replica 2 on the `nvme` CRUSH class (`osd.4`-`osd.7`, the 250GB WD Blue SN570 NVMe drives of `work-00..03`). All four OSDs live on one Proxmox host, so it is not HA against PVE host loss. History in `docs/ceph-hygiene-runbook.md` section 10.
+- `ceph-blockpool` — replica 2, host-domain failure, span class (any); dropped from replica 3 on 2026-11-25, see `docs/ceph-hygiene-runbook.md` section 14.
+- `ceph-blockpool-ssd` — **replica 1** on the `ssd` CRUSH class (`osd.3` melusine + `osd.8` unraid-worker). `osd.8` is ~94% full of other pools, so a second copy cannot be placed and every PG sat degraded; single-copy is deliberate. History in `docs/ceph-hygiene-runbook.md` sections 5 and 14.
+- `ceph-blockpool-nvme` — **replica 1** on the `nvme` CRUSH class (`osd.4`-`osd.7`, the 250GB WD Blue SN570 NVMe drives of `work-00..03`). All four OSDs live on one Proxmox host, so it is not HA against PVE host loss. History in `docs/ceph-hygiene-runbook.md` sections 10 and 14.
 - `ceph-blockpool-economy` — replica 2, failureDomain `osd`, `hdd` class (melusine's 4 HDDs, ~10 TiB)
 
 ## CRUSH device classes (as provisioned)

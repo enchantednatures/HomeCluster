@@ -1,0 +1,191 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# Companion to the ceph-blockpool-ssd replica reduction (size 2 -> 1).
+#
+# Why this exists: `default~ssd` contains exactly osd.3 and osd.8, and osd.8 is
+# ~94% full of *other* pools (ceph-blockpool, the RGW bucket pool), so it cannot
+# hold the second copy. 13 of the pool's 16 PGs were stuck
+# `active+undersized+degraded+remapped+backfill_toofull` with acting [3].
+#
+# At size 1 CRUSH picks the FIRST OSD of the old up set. Half of the PGs have
+# `up [8,3]`, so they would re-map onto osd.8 - the OSD that holds no copy and
+# has no room - and stay `active+remapped+backfill_toofull` forever. This Job
+# pins those PGs to the OSD that already holds their data with pg-upmap-items,
+# which removes the phantom backfill without moving any data.
+#
+# PGs that are already clean are left alone (their up/acting primary already
+# agree); nothing is moved off osd.8. osd.8 is expected to drop below
+# backfillfull on its own once the ceph-blockpool size 3 -> 2 shrink completes.
+#
+# Idempotent: re-running after the pins are applied finds nothing to change.
+# Versioned name because Flux cannot mutate a completed Job's immutable spec.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: rook-ceph-ssd-single-copy-v1
+  namespace: rook-ceph
+  labels:
+    app.kubernetes.io/name: rook-ceph-ssd-single-copy
+    app.kubernetes.io/part-of: rook-ceph
+    app.kubernetes.io/component: maintenance
+spec:
+  backoffLimit: 0
+  # No finished-Job TTL: a completed Job must persist so Flux does not see it
+  # as absent and re-create/re-run this one-shot mutation.
+  activeDeadlineSeconds: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: rook-ceph-ssd-single-copy
+        app.kubernetes.io/component: maintenance
+    spec:
+      restartPolicy: Never
+      serviceAccountName: rook-ceph-default
+      containers:
+        - name: ceph-ssd-single-copy
+          image: rook/ceph:v1.21.0 # pinned: one-shot Job; image bumps fail immutable spec.template
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -o errexit -o pipefail
+
+              # Render keyring + ceph.conf (upstream rook toolbox pattern)
+              ENDPOINT_MOUNT="/etc/rook/mon-endpoints"
+              KEYRING_MOUNT="/var/lib/rook-ceph-mon/secret.keyring"
+              CEPH_CONFIG="/etc/ceph/ceph.conf"
+              KEYRING_FILE="/etc/ceph/keyring"
+
+              ceph_secret=$(cat "${KEYRING_MOUNT}")
+              cat <<EOF > "${KEYRING_FILE}"
+              [${ROOK_CEPH_USERNAME}]
+              key = ${ceph_secret}
+              EOF
+
+              # shellcheck disable=SC2001
+              mon_endpoints=$(cat "${ENDPOINT_MOUNT}" | sed 's/[a-z0-9_-]\+=//g')
+              cat <<EOF > "${CEPH_CONFIG}"
+              [global]
+              mon_host = ${mon_endpoints}
+
+              [client.admin]
+              keyring = ${KEYRING_FILE}
+              EOF
+
+              POOL="ceph-blockpool-ssd"
+
+              # --- 1. Wait (bounded) for Rook to reconcile the pool to size 1.
+              #     Pinning is only valid for single-copy PGs; at size 2 an upmap
+              #     to one OSD would collide with the second replica.
+              size=""
+              for i in $(seq 1 90); do
+                size=$(ceph osd pool get "${POOL}" size | awk -F': ' '{print $2}')
+                if [ "${size}" = "1" ]; then
+                  break
+                fi
+                echo "waiting for ${POOL} size=1 (currently ${size}) [${i}/90]"
+                sleep 10
+              done
+              if [ "${size}" != "1" ]; then
+                echo "FAIL: ${POOL} did not reach size=1 (last=${size})"
+                exit 1
+              fi
+
+              # --- 2. Pin every PG whose up primary differs from its acting
+              #     primary back onto the acting primary. That is the OSD that
+              #     actually holds the data, so the PG becomes clean with no
+              #     backfill. PGs already mapped to their acting primary are
+              #     skipped so no data is moved.
+              pins=$(mktemp)
+              ceph pg ls-by-pool "${POOL}" --format=json \
+                | jq -r '.pg_stats[]
+                         | select(.acting_primary > 0)
+                         | select(.up_primary != .acting_primary)
+                         | "\(.pgid) \(.acting_primary)"' > "${pins}"
+
+              if [ ! -s "${pins}" ]; then
+                echo "nothing to pin: every ${POOL} PG already maps to its acting primary"
+              else
+                while read -r pgid target; do
+                  echo "pinning ${pgid} -> osd.${target} (pg-upmap-items)"
+                  ceph osd pg-upmap-items "${pgid}" "${target}"
+                done < "${pins}"
+              fi
+              rm -f "${pins}"
+
+              # --- 3. Gate (bounded) on the pool settling.
+              unhealthy=""
+              for i in $(seq 1 60); do
+                unhealthy=$(ceph pg ls-by-pool "${POOL}" --format=json \
+                  | jq -r '[.pg_stats[]
+                            | select((.state // "") | test("undersized|degraded|down|incomplete|stale|backfill_toofull"))]
+                           | length')
+                if [ "${unhealthy}" = "0" ]; then
+                  echo "pool settled: all ${POOL} PGs healthy"
+                  break
+                fi
+                echo "waiting for ${POOL} to settle (${unhealthy} unhealthy PGs) [${i}/60]"
+                sleep 10
+              done
+              if [ "${unhealthy}" != "0" ]; then
+                echo "FAIL: ${POOL} still has ${unhealthy} unhealthy PGs"
+                ceph pg ls-by-pool "${POOL}"
+                exit 1
+              fi
+
+              ceph osd pool get "${POOL}" size
+              ceph osd pool get "${POOL}" min_size
+              ceph pg ls-by-pool "${POOL}"
+              echo "single-copy pin complete: ${POOL} is size 1 and clean"
+          env:
+            - name: ROOK_CEPH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rook-ceph-mon
+                  key: ceph-username
+          volumeMounts:
+            - name: ceph-config
+              mountPath: /etc/ceph
+            - name: mon-endpoint-volume
+              mountPath: /etc/rook
+              readOnly: true
+            - name: ceph-admin-secret
+              mountPath: /var/lib/rook-ceph-mon
+              readOnly: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 2016
+            runAsGroup: 2016
+      volumes:
+        - name: ceph-admin-secret
+          secret:
+            secretName: rook-ceph-mon
+            optional: false
+            items:
+              - key: ceph-secret
+                path: secret.keyring
+        - name: mon-endpoint-volume
+          configMap:
+            name: rook-ceph-mon-endpoints
+            items:
+              - key: data
+                path: mon-endpoints
+        - name: ceph-config
+          emptyDir: {}
+      tolerations:
+        - key: "node.kubernetes.io/unreachable"
+          operator: "Exists"
+          effect: "NoExecute"
+          tolerationSeconds: 5
