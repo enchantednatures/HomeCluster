@@ -515,7 +515,7 @@ reduced instead of adding hardware:
 |---|---|---|---|
 | `ceph-blockpool-ssd` | size 2 | **size 1** | PGs stop needing `osd.8`; pool becomes clean on `osd.3` |
 | `ceph-blockpool-nvme` | size 2 | **size 1** | doubles the (tiny) headroom on `osd.4-7` |
-| `ceph-blockpool` | size 3 | **size 2** | frees ~640 GiB raw; usable capacity goes from raw/3 to raw/2 |
+| `ceph-blockpool` | size 3, all classes | **size 2, HDD-only** | frees ~640 GiB raw and moves the default pool off the fast classes (separate commit, `ceph-blockpool-hdd-v1`) |
 
 `ceph-blockpool` keeps `min_size: 2`, so a single OSD loss on the default pool
 still blocks I/O. That is the price of not keeping a third copy; raise it back
@@ -551,8 +551,9 @@ live on `osd.8`) are left alone; `osd.8` is expected to fall below
   `size 2` for both media pools. Bump it to a `-v4` Job with `size 1` / `size 2`
   for `ceph-blockpool`, but only once the cluster is back inside the accepted
   end state - re-running it mid-recovery produces a permanently Failed Job.
-- Moving `ceph-blockpool` and `ceph-objectstore.rgw.buckets.data` off the
-  `ssd`/`nvme` classes would free ~700 GiB of fast-tier space and is the only
-  route back to redundancy on those tiers. See `docs/ceph-hdd-tier-plan.md`.
+- `ceph-blockpool` is now HDD-only (`ceph-blockpool-hdd-osd`, `failureDomain:
+  osd`, all three HDDs on melusine). `ceph-objectstore.rgw.buckets.data` still
+  spans the fast classes; moving it would free the remaining fast-tier space
+  and is the route back to redundancy there. See `docs/ceph-hdd-tier-plan.md`.
 - The section 13 reclaim CronJob stays suspended until
   `OSD_BACKFILLFULL` / `PG_RECOVERY_FULL` clear.
