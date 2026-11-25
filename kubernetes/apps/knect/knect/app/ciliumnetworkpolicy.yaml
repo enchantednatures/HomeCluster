@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cilium.io/ciliumnetworkpolicy_v2.json
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-knectd
+  namespace: knect
+spec:
+  endpointSelector:
+    matchLabels:
+      k8s:app.kubernetes.io/name: knectd
+      k8s:app.kubernetes.io/instance: knectd
+  ingress:
+    # Tailscale operator proxies -> WebUI and JSON-RPC/SSE API
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: networking
+      toPorts:
+        - ports:
+            - port: "7420"
+              protocol: TCP
+    # Knative eventing dispatcher -> tap callback
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: knative-eventing
+      toPorts:
+        - ports:
+            - port: "7421"
+              protocol: TCP
+  egress:
+    # DNS (TCP + UDP)
+    - toEndpoints:
+        - matchLabels:
+            k8s:k8s-app: kube-dns
+            k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    # Kubernetes API (pod to apiserver crosses node/host endpoints; vanilla
+    # NetworkPolicy ipBlock rules do not match node identity, must use entities)
+    - toEntities:
+        - kube-apiserver
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "6443"
+              protocol: TCP
