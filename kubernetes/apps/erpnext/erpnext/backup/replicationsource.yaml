@@ -41,9 +41,15 @@ spec:
       limits:
         cpu: 500m
         memory: 512Mi
-    # ERPNext runs as uid 1000; site files are world-readable
-    # (755 dirs / 644 files) - no moverSecurityContext override needed
-    # (mover default uid 65532 can read)
+    # Run the mover as the app uid. Site files are mostly 755/644, but some
+    # site directories are 700 owned by uid 1000 (e.g. sites/flow-server),
+    # which the mover default uid 65532 cannot read - restic then exits 3 with
+    # "at least one source file could not be read". fsGroup keeps the restic
+    # cache writable for the same uid.
+    moverSecurityContext:
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
     # Per-app label for mover pod identification/debugging
     moverPodLabels:
       app: volsync-erpnext-backup
