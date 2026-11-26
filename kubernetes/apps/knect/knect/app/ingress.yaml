@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/instance: *name
   annotations:
     tailscale.com/hostname: knect
+    # One-shot trigger: the operator only renames an existing proxy device when
+    # this annotation changes. Bump the value to force a future rename.
     tailscale.com/force-reconcile: "1"
 spec:
   ingressClassName: tailscale
