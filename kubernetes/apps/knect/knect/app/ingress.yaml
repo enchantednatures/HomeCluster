@@ -10,6 +10,7 @@ metadata:
     app.kubernetes.io/instance: *name
   annotations:
     tailscale.com/hostname: knect
+    tailscale.com/force-reconcile: "1"
 spec:
   ingressClassName: tailscale
   tls:
