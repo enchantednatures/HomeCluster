@@ -34,10 +34,14 @@ spec:
         cpu: 100m
         memory: 256Mi
       limits:
-        memory: 2Gi
+        memory: 4Gi
     probes:
       startup:
         failureThreshold: 60
+    cache:
+      # The redb snapshot is mmap'd and pushes the cgroup over smaller limits;
+      # the daemon rebuilds from watches on start, so persistence is optional.
+      enabled: false
     rbac:
       # The daemon watches every discovered API resource. The chart's curated
       # ClusterRole predates several CRDs in these operator groups; grant
