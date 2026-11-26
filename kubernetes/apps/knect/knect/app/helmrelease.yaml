@@ -31,10 +31,46 @@ spec:
   values:
     resources:
       requests:
-        cpu: 50m
-        memory: 128Mi
+        cpu: 100m
+        memory: 256Mi
       limits:
-        memory: 512Mi
+        memory: 2Gi
+    probes:
+      startup:
+        failureThreshold: 60
+    rbac:
+      # The daemon watches every discovered API resource. The chart's curated
+      # ClusterRole predates several CRDs in these operator groups; grant
+      # read-only access so watchers do not log 403s and retry forever.
+      extraRules:
+        - apiGroups:
+            - ""
+          resources:
+            - podtemplates
+          verbs:
+            - get
+            - list
+            - watch
+        - apiGroups:
+            - apps
+          resources:
+            - controllerrevisions
+          verbs:
+            - get
+            - list
+            - watch
+        - apiGroups:
+            - ceph.rook.io
+            - cluster.redpanda.com
+            - kafka.strimzi.io
+            - kyverno.io
+            - postgresql.cnpg.io
+          resources:
+            - "*"
+          verbs:
+            - get
+            - list
+            - watch
     tap:
       enabled: true
       service:
