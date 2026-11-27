@@ -53,7 +53,7 @@ spec:
         - name: otel-tracing
           opentelemetry:
             port: 4317
-            service: tempo.monitoring.svc.cluster.local
+            service: tempo-distributor.monitoring.svc.cluster.local
         - name: authentik
           envoyExtAuthzHttp:
             service: ak-outpost-istio-forward-auth.authentik.svc.cluster.local

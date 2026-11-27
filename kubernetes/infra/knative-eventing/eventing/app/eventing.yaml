@@ -8,10 +8,10 @@ metadata:
 spec:
   version: "1.23.0"
   config:
-    config-tracing:
-      backend: "zipkin"
-      zipkin-endpoint: "http://tempo.monitoring.svc.cluster.local:9411/api/v2/spans"
-      sample-rate: "0.5"
+    config-observability:
+      tracing-protocol: "http/protobuf"
+      tracing-endpoint: "http://tempo-distributor.monitoring.svc.cluster.local:4318/v1/traces"
+      tracing-sampling-rate: "0.5"
     config-br-default-channel:
       channel-template-spec: |
         apiVersion: messaging.knative.dev/v1beta1
