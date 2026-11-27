@@ -200,9 +200,9 @@ metadata:
     app.kubernetes.io/part-of: rook-ceph
     app.kubernetes.io/component: backup
 spec:
-  # Paused 2026-11-25: the fast pools are backfillfull while the orphan
-  # snapshot backlog is drained. Re-enable once capacity is stable.
-  suspend: true
+  # Resumed 2026-11-27 after the HDD-only ceph-blockpool move and orphan
+  # cleanup restored headroom on the ssd/nvme classes.
+  suspend: false
   schedule: "0 1 * * *"  # Daily at 1 AM
   timeZone: "UTC"
   concurrencyPolicy: Forbid
