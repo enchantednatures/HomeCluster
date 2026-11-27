@@ -490,3 +490,16 @@ reset-kubernetes: ## Remove rendered kubernetes configs
 reset-sops: ## Remove SOPS configuration
 	@rm -rf $(SOPS_CONFIG_FILE)
 	@echo "SOPS config cleaned"
+
+.PHONY: preview-unknown-init-pods delete-unknown-init-pods
+
+preview-unknown-init-pods:
+	@kubectl get pods -A --no-headers | \
+		awk '$$4 == "Init:ContainerStatusUnknown" {print $$1, $$2}'
+
+delete-unknown-init-pods:
+	@$(MAKE) --no-print-directory preview-unknown-init-pods | \
+		while read -r namespace pod; do \
+			kubectl delete pod "$$pod" -n "$$namespace" \
+				--ignore-not-found --wait=false || exit 1; \
+		done
