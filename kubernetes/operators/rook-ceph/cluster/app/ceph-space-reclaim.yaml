@@ -138,7 +138,7 @@ spec:
                 runAsGroup: 2016
           containers:
             - name: reclaim
-              image: rook/ceph:v1.21.2 # datasource=docker depName=rook/ceph
+              image: rook/ceph:v1.21.3 # datasource=docker depName=rook/ceph
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/bash
