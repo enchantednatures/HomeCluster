@@ -12,7 +12,7 @@ spec:
   chart:
     spec:
       chart: knectd
-      version: 1.0.1 # datasource=helm depName=knectd repository=oci://ghcr.io/enchantednatures/charts
+      version: 1.1.0 # datasource=helm depName=knectd repository=oci://ghcr.io/enchantednatures/charts
       sourceRef:
         kind: HelmRepository
         name: enchantednatures
